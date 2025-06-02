@@ -515,7 +515,7 @@
     <script src="{{ asset('admin/vendor/jsvectormap/maps/world.js') }}"></script>
 
     <!-- Dashboard Js - tùng dương -->
-    <script src="{{ asset('admin/js/pages/dashboard.js') }}"></script>
+    <script src="{{ asset('admin/js/components/apexchart-bar.js') }}"></script>
 
 
     <!-- Apex Chart Area Demo js -->
