@@ -59,13 +59,17 @@ var chart = new ApexCharts(document.querySelector("#basic-bar"), options);
 
 chart.render();
 
+
+
+
+
 //
-// GROUPED BAR CHART
+// GROUPED BAR CHART - CHART Ở TRANG DASHBOARD - TÙNG DƯƠNG
 //
-var colors = ["#1c84ee", "#4ecac2"];
+var colors = ["#22C55E", "#FF6C2F"];
 var options = {
   chart: {
-    height: 380,
+    height: 450,
     type: "bar",
     toolbar: {
       show: false,
@@ -95,16 +99,16 @@ var options = {
   },
   series: [
     {
-      name: "Series 1",
-      data: [51, 30, 31, 50, 11, 42, 30],
+      name: "Đã đóng",
+      data: [20, 30, 31, 40, 15, 42, 30],
     },
     {
-      name: "Series 2",
-      data: [46, 57, 43, 66, 24, 45, 23],
-    },
+      name: "Chưa đóng",
+      data: [15, 10, 9, 0, 25, 0, 13],
+    }
   ],
   xaxis: {
-    categories: [2016, 2017, 2018, 2019, 2021, 2022, 2023],
+    categories: ["Lớp A1", "Lớp A2", "Lớp IE", "Lớp TC1", "Lớp TC2", "Lớp IE 1", "Lớp IE 2"]
   },
   legend: {
     offsetY: 5,
@@ -125,6 +129,8 @@ var options = {
 var chart = new ApexCharts(document.querySelector("#grouped-bar"), options);
 
 chart.render();
+
+
 
 //
 // STACKED BAR CHART
