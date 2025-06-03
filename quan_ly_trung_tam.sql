@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th6 02, 2025 lúc 03:46 PM
+-- Thời gian đã tạo: Th6 03, 2025 lúc 04:59 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -147,7 +147,11 @@ INSERT INTO `classes` (`id`, `name`, `teacher_id`, `courses_id`, `start_date`, `
 (7, 'Lớp TOEIC-1', 3, 4, '2025-07-15', '2025-10-15', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
 (8, 'Lớp TOEIC-2', 4, 4, '2025-07-15', '2025-10-15', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
 (9, 'Lớp Giao tiếp-1', 5, 5, '2025-06-01', '2025-08-30', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(10, 'Lớp Giao tiếp-2', 6, 5, '2025-06-01', '2025-08-30', '2025-06-02 13:32:34', '2025-06-02 13:32:34');
+(10, 'Lớp Giao tiếp-2', 6, 5, '2025-03-01', '2025-05-30', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(13, 'Lớp A2-3', 3, 2, '2025-06-05', '2025-09-03', '2025-06-02 14:55:59', '2025-06-02 14:55:59'),
+(14, 'Lớp IELTS-3', 4, 3, '2025-06-10', '2025-09-10', '2025-06-02 14:55:59', '2025-06-02 14:55:59'),
+(15, 'Lớp TOEIC-3', 5, 4, '2025-06-15', '2025-09-15', '2025-06-02 14:55:59', '2025-06-02 14:55:59'),
+(16, 'Lớp Giao tiếp-3', 6, 5, '2025-06-20', '2025-09-20', '2025-06-02 14:55:59', '2025-06-02 14:55:59');
 
 -- --------------------------------------------------------
 
@@ -296,10 +300,10 @@ CREATE TABLE `course_payments` (
 
 INSERT INTO `course_payments` (`id`, `student_id`, `class_id`, `course_id`, `amount`, `status`, `payment_code`, `method`, `note`, `created_at`, `updated_at`) VALUES
 (1, 7, 1, 1, 5000000.00, 'paid', 'PAY001', 'Bank Transfer', NULL, '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
-(2, 8, 1, 1, 5000000.00, 'unpaid', 'PAY002', NULL, 'Chưa thanh toán', '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
+(2, 8, 1, 1, 5000000.00, 'paid', 'PAY002', NULL, 'Chưa thanh toán', '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
 (3, 9, 1, 1, 5000000.00, 'paid', 'PAY003', 'Cash', NULL, '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
 (4, 10, 1, 1, 5000000.00, 'paid', 'PAY004', 'Bank Transfer', NULL, '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
-(5, 11, 1, 1, 5000000.00, 'unpaid', 'PAY005', NULL, 'Chưa thanh toán', '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
+(5, 11, 1, 1, 5000000.00, 'paid', 'PAY005', NULL, 'Chưa thanh toán', '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
 (6, 17, 2, 1, 5000000.00, 'paid', 'PAY006', 'Cash', NULL, '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
 (7, 18, 2, 1, 5000000.00, 'unpaid', 'PAY007', NULL, 'Chưa thanh toán', '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
 (8, 19, 2, 1, 5000000.00, 'paid', 'PAY008', 'Bank Transfer', NULL, '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
@@ -344,7 +348,12 @@ INSERT INTO `course_payments` (`id`, `student_id`, `class_id`, `course_id`, `amo
 (47, 23, 10, 5, 7000000.00, 'unpaid', 'PAY047', NULL, 'Chưa thanh toán', '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
 (48, 24, 10, 5, 7000000.00, 'paid', 'PAY048', 'Bank Transfer', NULL, '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
 (49, 25, 9, 5, 7000000.00, 'paid', 'PAY049', 'Cash', NULL, '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
-(50, 26, 10, 5, 7000000.00, 'unpaid', 'PAY050', NULL, 'Chưa thanh toán', '2025-06-02 13:34:18', '2025-06-02 13:34:18');
+(50, 26, 10, 5, 7000000.00, 'unpaid', 'PAY050', NULL, 'Chưa thanh toán', '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
+(51, 12, 1, 1, 5000000.00, 'paid', 'PAYCOD01', 'Tiền mặt', NULL, '2025-06-03 02:54:26', '2025-06-03 02:54:26'),
+(52, 13, 1, 1, 5000000.00, 'paid', 'PAYCOD01', 'Tiền mặt', NULL, '2025-06-03 02:55:12', '2025-06-03 02:55:12'),
+(53, 14, 1, 1, 5000000.00, 'paid', 'PAYCOD01', 'Tiền mặt', NULL, '2025-06-03 02:55:12', '2025-06-03 02:55:12'),
+(54, 15, 1, 1, 5000000.00, 'unpaid', 'PAYCOD01', 'Tiền mặt', NULL, '2025-06-03 02:55:12', '2025-06-03 02:55:12'),
+(55, 16, 1, 1, 5000000.00, 'unpaid', 'PAYCOD01', 'Tiền mặt', NULL, '2025-06-03 02:55:12', '2025-06-03 02:55:12');
 
 -- --------------------------------------------------------
 
@@ -717,7 +726,8 @@ INSERT INTO `users` (`id`, `name`, `email`, `phone`, `password`, `gender`, `birt
 (23, 'Trần Văn Vinh', 'vinh.student@gmail.com', '0923456781', '$2y$12$hashedpassword22', 'male', '2001-05-25', NULL, 'student', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
 (24, 'Phạm Thị Xuân', 'xuan.student@gmail.com', '0934567892', '$2y$12$hashedpassword23', 'female', '2000-06-30', NULL, 'student', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
 (25, 'Lê Văn Ý', 'y.student@gmail.com', '0945678903', '$2y$12$hashedpassword24', 'male', '1999-07-05', NULL, 'student', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(26, 'Hoàng Thị Z', 'z.student@gmail.com', '0956789014', '$2y$12$hashedpassword25', 'female', '2001-08-10', NULL, 'student', '2025-06-02 13:32:34', '2025-06-02 13:32:34');
+(26, 'Hoàng Thị Z', 'z.student@gmail.com', '0956789014', '$2y$12$hashedpassword25', 'female', '2001-08-10', NULL, 'student', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(27, 'Nhân Viên 1', 'nhanvien1@gmail.com', '0987732882', 'nhanvien', 'nữ', '2000-06-01', '', 'staff', '2025-06-02 14:16:04', '2025-06-02 14:16:04');
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -901,7 +911,7 @@ ALTER TABLE `attendances`
 -- AUTO_INCREMENT cho bảng `classes`
 --
 ALTER TABLE `classes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT cho bảng `class_student`
@@ -919,7 +929,7 @@ ALTER TABLE `courses`
 -- AUTO_INCREMENT cho bảng `course_payments`
 --
 ALTER TABLE `course_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT cho bảng `fill_in_blank_answers`
@@ -1009,7 +1019,7 @@ ALTER TABLE `teacher_salary_rules`
 -- AUTO_INCREMENT cho bảng `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- Các ràng buộc cho các bảng đã đổ

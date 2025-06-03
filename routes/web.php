@@ -23,9 +23,13 @@ Route::get('/reset-password', [loginController::class, 'showResetPasswordForm'])
 Route::post('/reset-password', [loginController::class, 'resetPassword'])->name('password.update');
 
 // Route dành cho admin và nhân viên --
-Route::middleware([CheckRole::class . ':admin,staff'])->group(function () {
+Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(function () {
     // trang quản trị cho admin
     Route::get('dashboard', [DashboardController::class, 'dashBoard'])->name('admin.dashboard');
+    Route::get('dashboard/chart/{course_id}', [DashboardController::class, 'chart']);
+
+
+
 });
 
 // // Routes cho tất cả người dùng (bao gồm học sinh)

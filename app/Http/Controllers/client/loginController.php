@@ -36,7 +36,7 @@ class loginController extends Controller
             $user = User::where('email', '=', $request->input('email'))->first();
 
             if ($user && Hash::check($request->input('password'), $user->password)) {
-                // dd($user);   
+                // dd($user);
                 Auth::login($user);
                 // sau khi đăng nhập nên chuyển về trang chủ
                 if($user->role === 'admin' || $user->role === 'staff'){
@@ -95,11 +95,11 @@ class loginController extends Controller
 
             ]);
 
-           
+
             // Đăng nhập tự động sau khi đăng ký (tùy chọn)
             // Auth::login($user);
             if ($user && Hash::check($request->input('password'), $user->password)) {
-                // dd($user);   
+                // dd($user);
                 Auth::login($user);
                 // sau khi đăng nhập nên chuyển về trang chủ
                 return redirect()->route('home')->with('success', 'Đăng nhập thành công!');
@@ -117,11 +117,11 @@ class loginController extends Controller
         session()->forget('user');
         return redirect()->route('home')->with('success', 'Đăng xuất thành công!');
     }
-  
+
 
     public function showForgotPasswordForm()
-    {   
-        
+    {
+
         return view('auth/forgot-password');
     }
 
@@ -167,13 +167,13 @@ class loginController extends Controller
             return back()->withErrors(['email' => 'Không thể gửi email. Vui lòng thử lại sau.']);
         }
 
-       
+
     }
 
     // Hiển thị form đặt lại mật khẩu
     public function showResetPasswordForm()
-    {   
-        
+    {
+
         return view('auth/reset-password');
     }
 
