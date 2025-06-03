@@ -35,6 +35,8 @@
 
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
+    {{-- LINK Jquery --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 
 <body>
@@ -426,7 +428,7 @@
 
                         </li>
                     @elseif (auth()->user()->isUser())
-                         <li class="menu-title">Quản lý</li>
+                        <li class="menu-title">Quản lý</li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.dashboard') }}">
@@ -502,6 +504,7 @@
 
     </div>
 
+
     <!-- ========== Footer End ========== -->
     <!-- Vendor Javascript (Require in all Page) -->
     <script src="{{ asset('admin/js/vendor.js') }}"></script>
@@ -514,12 +517,8 @@
     <script src="{{ asset('admin/vendor/jsvectormap/maps/world-merc.js') }}"></script>
     <script src="{{ asset('admin/vendor/jsvectormap/maps/world.js') }}"></script>
 
-    <!-- Dashboard Js - tùng dương -->
-    <script src="{{ asset('admin/js/components/apexchart-bar.js') }}"></script>
-
-
     <!-- Apex Chart Area Demo js -->
-    <script src="assets/js/components/apexchart-area.js"></script>
+    {{-- <script src="assets/js/components/apexchart-area.js"></script> --}}
 
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
@@ -545,7 +544,8 @@
         }, 300000); // 5phút
     </script>
 
-    <script src="{{ asset('admin/js/pages/dashboard.js') }}"></script>
+
+    @stack('scripts')
 
 </body>
 
