@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,7 +52,7 @@
                 <div class="modal-header offcanvas-header">
                     <!-- Mobile Menu Logo -->
                     <div class="offcanvas-logo">
-                        <a href="index.html"><img src="{{ asset('client/images/logo.svg')}}" alt="#" /></a>
+                        <a href="index.html"><img src="{{ asset('client/images/logo.svg') }}" alt="#" /></a>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                         <i class="fi fi-ss-cross"></i>
@@ -114,8 +115,7 @@
                                                 <a class="offcanvas__sub_menu_item" href="product.html">Product</a>
                                             </li>
                                             <li class="offcanvas__sub_menu_li">
-                                                <a class="offcanvas__sub_menu_item"
-                                                    href="product-details.html">Product
+                                                <a class="offcanvas__sub_menu_item" href="product-details.html">Product
                                                     Details</a>
                                             </li>
                                             <li class="offcanvas__sub_menu_li">
@@ -194,7 +194,7 @@
                                 <!-- Logo  -->
                                 <div class="ed-topbar__logo">
                                     <a href="index.html">
-                                        <img src="{{ asset('client/images/logo.svg')}}" alt="logo" />
+                                        <img src="{{ asset('client/images/logo.svg') }}" alt="logo" />
                                     </a>
                                 </div>
 
@@ -314,13 +314,7 @@
                         <!-- Header Right -->
                         <div class="ed-header__right">
                             <div class="ed-header__action">
-                                <div class="ed-header__cart">
-                                    <button type="button" data-bs-toggle="offcanvas" data-bs-target="#edSidebarCart"
-                                        aria-controls="offcanvasRight" class="ed-topbar__action-icon">
-                                        <img src="{{ asset('client/images/icons/icon-grey-bag.svg')}}" alt="icon-grey-bag" />
-                                        <span>3</span>
-                                    </button>
-                                </div>
+
                                 <div class="ed-topbar__info-buttons">
                                     <button type="button" class="register-btn" data-bs-toggle="modal"
                                         data-bs-target="#registerModal">
@@ -354,10 +348,209 @@
 
 
 
+    <div id="smooth-wrapper">
+        <div id="smooth-content">
 
-    @yield('content')
+            @yield('content')
+
+            <!-- Footer area start here -->
+            <div class="footer-bg position-relative">
+                <div class="footer-bg__img">
+                    <img src="{{ asset('client/images/footer/footer-2/footer-bg.png') }}" alt="footer-bg-img" />
+                </div>
+
+                <!-- Start Call Action Area -->
+                <section class="ed-call-action position-relative">
+                    <div class="container ed-container">
+                        <div class="ed-call-action__inner position-relative">
+                            <div class="ed-call-action__shapes">
+                                <img class="ed-call-action__shape-1 rotate-ani"
+                                    src="{{ asset('client/images/call-action/call-action-1/shape-1.svg') }}"
+                                    alt="shape-1" />
+                                <img class="ed-call-action__shape-2"
+                                    src="{{ asset('client/images/call-action/call-action-1/shape-2.svg') }}"
+                                    alt="shape-2" />
+                                <img class="ed-call-action__shape-3 updown-ani"
+                                    src="{{ asset('client/images/call-action/call-action-1/shape-3.svg') }}"
+                                    alt="shape-3" />
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="ed-call-action__img">
+                                        <img src="{{ asset('client/images/call-action/call-action-1/call-action-img.png') }}"
+                                            alt="call-action-img" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12 order-class">
+                                    <div class="ed-call-action__content">
+                                        <div class="ed-section-head">
+                                            <span class="ed-section-head__sm-title">GET STARTED NOW</span>
+                                            <h3 class="ed-section-head__title">
+                                                Affordable Your Online Courses <br />
+                                                & Learning Opportunities
+                                            </h3>
+                                            <p class="ed-section-head__text">
+                                                Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia
+                                                deserunt mollit. Excepteur sint occaecat.
+                                            </p>
+                                        </div>
+                                        <div class="ed-call-action__content-btn">
+                                            <a href="course-1.html" class="ed-btn"> Start Learning Today<i
+                                                    class="fi fi-rr-arrow-small-right"></i> </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- End Call Action Area -->
+
+                <!-- Start Footer Area -->
+                <footer class="ed-footer position-relative">
+                    <!-- Footer Top -->
+                    <div class="ed-footer__top position-relative">
+                        <div class="ed-footer__shapes">
+                            <img class="ed-footer__shape-1"
+                                src="{{ asset('client/images/footer/footer-1/shape-1.svg') }}" alt="shape-1" />
+                            <img class="ed-footer__shape-2 rotate-ani"
+                                src="{{ asset('client/images/footer/footer-1/shape-2.svg') }}" alt="shape-2" />
+                            <img class="ed-footer__shape-3"
+                                src="{{ asset('client/images/footer/footer-1/shape-3.svg') }}" alt="shape-3" />
+                        </div>
+                        <div class="container ed-container">
+                            <div class="row g-0">
+                                <div class="col-lg-4 col-md-6 col-12">
+                                    <div class="ed-footer__widget ed-footer__about">
+                                        <a href="index.html" class="ed-footer__logo">
+                                            <img src="{{ asset('client/images/logo.svg') }}" alt="footer-logo" />
+                                        </a>
+                                        <p class="ed-footer__about-text">
+                                            Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia
+                                            deserunt mollit.
+                                        </p>
+                                        <ul class="ed-footer__about-social">
+                                            <li>
+                                                <a href="https://www.facebook.com/" target="_blank"><img
+                                                        src="{{ asset('client/images/icons/icon-dark-facebook.svg') }}"
+                                                        alt="icon-dark-facebook" /></a>
+                                            </li>
+                                            <li>
+                                                <a href="https://www.twitter.com/" target="_blank"><img
+                                                        src="{{ asset('client/images/icons/icon-dark-twitter.svg') }}"
+                                                        alt="icon-dark-twitter" /></a>
+                                            </li>
+                                            <li>
+                                                <a href="https://www.dribbble.com/" target="_blank"><img
+                                                        src="{{ asset('client/images/icons/icon-dark-dribbble.svg') }}"
+                                                        alt="icon-dark-dribbble" /></a>
+                                            </li>
+                                            <li>
+                                                <a href="https://www.instagram.com/" target="_blank"><img
+                                                        src="{{ asset('client/images/icons/icon-dark-instagram.svg') }}"
+                                                        alt="icon-dark-instagram" /></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-6 col-12">
+                                    <div class="ed-footer__widget">
+                                        <h4 class="ed-footer__widget-title">Links</h4>
+                                        <ul class="ed-footer__widget-links">
+                                            <li><a href="about-1.html">About Us</a></li>
+                                            <li><a href="course-1.html">Our Courses</a></li>
+                                            <li><a href="#">Pricing Plan</a></li>
+                                            <li><a href="contact.html">Contact Us</a></li>
+                                            <li><a href="blog.html">Our News</a></li>
+                                            <li><a href="faq.html">FAQ’s</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6 col-12">
+                                    <div class="ed-footer__widget contact-widget">
+                                        <h4 class="ed-footer__widget-title">Contact</h4>
+                                        <!-- Single Info  -->
+                                        <div class="ed-footer__contact">
+                                            <div class="ed-footer__contact-icon">
+                                                <img src="{{ asset('client/images/icons/icon-phone-blue.svg') }}"
+                                                    alt="icon-phone-blue" />
+                                            </div>
+                                            <div class="ed-footer__contact-info">
+                                                <span>24/7 Support</span>
+                                                <a href="tel:+532 321 33 33">+532 321 33 33</a>
+                                            </div>
+                                        </div>
+                                        <!-- Single Info  -->
+                                        <div class="ed-footer__contact">
+                                            <div class="ed-footer__contact-icon">
+                                                <img src="{{ asset('client/images/icons/icon-envelope-blue.svg') }}"
+                                                    alt="icon-envelope-blue" />
+                                            </div>
+                                            <div class="ed-footer__contact-info">
+                                                <span>Send Message</span>
+                                                <a href="mailto:eduna@gmail.com">eduna@gmail.com</a>
+                                            </div>
+                                        </div>
+
+                                        <!-- Single Info  -->
+                                        <div class="ed-footer__contact">
+                                            <div class="ed-footer__contact-icon">
+                                                <img src="{{ asset('client/images/icons/icon-location-blue.svg') }}"
+                                                    alt="icon-location-blue" />
+                                            </div>
+                                            <div class="ed-footer__contact-info">
+                                                <span>Our Locati0n</span>
+                                                <a href="#" target="_blank">32/Jenin, London</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-6 col-12">
+                                    <div class="ed-footer__widget newsletter-widget">
+                                        <h4 class="ed-footer__widget-title">Subscribe</h4>
+
+                                        <div class="ed-footer__newsletter">
+                                            <p class="ed-footer__about-text">
+                                                Enter your email address to register to our newsletter subscription
+                                            </p>
+                                            <form action="#" method="post" class="ed-footer__newsletter-form">
+                                                <input type="email" name="email" placeholder="Enter email"
+                                                    required />
+                                                <button type="submit" class="ed-btn">Subscribe Now<i
+                                                        class="fi fi-rr-arrow-small-right"></i></button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Bottom -->
+                    <div class="ed-footer__bottom">
+                        <div class="container ed-container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <p class="ed-footer__copyright-text">
+                                        Copyright 2024 Eduna | Developed By
+                                        <a href="https://themeforest.net/user/bizantheme"
+                                            target="_blank">BizanTheme</a>. All Rights Reserved
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
 
 
+
+
+
+                <!-- End Footer Area  -->
+            </div> <!-- Footer area end here -->
+        </div>
+    </div>
 
 
 
@@ -374,7 +567,7 @@
                 <!-- Auth Head  -->
                 <div class="ed-auth__modal-head">
                     <a href="index.html" class="ed-auth__modal-logo">
-                        <img src="{{ asset('client/images/logo.svg')}}" alt="logo" />
+                        <img src="{{ asset('client/images/logo.svg') }}" alt="logo" />
                     </a>
                     <h3 class="ed-auth__modal-title">Sign In Now</h3>
                     <p class="ed-auth__modal-text">
@@ -387,9 +580,9 @@
 
                 <!-- Auth Body  -->
                 <div class="ed-auth__modal-body">
-                    <form action="#" method="post" class="ed-auth__modal-form">
+                    <form action="{{ route('loginAuth') }}" method="POST" class="ed-auth__modal-form">
                         <div class="form-group">
-                            <input type="text" name="name" placeholder="Enter user name" required />
+                            <input type="email" name="email" placeholder="Enter user email" required />
                         </div>
 
                         <div class="form-group">
@@ -416,17 +609,18 @@
                         <ul class="ed-auth__modal-third-party-list">
                             <li>
                                 <a class="google-login" href="https://www.google.com/"><img
-                                        src="{{ asset('client/images/icons/icon-color-google.svg')}}" alt="icon-color-google" /></a>
+                                        src="{{ asset('client/images/icons/icon-color-google.svg') }}"
+                                        alt="icon-color-google" /></a>
                             </li>
 
                             <li>
                                 <a class="facebook-login" href="https://facebook.com/"><img
-                                        src="{{ asset('client/images/icons/icon-color-facebook.svg')}}"
+                                        src="{{ asset('client/images/icons/icon-color-facebook.svg') }}"
                                         alt="icon-color-facebook" /></a>
                             </li>
                             <li>
                                 <a class="linkedin-login" href="https://www.linkedin.com/"><img
-                                        src="{{ asset('client/images/icons/icon-color-linkedin.svg')}}"
+                                        src="{{ asset('client/images/icons/icon-color-linkedin.svg') }}"
                                         alt="icon-color-linkedin" /></a>
                             </li>
                         </ul>
@@ -449,7 +643,7 @@
                 <!-- Auth Head  -->
                 <div class="ed-auth__modal-head">
                     <a href="index.html" class="ed-auth__modal-logo">
-                        <img src="{{ asset('client/images/logo.svg" alt="logo')}}" />
+                        <img src="{{ asset('client/images/logo.svg') }}" alt="logo" />
                     </a>
                     <h3 class="ed-auth__modal-title">Sign Up Now</h3>
                     <p class="ed-auth__modal-text">
@@ -502,17 +696,18 @@
                         <ul class="ed-auth__modal-third-party-list">
                             <li>
                                 <a class="google-login" href="https://www.google.com/"><img
-                                        src="{{ asset('client/images/icons/icon-color-google.svg" alt="icon-color-google')}}" /></a>
+                                        src="{{ asset('client/images/icons/icon-color-google.svg') }}"
+                                        alt="icon-color-google" /></a>
                             </li>
 
                             <li>
                                 <a class="facebook-login" href="https://facebook.com/"><img
-                                        src="{{ asset('client/images/icons/icon-color-facebook.svg')}}"
+                                        src="{{ asset('client/images/icons/icon-color-facebook.svg') }}"
                                         alt="icon-color-facebook" /></a>
                             </li>
                             <li>
                                 <a class="linkedin-login" href="https://www.linkedin.com/"><img
-                                        src="{{ asset('client/images/icons/icon-color-linkedin.svg')}}"
+                                        src="{{ asset('client/images/icons/icon-color-linkedin.svg') }}"
                                         alt="icon-color-linkedin" /></a>
                             </li>
                         </ul>
@@ -530,7 +725,7 @@
         aria-labelledby="offcanvasRightLabel">
         <div class="ed-sidebar-header">
             <a href="index-1.html" class="ed-sidebar-logo">
-                <img src="{{ asset('client/images/logo.svg')}}" alt="logo" />
+                <img src="{{ asset('client/images/logo.svg') }}" alt="logo" />
             </a>
             <button type="button" class="text-reset" data-bs-dismiss="offcanvas" aria-label="Close">
                 <i class="fi fi-rr-cross"></i>
@@ -543,7 +738,7 @@
                 <!-- Sigle Info  -->
                 <div class="ed-contact__info-item">
                     <div class="ed-contact__info-icon">
-                        <img src="{{ asset('client/images/icons/icon-phone-blue.svg')}}" alt="icon-phone-blue" />
+                        <img src="{{ asset('client/images/icons/icon-phone-blue.svg') }}" alt="icon-phone-blue" />
                     </div>
                     <div class="ed-contact__info-content">
                         <span>24/7 Support</span>
@@ -553,7 +748,8 @@
                 <!-- Sigle Info  -->
                 <div class="ed-contact__info-item">
                     <div class="ed-contact__info-icon">
-                        <img src="{{ asset('client/images/icons/icon-envelope-blue.svg')}}" alt="icon-envelope-blue" />
+                        <img src="{{ asset('client/images/icons/icon-envelope-blue.svg') }}"
+                            alt="icon-envelope-blue" />
                     </div>
                     <div class="ed-contact__info-content">
                         <span>Send Message</span>
@@ -564,7 +760,8 @@
                 <!-- Sigle Info  -->
                 <div class="ed-contact__info-item">
                     <div class="ed-contact__info-icon">
-                        <img src="{{ asset('client/images/icons/icon-location-blue.svg')}}" alt="icon-location-blue" />
+                        <img src="{{ asset('client/images/icons/icon-location-blue.svg') }}"
+                            alt="icon-location-blue" />
                     </div>
                     <div class="ed-contact__info-content">
                         <span>Our Locati0n</span>
@@ -579,19 +776,23 @@
                 <ul class="ed-sidebar-social">
                     <li>
                         <a href="https://www.facebook.com/" target="_blank"><img
-                                src="{{ asset('client/images/icons/icon-dark-facebook.svg')}}" alt="icon-dark-facebook" /></a>
+                                src="{{ asset('client/images/icons/icon-dark-facebook.svg') }}"
+                                alt="icon-dark-facebook" /></a>
                     </li>
                     <li>
                         <a href="https://www.twitter.com/" target="_blank"><img
-                                src="{{ asset('client/images/icons/icon-dark-twitter.svg')}}" alt="icon-dark-twitter" /></a>
+                                src="{{ asset('client/images/icons/icon-dark-twitter.svg') }}"
+                                alt="icon-dark-twitter" /></a>
                     </li>
                     <li>
                         <a href="https://www.dribbble.com/" target="_blank"><img
-                                src="{{ asset('client/images/icons/icon-dark-dribbble.svg')}}" alt="icon-dark-dribbble" /></a>
+                                src="{{ asset('client/images/icons/icon-dark-dribbble.svg') }}"
+                                alt="icon-dark-dribbble" /></a>
                     </li>
                     <li>
                         <a href="https://www.instagram.com/" target="_blank"><img
-                                src="{{ asset('client/images/icons/icon-dark-instagram.svg')}}" alt="icon-dark-instagram" /></a>
+                                src="{{ asset('client/images/icons/icon-dark-instagram.svg') }}"
+                                alt="icon-dark-instagram" /></a>
                     </li>
                 </ul>
             </div>
