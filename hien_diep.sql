@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th6 03, 2025 lúc 04:59 AM
+-- Thời gian đã tạo: Th6 04, 2025 lúc 04:17 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -55,66 +55,38 @@ CREATE TABLE `attendances` (
 --
 
 INSERT INTO `attendances` (`id`, `user_id`, `schedule_id`, `date`, `status`, `note`, `created_at`) VALUES
-(1, 7, 1, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(2, 8, 1, '2025-06-02', 'absent', 'Nghỉ ốm', '2025-06-02 13:39:20'),
-(3, 9, 1, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(4, 10, 1, '2025-06-02', 'late', 'Đến muộn 10 phút', '2025-06-02 13:39:20'),
-(5, 11, 1, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(6, 12, 1, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(7, 13, 1, '2025-06-02', 'excused', 'Nghỉ có phép', '2025-06-02 13:39:20'),
-(8, 14, 1, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(9, 15, 1, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(10, 16, 1, '2025-06-02', 'absent', NULL, '2025-06-02 13:39:20'),
-(11, 17, 2, '2025-06-03', 'present', NULL, '2025-06-02 13:39:20'),
-(12, 18, 2, '2025-06-03', 'present', NULL, '2025-06-02 13:39:20'),
-(13, 19, 2, '2025-06-03', 'late', 'Đến muộn 5 phút', '2025-06-02 13:39:20'),
-(14, 20, 2, '2025-06-03', 'present', NULL, '2025-06-02 13:39:20'),
-(15, 21, 2, '2025-06-03', 'absent', 'Nghỉ không phép', '2025-06-02 13:39:20'),
-(16, 22, 2, '2025-06-03', 'present', NULL, '2025-06-02 13:39:20'),
-(17, 23, 2, '2025-06-03', 'present', NULL, '2025-06-02 13:39:20'),
-(18, 24, 2, '2025-06-03', 'excused', 'Nghỉ có phép', '2025-06-02 13:39:20'),
-(19, 25, 2, '2025-06-03', 'present', NULL, '2025-06-02 13:39:20'),
-(20, 26, 2, '2025-06-03', 'present', NULL, '2025-06-02 13:39:20'),
-(21, 7, 3, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(22, 8, 3, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(23, 9, 3, '2025-06-02', 'absent', NULL, '2025-06-02 13:39:20'),
-(24, 10, 3, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(25, 11, 3, '2025-06-02', 'late', 'Đến muộn 15 phút', '2025-06-02 13:39:20'),
-(26, 7, 4, '2025-06-04', 'present', NULL, '2025-06-02 13:39:20'),
-(27, 8, 4, '2025-06-04', 'present', NULL, '2025-06-02 13:39:20'),
-(28, 9, 4, '2025-06-04', 'present', NULL, '2025-06-02 13:39:20'),
-(29, 10, 4, '2025-06-04', 'excused', 'Nghỉ có phép', '2025-06-02 13:39:20'),
-(30, 11, 4, '2025-06-04', 'present', NULL, '2025-06-02 13:39:20'),
-(31, 7, 5, '2025-06-03', 'present', NULL, '2025-06-02 13:39:20'),
-(32, 8, 5, '2025-06-03', 'absent', NULL, '2025-06-02 13:39:20'),
-(33, 9, 5, '2025-06-03', 'present', NULL, '2025-06-02 13:39:20'),
-(34, 10, 5, '2025-06-03', 'present', NULL, '2025-06-02 13:39:20'),
-(35, 11, 5, '2025-06-03', 'late', 'Đến muộn 10 phút', '2025-06-02 13:39:20'),
-(36, 17, 6, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(37, 18, 6, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(38, 19, 6, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(39, 20, 6, '2025-06-02', 'absent', NULL, '2025-06-02 13:39:20'),
-(40, 21, 6, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(41, 7, 7, '2025-06-04', 'present', NULL, '2025-06-02 13:39:20'),
-(42, 8, 7, '2025-06-04', 'present', NULL, '2025-06-02 13:39:20'),
-(43, 9, 7, '2025-06-04', 'present', NULL, '2025-06-02 13:39:20'),
-(44, 10, 7, '2025-06-04', 'excused', 'Nghỉ có phép', '2025-06-02 13:39:20'),
-(45, 11, 7, '2025-06-04', 'present', NULL, '2025-06-02 13:39:20'),
-(46, 12, 8, '2025-06-03', 'present', NULL, '2025-06-02 13:39:20'),
-(47, 13, 8, '2025-06-03', 'present', NULL, '2025-06-02 13:39:20'),
-(48, 14, 8, '2025-06-03', 'absent', NULL, '2025-06-02 13:39:20'),
-(49, 15, 8, '2025-06-03', 'present', NULL, '2025-06-02 13:39:20'),
-(50, 16, 8, '2025-06-03', 'late', 'Đến muộn 5 phút', '2025-06-02 13:39:20'),
-(51, 17, 9, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(52, 18, 9, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(53, 19, 9, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(54, 20, 9, '2025-06-02', 'absent', NULL, '2025-06-02 13:39:20'),
-(55, 21, 9, '2025-06-02', 'present', NULL, '2025-06-02 13:39:20'),
-(56, 22, 10, '2025-06-04', 'present', NULL, '2025-06-02 13:39:20'),
-(57, 23, 10, '2025-06-04', 'present', NULL, '2025-06-02 13:39:20'),
-(58, 24, 10, '2025-06-04', 'present', NULL, '2025-06-02 13:39:20'),
-(59, 25, 10, '2025-06-04', 'excused', 'Nghỉ có phép', '2025-06-02 13:39:20'),
-(60, 26, 10, '2025-06-04', 'present', NULL, '2025-06-02 13:39:20');
+(61, 7, 21, '2025-06-09', 'present', NULL, '2025-06-09 11:00:00'),
+(62, 8, 21, '2025-06-09', 'late', 'Đến muộn 10 phút', '2025-06-09 11:00:00'),
+(63, 9, 21, '2025-06-09', 'present', NULL, '2025-06-09 11:00:00'),
+(64, 10, 21, '2025-06-09', 'absent', 'Nghỉ không phép', '2025-06-09 11:00:00'),
+(65, 7, 22, '2025-06-11', 'present', NULL, '2025-06-11 11:00:00'),
+(66, 8, 22, '2025-06-11', 'present', NULL, '2025-06-11 11:00:00'),
+(67, 9, 22, '2025-06-11', 'excused', 'Nghỉ có phép', '2025-06-11 11:00:00'),
+(68, 10, 22, '2025-06-11', 'present', NULL, '2025-06-11 11:00:00'),
+(69, 7, 24, '2025-06-10', 'present', NULL, '2025-06-10 12:00:00'),
+(70, 8, 24, '2025-06-10', 'present', NULL, '2025-06-10 12:00:00'),
+(71, 9, 24, '2025-06-10', 'late', 'Đến muộn 15 phút', '2025-06-10 12:00:00'),
+(72, 10, 24, '2025-06-10', 'present', NULL, '2025-06-10 12:00:00'),
+(73, 7, 25, '2025-06-12', 'present', NULL, '2025-06-12 12:00:00'),
+(74, 8, 25, '2025-06-12', 'absent', 'Nghỉ không phép', '2025-06-12 12:00:00'),
+(75, 9, 25, '2025-06-12', 'present', NULL, '2025-06-12 12:00:00'),
+(76, 10, 25, '2025-06-12', 'present', NULL, '2025-06-12 12:00:00'),
+(77, 7, 27, '2025-06-16', 'present', NULL, '2025-06-16 11:30:00'),
+(78, 8, 27, '2025-06-16', 'present', NULL, '2025-06-16 11:30:00'),
+(79, 9, 27, '2025-06-16', 'present', NULL, '2025-06-16 11:30:00'),
+(80, 10, 27, '2025-06-16', 'excused', 'Nghỉ có phép', '2025-06-16 11:30:00'),
+(81, 7, 28, '2025-06-18', 'present', NULL, '2025-06-18 11:30:00'),
+(82, 8, 28, '2025-06-18', 'late', 'Đến muộn 5 phút', '2025-06-18 11:30:00'),
+(83, 9, 28, '2025-06-18', 'present', NULL, '2025-06-18 11:30:00'),
+(84, 10, 28, '2025-06-18', 'present', NULL, '2025-06-18 11:30:00'),
+(85, 7, 29, '2025-06-17', 'present', NULL, '2025-06-17 12:00:00'),
+(86, 8, 29, '2025-06-17', 'present', NULL, '2025-06-17 12:00:00'),
+(87, 9, 29, '2025-06-17', 'absent', 'Nghỉ không phép', '2025-06-17 12:00:00'),
+(88, 10, 29, '2025-06-17', 'present', NULL, '2025-06-17 12:00:00'),
+(89, 7, 30, '2025-06-19', 'present', NULL, '2025-06-19 12:00:00'),
+(90, 8, 30, '2025-06-19', 'present', NULL, '2025-06-19 12:00:00'),
+(91, 9, 30, '2025-06-19', 'present', NULL, '2025-06-19 12:00:00'),
+(92, 10, 30, '2025-06-19', 'late', 'Đến muộn 10 phút', '2025-06-19 12:00:00');
 
 -- --------------------------------------------------------
 
@@ -125,10 +97,9 @@ INSERT INTO `attendances` (`id`, `user_id`, `schedule_id`, `date`, `status`, `no
 CREATE TABLE `classes` (
   `id` int(11) NOT NULL,
   `name` varchar(100) DEFAULT NULL,
-  `teacher_id` int(11) DEFAULT NULL,
   `courses_id` int(11) DEFAULT NULL,
-  `start_date` date DEFAULT NULL,
-  `end_date` date DEFAULT NULL,
+  `number_of_sessions` int(225) NOT NULL DEFAULT 0 COMMENT 'Số buổi đã học của lớp',
+  `status` enum('not_started','in_progress','completed') NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -137,21 +108,21 @@ CREATE TABLE `classes` (
 -- Đang đổ dữ liệu cho bảng `classes`
 --
 
-INSERT INTO `classes` (`id`, `name`, `teacher_id`, `courses_id`, `start_date`, `end_date`, `created_at`, `updated_at`) VALUES
-(1, 'Lớp A1-1', 2, 1, '2025-06-01', '2025-08-30', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(2, 'Lớp A1-2', 3, 1, '2025-06-01', '2025-08-30', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(3, 'Lớp A2-1', 4, 2, '2025-06-15', '2025-09-15', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(4, 'Lớp A2-2', 5, 2, '2025-06-15', '2025-09-15', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(5, 'Lớp IELTS-1', 6, 3, '2025-07-01', '2025-09-30', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(6, 'Lớp IELTS-2', 2, 3, '2025-07-01', '2025-09-30', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(7, 'Lớp TOEIC-1', 3, 4, '2025-07-15', '2025-10-15', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(8, 'Lớp TOEIC-2', 4, 4, '2025-07-15', '2025-10-15', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(9, 'Lớp Giao tiếp-1', 5, 5, '2025-06-01', '2025-08-30', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(10, 'Lớp Giao tiếp-2', 6, 5, '2025-03-01', '2025-05-30', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(13, 'Lớp A2-3', 3, 2, '2025-06-05', '2025-09-03', '2025-06-02 14:55:59', '2025-06-02 14:55:59'),
-(14, 'Lớp IELTS-3', 4, 3, '2025-06-10', '2025-09-10', '2025-06-02 14:55:59', '2025-06-02 14:55:59'),
-(15, 'Lớp TOEIC-3', 5, 4, '2025-06-15', '2025-09-15', '2025-06-02 14:55:59', '2025-06-02 14:55:59'),
-(16, 'Lớp Giao tiếp-3', 6, 5, '2025-06-20', '2025-09-20', '2025-06-02 14:55:59', '2025-06-02 14:55:59');
+INSERT INTO `classes` (`id`, `name`, `courses_id`, `number_of_sessions`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Lớp A1-1', 1, 0, 'in_progress', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(2, 'Lớp A1-2', 1, 0, 'in_progress', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(3, 'Lớp A2-1', 2, 0, 'in_progress', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(4, 'Lớp A2-2', 2, 0, 'in_progress', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(5, 'Lớp IELTS-1', 3, 0, 'in_progress', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(6, 'Lớp IELTS-2', 3, 0, 'not_started', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(7, 'Lớp TOEIC-1', 4, 0, 'not_started', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(8, 'Lớp TOEIC-2', 4, 0, 'not_started', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(9, 'Lớp Giao tiếp-1', 5, 0, 'not_started', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(10, 'Lớp Giao tiếp-2', 5, 0, 'not_started', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(13, 'Lớp A2-3', 2, 0, 'not_started', '2025-06-02 14:55:59', '2025-06-02 14:55:59'),
+(14, 'Lớp IELTS-3', 3, 0, 'not_started', '2025-06-02 14:55:59', '2025-06-02 14:55:59'),
+(15, 'Lớp TOEIC-3', 4, 0, 'not_started', '2025-06-02 14:55:59', '2025-06-02 14:55:59'),
+(16, 'Lớp Giao tiếp-3', 5, 0, 'not_started', '2025-06-02 14:55:59', '2025-06-02 14:55:59');
 
 -- --------------------------------------------------------
 
@@ -258,6 +229,7 @@ CREATE TABLE `courses` (
   `id` int(11) NOT NULL,
   `name` varchar(100) DEFAULT NULL,
   `price` decimal(11,0) DEFAULT NULL,
+  `total_sessions` int(11) NOT NULL,
   `description` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
@@ -267,12 +239,12 @@ CREATE TABLE `courses` (
 -- Đang đổ dữ liệu cho bảng `courses`
 --
 
-INSERT INTO `courses` (`id`, `name`, `price`, `description`, `created_at`, `updated_at`) VALUES
-(1, 'Tiếng Anh A1', 5000000, 'Khóa học tiếng Anh cơ bản trình độ A1', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(2, 'Tiếng Anh A2', 6000000, 'Khóa học tiếng Anh trình độ A2', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(3, 'IELTS', 10000000, 'Khóa học luyện thi IELTS', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(4, 'TOEIC', 8000000, 'Khóa học luyện thi TOEIC', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
-(5, 'Giao tiếp', 7000000, 'Khóa học tiếng Anh giao tiếp', '2025-06-02 13:32:34', '2025-06-02 13:32:34');
+INSERT INTO `courses` (`id`, `name`, `price`, `total_sessions`, `description`, `created_at`, `updated_at`) VALUES
+(1, 'Tiếng Anh A1', 5000000, 20, 'Khóa học tiếng Anh cơ bản trình độ A1', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(2, 'Tiếng Anh A2', 6000000, 22, 'Khóa học tiếng Anh trình độ A2', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(3, 'IELTS', 10000000, 30, 'Khóa học luyện thi IELTS', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(4, 'TOEIC', 8000000, 30, 'Khóa học luyện thi TOEIC', '2025-06-02 13:32:34', '2025-06-02 13:32:34'),
+(5, 'Giao tiếp', 7000000, 25, 'Khóa học tiếng Anh giao tiếp', '2025-06-02 13:32:34', '2025-06-02 13:32:34');
 
 -- --------------------------------------------------------
 
@@ -315,7 +287,7 @@ INSERT INTO `course_payments` (`id`, `student_id`, `class_id`, `course_id`, `amo
 (14, 10, 3, 2, 6000000.00, 'paid', 'PAY014', 'Bank Transfer', NULL, '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
 (15, 11, 3, 2, 6000000.00, 'unpaid', 'PAY015', NULL, 'Chưa thanh toán', '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
 (16, 17, 4, 2, 6000000.00, 'paid', 'PAY016', 'Cash', NULL, '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
-(17, 18, 4, 2, 6000000.00, 'unpaid', 'PAY017', NULL, 'Chưa thanh toán', '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
+(17, 18, 4, 2, 6000000.00, 'paid', 'PAY017', NULL, 'Chưa thanh toán', '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
 (18, 19, 4, 2, 6000000.00, 'paid', 'PAY018', 'Bank Transfer', NULL, '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
 (19, 20, 4, 2, 6000000.00, 'paid', 'PAY019', 'Cash', NULL, '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
 (20, 21, 4, 2, 6000000.00, 'unpaid', 'PAY020', NULL, 'Chưa thanh toán', '2025-06-02 13:34:18', '2025-06-02 13:34:18'),
@@ -353,7 +325,27 @@ INSERT INTO `course_payments` (`id`, `student_id`, `class_id`, `course_id`, `amo
 (52, 13, 1, 1, 5000000.00, 'paid', 'PAYCOD01', 'Tiền mặt', NULL, '2025-06-03 02:55:12', '2025-06-03 02:55:12'),
 (53, 14, 1, 1, 5000000.00, 'paid', 'PAYCOD01', 'Tiền mặt', NULL, '2025-06-03 02:55:12', '2025-06-03 02:55:12'),
 (54, 15, 1, 1, 5000000.00, 'unpaid', 'PAYCOD01', 'Tiền mặt', NULL, '2025-06-03 02:55:12', '2025-06-03 02:55:12'),
-(55, 16, 1, 1, 5000000.00, 'unpaid', 'PAYCOD01', 'Tiền mặt', NULL, '2025-06-03 02:55:12', '2025-06-03 02:55:12');
+(55, 16, 1, 1, 5000000.00, 'unpaid', 'PAYCOD01', 'Tiền mặt', NULL, '2025-06-03 02:55:12', '2025-06-03 02:55:12'),
+(56, 22, 2, 1, 5000000.00, 'unpaid', 'PAY051', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(57, 23, 2, 1, 5000000.00, 'unpaid', 'PAY052', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(58, 24, 2, 1, 5000000.00, 'unpaid', 'PAY053', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(59, 25, 2, 1, 5000000.00, 'unpaid', 'PAY054', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(60, 26, 2, 1, 5000000.00, 'unpaid', 'PAY055', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(61, 12, 3, 2, 6000000.00, 'unpaid', 'PAY056', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(62, 13, 3, 2, 6000000.00, 'unpaid', 'PAY057', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(63, 14, 3, 2, 6000000.00, 'unpaid', 'PAY058', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(64, 15, 3, 2, 6000000.00, 'unpaid', 'PAY059', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(65, 16, 3, 2, 6000000.00, 'unpaid', 'PAY060', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(66, 22, 4, 2, 6000000.00, 'unpaid', 'PAY061', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(67, 23, 4, 2, 6000000.00, 'unpaid', 'PAY062', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(68, 24, 4, 2, 6000000.00, 'unpaid', 'PAY063', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(69, 25, 4, 2, 6000000.00, 'unpaid', 'PAY064', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(70, 26, 4, 2, 6000000.00, 'unpaid', 'PAY065', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(71, 12, 5, 3, 10000000.00, 'unpaid', 'PAY066', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(72, 13, 5, 3, 10000000.00, 'unpaid', 'PAY067', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(73, 14, 5, 3, 10000000.00, 'unpaid', 'PAY068', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(74, 15, 5, 3, 10000000.00, 'unpaid', 'PAY069', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00'),
+(75, 16, 5, 3, 10000000.00, 'unpaid', 'PAY070', NULL, 'Chưa thanh toán', '2025-06-03 03:01:00', '2025-06-03 03:01:00');
 
 -- --------------------------------------------------------
 
@@ -380,6 +372,22 @@ CREATE TABLE `fill_in_blank_questions` (
   `content` text NOT NULL,
   `correct_answer` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `lessons`
+--
+
+CREATE TABLE `lessons` (
+  `id` int(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `link_document` varchar(1000) DEFAULT NULL,
+  `quizzes_id` int(255) DEFAULT NULL,
+  `course_id` int(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -435,7 +443,7 @@ CREATE TABLE `questions` (
 --
 
 CREATE TABLE `quizzes` (
-  `id` int(11) NOT NULL,
+  `id` int(255) NOT NULL,
   `title` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `access_code` varchar(20) DEFAULT NULL,
@@ -512,8 +520,10 @@ CREATE TABLE `schedules` (
   `id` int(11) NOT NULL,
   `class_id` int(11) DEFAULT NULL,
   `day_of_week` enum('Mon','Tue','Wed','Thu','Fri','Sat','Sun') DEFAULT NULL,
+  `date` date NOT NULL,
   `start_time` time DEFAULT NULL,
   `end_time` time DEFAULT NULL,
+  `teacher_id` int(255) NOT NULL,
   `room` varchar(50) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -522,27 +532,17 @@ CREATE TABLE `schedules` (
 -- Đang đổ dữ liệu cho bảng `schedules`
 --
 
-INSERT INTO `schedules` (`id`, `class_id`, `day_of_week`, `start_time`, `end_time`, `room`, `created_at`) VALUES
-(1, 1, 'Mon', '18:00:00', '20:00:00', 'Phòng 101', '2025-06-02 13:34:18'),
-(2, 1, 'Wed', '18:00:00', '20:00:00', 'Phòng 101', '2025-06-02 13:34:18'),
-(3, 2, 'Tue', '19:00:00', '21:00:00', 'Phòng 102', '2025-06-02 13:34:18'),
-(4, 2, 'Thu', '19:00:00', '21:00:00', 'Phòng 102', '2025-06-02 13:34:18'),
-(5, 3, 'Mon', '17:00:00', '19:00:00', 'Phòng 201', '2025-06-02 13:34:18'),
-(6, 3, 'Fri', '17:00:00', '19:00:00', 'Phòng 201', '2025-06-02 13:34:18'),
-(7, 4, 'Wed', '18:30:00', '20:30:00', 'Phòng 202', '2025-06-02 13:34:18'),
-(8, 4, 'Sat', '18:30:00', '20:30:00', 'Phòng 202', '2025-06-02 13:34:18'),
-(9, 5, 'Tue', '18:00:00', '20:00:00', 'Phòng 301', '2025-06-02 13:34:18'),
-(10, 5, 'Thu', '18:00:00', '20:00:00', 'Phòng 301', '2025-06-02 13:34:18'),
-(11, 6, 'Mon', '19:00:00', '21:00:00', 'Phòng 302', '2025-06-02 13:34:18'),
-(12, 6, 'Fri', '19:00:00', '21:00:00', 'Phòng 302', '2025-06-02 13:34:18'),
-(13, 7, 'Wed', '17:30:00', '19:30:00', 'Phòng 401', '2025-06-02 13:34:18'),
-(14, 7, 'Sun', '17:30:00', '19:30:00', 'Phòng 401', '2025-06-02 13:34:18'),
-(15, 8, 'Tue', '18:30:00', '20:30:00', 'Phòng 402', '2025-06-02 13:34:18'),
-(16, 8, 'Sat', '18:30:00', '20:30:00', 'Phòng 402', '2025-06-02 13:34:18'),
-(17, 9, 'Mon', '18:00:00', '20:00:00', 'Phòng 501', '2025-06-02 13:34:18'),
-(18, 9, 'Thu', '18:00:00', '20:00:00', 'Phòng 501', '2025-06-02 13:34:18'),
-(19, 10, 'Wed', '19:00:00', '21:00:00', 'Phòng 502', '2025-06-02 13:34:18'),
-(20, 10, 'Fri', '19:00:00', '21:00:00', 'Phòng 502', '2025-06-02 13:34:18');
+INSERT INTO `schedules` (`id`, `class_id`, `day_of_week`, `date`, `start_time`, `end_time`, `teacher_id`, `room`, `created_at`) VALUES
+(21, 1, 'Mon', '2025-06-09', '18:00:00', '20:00:00', 2, 'Phòng 101', '2025-06-03 19:00:00'),
+(22, 1, 'Wed', '2025-06-11', '18:00:00', '20:00:00', 2, 'Phòng 101', '2025-06-03 19:00:00'),
+(23, 1, 'Fri', '2025-06-13', '18:00:00', '20:00:00', 2, 'Phòng 101', '2025-06-03 19:00:00'),
+(24, 3, 'Tue', '2025-06-10', '19:00:00', '21:00:00', 3, 'Phòng 201', '2025-06-03 19:00:00'),
+(25, 3, 'Thu', '2025-06-12', '19:00:00', '21:00:00', 3, 'Phòng 201', '2025-06-03 19:00:00'),
+(26, 3, 'Sat', '2025-06-14', '19:00:00', '21:00:00', 3, 'Phòng 201', '2025-06-03 19:00:00'),
+(27, 5, 'Mon', '2025-06-16', '18:30:00', '20:30:00', 4, 'Phòng 301', '2025-06-03 19:00:00'),
+(28, 5, 'Wed', '2025-06-18', '18:30:00', '20:30:00', 4, 'Phòng 301', '2025-06-03 19:00:00'),
+(29, 7, 'Tue', '2025-06-17', '19:00:00', '21:00:00', 5, 'Phòng 401', '2025-06-03 19:00:00'),
+(30, 7, 'Thu', '2025-06-19', '19:00:00', '21:00:00', 5, 'Phòng 401', '2025-06-03 19:00:00');
 
 -- --------------------------------------------------------
 
@@ -588,7 +588,7 @@ INSERT INTO `scores` (`id`, `student_id`, `class_id`, `score_type`, `score`, `ex
 (21, 12, 8, 'oral', 8.5, '2025-08-01', '2025-06-02 13:39:20'),
 (22, 13, 8, '15min', 6.5, '2025-07-10', '2025-06-02 13:39:20'),
 (23, 14, 8, 'midterm', 8, '2025-08-15', '2025-06-02 13:39:20'),
-(24, 17, 9, '', 7.5, '2025-06-15', '2025-06-02 13:39:20'),
+(24, 17, 9, 'final', 7.5, '2025-06-15', '2025-06-02 13:39:20'),
 (25, 18, 9, '15min', 7, '2025-06-10', '2025-06-02 13:39:20'),
 (26, 19, 9, 'midterm', 8.5, '2025-07-15', '2025-06-02 13:39:20'),
 (27, 23, 10, '15min', 6.5, '2025-06-10', '2025-06-02 13:39:20'),
@@ -753,8 +753,7 @@ ALTER TABLE `attendances`
 --
 ALTER TABLE `classes`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `courses_id` (`courses_id`),
-  ADD KEY `fk_classes_teacher` (`teacher_id`);
+  ADD KEY `courses_id` (`courses_id`);
 
 --
 -- Chỉ mục cho bảng `class_student`
@@ -793,6 +792,13 @@ ALTER TABLE `fill_in_blank_answers`
 ALTER TABLE `fill_in_blank_questions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `quiz_id` (`quiz_id`);
+
+--
+-- Chỉ mục cho bảng `lessons`
+--
+ALTER TABLE `lessons`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `course_id` (`course_id`);
 
 --
 -- Chỉ mục cho bảng `notifications`
@@ -905,7 +911,7 @@ ALTER TABLE `answers`
 -- AUTO_INCREMENT cho bảng `attendances`
 --
 ALTER TABLE `attendances`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=93;
 
 --
 -- AUTO_INCREMENT cho bảng `classes`
@@ -929,7 +935,7 @@ ALTER TABLE `courses`
 -- AUTO_INCREMENT cho bảng `course_payments`
 --
 ALTER TABLE `course_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT cho bảng `fill_in_blank_answers`
@@ -942,6 +948,12 @@ ALTER TABLE `fill_in_blank_answers`
 --
 ALTER TABLE `fill_in_blank_questions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT cho bảng `lessons`
+--
+ALTER TABLE `lessons`
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT cho bảng `notifications`
@@ -959,7 +971,7 @@ ALTER TABLE `questions`
 -- AUTO_INCREMENT cho bảng `quizzes`
 --
 ALTER TABLE `quizzes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT cho bảng `quiz_attempts`
@@ -989,7 +1001,7 @@ ALTER TABLE `reorder_question_parts`
 -- AUTO_INCREMENT cho bảng `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT cho bảng `scores`
@@ -1042,8 +1054,7 @@ ALTER TABLE `attendances`
 -- Các ràng buộc cho bảng `classes`
 --
 ALTER TABLE `classes`
-  ADD CONSTRAINT `classes_ibfk_1` FOREIGN KEY (`courses_id`) REFERENCES `courses` (`id`),
-  ADD CONSTRAINT `fk_classes_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `classes_ibfk_1` FOREIGN KEY (`courses_id`) REFERENCES `courses` (`id`);
 
 --
 -- Các ràng buộc cho bảng `class_student`
@@ -1072,6 +1083,12 @@ ALTER TABLE `fill_in_blank_answers`
 --
 ALTER TABLE `fill_in_blank_questions`
   ADD CONSTRAINT `fill_in_blank_questions_ibfk_1` FOREIGN KEY (`quiz_id`) REFERENCES `quizzes` (`id`);
+
+--
+-- Các ràng buộc cho bảng `lessons`
+--
+ALTER TABLE `lessons`
+  ADD CONSTRAINT `lessons_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`);
 
 --
 -- Các ràng buộc cho bảng `notifications`

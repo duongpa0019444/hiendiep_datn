@@ -24,15 +24,16 @@ class dashboardController extends Controller
             FROM `users`;");
 
         $classs = DB::select("
-                SELECT
+                    SELECT
             (SELECT COUNT(*) FROM `classes`) AS total_classes,
-            (SELECT COUNT(*) FROM `classes` WHERE `start_date` <= CURDATE() AND `end_date` >= CURDATE()) AS total_classes_in_progress,
-            (SELECT COUNT(*) FROM `classes` WHERE `end_date` < CURDATE()) AS total_classes_completed,
-            (SELECT COUNT(*) FROM `classes` WHERE `start_date` > CURDATE()) AS total_classes_unstarted;
+            (SELECT COUNT(*) FROM `classes` WHERE status = 'in_progress') AS total_classes_in_progress,
+            (SELECT COUNT(*) FROM `classes` WHERE status = 'completed') AS total_classes_completed,
+            (SELECT COUNT(*) FROM `classes` WHERE status = 'not_started') AS total_classes_unstarted;
         ");
 
+
         $countPayments = DB::select("
-                    SELECT
+                SELECT
             (SELECT COALESCE(SUM(amount), 0) FROM `course_payments` WHERE `status` = 'paid') AS total_revenue,
             (SELECT COUNT(*) FROM `course_payments` WHERE `status` = 'paid') AS total_paid_records,
             (SELECT COUNT(DISTINCT student_id)
@@ -54,8 +55,7 @@ class dashboardController extends Controller
             ->select('classes.name as class_name', 'classes.id')
             ->selectRaw('COALESCE((SELECT COUNT(DISTINCT cs.student_id) FROM class_student cs WHERE cs.class_id = classes.id AND EXISTS (SELECT 1 FROM course_payments cp WHERE cp.student_id = cs.student_id AND cp.class_id = cs.class_id AND cp.status = \'paid\')), 0) as paid_students')
             ->selectRaw('COALESCE((SELECT COUNT(DISTINCT cs.student_id) FROM class_student cs WHERE cs.class_id = classes.id AND NOT EXISTS (SELECT 1 FROM course_payments cp WHERE cp.student_id = cs.student_id AND cp.class_id = cs.class_id AND cp.status = \'paid\')), 0) as unpaid_students')
-            ->where('start_date', '<=', now())
-            ->where('end_date', '>=', now())
+            ->where('status', '=', 'in_progress')
             ->when($course_id != 0, function ($query) use ($course_id) {
                 return $query->where('courses_id', $course_id);
             })
