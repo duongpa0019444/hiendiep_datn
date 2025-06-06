@@ -114,7 +114,7 @@ class loginController extends Controller
 
      public function logout()
     {
-        session()->forget('user');
+        Auth::logout();
         return redirect()->route('home')->with('success', 'Đăng xuất thành công!');
     }
 
@@ -225,4 +225,7 @@ class loginController extends Controller
         // Trả về phản hồi
         return redirect()->route('auth.login')->with('success', 'Mật khẩu đã được đặt lại thành công!');
     }
+
+
+
 }

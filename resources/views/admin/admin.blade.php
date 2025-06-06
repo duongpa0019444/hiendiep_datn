@@ -321,23 +321,7 @@
 
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/statistical">
-                                <span class="nav-icon">
-                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
-                                </span>
-                                <span class="nav-text"> Quản lí học phí </span>
-                            </a>
 
-                            {{-- <div class="collapse" id="user">
-                            <ul class="nav sub-navbar-nav">
-                                <li class="sub-nav-item">
-                                    <a class="sub-nav-link" href="/admin/user/list">Tạo khoản thu</a>
-                                </li>
-
-
-                            </ul>
-                        </div> --}}
 
                         </li>
                         <li class="nav-item">
@@ -360,11 +344,11 @@
 
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/statistical">
+                            <a class="nav-link" href="{{ route('admin.course_payments') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
+                                    <iconify-icon icon="mdi:cash"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Quản lí thanh toán</span>
+                                <span class="nav-text">Học phí & Thanh toán </span>
                             </a>
 
                             {{-- <div class="collapse" id="user">

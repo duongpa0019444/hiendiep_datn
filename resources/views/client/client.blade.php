@@ -28,7 +28,11 @@
     <link rel="stylesheet" href="{{ asset('client/plugins/css/uicons.css') }}" />
     <!-- Main CSS -->
     <link rel="stylesheet" href="{{ asset('client/style.css') }}" />
+
+
+
 </head>
+
 
 <body class="element-wrapper">
 
@@ -115,7 +119,8 @@
                                                 <a class="offcanvas__sub_menu_item" href="product.html">Product</a>
                                             </li>
                                             <li class="offcanvas__sub_menu_li">
-                                                <a class="offcanvas__sub_menu_item" href="product-details.html">Product
+                                                <a class="offcanvas__sub_menu_item"
+                                                    href="product-details.html">Product
                                                     Details</a>
                                             </li>
                                             <li class="offcanvas__sub_menu_li">
@@ -581,6 +586,7 @@
                 <!-- Auth Body  -->
                 <div class="ed-auth__modal-body">
                     <form action="{{ route('loginAuth') }}" method="POST" class="ed-auth__modal-form">
+                        @csrf
                         <div class="form-group">
                             <input type="email" name="email" placeholder="Enter user email" required />
                         </div>
@@ -851,7 +857,6 @@
 
     <!-- Main JS -->
     <script src="{{ asset('client/plugins/js/active.js') }}"></script>
-
 
 
 </body>

@@ -18,7 +18,7 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-     protected $fillable = [
+    protected $fillable = [
         'name',
         'email',
         'phone',
@@ -27,7 +27,7 @@ class User extends Authenticatable
         'gender',
         'birth_date',
         'role',
-        
+
     ];
 
     /**
@@ -53,11 +53,11 @@ class User extends Authenticatable
         ];
     }
 
-   
+
 
     public function hasAnyRole(array $roles)
     {
-         return in_array($this->role, $roles);
+        return in_array($this->role, $roles);
     }
 
 
@@ -70,5 +70,11 @@ class User extends Authenticatable
     public function isUser()
     {
         return $this->hasAnyRole(['staff']);
+    }
+
+    // Quan hệ với bảng course_payment
+    public function payments()
+    {
+        return $this->hasMany(CoursePayment::class, 'student_id');
     }
 }
