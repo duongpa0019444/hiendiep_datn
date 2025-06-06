@@ -144,7 +144,7 @@
                                             </div>
                                             <div class="col-lg-6 col-md-12 col-sm-12">
                                                 <span class="text-primary"> <i class="bx bxs-up-arrow fs-12"></i>
-                                                    {{ $countPayment->total_students_unpaid }}</span>
+                                                    {{ $countPayment->total_unpaid_records }}</span>
                                                 <span class="text-muted fs-12">Lượt chưa đóng tiền</span>
                                             </div>
                                         </div>

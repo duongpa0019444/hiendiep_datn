@@ -33,12 +33,19 @@ class dashboardController extends Controller
 
 
         $countPayments = DB::select("
-                SELECT
-            (SELECT COALESCE(SUM(amount), 0) FROM `course_payments` WHERE `status` = 'paid') AS total_revenue,
-            (SELECT COUNT(*) FROM `course_payments` WHERE `status` = 'paid') AS total_paid_records,
-            (SELECT COUNT(DISTINCT student_id)
+                        SELECT
+            (SELECT COALESCE(SUM(amount), 0)
             FROM `course_payments`
-            WHERE student_id NOT IN (SELECT student_id FROM `course_payments` WHERE `status` = 'paid')) AS total_students_unpaid;
+            WHERE `status` = 'paid') AS total_revenue,
+
+            (SELECT COUNT(*)
+            FROM `course_payments`
+            WHERE `status` = 'paid') AS total_paid_records,
+
+            (SELECT COUNT(*)
+            FROM `course_payments`
+            WHERE `status` = 'unpaid') AS total_unpaid_records;
+
         ");
 
         $courses = DB::table('courses')->get();
