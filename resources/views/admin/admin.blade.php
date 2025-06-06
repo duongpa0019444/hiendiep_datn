@@ -7,7 +7,7 @@
 <head>
     <!-- Title Meta -->
     <meta charset="utf-8" />
-    <title><?= $title ?? '' ?></title>
+    <title>@yield('title')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A fully responsive premium admin dashboard template" />
     <meta name="author" content="Techzaa" />
@@ -255,7 +255,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin">
+                            <a class="nav-link" href="{{ route('admin.account')}}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:beer-alt-twotone-loop"></iconify-icon>
                                 </span>
@@ -519,7 +519,8 @@
 
 
     <!-- Apex Chart Area Demo js -->
-    <script src="assets/js/components/apexchart-area.js"></script>
+    <script src="{{ asset('admin/js/components/apexchart-area.js') }}"></script>
+
 
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
