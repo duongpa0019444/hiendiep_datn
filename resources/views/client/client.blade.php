@@ -197,118 +197,44 @@
                             <div class="ed-header__left-widget--style2">
                                 <!-- Logo  -->
                                 <div class="ed-topbar__logo">
-                                    <a href="index.html">
+                                    <a href="{{ route('home') }}">
                                         <img src="{{ asset('client/images/logo.svg') }}" alt="logo" />
                                     </a>
                                 </div>
 
-                                <!-- Category Dropdown -->
-                                <div class="ed-topbar__search-widget">
-                                    <div class="ed-topbar__category">
-                                        <select>
-                                            <option data-display="All Categories">
-                                                All Categories
-                                            </option>
-                                            <option value="1">Business</option>
-                                            <option value="2">Marketing</option>
-                                            <option value="3">Design</option>
-                                            <option value="4">Finance</option>
-                                            <option value="5">Lifestyle</option>
-                                            <option value="6">Development</option>
-                                            <option value="7">Photography</option>
-                                        </select>
-                                    </div>
-                                </div>
+
                             </div>
 
                             <!-- Navigation Menu -->
                             <nav class="ed-header__navigation">
                                 <ul class="ed-header__menu">
                                     <li class="active">
-                                        <a href="javascript:void(0)">Home<i class="fi fi-ss-angle-small-down"></i></a>
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="index.html">Home One</a>
-                                            </li>
-                                            <li class="active">
-                                                <a href="index-2.html">Home Two</a>
-                                            </li>
-                                            <li>
-                                                <a href="index-3.html">Home Three</a>
-                                            </li>
-                                            <li>
-                                                <a href="index-4.html">Home Four</a>
-                                            </li>
-                                            <li>
-                                                <a href="index-5.html">Home Five</a>
-                                            </li>
-                                        </ul>
+                                        <a href="{{ route('home') }}">Trang chủ</a>
+
                                     </li>
                                     <li>
-                                        <a href="javascript:void(0)">Courses<i
+                                        <a href="javascript:void(0)">Khóa học<i
                                                 class="fi fi-ss-angle-small-down"></i></a>
                                         <ul class="sub-menu">
-                                            <li><a href="course-1.html">Course One</a></li>
-                                            <li><a href="course-2.html">Course Two</a></li>
-                                            <li><a href="course-3.html">Course Three</a></li>
-                                            <li>
-                                                <a href="course-details.html">Course Details</a>
-                                            </li>
+                                            <li><a href="#">Khóa Tiếng anh 1</a></li>
+                                            <li><a href="#">Khóa Tiếng anh 2</a></li>
+                                            <li><a href="#">Khóa Tiếng anh 3</a></li>
                                         </ul>
                                     </li>
+
                                     <li>
-                                        <a href="javascript:void(0)">Pages<i
-                                                class="fi fi-ss-angle-small-down"></i></a>
+                                        <a href="javascript:void(0)">Bài viết<i class="fi fi-ss-angle-small-down"></i></a>
                                         <ul class="sub-menu">
-                                            <li>
-                                                <a href="javascript:void(0)">Products<i
-                                                        class="fi fi-ss-angle-small-right"></i></a>
-                                                <ul class="sub-menu third-menu">
-                                                    <li><a href="product.html">Product</a></li>
-                                                    <li>
-                                                        <a href="product-details.html">Product Details</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="cart.html">Product Cart</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="checkout.html">Product Checkout</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0)">Teacher <i
-                                                        class="fi fi-ss-angle-small-right"></i></a>
-                                                <ul class="sub-menu third-menu">
-                                                    <li><a href="teacher.html">Teacher</a></li>
-                                                    <li>
-                                                        <a href="teacher-details.html">Teacher Details</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li><a href="faq.html">Faq</a></li>
-                                            <li>
-                                                <a href="404.html">404 Error</a>
-                                            </li>
+                                            <li><a href="#">Tin giáo dục </a></li>
+                                            <li><a href="#">Tin công nghệ </a></li>
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="javascript:void(0)">News<i class="fi fi-ss-angle-small-down"></i></a>
-                                        <ul class="sub-menu">
-                                            <li><a href="blog.html">Blog </a></li>
-                                            <li><a href="blog-details.html">Blog Details</a></li>
-                                        </ul>
+                                        <a href="javascript:void(0)">Giới thiệu</a>
+
                                     </li>
                                     <li>
-                                        <a href="javascript:void(0)">About<i
-                                                class="fi fi-ss-angle-small-down"></i></a>
-                                        <ul class="sub-menu">
-                                            <li><a href="about-1.html">About One </a></li>
-                                            <li><a href="about-2.html">About Two</a></li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <a href="contact.html">Contact</a>
+                                        <a href="#">Liên hệ</a>
                                     </li>
                                 </ul>
                             </nav>
@@ -329,17 +255,20 @@
 
                                     @auth
                                         <div class="d-flex align-items-center gap-3">
-                                            <span class="fw-medium">{{ Auth::user()->name }} </span>
 
                                             @if (Auth::user()->role == 'teacher')
                                                 <a href="{{ route('client.information') }}">
-                                                    <img class="pb-2"
+                                                    <span class="fw-medium name-user">{{ Auth::user()->name }} </span>
+
+                                                    <img
                                                         src="{{ asset('client/images/icons/teacher.svg') }}"
                                                         alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px">
                                                 </a>
                                             @elseif (Auth::user()->role == 'student')
                                                 <a href="{{ route('client.information') }}">
-                                                    <img class="pb-2"
+                                                    <span class="fw-medium name-user">{{ Auth::user()->name }} </span>
+
+                                                    <img
                                                         src="{{ asset('client/images/icons/studentBoy.svg') }}"
                                                         alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px">
                                                 </a>
@@ -897,7 +826,7 @@
     <!-- Main JS -->
     <script src="{{ asset('client/plugins/js/active.js') }}"></script>
 
-
+    @stack('script')
 </body>
 
 <!-- Mirrored from bizantheme.com/php/eduna-php/index.php by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 13 May 2025 09:12:16 GMT -->

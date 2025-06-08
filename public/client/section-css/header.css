@@ -695,7 +695,12 @@
   .ed-header.ed-header--style5 .ed-header__action {
     display: none;
   }
+
+  .name-user{
+    display: none;
+  }
 }
+
 
 /*================================================================================================
     End Header CSS

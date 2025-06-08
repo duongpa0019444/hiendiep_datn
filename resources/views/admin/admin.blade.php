@@ -34,6 +34,8 @@
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+      {{-- LINK Jquery --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 </head>
 
@@ -319,23 +321,7 @@
 
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/statistical">
-                                <span class="nav-icon">
-                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
-                                </span>
-                                <span class="nav-text"> Quản lí học phí </span>
-                            </a>
 
-                            {{-- <div class="collapse" id="user">
-                            <ul class="nav sub-navbar-nav">
-                                <li class="sub-nav-item">
-                                    <a class="sub-nav-link" href="/admin/user/list">Tạo khoản thu</a>
-                                </li>
-
-
-                            </ul>
-                        </div> --}}
 
                         </li>
                         <li class="nav-item">
@@ -358,11 +344,11 @@
 
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/statistical">
+                            <a class="nav-link" href="{{ route('admin.course_payments') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
+                                    <iconify-icon icon="mdi:cash"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Quản lí thanh toán</span>
+                                <span class="nav-text">Học phí & Thanh toán </span>
                             </a>
 
                             {{-- <div class="collapse" id="user">
@@ -514,13 +500,6 @@
     <script src="{{ asset('admin/vendor/jsvectormap/maps/world-merc.js') }}"></script>
     <script src="{{ asset('admin/vendor/jsvectormap/maps/world.js') }}"></script>
 
-    <!-- Dashboard Js - tùng dương -->
-    <script src="{{ asset('admin/js/components/apexchart-bar.js') }}"></script>
-
-
-    <!-- Apex Chart Area Demo js -->
-    <script src="{{ asset('admin/js/components/apexchart-area.js') }}"></script>
-
 
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
@@ -546,7 +525,7 @@
         }, 300000); // 5phút
     </script>
 
-    <script src="{{ asset('admin/js/pages/dashboard.js') }}"></script>
+    @stack('scripts')
 
 </body>
 

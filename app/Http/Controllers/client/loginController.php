@@ -36,7 +36,7 @@ class loginController extends Controller
             $user = User::where('email', '=', $request->input('email'))->first();
 
             if ($user && Hash::check($request->input('password'), $user->password)) {
-                // dd($user);   
+                // dd($user);
                 Auth::login($user);
                 // sau khi đăng nhập nên chuyển về trang chủ
                 if ($user->role === 'admin' || $user->role === 'staff') {
@@ -93,7 +93,7 @@ class loginController extends Controller
             ]);
 
 
-            // Đăng nhập tự động sau khi đăng ký 
+            // Đăng nhập tự động sau khi đăng ký
             if ($user && Hash::check($request->input('password'), $user->password)) {
                 Auth::login($user);
                 return redirect()->route('home')->with('success', 'Đăng nhập thành công!');
@@ -103,9 +103,11 @@ class loginController extends Controller
 
     public function logout()
     {
+
         Auth::logout(); // <-- logout chính thức
         session()->invalidate();
         session()->regenerateToken();
+
         return redirect()->route('home')->with('success', 'Đăng xuất thành công!');
     }
 
@@ -214,4 +216,7 @@ class loginController extends Controller
         // Trả về phản hồi
         return redirect()->route('auth.login')->with('success', 'Mật khẩu đã được đặt lại thành công!');
     }
+
+
+
 }
