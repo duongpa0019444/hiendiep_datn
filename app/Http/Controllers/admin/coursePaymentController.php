@@ -1,13 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\admin;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\coursePayment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request as FacadesRequest;
-
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use App\Exports\CoursePaymentsExport;
+use Maatwebsite\Excel\Facades\Excel;
 class coursePaymentController extends Controller
 {
     //
@@ -76,8 +80,11 @@ class coursePaymentController extends Controller
         try {
 
             $payment = CoursePayment::findOrFail($id);
-
-            $payment->payment_date = $request->payment_date;
+            if ($payment->status == 'paid') {
+                $payment->payment_date = $request->payment_date ?? now();
+            } else {
+                $payment->payment_date = $request->payment_date;
+            }
             $payment->method = $request->method;
             $payment->status = $request->status;
             $payment->note = $request->note;
@@ -89,7 +96,6 @@ class coursePaymentController extends Controller
                 'message' => 'Cập nhật thanh toán thành công',
                 'payment' => $payment->load(['user', 'class', 'course'])
             ]);
-
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Cập nhật thất bại: ' . $e->getMessage()]);
         }
@@ -111,5 +117,58 @@ class coursePaymentController extends Controller
         return response()->json([
             'success' => 'Xóa thanh toán thành công'
         ]);
+    }
+
+
+    public function Statistics()
+    {
+        $Statistics = DB::select("
+            SELECT
+                SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS total_paid,
+                SUM(CASE WHEN status = 'unpaid' THEN amount ELSE 0 END) AS total_unpaid,
+                COUNT(CASE WHEN method = 'Cash' AND status = 'paid' THEN 1 END) AS cash_payment_count,
+                COUNT(CASE WHEN method = 'Bank Transfer' AND status = 'paid' THEN 1 END) AS bank_transfer_payment_count
+            FROM course_payments;
+        ");
+
+
+        return response()->json($Statistics[0]);
+    }
+
+
+    public function show($id)
+    {
+        $payment = CoursePayment::with(['user', 'class', 'course'])
+            ->findOrFail($id);
+        return response()->json($payment);
+    }
+
+
+
+    public function download($id)
+    {
+        $payment = CoursePayment::with(['user', 'class', 'course'])->findOrFail($id);
+
+        // Kiểm tra trạng thái đã thanh toán
+        if ($payment->status !== 'paid') {
+            return redirect()->back()->with('error', 'Hóa đơn chỉ được xuất khi đã thanh toán.');
+        }
+
+        // Chuẩn hóa tên file
+        $studentName = Str::slug($payment->user->name);
+        $courseName = Str::slug($payment->course->name ?? 'unknown_course');
+        $timestamp = now()->format('Ymd_His');
+        // Tạo file PDF từ view
+        $pdf = Pdf::loadView('admin.course_payments.coursePayment-invoice', compact('payment'));
+        // Tải file
+        return $pdf->download("hoa_don_{$studentName}_{$courseName}_{$timestamp}.pdf");
+    }
+
+
+
+    public function exportExcel(Request $request)
+    {
+        $filters = $request->only(['keyword', 'class_id', 'status_class', 'status', 'method']);
+        return Excel::download(new CoursePaymentsExport($filters), 'danh_sach_thanh_toan.xlsx');
     }
 }

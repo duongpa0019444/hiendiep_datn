@@ -42,6 +42,7 @@ class loginController extends Controller
                 if($user->role === 'admin' || $user->role === 'staff'){
                     return redirect()->route('admin.dashboard')->with('success', 'Đăng nhập thành công!');
                 }else{
+
                     return redirect()->route('home')->with('success', 'Đăng nhập thành công!');
 
                 }

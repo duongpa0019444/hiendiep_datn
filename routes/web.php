@@ -3,7 +3,7 @@ use App\Http\Controllers\client\HomeController;
 use App\Http\Controllers\admin\dashboardController;
 use App\Http\Controllers\client\loginController;
 use App\Http\Controllers\client\UserController;
-use App\Http\Controllers\coursePaymentController;
+use App\Http\Controllers\admin\coursePaymentController;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 
@@ -35,14 +35,17 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::put('course-payments/{id}/update', [coursePaymentController::class, 'update'])->name('admin.course_payments.update');
     Route::get('course-payments/filter', [coursePaymentController::class, 'filter'])->name('admin.course_payments.filter');
     Route::delete('course-payments/{id}/delete', [coursePaymentController::class, 'delete'])->name('admin.course_payments.delete');
-
-
+    Route::get('course-payments/statistics', [coursePaymentController::class, 'statistics'])->name('admin.course_payments.statistics');
+    Route::get('course-payments/{id}/show', [coursePaymentController::class, 'show'])->name('admin.course_payments.show');
+    Route::get('course-payments/{id}/download', [coursePaymentController::class, 'download'])->name('admin.course_payments.download');
+    Route::get('/admin/course-payments/export', [coursePaymentController::class, 'exportExcel'])->name('admin.course_payments.export');
 
 
 });
 
-// // Routes cho tất cả người dùng (bao gồm học sinh)
-// Route::middleware([CheckRole::class . ':admin,staff,student,parent,teacher'])->group(function () {
-//     // trang quản trị cho người dùng
-//     Route::get('dashboard', [UserController::class, 'dashBoard'])->name('client.dashboard');
-// });
+
+
+Route::middleware([CheckRole::class . ':student,teacher'])->group(function () {
+    Route::get('my-account', [UserController::class, 'myAccount'])->name('admin.myAccount');
+
+});

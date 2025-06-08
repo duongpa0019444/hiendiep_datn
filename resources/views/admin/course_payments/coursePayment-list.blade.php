@@ -6,15 +6,24 @@
     <div class="page-content">
         <!-- Start Container Fluid -->
         <div class="container-xxl">
+
+
+            <nav aria-label="breadcrumb p-0">
+                <ol class="breadcrumb py-0">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Học phí & Thanh toán</li>
+                </ol>
+            </nav>
+
             <!-- Summary Cards -->
-            <div class="row mt-1">
+            <div class="row">
                 <div class="col-md-6 col-xl-3">
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
                                     <h4 class="card-title mb-2 d-flex align-items-center gap-2 fs-5">Tổng đã thanh toán</h4>
-                                    <p class="text-muted fw-medium fs-22 mb-0">
+                                    <p class="text-muted fw-medium fs-22 mb-0" id="total_paid">
                                         {{ number_format(\DB::table('course_payments')->where('status', 'paid')->sum('amount'), 0, ',', '.') }}
                                         VNĐ
                                     </p>
@@ -36,7 +45,7 @@
                                 <div>
                                     <h4 class="card-title mb-2 d-flex align-items-center gap-2 fs-5">Tổng chưa thanh toán
                                     </h4>
-                                    <p class="text-muted fw-medium fs-22 mb-0">
+                                    <p class="text-muted fw-medium fs-22 mb-0" id="total_unpaid">
                                         {{ number_format(\DB::table('course_payments')->where('status', 'unpaid')->sum('amount'), 0, ',', '.') }}
                                         VNĐ
                                     </p>
@@ -58,7 +67,7 @@
                                 <div>
                                     <h4 class="card-title mb-2 d-flex align-items-center gap-2 fs-5">Thanh toán tiền mặt
                                     </h4>
-                                    <p class="text-muted fw-medium fs-22 mb-0">
+                                    <p class="text-muted fw-medium fs-22 mb-0" id="total_cash">
                                         {{ \DB::table('course_payments')->where('method', 'Cash')->count() }}
                                     </p>
                                 </div>
@@ -78,7 +87,7 @@
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
                                     <h4 class="card-title mb-2 d-flex align-items-center gap-2 fs-5">Chuyển khoản </h4>
-                                    <p class="text-muted fw-medium fs-22 mb-0">
+                                    <p class="text-muted fw-medium fs-22 mb-0" id="total_bank_transfer">
                                         {{ \DB::table('course_payments')->where('method', 'Bank Transfer')->count() }}
                                     </p>
                                 </div>
@@ -93,7 +102,14 @@
                     </div>
                 </div>
             </div>
-            <h4 class="card-title mb-1">Danh sách thanh toán học phí</h4>
+            <div class="d-flex justify-content-between">
+                <h4 class="card-title mb-1">Danh sách thanh toán học phí</h4>
+                <a id="export-btn" href="#"
+                    class="btn btn-outline-primary btn-sm">
+                    <iconify-icon icon="material-symbols:download" class="fs-20"></iconify-icon> Xuất file
+                </a>
+
+            </div>
 
             <!-- Payment List -->
             <div class="row">
@@ -144,7 +160,8 @@
                                     <label for="status_filter" class="form-label mb-1">Trạng thái thanh toán</label>
                                     <select name="status" id="status_filter" class="form-select form-select-sm">
                                         <option value="">Tất cả</option>
-                                        <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Đã thanh
+                                        <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Đã
+                                            thanh
                                             toán
                                         </option>
                                         <option value="unpaid" {{ request('status') == 'unpaid' ? 'selected' : '' }}>Chưa
@@ -159,7 +176,8 @@
                                         <option value="Bank Transfer"
                                             {{ request('method') == 'Bank Transfer' ? 'selected' : '' }}>Chuyển khoản
                                         </option>
-                                        <option value="Cash" {{ request('method') == 'Cash' ? 'selected' : '' }}>Tiền mặt
+                                        <option value="Cash" {{ request('method') == 'Cash' ? 'selected' : '' }}>Tiền
+                                            mặt
                                         </option>
                                     </select>
                                 </div>
@@ -223,9 +241,17 @@
                                                                 class="ms-1"></iconify-icon>
                                                         </button>
                                                         <ul class="dropdown-menu">
-                                                            <li><a class="dropdown-item" href="#"><iconify-icon
-                                                                        icon="solar:eye-broken"
-                                                                        class="me-1"></iconify-icon> Xem</a></li>
+                                                            @if ($payment->status == 'paid')
+                                                                <li data-bs-target="#modal-printCoursePayment">
+                                                                    <button class="dropdown-item btn-invoice-coursePayment"
+                                                                        data-coursePayment_id="{{ $payment->id }}"><iconify-icon
+                                                                            icon="solar:eye-broken"
+                                                                            class="me-1"></iconify-icon> Xem hóa
+                                                                        đơn</button>
+                                                                </li>
+                                                            @endif
+
+
                                                             <li data-bs-target="#modal-course-payment">
                                                                 <button
                                                                     class="dropdown-item text-warning btn-edit-course-payment"
@@ -234,7 +260,9 @@
                                                                         class="me-1"></iconify-icon> Sửa</button>
                                                             </li>
                                                             <li>
-                                                                <form action="" method="post">
+                                                                <form
+                                                                    action="{{ route('admin.course_payments.delete', $payment->id) }}"
+                                                                    method="post">
                                                                     @csrf
                                                                     @method('DELETE')
                                                                     <button class="dropdown-item text-danger"
@@ -275,10 +303,10 @@
 
 
 
-                        {{-- Modal---------------------- --}}
+                        {{-- Modal Cập nhật thanh toán---------------------- --}}
                         <div class="modal fade" id="modal-course-payment" tabindex="-1"
                             aria-labelledby="editPaymentModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-scrollable">
+                            <div class="modal-dialog modal-dialog-scrollable modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header bg-light-subtle">
                                         <h5 class="modal-title d-flex align-items-center gap-2"
@@ -292,7 +320,8 @@
                                     <form action="" method="post">
                                         @csrf
                                         @method('PUT')
-                                        <div class="modal-body" id="modal-body-courser-payment">
+                                        <div class="modal-body d-flex justify-content-between flex-wrap bg"
+                                            id="modal-body-courser-payment">
 
                                         </div>
                                         <div class="modal-footer">
@@ -313,6 +342,32 @@
                             </div>
                         </div>
 
+
+
+                        {{-- Modal Hiển thị hóa đơn --}}
+                        <div class="modal fade" id="modal-printCoursePayment" tabindex="-1"
+                            aria-labelledby="editPaymentModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-scrollable modal-lg">
+                                <div class="modal-content">
+
+                                    <div class="modal-body">
+                                        <div class="d-flex justify-content-end">
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="invoice-container">
+
+
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Đóng</button>
+                                        <a href="" class="btn btn-primary btn-print-invoive">Xuất hóa đơn</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -341,6 +396,100 @@
     <script>
         const csrfToken = '{{ csrf_token() }}';
 
+
+        //Hàm xử lý khi click xem hóa đơn
+        $(document).on('click', '.btn-invoice-coursePayment', function() {
+            const coursePaymentId = $(this).data('coursepayment_id');
+
+            console.log('Course Payment ID:', coursePaymentId);
+            $.ajax({
+                url: `/admin/course-payments/${coursePaymentId}/show`,
+                type: 'GET',
+                success: function(response) {
+                    console.log('Response:', response);
+                    const payment = response;
+                    $('.invoice-container').html(`
+                <div class="invoice-header text-center">
+                    <h3 class="mt-2">TRUNG TÂM ĐÀO TẠO HIEN DIEP</h3>
+                    <p>Địa chỉ: 123 Đường Trịnh Kiểm, P. Đông Vệ, TP. Thanh Hóa</p>
+                    <p>Hotline: 0123 456 789 | Email: contact@hiendiep.edu.vn</p>
+                    <hr>
+                    <h4>HÓA ĐƠN HỌC PHÍ</h4>
+                    <p>Mã hóa đơn: <strong>${payment.payment_code || 'N/A'}</strong> | Ngày xuất: <strong>${new Date().toLocaleDateString('vi-VN')}</strong></p>
+                </div>
+                <div class="student-details">
+                    <h5>Thông tin học viên</h5>
+                    <div class="grid-container">
+                        <div class="grid-item">
+                            <p><strong>Họ và tên:</strong> ${payment.user?.name || 'N/A'}</p>
+                        </div>
+                        <div class="grid-item">
+                            <p><strong>Số điện thoại:</strong> ${payment.user?.phone || 'N/A'}</p>
+                            <p><strong>Email:</strong> ${payment.user?.email || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="invoice-details">
+                    <h5>Chi tiết thanh toán</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">STT</th>
+                                <th class="text-center">Nội dung</th>
+                                <th class="text-center">Số tiền (VNĐ)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>
+                                    <strong>Khóa học:</strong> ${payment.course?.name || 'N/A'}<br>
+                                    <strong>Lớp:</strong> ${payment.class?.name || 'N/A'}<br>
+                                    <strong>Mã thanh toán:</strong> ${payment.payment_code || 'N/A'}
+                                </td>
+                                <td class="text-end">${Number(payment.amount || 0).toLocaleString('vi-VN')}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="2" class="text-end">Tổng cộng:</th>
+                                <td class="text-end">${Number(payment.amount || 0).toLocaleString('vi-VN')}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="payment-info">
+                    <h5>Thông tin thanh toán</h5>
+                    <p><strong>Phương thức:</strong> ${payment.method === 'Cash' ? 'Tiền mặt' : (payment.method === 'Bank Transfer' ? 'Chuyển khoản' : 'N/A')}</p>
+                    <p><strong>Ngày thanh toán:</strong> ${payment.payment_date ? new Date(payment.payment_date).toLocaleString('vi-VN') : 'N/A'}</p>
+                    <p><strong>Ghi chú:</strong> ${payment.note || 'N/A'}</p>
+                </div>
+                <div class="invoice-footer text-center mt-4">
+                    <p><strong>Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi!</strong></p>
+                    <p>Trung tâm Hien Diep</p>
+                </div>
+            `);
+                    $('.btn-print-invoive').attr('href',
+                        `/admin/course-payments/${coursePaymentId}/download`);
+                    $('#modal-printCoursePayment').modal('show');
+                },
+                error: function(xhr) {
+                    console.error('Lỗi khi tải hóa đơn:', xhr.responseText);
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: xhr.responseJSON?.error ||
+                            'Không thể tải hóa đơn. Vui lòng thử lại.',
+                        icon: 'error',
+                        confirmButtonClass: 'btn btn-primary w-xs mt-2',
+                        buttonsStyling: false
+                    });
+                }
+            });
+        });
+
+
+
+        //reset search
         $('#searchForm').on('reset', function(e) {
             setTimeout(function() {
                 window.location.reload();
@@ -409,7 +558,7 @@
                                 Thao tác <iconify-icon icon="tabler:caret-down-filled" class="ms-1"></iconify-icon>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#"><iconify-icon icon="solar:eye-broken" class="me-1"></iconify-icon> Xem</a></li>
+                                <li><a class="dropdown-item" href="#"><iconify-icon icon="solar:eye-broken" class="me-1"></iconify-icon> Xem hóa đơn</a></li>
                                  <li data-bs-target="#modal-course-payment">
                                     <button
                                         class="dropdown-item text-warning btn-edit-course-payment"
@@ -418,10 +567,10 @@
                                             class="me-1"></iconify-icon> Sửa</button>
                                 </li>
                                 <li>
-                                    <form action="" method="post">
+                                    <form action="/admin/course-payments/${payment.id}/delete" method="post">
                                         <input type="hidden" name="_token" value="${csrfToken}">
                                         <input type="hidden" name="_method" value="DELETE">
-                                        <button type="submit" class="dropdown-item text-danger">
+                                        <button type="submit" class="dropdown-item text-danger" id="sweetalert-params">
                                             <iconify-icon icon="solar:trash-bin-minimalistic-2-broken" class="me-1"></iconify-icon> Xóa
                                         </button>
                                     </form>
@@ -453,21 +602,6 @@
             return `${hours}:${minutes} ${day}/${month}/${year}`;
         }
 
-        // Hàm định dạng thời gian cho input datetime-local
-        function formatDateTimeForInput(dateString) {
-            if (!dateString) return '';
-
-            const date = new Date(dateString);
-            const pad = num => num.toString().padStart(2, '0');
-
-            const year = date.getFullYear();
-            const month = pad(date.getMonth() + 1);
-            const day = pad(date.getDate());
-            const hours = pad(date.getHours());
-            const minutes = pad(date.getMinutes());
-
-            return `${year}-${month}-${day}T${hours}:${minutes}`;
-        }
 
         // Xử lý phân trang
         $(document).on('click', '#pagination-wrapper a', function(e) {
@@ -487,6 +621,7 @@
         });
 
 
+        //Hàm xử lý render dữ liệu lên modal khi ấn nút sửa
         $(document).on('click', '.btn-edit-course-payment', function() {
             const coursePaymentId = $(this).data('coursepayment_id');
             console.log(coursePaymentId);
@@ -498,51 +633,51 @@
                     console.log(response.payment);
                     $('#modal-body-courser-payment').html(
                         `
-                    <div class="mb-3">
+                    <div class="mb-1  p-2 col-lg-12 col-md-12 col-sm-12">
                         <label class="form-label fw-bold d-flex align-items-center gap-2">
                             <iconify-icon icon="solar:user-broken" class="text-info"></iconify-icon>
                             Người dùng
                         </label>
-                        <div class="card bg-light-subtle border-0 p-2">
+                        <div class="card bg-light border-0 p-2">
                             <div class="fw-bold">${response.payment.user?.name || 'N/A'}</div>
                             <div class="text-muted small">${response.payment.user?.email || 'N/A'}</div>
                             <input type="hidden" name="user_id" value="${response.payment.user?.id || ''}">
                         </div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-1  p-2 col-lg-6 col-md-12 col-sm-12">
                         <label class="form-label fw-bold d-flex align-items-center gap-2">
                             <iconify-icon icon="solar:notebook-broken" class="text-success"></iconify-icon>
                             Lớp học
                         </label>
-                        <div class="card bg-light-subtle border-0 p-2">
+                        <div class="card bg-light border-0 p-2">
                             <div class="fw-bold">${response.payment.class?.name || 'N/A'}</div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-1  p-2 col-lg-6 col-md-12 col-sm-12">
                         <label class="form-label fw-bold d-flex align-items-center gap-2">
                             <iconify-icon icon="solar:book-broken" class="text-primary"></iconify-icon>
                             Khóa học
                         </label>
-                        <div class="card bg-light-subtle border-0 p-2">
+                        <div class="card bg-light border-0 p-2">
                             <div class="fw-bold">${response.payment.course?.name || 'N/A'}</div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-1  p-2 col-lg-6 col-md-12 col-sm-12">
                         <label class="form-label fw-bold d-flex align-items-center gap-2">
                             <iconify-icon icon="solar:money-bag-broken" class="text-warning"></iconify-icon>
                             Số tiền
                         </label>
-                        <div class="card bg-light-subtle border-0 p-2">
+                        <div class="card bg-light border-0 p-2">
                             <div class="fw-bold">
                                 ${response.payment.amount ? Number(response.payment.amount).toLocaleString('vi-VN') + ' VNĐ' : '0 VNĐ'}
                             </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-1 p-2 col-lg-6 col-md-12 col-sm-12">
                         <label class="form-label fw-bold d-flex align-items-center gap-2">
                             <iconify-icon icon="solar:check-circle-broken" class="text-success"></iconify-icon>
                             Trạng thái
@@ -559,7 +694,7 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-1 p-2 col-lg-6 col-md-12 col-sm-12">
                         <label for="payment_date" class="form-label fw-bold d-flex align-items-center gap-2">
                             <iconify-icon icon="solar:calendar-broken" class="text-info"></iconify-icon>
                             Ngày thanh toán
@@ -575,7 +710,7 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-1 p-2 col-lg-6 col-md-12 col-sm-12">
                         <label for="method-${response.payment.id}" class="form-label fw-bold d-flex align-items-center gap-2">
                             <iconify-icon icon="solar:card-broken" class="text-primary"></iconify-icon>
                             Phương thức thanh toán
@@ -594,7 +729,7 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-1 p-2 col-12">
                         <label for="note" class="form-label fw-bold d-flex align-items-center gap-2">
                             <iconify-icon icon="solar:notes-broken" class="text-secondary"></iconify-icon>
                             Ghi chú
@@ -665,17 +800,23 @@
                                             Thao tác <iconify-icon icon="tabler:caret-down-filled" class="ms-1"></iconify-icon>
                                         </button>
                                         <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="#"><iconify-icon icon="solar:eye-broken" class="me-1"></iconify-icon> Xem</a></li>
+
+                                             ${payment.status === 'paid' ? `
+                                                            <li>
+                                                                <a class="dropdown-item" href="#">
+                                                                    <iconify-icon icon="solar:eye-broken" class="me-1"></iconify-icon> Xem hóa đơn
+                                                                </a>
+                                                            </li>` : ''}
                                             <li>
                                                 <button class="dropdown-item text-warning btn-edit-course-payment" data-coursepayment_id="${payment.id}" data-bs-target="#modal-course-payment">
                                                     <iconify-icon icon="solar:pen-2-broken" class="me-1"></iconify-icon> Sửa
                                                 </button>
                                             </li>
                                             <li>
-                                                <form action="" method="post">
+                                                <form action="/admin/course-payments/${payment.id}/delete" method="post">
                                                     <input type="hidden" name="_token" value="${csrfToken}">
                                                     <input type="hidden" name="_method" value="DELETE">
-                                                    <button type="submit" class="dropdown-item text-danger">
+                                                    <button type="submit" class="dropdown-item text-danger" id="sweetalert-params">
                                                         <iconify-icon icon="solar:trash-bin-minimalistic-2-broken" class="me-1"></iconify-icon> Xóa
                                                     </button>
                                                 </form>
@@ -688,6 +829,7 @@
                     }
 
                     $('#modal-course-payment').modal('hide');
+                    renderStatistics();
                 },
                 error: function(xhr) {
                     console.error('Lỗi khi cập nhật:', xhr.responseText);
@@ -697,10 +839,12 @@
         });
 
 
-        //Parameter
+        //Hàm xử lý xóa dữ liệu
         if (document.getElementById("sweetalert-params"))
             document.getElementById("sweetalert-params").addEventListener("click", function(e) {
                 e.preventDefault();
+                const form = $(this).closest('form');
+                const actionUrl = form.attr('action');
                 Swal.fire({
                     title: 'Bạn có chắc chắn?',
                     text: "Bạn sẽ không thể hoàn tác hành động này!",
@@ -715,9 +859,11 @@
                 }).then(function(result) {
 
                     if (result.value) {
+
                         $.ajax({
-                            url: $(this).attr('href'),
-                            type: 'DELETE',
+                            url: actionUrl,
+                            type: 'POST',
+                            data: form.serialize(),
                             success: function(response) {
                                 Swal.fire({
                                     title: 'Đã xóa!',
@@ -726,6 +872,8 @@
                                     confirmButtonClass: 'btn btn-primary w-xs mt-2',
                                     buttonsStyling: false
                                 })
+                                form.closest('tr').remove();
+                                renderStatistics();
                             },
 
                         })
@@ -743,5 +891,50 @@
                     }
                 });
             });
+
+
+
+        //Hàm xử lý render lại các hộp thống kê
+        function renderStatistics() {
+            const total_bank_transfer = $('#total_bank_transfer');
+            const total_cash = $('#total_cash');
+            const total_unpaid = $('#total_unpaid');
+            const total_paid = $('#total_paid');
+
+            $.ajax({
+                url: '/admin/course-payments/statistics',
+                type: 'GET',
+                success: function(response) {
+                    console.log('thống kê:' + response);
+
+                    total_unpaid.text(formatCurrency(response.total_unpaid) + 'VNĐ');
+                    total_paid.text(formatCurrency(response.total_paid) + 'VNĐ');
+                    total_bank_transfer.text(formatCurrency(response.bank_transfer_payment_count));
+                    total_cash.text(formatCurrency(response.cash_payment_count));
+                }
+            })
+
+        }
+
+
+        // Hàm định dạng số tiền theo kiểu VNĐ
+        function formatCurrency(amount) {
+            if (!amount) return '0 VNĐ';
+            return Number(amount).toLocaleString('vi-VN');
+        }
+
+
+        //xử lý nút xuất file
+        // Xử lý nút xuất file
+        $('#export-btn').on('click', function(e) {
+            e.preventDefault();
+            // Lấy dữ liệu từ form lọc
+            let formData = $('#searchForm').serialize();
+            console.log(formData);
+            // Tạo URL với các tham số lọc
+            let exportUrl = '{{ route('admin.course_payments.export') }}?' + formData;
+            // Chuyển hướng đến URL xuất file
+            window.location.href = exportUrl;
+        });
     </script>
 @endpush

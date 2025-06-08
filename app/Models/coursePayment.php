@@ -38,4 +38,8 @@ class coursePayment extends Model
     {
         return $this->belongsTo(classes::class, 'class_id');
     }
+
+    protected $casts = [
+        'payment_date' => 'datetime',
+    ];
 }

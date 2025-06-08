@@ -10,4 +10,8 @@ class UserController extends Controller
     public function dashBoard(){
         return view('client.home');
     }
+
+    public function myAccount(){
+        return view('client.myAccount.index');
+    }
 }
