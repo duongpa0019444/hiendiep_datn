@@ -10,4 +10,8 @@ class UserController extends Controller
     public function information(){
         return view('client.accounts.information');
     }
+
+    public function myAccount(){
+        return view('client.myAccount.index');
+    }
 }

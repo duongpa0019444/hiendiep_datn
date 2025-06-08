@@ -119,7 +119,9 @@
                                                 <a class="offcanvas__sub_menu_item" href="product.html">Product</a>
                                             </li>
                                             <li class="offcanvas__sub_menu_li">
+
                                                 <a class="offcanvas__sub_menu_item" href="product-details.html">Product
+
                                                     Details</a>
                                             </li>
                                             <li class="offcanvas__sub_menu_li">
@@ -320,6 +322,7 @@
                             <div class="ed-header__action">
 
                                 <div class="ed-topbar__info-buttons">
+
                                     @guest
                                         <button type="button" class="register-btn" data-bs-toggle="modal"
                                             data-bs-target="#loginModal">
@@ -685,6 +688,7 @@
 
                 <!-- Auth Body  -->
                 <div class="ed-auth__modal-body">
+
                     <form action="{{ route('registerAuth') }}" method="post" class="ed-auth__modal-form">
                         @csrf
                         <div class="form-group">
@@ -708,10 +712,12 @@
                             @error('phone')
                                 <span class="error" style="color: red; font-size: 0.9em;">{{ $message }}</span>
                             @enderror
+
                         </div>
 
                         <div class="form-group">
                             <input type="password" name="password" placeholder="Enter password" required />
+
                             @error('password')
                                 <span class="error" style="color: red; font-size: 0.9em;">{{ $message }}</span>
                             @enderror
@@ -724,6 +730,7 @@
                                 <span class="error" style="color: red; font-size: 0.9em;">{{ $message }}</span>
                             @enderror
                         </div>
+
 
                         <div class="ed-auth__form-btn">
                             <button type="submit" class="ed-btn">Register Now<i
