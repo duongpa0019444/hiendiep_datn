@@ -119,8 +119,7 @@
                                                 <a class="offcanvas__sub_menu_item" href="product.html">Product</a>
                                             </li>
                                             <li class="offcanvas__sub_menu_li">
-                                                <a class="offcanvas__sub_menu_item"
-                                                    href="product-details.html">Product
+                                                <a class="offcanvas__sub_menu_item" href="product-details.html">Product
                                                     Details</a>
                                             </li>
                                             <li class="offcanvas__sub_menu_li">
@@ -321,14 +320,34 @@
                             <div class="ed-header__action">
 
                                 <div class="ed-topbar__info-buttons">
-                                    <button type="button" class="register-btn" data-bs-toggle="modal"
-                                        data-bs-target="#registerModal">
-                                        Register
-                                    </button>
-                                    <button type="button" class="login-btn" data-bs-toggle="modal"
-                                        data-bs-target="#loginModal">
-                                        Log In
-                                    </button>
+                                    @guest
+                                        <button type="button" class="register-btn" data-bs-toggle="modal"
+                                            data-bs-target="#loginModal">
+                                            Log In
+                                        </button>
+                                    @else
+                                        <div class="d-flex align-items-center gap-3">
+                                            <span class="fw-medium">{{ Auth::user()->name }} </span>
+                                            @if (Auth::user()->role == 'teacher')
+                                                <a href="{{ route('clietn.information') }}">
+                                                    <img class="pb-2"
+                                                        src="{{ asset('client/images/icons/teacher.svg') }}"
+                                                        alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px">
+                                                </a>
+                                            @elseif (Auth::user()->role == 'student')
+                                                <a href="{{route('client.information')}}">
+                                                    <img class="pb-2"
+                                                    src="{{ asset('client/images/icons/studentBoy.svg') }}"
+                                                    alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px">
+                                                </a>
+                                            @endif
+                                            <form action="{{ route('auth.logout') }}" method="GET" style="margin: 0">
+                                                @csrf
+                                                <button type="submit" class="text-decoration-none">Logout</button>
+                                            </form>
+                                        </div>
+
+                                    @endguest
                                 </div>
                             </div>
 
@@ -575,12 +594,6 @@
                         <img src="{{ asset('client/images/logo.svg') }}" alt="logo" />
                     </a>
                     <h3 class="ed-auth__modal-title">Sign In Now</h3>
-                    <p class="ed-auth__modal-text">
-                        Didn’t Create an account?
-                        <button type="button" data-bs-toggle="modal" data-bs-target="#registerModal">
-                            Sign Up
-                        </button>
-                    </p>
                 </div>
 
                 <!-- Auth Body  -->
@@ -602,14 +615,14 @@
                                 Remember me
                             </label>
                         </div>
-                        <div class="ed-auth__form-btn">
+                        <div class="ed-auth__form-btn d-flex justify-content-center">
                             <button type="submit" class="ed-btn">Sign In<i
                                     class="fi fi-rr-arrow-small-right"></i></button>
                         </div>
                     </form>
                 </div>
                 <!-- Auth Footer  -->
-                <div class="ed-auth__modal-footer">
+                {{-- <div class="ed-auth__modal-footer">
                     <div class="ed-auth__modal-third-party">
                         <p>Or Sign In with</p>
                         <ul class="ed-auth__modal-third-party-list">
@@ -631,7 +644,7 @@
                             </li>
                         </ul>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -662,30 +675,46 @@
 
                 <!-- Auth Body  -->
                 <div class="ed-auth__modal-body">
-                    <form action="#" method="post" class="ed-auth__modal-form">
+                    <form action="{{ route('registerAuth') }}" method="post" class="ed-auth__modal-form">
+                        @csrf
                         <div class="form-group">
                             <input type="text" name="name" placeholder="Enter name" required />
-                        </div>
-
-                        <div class="form-group">
-                            <input type="text" name="user name" placeholder="Enter user name" required />
+                            @error('name')
+                                <span class="error" style="color: red; font-size: 0.9em;">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <input type="email" name="email" placeholder="Enter email" required />
+                            @error('email')
+                                <span class="error" style="color: red; font-size: 0.9em;">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <input type="tel" name="phone" inputmode="numeric" pattern="[0-9]{10,15}"
+                                value="{{ old('phone') }}" placeholder="Enter phone" required
+                                onkeypress="return (event.charCode !=8 && event.charCode == 0) ? true : (event.charCode >= 48 && event.charCode <= 57)" />
+                            @error('phone')
+                                <span class="error" style="color: red; font-size: 0.9em;">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <input type="password" name="password" placeholder="Enter password" required />
+                            @error('password')
+                                <span class="error" style="color: red; font-size: 0.9em;">{{ $message }}</span>
+                            @enderror
                         </div>
 
-                        <div class="form-check">
-                            <label class="form-check-label" for="flexCheckDefault2">
-                                <input class="form-check-input" type="checkbox" value=""
-                                    id="flexCheckDefault2" />
-                                I agree with your <strong>Privacy Policy</strong>
-                            </label>
+                        <div class="form-group">
+                            <input type="password" name="password_confirmation"
+                                placeholder="Enter password_confirmation" required />
+                            @error('password_confirmation')
+                                <span class="error" style="color: red; font-size: 0.9em;">{{ $message }}</span>
+                            @enderror
                         </div>
+
                         <div class="ed-auth__form-btn">
                             <button type="submit" class="ed-btn">Register Now<i
                                     class="fi fi-rr-arrow-small-right"></i></button>
