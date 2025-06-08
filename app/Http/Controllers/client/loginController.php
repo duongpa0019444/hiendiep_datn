@@ -39,12 +39,11 @@ class loginController extends Controller
                 // dd($user);   
                 Auth::login($user);
                 // sau khi đăng nhập nên chuyển về trang chủ
-                if($user->role === 'admin' || $user->role === 'staff'){
+                if ($user->role === 'admin' || $user->role === 'staff') {
                     return redirect()->route('admin.dashboard')->with('success', 'Đăng nhập thành công!');
-                }else{
+                } else {
                     return redirect()->route('client.information')->with('success', 'Đăng nhập thành công!');
                 }
-
             } else {
                 return redirect()->back()->with('error', 'Sai email hoặc mật khẩu!');
             }
@@ -93,25 +92,27 @@ class loginController extends Controller
 
             ]);
 
-            
+
             // Đăng nhập tự động sau khi đăng ký 
             if ($user && Hash::check($request->input('password'), $user->password)) {
                 Auth::login($user);
                 return redirect()->route('home')->with('success', 'Đăng nhập thành công!');
             }
-        } 
+        }
     }
 
-     public function logout()
+    public function logout()
     {
-        session()->forget('user');
+        Auth::logout(); // <-- logout chính thức
+        session()->invalidate();
+        session()->regenerateToken();
         return redirect()->route('home')->with('success', 'Đăng xuất thành công!');
     }
-  
+
 
     public function showForgotPasswordForm()
-    {   
-        
+    {
+
         return view('auth/forgot-password');
     }
 
@@ -127,7 +128,7 @@ class loginController extends Controller
         // $status = Password::sendResetLink(
         //     $request->only('email')
         // );
-         // Trả )về phản hồi
+        // Trả )về phản hồi
         // return $status === Password::RESET_LINK_SENT
         //             ? back()->with('status', 'Liên kết đặt lại mật khẩu đã được gửi đến email của bạn!')
         //             : back()->withErrors(['email' => 'Không thể gửi liên kết. Vui lòng kiểm tra lại email.']);
@@ -144,26 +145,24 @@ class loginController extends Controller
                 'created_at' => now()
             ]
         );
-            session(['reset_email' => $request->email]);
+        session(['reset_email' => $request->email]);
         // Gửi email chứa mã số
         try {
             Mail::raw("Mã số đặt lại mật khẩu của bạn là: $token", function ($message) use ($request) {
                 $message->to($request->email)
-                        ->subject('Mã số đặt lại mật khẩu');
+                    ->subject('Mã số đặt lại mật khẩu');
             });
 
             return redirect()->route('password.reset')->with('success', 'Mã số đã được gửi đến email của bạn!');
         } catch (\Exception $e) {
             return back()->withErrors(['email' => 'Không thể gửi email. Vui lòng thử lại sau.']);
         }
-
-       
     }
 
     // Hiển thị form đặt lại mật khẩu
     public function showResetPasswordForm()
-    {   
-        
+    {
+
         return view('auth/reset-password');
     }
 

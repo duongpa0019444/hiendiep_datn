@@ -96,7 +96,7 @@ class AccountController extends Controller
             'name'       => 'required|string|max:255|unique:users,name,' . $user->id,
             'email'      => 'required|email|max:255|unique:users,email,' . $user->id,
             'phone'      => 'required|digits_between:8,20',
-            'password'   => 'required|string|min:6',
+            'password'   => 'nullable|string|min:6',
             'gender'     => 'required|in:boy,girl',
             'birth_date' => 'required|date',
             'avatar'     => 'nullable|image|mimes:jpg,jpeg,png|max:2048',

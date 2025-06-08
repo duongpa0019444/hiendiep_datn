@@ -1,15 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>@yield('title')</title>
     <meta name="description" content="@yield('description')">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    
+
+    <link rel="shortcut icon" href="{{ asset('client/images/favicon.svg') }}" />
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{{ asset('client/plugins/css/bootstrap.min.css') }}" />
+    <!-- Animate CSS -->
+    <link rel="stylesheet" href="{{ asset('client/plugins/css/animate.min.css') }}" />
+    <!-- Owl Carousel CSS -->
+    <link rel="stylesheet" href="{{ asset('client/plugins/css/owl.carousel.min.css') }}" />
+    <!-- Swiper Slider CSS -->
+    <link rel="stylesheet" href="{{ asset('client/plugins/css/swiper-bundle.min.css') }}" />
+    <!-- Maginific Popup CSS -->
+    <link rel="stylesheet" href="{{ asset('client/plugins/css/maginific-popup.min.css') }}" />
+    <!-- Nice Select CSS -->
+    <link rel="stylesheet" href="{{ asset('client/plugins/css/nice-select.min.css') }}" />
+    <!-- Icofont -->
+    <link rel="stylesheet" href="{{ asset('client/plugins/css/icofont.css') }}" />
+    <!-- Uicons -->
+    <link rel="stylesheet" href="{{ asset('client/plugins/css/uicons.css') }}" />
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{{ asset('client/style.css') }}" />
+
+
+
 </head>
+
 
 <body class="element-wrapper">
 
@@ -302,29 +325,33 @@
                                             data-bs-target="#loginModal">
                                             Log In
                                         </button>
-                                    @else
+                                    @endguest
+
+                                    @auth
                                         <div class="d-flex align-items-center gap-3">
                                             <span class="fw-medium">{{ Auth::user()->name }} </span>
+
                                             @if (Auth::user()->role == 'teacher')
-                                                <a href="{{ route('clietn.information') }}">
+                                                <a href="{{ route('client.information') }}">
                                                     <img class="pb-2"
                                                         src="{{ asset('client/images/icons/teacher.svg') }}"
                                                         alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px">
                                                 </a>
                                             @elseif (Auth::user()->role == 'student')
-                                                <a href="{{route('client.information')}}">
+                                                <a href="{{ route('client.information') }}">
                                                     <img class="pb-2"
-                                                    src="{{ asset('client/images/icons/studentBoy.svg') }}"
-                                                    alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px">
+                                                        src="{{ asset('client/images/icons/studentBoy.svg') }}"
+                                                        alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px">
                                                 </a>
                                             @endif
+
                                             <form action="{{ route('auth.logout') }}" method="GET" style="margin: 0">
                                                 @csrf
                                                 <button type="submit" class="text-decoration-none">Logout</button>
                                             </form>
                                         </div>
+                                    @endauth
 
-                                    @endguest
                                 </div>
                             </div>
 
@@ -571,6 +598,12 @@
                         <img src="{{ asset('client/images/logo.svg') }}" alt="logo" />
                     </a>
                     <h3 class="ed-auth__modal-title">Sign In Now</h3>
+                    <p class="ed-auth__modal-text">
+                        Didn’t Create an account?
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#registerModal">
+                            Sign Up
+                        </button>
+                    </p>
                 </div>
 
                 <!-- Auth Body  -->
@@ -592,14 +625,14 @@
                                 Remember me
                             </label>
                         </div>
-                        <div class="ed-auth__form-btn d-flex justify-content-center">
+                        <div class="ed-auth__form-btn">
                             <button type="submit" class="ed-btn">Sign In<i
                                     class="fi fi-rr-arrow-small-right"></i></button>
                         </div>
                     </form>
                 </div>
                 <!-- Auth Footer  -->
-                {{-- <div class="ed-auth__modal-footer">
+                <div class="ed-auth__modal-footer">
                     <div class="ed-auth__modal-third-party">
                         <p>Or Sign In with</p>
                         <ul class="ed-auth__modal-third-party-list">
@@ -621,7 +654,7 @@
                             </li>
                         </ul>
                     </div>
-                </div> --}}
+                </div>
             </div>
         </div>
     </div>
@@ -866,4 +899,7 @@
 
 
 </body>
+
+<!-- Mirrored from bizantheme.com/php/eduna-php/index.php by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 13 May 2025 09:12:16 GMT -->
+
 </html>
