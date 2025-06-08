@@ -77,6 +77,47 @@
 
             </div>
 
+            <div class="row">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title">Danh sách tất cả người dùng</h4>
+                    </div> <!-- end card-header-->
+                    <div class="card-body p-0">
+                        <div class="px-3" data-simplebar style="max-height: 398px;">
+                            <table class="table table-hover mb-0 table-centered">
+                                <thead>
+                                    <tr>
+                                        <th>Tên</th>
+                                        <th>Giới tính</th>
+                                        <th>Ngày sinh nhật</th>
+                                        <th>Email</th>
+                                        <th>Số điện thoại</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($role as $data)
+                                        <tr>
+                                            <td>{{ $data->name }}</td>
+                                            <td>{{ $data->gender }}</td>
+                                            <td>{{ $data->birth_date }}</td>
+                                            <td>{{ $data->email }}</td>
+                                            <td>{{ $data->phone }}</td>
+                                        </tr>
+                                    @endforeach
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div> <!-- end card body -->
+                    <div class="card-footer border-top">
+                        <nav aria-label="Page navigation">
+                            {!! $role->links('pagination::bootstrap-5') !!}
+                        </nav>
+                    </div>
+                </div>
+
+            </div>
+
             
         </div>
         <!-- end row -->

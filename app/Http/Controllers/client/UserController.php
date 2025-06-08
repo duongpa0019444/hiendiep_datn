@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 
 class UserController extends Controller
 {
-    public function dashBoard(){
-        return view('client.home');
+    public function information(){
+        return view('client.accounts.information');
     }
 }

@@ -13,14 +13,15 @@ use Illuminate\Support\Str;
 class AccountController extends Controller
 {
     public function account()
-    {
+    {   
+        $role = User::orderBy('id', 'desc')->paginate(7);
+
         $roleCounts = User::select('role', DB::raw('count(*) as total'))
             ->groupBy('role')
             ->pluck('total', 'role') // ['admin' => 10, 'teacher' => 5, ...]
             ->toArray();
 
-
-        return view('admin.accounts.account', compact('roleCounts'));
+        return view('admin.accounts.account', compact('roleCounts', 'role'));
     }
 
     public function list($role)

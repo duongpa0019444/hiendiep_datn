@@ -42,8 +42,7 @@ class loginController extends Controller
                 if($user->role === 'admin' || $user->role === 'staff'){
                     return redirect()->route('admin.dashboard')->with('success', 'Đăng nhập thành công!');
                 }else{
-                    return redirect()->route('home')->with('success', 'Đăng nhập thành công!');
-
+                    return redirect()->route('client.information')->with('success', 'Đăng nhập thành công!');
                 }
 
             } else {
@@ -85,7 +84,6 @@ class loginController extends Controller
                 'password.confirmed' => 'Xác nhận mật khẩu không khớp!',
             ]);
 
-            // Tạo người dùng mới
             $user = User::create([
                 'name' => $request->input('name'),
                 'phone' => $request->input('phone'),
@@ -95,21 +93,13 @@ class loginController extends Controller
 
             ]);
 
-           
-            // Đăng nhập tự động sau khi đăng ký (tùy chọn)
-            // Auth::login($user);
+            
+            // Đăng nhập tự động sau khi đăng ký 
             if ($user && Hash::check($request->input('password'), $user->password)) {
-                // dd($user);   
                 Auth::login($user);
-                // sau khi đăng nhập nên chuyển về trang chủ
                 return redirect()->route('home')->with('success', 'Đăng nhập thành công!');
             }
-
-            // Redirect về trang thành công
-            return redirect()->route('auth.login')->with('success', 'Đăng ký thành công!');
-        } else {
-            return view('auth.register');
-        }
+        } 
     }
 
      public function logout()
