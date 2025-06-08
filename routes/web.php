@@ -63,4 +63,6 @@ Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function
     Route::get('score', [UserController::class, 'score'])->name('client.score');
     Route::get('quizz', [UserController::class, 'quizz'])->name('client.quizz');
     Route::get('account', [UserController::class, 'account'])->name('client.account');
+
 });
+

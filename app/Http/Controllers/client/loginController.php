@@ -43,6 +43,7 @@ class loginController extends Controller
                     return redirect()->route('admin.dashboard')->with('success', 'Đăng nhập thành công!');
                 } else {
                     return redirect()->route('client.information')->with('success', 'Đăng nhập thành công!');
+
                 }
             } else {
                 return redirect()->back()->with('error', 'Sai email hoặc mật khẩu!');

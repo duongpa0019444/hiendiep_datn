@@ -27,4 +27,8 @@ class UserController extends Controller
         return view('client.accounts.students.account');
 
     }
+
+    public function myAccount(){
+        return view('client.myAccount.index');
+    }
 }
