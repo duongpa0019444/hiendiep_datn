@@ -95,7 +95,7 @@ class loginController extends Controller
             ]);
 
 
-            // Đăng nhập tự động sau khi đăng ký 
+            // Đăng nhập tự động sau khi đăng ký
             if ($user && Hash::check($request->input('password'), $user->password)) {
 
                 Auth::login($user);

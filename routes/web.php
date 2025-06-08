@@ -27,10 +27,18 @@ Route::post('/reset-password', [loginController::class, 'resetPassword'])->name(
 // Route dành cho admin và nhân viên --
 Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(function () {
     // trang quản trị cho admin
-
-
     Route::get('dashboard', [DashboardController::class, 'dashBoard'])->name('admin.dashboard');
     Route::get('dashboard/chart/{course_id}', [DashboardController::class, 'chart']);
+
+
+    // Trang quản lý tài khoản
+    Route::get('/account', [AccountController::class, 'account'])->name('admin.account');
+    Route::get('/account/{role}', [AccountController::class, 'list'])->name('admin.account.list');
+    Route::get('/account-add/{role}', [AccountController::class, 'add'])->name('admin.account.add');
+    Route::post('/account-store/{role}', [AccountController::class, 'store'])->name('admin.account.store');
+    Route::get('/account-edit/{role}/{id}', [AccountController::class, 'edit'])->name('admin.account.edit');
+    Route::post('/account-store/{role}/{id}', [AccountController::class, 'update'])->name('admin.account.update');
+    Route::get('/account-delete/{role}/{id}', [AccountController::class, 'delete'])->name('admin.account.delete');
 
     // Trang quản lý học phí Thanh toán
     Route::get('course-payments', [coursePaymentController::class, 'index'])->name('admin.course_payments');
@@ -48,7 +56,15 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
 
 
 
-Route::middleware([CheckRole::class . ':student,teacher'])->group(function () {
-    Route::get('my-account', [UserController::class, 'myAccount'])->name('admin.myAccount');
+
+// Routes dành cho client
+Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function () {
+    // trang quản trị cho người dùng
+    Route::get('information', [UserController::class, 'information'])->name('client.information');
+    Route::get('schedule', [UserController::class, 'schedule'])->name('client.schedule');
+    Route::get('score', [UserController::class, 'score'])->name('client.score');
+    Route::get('quizz', [UserController::class, 'quizz'])->name('client.quizz');
+    Route::get('account', [UserController::class, 'account'])->name('client.account');
 
 });
+

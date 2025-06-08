@@ -34,6 +34,8 @@
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+      {{-- LINK Jquery --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     {{-- LINK Jquery --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -322,8 +324,6 @@
                         </li>
 
 
-
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/admin/statistical">
                                 <span class="nav-icon">

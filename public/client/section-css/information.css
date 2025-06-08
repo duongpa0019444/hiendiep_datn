@@ -1,0 +1,133 @@
+.my-account {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar-myAccount {
+    width: 250px;
+    background: white;
+    color: rgb(0, 0, 0);
+    padding: 20px;
+    height: 80vh;
+    position: fixed;
+    border-radius: 8px;
+}
+
+.sidebar-myAccount h2 {
+    margin-bottom: 30px;
+    font-size: 24px;
+    text-align: center;
+    color: #000000;
+}
+
+.sidebar-myAccount ul {
+    list-style: none;
+}
+
+.sidebar-myAccount ul li {
+    margin: 20px 0;
+}
+
+.sidebar-myAccount ul li a {
+    color: rgb(0, 0, 0);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.sidebar-myAccount ul li a:hover,
+.sidebar-myAccount ul li a.active {
+    background: #f0f0f0;
+}
+
+.sidebar-myAccount ul li a i {
+    margin-right: 10px;
+}
+
+.content {
+    margin-left: 250px;
+    padding-left: 20px;
+    width: calc(100% - 250px);
+}
+
+.content h1 {
+    margin-bottom: 20px;
+    color: #004d66;
+}
+
+.content-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.content-section.active {
+    display: block;
+}
+
+.content-section table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.content-section table th,
+.content-section table td {
+    padding: 12px;
+    border: 1px solid #b3e0f2;
+    text-align: left;
+}
+
+.content-section table th {
+    background: #004d66;
+    color: white;
+}
+
+.quiz-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.quiz-item {
+    background: #e6ecef;
+    padding: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.quiz-item:hover {
+    background: #b3e0f2;
+}
+
+.quiz-item.active {
+    background: #006d8f;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .sidebar-myAccount {
+        width: 200px;
+    }
+
+    .content {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+    }
+}
+
+@media (max-width: 576px) {
+    .sidebar-myAccount {
+        display: none;
+    }
+
+    .content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
