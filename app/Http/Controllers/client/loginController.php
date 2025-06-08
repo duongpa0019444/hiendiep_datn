@@ -41,6 +41,7 @@ class loginController extends Controller
                 // sau khi đăng nhập nên chuyển về trang chủ
                 if ($user->role === 'admin' || $user->role === 'staff') {
                     return redirect()->route('admin.dashboard')->with('success', 'Đăng nhập thành công!');
+
                 } else {
                     return redirect()->route('client.information')->with('success', 'Đăng nhập thành công!');
 
@@ -96,6 +97,7 @@ class loginController extends Controller
 
             // Đăng nhập tự động sau khi đăng ký
             if ($user && Hash::check($request->input('password'), $user->password)) {
+
                 Auth::login($user);
                 return redirect()->route('home')->with('success', 'Đăng nhập thành công!');
             }
@@ -160,6 +162,7 @@ class loginController extends Controller
         } catch (\Exception $e) {
             return back()->withErrors(['email' => 'Không thể gửi email. Vui lòng thử lại sau.']);
         }
+
     }
 
     // Hiển thị form đặt lại mật khẩu

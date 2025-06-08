@@ -30,6 +30,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('dashboard', [DashboardController::class, 'dashBoard'])->name('admin.dashboard');
     Route::get('dashboard/chart/{course_id}', [DashboardController::class, 'chart']);
 
+
     // Trang quản lý tài khoản
     Route::get('/account', [AccountController::class, 'account'])->name('admin.account');
     Route::get('/account/{role}', [AccountController::class, 'list'])->name('admin.account.list');
@@ -38,10 +39,6 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/account-edit/{role}/{id}', [AccountController::class, 'edit'])->name('admin.account.edit');
     Route::post('/account-store/{role}/{id}', [AccountController::class, 'update'])->name('admin.account.update');
     Route::get('/account-delete/{role}/{id}', [AccountController::class, 'delete'])->name('admin.account.delete');
-
-
-    // Quản lí điểm số
-    Route::get('/score', [ScoreController::class, 'score'])->name('admin.score');
 
     // Trang quản lý học phí Thanh toán
     Route::get('course-payments', [coursePaymentController::class, 'index'])->name('admin.course_payments');
@@ -53,7 +50,12 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('course-payments/{id}/show', [coursePaymentController::class, 'show'])->name('admin.course_payments.show');
     Route::get('course-payments/{id}/download', [coursePaymentController::class, 'download'])->name('admin.course_payments.download');
     Route::get('/admin/course-payments/export', [coursePaymentController::class, 'exportExcel'])->name('admin.course_payments.export');
+
+
 });
+
+
+
 
 // Routes dành cho client
 Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function () {

@@ -37,6 +37,8 @@
       {{-- LINK Jquery --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
+    {{-- LINK Jquery --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 
 <body>
@@ -322,8 +324,6 @@
                         </li>
 
 
-
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/admin/statistical">
                                 <span class="nav-icon">
@@ -412,7 +412,7 @@
 
                         </li>
                     @elseif (auth()->user()->isUser())
-                         <li class="menu-title">Quản lý</li>
+                        <li class="menu-title">Quản lý</li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.dashboard') }}">
@@ -488,6 +488,7 @@
 
     </div>
 
+
     <!-- ========== Footer End ========== -->
     <!-- Vendor Javascript (Require in all Page) -->
     <script src="{{ asset('admin/js/vendor.js') }}"></script>
@@ -524,6 +525,7 @@
                 });
         }, 300000); // 5phút
     </script>
+
 
     @stack('scripts')
 

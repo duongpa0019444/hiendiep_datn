@@ -62,10 +62,8 @@ chart.render();
 
 
 
-
 //
-// GROUPED BAR CHART - CHART Ở TRANG DASHBOARD - TÙNG DƯƠNG
-//
+// GROUPED BAR CHART
 var colors = ["#22C55E", "#FF6C2F"];
 var options = {
   chart: {
