@@ -11,7 +11,9 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Exports\CoursePaymentsExport;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+
 class coursePaymentController extends Controller
 {
     //
@@ -81,9 +83,9 @@ class coursePaymentController extends Controller
 
             $payment = CoursePayment::findOrFail($id);
             if ($payment->status == 'paid') {
-                $payment->payment_date = $request->payment_date ?? now();
-            } else {
                 $payment->payment_date = $request->payment_date;
+            } else {
+                $payment->payment_date = $request->payment_date  ?? now();
             }
             $payment->method = $request->method;
             $payment->status = $request->status;
@@ -170,5 +172,64 @@ class coursePaymentController extends Controller
     {
         $filters = $request->only(['keyword', 'class_id', 'status_class', 'status', 'method']);
         return Excel::download(new CoursePaymentsExport($filters), 'danh_sach_thanh_toan.xlsx');
+    }
+
+
+
+    public function showPaymentStudent()
+    {
+        $userId = Auth::id();
+        $payments = CoursePayment::with(['user', 'class', 'course'])
+            ->where('student_id', $userId)
+            ->where('status', 'unpaid')
+            ->get();
+
+        return response()->json($payments);
+    }
+
+    public function updatePayment(Request $request)
+    {
+        // Kiểm tra người dùng đã đăng nhập
+        if (!Auth::check()) {
+            return response()->json([
+                'error' => 'Bạn cần đăng nhập để thực hiện hành động này'
+            ], 401);
+        }
+
+        // Kiểm tra dữ liệu đầu vào
+        $request->validate([
+            'paidContent' => 'required|string|max:255',
+        ]);
+
+        $id = Auth::user()->id;
+        $payments = CoursePayment::where('student_id', $id)
+            ->where('status', 'unpaid')
+            ->get();
+
+        // Kiểm tra nếu không có thanh toán
+        if ($payments->isEmpty()) {
+            return response()->json([
+                'error' => 'Không tìm thấy thanh toán chưa hoàn thành'
+            ], 404);
+        }
+
+        try {
+            foreach ($payments as $payment) {
+                $payment->status = 'paid';
+                $payment->payment_code = $request->paidContent;
+                $payment->method = 'Bank Transfer';
+                $payment->payment_date = now();
+                $payment->save();
+            }
+
+            return response()->json([
+                'success' => 'Cập nhật thanh toán thành công',
+                'payment_code' => $request->paidContent
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Lỗi khi cập nhật thanh toán: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
