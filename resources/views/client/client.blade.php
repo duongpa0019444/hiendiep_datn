@@ -29,6 +29,7 @@
     <!-- Main CSS -->
     <link rel="stylesheet" href="{{ asset('client/style.css') }}" />
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 
 </head>
@@ -67,31 +68,12 @@
                     <nav class="offcanvas__menu">
                         <ul class="offcanvas__menu_ul">
                             <li class="offcanvas__menu_li">
-                                <a class="offcanvas__menu_item" href="index.html">Home</a>
-                                <ul class="offcanvas__sub_menu">
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="index.html" class="offcanvas__sub_menu_item">Home One</a>
-                                    </li>
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="index-2.html" class="offcanvas__sub_menu_item">Home Two</a>
-                                    </li>
+                                <a class="offcanvas__menu_item" href="{{ route('home') }}">Trang chủ</a>
 
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="index-3.html" class="offcanvas__sub_menu_item">Home Three</a>
-                                    </li>
-
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="index-4.html" class="offcanvas__sub_menu_item">Home Four</a>
-                                    </li>
-
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="index-5.html" class="offcanvas__sub_menu_item">Home Five</a>
-                                    </li>
-                                </ul>
                             </li>
 
                             <li class="offcanvas__menu_li">
-                                <a class="offcanvas__menu_item" href="course-1.html">Courses</a>
+                                <a class="offcanvas__menu_item" href="course-1.html">Khóa học</a>
                                 <ul class="offcanvas__sub_menu">
                                     <li class="offcanvas__sub_menu_li">
                                         <a href="course-1.html" class="offcanvas__sub_menu_item">Course One</a>
@@ -110,77 +92,45 @@
                             </li>
 
                             <li class="offcanvas__menu_li">
-                                <a class="offcanvas__menu_item" href="javascript:void(0)">Pages</a>
+                                <a class="offcanvas__menu_item" href="blog.html">Bài viết</a>
                                 <ul class="offcanvas__sub_menu">
                                     <li class="offcanvas__sub_menu_li">
-                                        <a href="product.html" class="offcanvas__sub_menu_item">Products</a>
-                                        <ul class="offcanvas__sub_menu">
-                                            <li class="offcanvas__sub_menu_li">
-                                                <a class="offcanvas__sub_menu_item" href="product.html">Product</a>
-                                            </li>
-                                            <li class="offcanvas__sub_menu_li">
-
-                                                <a class="offcanvas__sub_menu_item" href="product-details.html">Product
-
-                                                    Details</a>
-                                            </li>
-                                            <li class="offcanvas__sub_menu_li">
-                                                <a class="offcanvas__sub_menu_item" href="cart.html">Product Cart</a>
-                                            </li>
-                                            <li class="offcanvas__sub_menu_li">
-                                                <a class="offcanvas__sub_menu_item" href="checkout.html">Product
-                                                    Checkout</a>
-                                            </li>
-                                        </ul>
+                                        <a href="blog.html" class="offcanvas__sub_menu_item">Tin tức giáo dục</a>
                                     </li>
                                     <li class="offcanvas__sub_menu_li">
-                                        <a href="teacher.html" class="offcanvas__sub_menu_item">Teacher </a>
-                                        <ul class="offcanvas__sub_menu">
-                                            <li class="offcanvas__sub_menu_li">
-                                                <a class="offcanvas__sub_menu_item" href="teacher.html">Teacher</a>
-                                            </li>
-                                            <li class="offcanvas__sub_menu_li">
-                                                <a class="offcanvas__sub_menu_item"
-                                                    href="teacher-details.html">Teacher
-                                                    Details</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="faq.html" class="offcanvas__sub_menu_item">Faq</a>
-                                    </li>
-
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="404.html" class="offcanvas__sub_menu_item">404 Error</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="offcanvas__menu_li">
-                                <a class="offcanvas__menu_item" href="blog.html">News</a>
-                                <ul class="offcanvas__sub_menu">
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="blog.html" class="offcanvas__sub_menu_item">Blog</a>
-                                    </li>
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Blog Details</a>
+                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Tin tức công nghệ</a>
                                     </li>
                                 </ul>
                             </li>
 
                             <li class="offcanvas__menu_li">
-                                <a class="offcanvas__menu_item active" href="about-1.html">About</a>
-                                <ul class="offcanvas__sub_menu">
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="about-1.html" class="offcanvas__sub_menu_item active">About One</a>
-                                    </li>
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="about-2.html" class="offcanvas__sub_menu_item">About Two</a>
-                                    </li>
-                                </ul>
+                                <a class="offcanvas__menu_item active" href="about-1.html">Giới thiệu</a>
+
                             </li>
 
                             <li class="offcanvas__menu_li">
-                                <a class="offcanvas__menu_item" href="contact.html">Contact</a>
+                                <a class="offcanvas__menu_item" href="contact.html">Liên hệ</a>
+                            </li>
+
+                            <li class="offcanvas__menu_li mt-4">
+                                <a class="offcanvas__menu_item" href="blog.html"><i class="icofont-user me-2"></i>Tài khoản của bạn</a>
+                                <ul class="offcanvas__sub_menu">
+                                    <li class="offcanvas__sub_menu_li">
+                                        <a href="blog.html" class="offcanvas__sub_menu_item">Dashboard</a>
+                                    </li>
+                                    <li class="offcanvas__sub_menu_li">
+                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Lịch học</a>
+                                    </li>
+                                     <li class="offcanvas__sub_menu_li">
+                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Điểm số</a>
+                                    </li>
+                                      <li class="offcanvas__sub_menu_li">
+                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Bài quizz</a>
+                                    </li>
+                                         <li class="offcanvas__sub_menu_li">
+                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Thông tin tài khoản</a>
+                                    </li>
+                                </ul>
                             </li>
                         </ul>
                     </nav>
@@ -225,7 +175,8 @@
                                     </li>
 
                                     <li>
-                                        <a href="javascript:void(0)">Bài viết<i class="fi fi-ss-angle-small-down"></i></a>
+                                        <a href="javascript:void(0)">Bài viết<i
+                                                class="fi fi-ss-angle-small-down"></i></a>
                                         <ul class="sub-menu">
                                             <li><a href="#">Tin giáo dục </a></li>
                                             <li><a href="#">Tin công nghệ </a></li>
@@ -251,8 +202,8 @@
 
                                     @guest
                                         <button type="button" class="register-btn" data-bs-toggle="modal"
-                                            data-bs-target="#loginModal">
-                                            Log In
+                                            data-bs-target="#loginModal"><i class="icofont-user me-2"></i>
+                                            Đăng nhập
                                         </button>
                                     @endguest
 
@@ -263,16 +214,14 @@
                                                 <a href="{{ route('client.information') }}">
                                                     <span class="fw-medium name-user">{{ Auth::user()->name }} </span>
 
-                                                    <img
-                                                        src="{{ asset('client/images/icons/teacher.svg') }}"
+                                                    <img src="{{ asset('client/images/icons/teacher.svg') }}"
                                                         alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px">
                                                 </a>
                                             @elseif (Auth::user()->role == 'student')
                                                 <a href="{{ route('client.information') }}">
                                                     <span class="fw-medium name-user">{{ Auth::user()->name }} </span>
 
-                                                    <img
-                                                        src="{{ asset('client/images/icons/studentBoy.svg') }}"
+                                                    <img src="{{ asset('client/images/icons/studentBoy.svg') }}"
                                                         alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px">
                                                 </a>
                                             @endif
@@ -790,6 +739,100 @@
         </div>
     </div>
     <!-- End Sidebar  -->
+
+
+    <!-- Modal -->
+    <div id="customModal" class="modal" tabindex="-1" style=" background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-xl" style="margin-top: 20px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">THÔNG BÁO ĐÓNG HỌC PHÍ!</h5>
+                    <button type="button" class="btn-close" onclick="closeModal('customModal')"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">
+                        Trung tâm ngoại ngữ Hiền Diệp thông báo về việc <strong class="text-danger">đóng học
+                            phí</strong>
+                        cho khóa hiện tại. Vui lòng kiểm tra
+                        thông tin dưới đây và thực hiện thanh toán đúng hạn!
+                    </p>
+                    <h6>Thông tin thanh toán:</h6>
+                    <ul>
+                        <li class="text-black">
+                            <strong>Tên học sinh:</strong> <span
+                                id="studentName">{{ Auth::user()->name ?? '' }}</span>
+                            <strong class="ms-4">Ngày sinh:</strong> <span`
+                                id="studentName">{{ \Carbon\Carbon::parse(Auth::user()->birth_date??"")->format('d/m/Y') }}</span>
+
+                        </li>
+
+                    </ul>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Khóa học</th>
+                                <th>Lớp</th>
+                                <th>Số tiền phải đóng (VNĐ)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="body-infomation-payment-student">
+
+
+                        </tbody>
+                    </table>
+                    <p class="mb-3">
+                        Vui lòng thực hiện thanh toán qua mã QR tại đây:
+                        <button class="text-primary fw-bold btn-showQr-payment" target="_blank">Xem mã QR
+                            thanh toán </button>
+                    </p>
+                    <p class="text-end mt-3">
+                        Trân trọng,
+                        Trung tâm ngoại ngữ Hiền Diệp!<br>
+                        <em>Ngày {{ now()->format('d') }} tháng {{ now()->format('m') }} năm
+                            {{ now()->format('Y') }}</em>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div id="qrModal" class="modal" tabindex="-1" style=" background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-md" style="margin-top: 20px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Mã Thanh toán!</h5>
+                    <button type="button" class="btn-close btn-close-qr"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p>Quét mã QR để thanh toán:</p>
+                    <img src="https://via.placeholder.com/200" alt="QR Code" class="img-fluid" id="qrCode">
+                    <p>Nội dung chuyển khoản: <span id="qrContent"></span></p>
+                    <p>Số tiền: <span id="qrAmount"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {{-- Thông báo --}}
+    <!-- Popup container -->
+    <div id="customAlert" class="custom-alert-backdrop" role="alert" aria-modal="true" aria-hidden="true">
+        <div class="custom-alert-box">
+            <div class="particles">
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+            </div>
+            <div class="custom-alert-icon"></div>
+            <div class="custom-alert-title" id="alertTitle"></div>
+            <div class="custom-alert-text" id="alertText"></div>
+            <button class="custom-alert-btn" id="alertBtn">OK</button>
+        </div>
+    </div>
 
     <!-- Back to top area start here -->
     <!-- Start Back To Top  -->

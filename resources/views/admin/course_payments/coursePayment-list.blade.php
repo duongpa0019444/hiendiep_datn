@@ -558,13 +558,17 @@
                                 Thao tác <iconify-icon icon="tabler:caret-down-filled" class="ms-1"></iconify-icon>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#"><iconify-icon icon="solar:eye-broken" class="me-1"></iconify-icon> Xem hóa đơn</a></li>
-                                 <li data-bs-target="#modal-course-payment">
-                                    <button
-                                        class="dropdown-item text-warning btn-edit-course-payment"
-                                        data-coursePayment_id="${payment.id}"><iconify-icon
-                                            icon="solar:pen-2-broken"
-                                            class="me-1"></iconify-icon> Sửa</button>
+
+                                ${payment.status === 'paid' ? `
+                                <li data-bs-target="#modal-printCoursePayment">
+                                    <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
+                                        <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
+                                    </button>
+                                </li>` : ''}
+                                <li data-bs-target="#modal-course-payment">
+                                    <button class="dropdown-item text-warning btn-edit-course-payment" data-coursePayment_id="${ payment.id }">
+                                        <iconify-icon icon="solar:pen-2-broken" class="me-1"></iconify-icon> Sửa
+                                    </button>
                                 </li>
                                 <li>
                                     <form action="/admin/course-payments/${payment.id}/delete" method="post">
@@ -801,14 +805,15 @@
                                         </button>
                                         <ul class="dropdown-menu">
 
-                                             ${payment.status === 'paid' ? `
-                                                            <li>
-                                                                <a class="dropdown-item" href="#">
-                                                                    <iconify-icon icon="solar:eye-broken" class="me-1"></iconify-icon> Xem hóa đơn
-                                                                </a>
-                                                            </li>` : ''}
-                                            <li>
-                                                <button class="dropdown-item text-warning btn-edit-course-payment" data-coursepayment_id="${payment.id}" data-bs-target="#modal-course-payment">
+                                            ${payment.status === 'paid' ? `
+                                            <li data-bs-target="#modal-printCoursePayment">
+                                                <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
+                                                    <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
+                                                </button>
+                                            </li>` : ''}
+
+                                            <li data-bs-target="#modal-course-payment">
+                                                <button class="dropdown-item text-warning btn-edit-course-payment" data-coursePayment_id="${ payment.id }">
                                                     <iconify-icon icon="solar:pen-2-broken" class="me-1"></iconify-icon> Sửa
                                                 </button>
                                             </li>

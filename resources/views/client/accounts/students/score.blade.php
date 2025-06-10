@@ -2,7 +2,7 @@
 
 @section('content-information')
     <div id="grades" class="content-section">
-        <h1>Điểm Số</h1>
+        <h2>Điểm Số</h2>
         <table>
             <tr>
                 <th>Môn Học</th>

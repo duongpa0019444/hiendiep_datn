@@ -65,6 +65,8 @@ Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function
     Route::get('score', [UserController::class, 'score'])->name('client.score');
     Route::get('quizz', [UserController::class, 'quizz'])->name('client.quizz');
     Route::get('account', [UserController::class, 'account'])->name('client.account');
+    Route::get('course-payments/infomation', [coursePaymentController::class, 'showPaymentStudent']); //Lấy thông tin thanh toán của học sinh
+    Route::post('course-payments/updatePayment', [coursePaymentController::class, 'updatePayment'])->name('admin.course_payments.updatePayment');
 
 });
 
