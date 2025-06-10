@@ -4,11 +4,17 @@ namespace App\Http\Controllers\client;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\coursePayment;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     public function information(){
-        return view('client.accounts.students.dashboard');
+        $userId = Auth::user()->id;
+        $unPaymentInfo = coursePayment::where('student_id', $userId)
+            ->where('status', 'unpaid')
+            ->get();
+        return view('client.accounts.students.dashboard', compact('unPaymentInfo'));
     }
 
     public function schedule(){
@@ -28,7 +34,5 @@ class UserController extends Controller
 
     }
 
-    public function myAccount(){
-        return view('client.myAccount.index');
-    }
+
 }

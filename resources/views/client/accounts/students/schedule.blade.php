@@ -2,7 +2,7 @@
 
 @section('content-information')
     <div id="schedule" class="content-section">
-        <h1>Thời Khóa Biểu</h1>
+        <h2>Thời Khóa Biểu</h2>
         <table>
             <tr>
                 <th>Thời Gian</th>
