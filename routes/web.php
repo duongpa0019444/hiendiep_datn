@@ -7,6 +7,7 @@ use App\Http\Controllers\admin\ScoreController;
 use App\Http\Controllers\client\loginController;
 use App\Http\Controllers\client\UserController;
 use App\Http\Controllers\admin\coursePaymentController;
+use App\Http\Controllers\admin\quizzesController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckRoleClient;
 use Illuminate\Support\Facades\Route;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
-Route::get('logout',[loginController::class, 'logout'])->name('auth.logout');
+Route::get('logout', [loginController::class, 'logout'])->name('auth.logout');
 Route::post('login', [loginController::class, 'login'])->name('loginAuth');
 Route::post('register', [loginController::class, 'register'])->name('registerAuth');
 
@@ -29,7 +30,8 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     // trang quản trị cho admin
     Route::get('dashboard', [DashboardController::class, 'dashBoard'])->name('admin.dashboard');
     Route::get('dashboard/chart/{course_id}', [DashboardController::class, 'chart']);
-
+    // Quản lí điểm số
+    Route::get('/score', [ScoreController::class, 'score'])->name('admin.score');
 
     // Trang quản lý tài khoản
     Route::get('/account', [AccountController::class, 'account'])->name('admin.account');
@@ -52,6 +54,15 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/admin/course-payments/export', [coursePaymentController::class, 'exportExcel'])->name('admin.course_payments.export');
 
 
+    //Trang quản lý quizz
+    Route::get('quizzes', [quizzesController::class, 'index'])->name('admin.quizz');
+    Route::get('quizzes/{id}/detail', [quizzesController::class, 'detail'])->name('admin.quizzes.detail');
+    Route::get('quizzes/filter', [quizzesController::class, 'filter'])->name('admin.quizzes.filter');
+    Route::delete('quizzes/{id}/delete', [quizzesController::class, 'delete'])->name('admin.quizzes.delete');
+    Route::post('quizzes/store', [quizzesController::class, 'store'])->name('admin.quizzes.store');
+    Route::put('quizzes/{id}/update', [quizzesController::class, 'update'])->name('admin.quizzes.update');
+
+
 });
 
 
@@ -69,4 +80,3 @@ Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function
     Route::post('course-payments/updatePayment', [coursePaymentController::class, 'updatePayment'])->name('admin.course_payments.updatePayment');
 
 });
-

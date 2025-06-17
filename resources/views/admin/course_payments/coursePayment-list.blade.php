@@ -22,7 +22,7 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
-                                    <h4 class="card-title mb-2 d-flex align-items-center gap-2 fs-5">Tổng đã thanh toán</h4>
+                                    <h4 class="card-title mb-2 d-flex align-items-center gap-2 fs-5">Đã thanh toán</h4>
                                     <p class="text-muted fw-medium fs-22 mb-0" id="total_paid">
                                         {{ number_format(\DB::table('course_payments')->where('status', 'paid')->sum('amount'), 0, ',', '.') }}
                                         VNĐ
@@ -43,7 +43,7 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
-                                    <h4 class="card-title mb-2 d-flex align-items-center gap-2 fs-5">Tổng chưa thanh toán
+                                    <h4 class="card-title mb-2 d-flex align-items-center gap-2 fs-5">Chưa thanh toán
                                     </h4>
                                     <p class="text-muted fw-medium fs-22 mb-0" id="total_unpaid">
                                         {{ number_format(\DB::table('course_payments')->where('status', 'unpaid')->sum('amount'), 0, ',', '.') }}
@@ -104,8 +104,7 @@
             </div>
             <div class="d-flex justify-content-between">
                 <h4 class="card-title mb-1">Danh sách thanh toán học phí</h4>
-                <a id="export-btn" href="#"
-                    class="btn btn-outline-primary btn-sm">
+                <a id="export-btn" href="#" class="btn btn-outline-primary btn-sm">
                     <iconify-icon icon="material-symbols:download" class="fs-20"></iconify-icon> Xuất file
                 </a>
 
@@ -114,85 +113,85 @@
             <!-- Payment List -->
             <div class="row">
                 <div class="col-xl-12">
-                    <div class="card">
-                        <div class="card-header p-2">
-                            <form method="GET" action="{{ route('admin.course_payments.filter') }}"
-                                class="row g-2 d-flex align-items-end" id="searchForm">
-                                <input type="hidden" name="limit" id="limit" value="10">
+                    <div class="card p-2">
+                        <form method="GET" action="{{ route('admin.course_payments.filter') }}"
+                            class="row g-2 d-flex align-items-end" id="searchForm">
+                            <input type="hidden" name="limit" id="limit" value="10">
 
-                                <div class="col-12 col-md-6 col-lg-4 col-xl-2">
-                                    <label for="keyword" class="form-label mb-1">Từ khóa</label>
-                                    <input type="text" name="keyword" id="keyword" class="form-control form-control-sm"
-                                        placeholder="Tên học sinh">
-                                </div>
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-2">
+                                <label for="keyword" class="form-label mb-1">Từ khóa</label>
+                                <input type="text" name="keyword" id="keyword" class="form-control form-control-sm"
+                                    placeholder="Tên học sinh">
+                            </div>
 
-                                <div class="col-12 col-md-6 col-lg-4 col-xl-2">
-                                    <label for="class_filter" class="form-label mb-1">Lớp</label>
-                                    <select name="class_id" id="class_filter" class="form-select form-select-sm"
-                                        data-choices>
-                                        <option value="">Tất cả</option>
-                                        @foreach (\DB::table('classes')->get() as $class)
-                                            <option value="{{ $class->id }}"
-                                                {{ request('class_id') == $class->id ? 'selected' : '' }}>
-                                                {{ $class->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-2">
+                                <label for="class_filter" class="form-label mb-1">Lớp</label>
+                                <select name="class_id" id="class_filter" class="form-select form-select-sm" data-choices>
+                                    <option value="">Tất cả</option>
+                                    @foreach (\DB::table('classes')->get() as $class)
+                                        <option value="{{ $class->id }}"
+                                            {{ request('class_id') == $class->id ? 'selected' : '' }}>
+                                            {{ $class->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                                <div class="col-12 col-md-6 col-lg-4 col-xl-2">
-                                    <label for="status_class_filter" class="form-label mb-1">Trạng thái lớp học</label>
-                                    <select name="status_class" id="status_class_filter" class="form-select form-select-sm">
-                                        <option value="">Tất cả</option>
-                                        <option value="in_progress"
-                                            {{ request('status_class') == 'in_progress' ? 'selected' : '' }}>Đang hoạt động
-                                        </option>
-                                        <option value="completed"
-                                            {{ request('status_class') == 'completed' ? 'selected' : '' }}>Đã hoàn thành
-                                        </option>
-                                        <option value="not_started"
-                                            {{ request('status_class') == 'not_started' ? 'selected' : '' }}>Chưa bắt đầu
-                                        </option>
-                                    </select>
-                                </div>
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-2">
+                                <label for="status_class_filter" class="form-label mb-1">Trạng thái lớp học</label>
+                                <select name="status_class" id="status_class_filter" class="form-select form-select-sm">
+                                    <option value="">Tất cả</option>
+                                    <option value="in_progress"
+                                        {{ request('status_class') == 'in_progress' ? 'selected' : '' }}>Đang hoạt động
+                                    </option>
+                                    <option value="completed"
+                                        {{ request('status_class') == 'completed' ? 'selected' : '' }}>Đã hoàn thành
+                                    </option>
+                                    <option value="not_started"
+                                        {{ request('status_class') == 'not_started' ? 'selected' : '' }}>Chưa bắt đầu
+                                    </option>
+                                </select>
+                            </div>
 
-                                <div class="col-12 col-md-6 col-lg-4 col-xl-2">
-                                    <label for="status_filter" class="form-label mb-1">Trạng thái thanh toán</label>
-                                    <select name="status" id="status_filter" class="form-select form-select-sm">
-                                        <option value="">Tất cả</option>
-                                        <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Đã
-                                            thanh
-                                            toán
-                                        </option>
-                                        <option value="unpaid" {{ request('status') == 'unpaid' ? 'selected' : '' }}>Chưa
-                                            thanh toán</option>
-                                    </select>
-                                </div>
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-2">
+                                <label for="status_filter" class="form-label mb-1">Trạng thái thanh toán</label>
+                                <select name="status" id="status_filter" class="form-select form-select-sm">
+                                    <option value="">Tất cả</option>
+                                    <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Đã
+                                        thanh
+                                        toán
+                                    </option>
+                                    <option value="unpaid" {{ request('status') == 'unpaid' ? 'selected' : '' }}>Chưa
+                                        thanh toán</option>
+                                </select>
+                            </div>
 
-                                <div class="col-12 col-md-6 col-lg-4 col-xl-2">
-                                    <label for="method_filter" class="form-label mb-1">Phương thức thanh toán</label>
-                                    <select name="method" id="method_filter" class="form-select form-select-sm">
-                                        <option value="">Tất cả</option>
-                                        <option value="Bank Transfer"
-                                            {{ request('method') == 'Bank Transfer' ? 'selected' : '' }}>Chuyển khoản
-                                        </option>
-                                        <option value="Cash" {{ request('method') == 'Cash' ? 'selected' : '' }}>Tiền
-                                            mặt
-                                        </option>
-                                    </select>
-                                </div>
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-2">
+                                <label for="method_filter" class="form-label mb-1">Phương thức thanh toán</label>
+                                <select name="method" id="method_filter" class="form-select form-select-sm">
+                                    <option value="">Tất cả</option>
+                                    <option value="Bank Transfer"
+                                        {{ request('method') == 'Bank Transfer' ? 'selected' : '' }}>Chuyển khoản
+                                    </option>
+                                    <option value="Cash" {{ request('method') == 'Cash' ? 'selected' : '' }}>Tiền
+                                        mặt
+                                    </option>
+                                </select>
+                            </div>
 
-                                <div class="col-12 col-md-6 col-lg-4 col-xl-2 d-flex align-items-end gap-2">
-                                    <button type="submit" class="btn btn-success btn-sm w-50">Lọc</button>
-                                    <button type="reset" class="btn btn-danger btn-sm w-50">Xóa</button>
-                                </div>
-                            </form>
-                        </div>
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-2 d-flex align-items-end gap-2">
+                                <button type="submit" class="btn btn-success btn-sm w-50">Lọc</button>
+                                <button type="reset" class="btn btn-danger btn-sm w-50">Xóa</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card" style="border-radius: 0;">
 
                         <div class="card-body p-0">
                             <div class="table-responsive table-gridjs">
-                                <table class="table align-middle mb-0 table-hover table-centered">
-                                    <thead class="bg-light-subtle">
+                                <table class="table  rounded align-middle mb-0 table-hover table-centered" >
+                                    <thead class="table-dark">
                                         <tr>
                                             <th>Tên học sinh</th>
                                             <th>Lớp</th>
@@ -220,7 +219,7 @@
                                                 </td>
 
                                                 </td>
-                                                <td>{{ number_format($payment->amount, 0, ',', '.') }}</td>
+                                                <td class="text-end">{{ number_format($payment->amount, 0, ',', '.') }}</td>
                                                 <td>
                                                     <span
                                                         class="badge {{ $payment->status == 'paid' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' }} py-1 px-2">
@@ -265,8 +264,9 @@
                                                                     method="post">
                                                                     @csrf
                                                                     @method('DELETE')
-                                                                    <button class="dropdown-item text-danger"
-                                                                        id="sweetalert-params">
+                                                                    <button
+                                                                        class="dropdown-item text-danger sweetalert-params-coursepayment"
+                                                                        type="button">
                                                                         <iconify-icon
                                                                             icon="solar:trash-bin-minimalistic-2-broken"
                                                                             class="me-1"></iconify-icon> Xóa
@@ -542,7 +542,7 @@
                         <div class="fs-6">Khóa: ${payment.course?.name || ''}</div>
                     </td>
                     <td>${formatDateTime(payment.payment_date)}</td>
-                    <td>${Number(payment.amount).toLocaleString('vi-VN')}</td>
+                    <td class="text-end">${Number(payment.amount).toLocaleString('vi-VN')}</td>
                     <td>
                         <span class="badge ${payment.status === 'paid' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'} py-1 px-2">
                             ${payment.status === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
@@ -560,11 +560,12 @@
                             <ul class="dropdown-menu">
 
                                 ${payment.status === 'paid' ? `
-                                <li data-bs-target="#modal-printCoursePayment">
-                                    <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
-                                        <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
-                                    </button>
-                                </li>` : ''}
+                                        <li data-bs-target="#modal-printCoursePayment">
+                                            <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
+                                                <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
+                                            </button>
+                                        </li>` : ''}
+
                                 <li data-bs-target="#modal-course-payment">
                                     <button class="dropdown-item text-warning btn-edit-course-payment" data-coursePayment_id="${ payment.id }">
                                         <iconify-icon icon="solar:pen-2-broken" class="me-1"></iconify-icon> Sửa
@@ -574,7 +575,7 @@
                                     <form action="/admin/course-payments/${payment.id}/delete" method="post">
                                         <input type="hidden" name="_token" value="${csrfToken}">
                                         <input type="hidden" name="_method" value="DELETE">
-                                        <button type="submit" class="dropdown-item text-danger" id="sweetalert-params">
+                                        <button type="button" class="dropdown-item text-danger sweetalert-params-coursepayment">
                                             <iconify-icon icon="solar:trash-bin-minimalistic-2-broken" class="me-1"></iconify-icon> Xóa
                                         </button>
                                     </form>
@@ -788,7 +789,7 @@
                                     <div class="fs-6">Khóa: ${payment.course?.name || ''}</div>
                                 </td>
                                 <td>${formatDateTime(payment.payment_date)}</td>
-                                <td>${Number(payment.amount).toLocaleString('vi-VN')}</td>
+                                <td class="text-end">${Number(payment.amount).toLocaleString('vi-VN')}</td>
                                 <td>
                                     <span class="badge ${payment.status === 'paid' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'} py-1 px-2">
                                         ${payment.status === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
@@ -806,11 +807,13 @@
                                         <ul class="dropdown-menu">
 
                                             ${payment.status === 'paid' ? `
-                                            <li data-bs-target="#modal-printCoursePayment">
-                                                <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
-                                                    <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
-                                                </button>
-                                            </li>` : ''}
+
+                                                    <li data-bs-target="#modal-printCoursePayment">
+                                                        <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
+                                                            <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
+                                                        </button>
+                                                    </li>` : ''}
+
 
                                             <li data-bs-target="#modal-course-payment">
                                                 <button class="dropdown-item text-warning btn-edit-course-payment" data-coursePayment_id="${ payment.id }">
@@ -821,7 +824,7 @@
                                                 <form action="/admin/course-payments/${payment.id}/delete" method="post">
                                                     <input type="hidden" name="_token" value="${csrfToken}">
                                                     <input type="hidden" name="_method" value="DELETE">
-                                                    <button type="submit" class="dropdown-item text-danger" id="sweetalert-params">
+                                                    <button type="button" class="dropdown-item text-danger sweetalert-params-coursepayment">
                                                         <iconify-icon icon="solar:trash-bin-minimalistic-2-broken" class="me-1"></iconify-icon> Xóa
                                                     </button>
                                                 </form>
@@ -845,57 +848,56 @@
 
 
         //Hàm xử lý xóa dữ liệu
-        if (document.getElementById("sweetalert-params"))
-            document.getElementById("sweetalert-params").addEventListener("click", function(e) {
-                e.preventDefault();
-                const form = $(this).closest('form');
-                const actionUrl = form.attr('action');
-                Swal.fire({
-                    title: 'Bạn có chắc chắn?',
-                    text: "Bạn sẽ không thể hoàn tác hành động này!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Vâng, xóa nó!',
-                    cancelButtonText: 'Không, hủy!',
-                    confirmButtonClass: 'btn btn-primary w-xs me-2 mt-2',
-                    cancelButtonClass: 'btn btn-danger w-xs mt-2',
-                    buttonsStyling: false,
-                    showCloseButton: false
-                }).then(function(result) {
+        $(document).on('click', '.sweetalert-params-coursepayment', function(e) {
+            e.preventDefault();
+            const form = $(this).closest('form');
+            const actionUrl = form.attr('action');
+            Swal.fire({
+                title: 'Bạn có chắc chắn?',
+                text: "Bạn sẽ không thể hoàn tác hành động này!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Vâng, xóa nó!',
+                cancelButtonText: 'Không, hủy!',
+                confirmButtonClass: 'btn btn-primary w-xs me-2 mt-2',
+                cancelButtonClass: 'btn btn-danger w-xs mt-2',
+                buttonsStyling: false,
+                showCloseButton: false
+            }).then(function(result) {
 
-                    if (result.value) {
+                if (result.value) {
 
-                        $.ajax({
-                            url: actionUrl,
-                            type: 'POST',
-                            data: form.serialize(),
-                            success: function(response) {
-                                Swal.fire({
-                                    title: 'Đã xóa!',
-                                    text: response.success,
-                                    icon: 'success',
-                                    confirmButtonClass: 'btn btn-primary w-xs mt-2',
-                                    buttonsStyling: false
-                                })
-                                form.closest('tr').remove();
-                                renderStatistics();
-                            },
+                    $.ajax({
+                        url: actionUrl,
+                        type: 'POST',
+                        data: form.serialize(),
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'Đã xóa!',
+                                text: response.success,
+                                icon: 'success',
+                                confirmButtonClass: 'btn btn-primary w-xs mt-2',
+                                buttonsStyling: false
+                            })
+                            form.closest('tr').remove();
+                            renderStatistics();
+                        },
 
-                        })
+                    })
 
-                    } else if (
-                        result.dismiss === Swal.DismissReason.cancel
-                    ) {
-                        Swal.fire({
-                            title: 'Đã hủy',
-                            text: 'Dữ liệu của bạn vẫn an toàn :)',
-                            icon: 'error',
-                            confirmButtonClass: 'btn btn-primary mt-2',
-                            buttonsStyling: false
-                        })
-                    }
-                });
+                } else if (
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    Swal.fire({
+                        title: 'Đã hủy',
+                        text: 'Dữ liệu của bạn vẫn an toàn :)',
+                        icon: 'error',
+                        confirmButtonClass: 'btn btn-primary mt-2',
+                        buttonsStyling: false
+                    })
+                }
             });
+        });
 
 
 

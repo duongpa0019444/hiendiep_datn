@@ -191,6 +191,43 @@
                     </div> <!-- end card -->
                 </div> <!-- end col -->
             </div> <!-- end row -->
+            <div class="card mt-2 p-2">
+                <table class="table table-centered table-hover">
+                    <h4 class="card-title mb-1">Lớp học (ngày 16/06/2025)</h4>
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">STT</th>
+                            <th scope="col">Lớp học</th>
+                            <th scope="col">Môn học</th>
+                            <th scope="col">Giáo viên</th>
+                            <th scope="col">Thời gian</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Lớp IELTS-1</td>
+                            <td>IELTS</td>
+                            <td>Phạm Minh Tuấn</td>
+                            <td>18:30 - 20:30</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Lớp IELTS-1</td>
+                            <td>IELTS</td>
+                            <td>Phạm Minh Tuấn</td>
+                            <td>18:30 - 20:30</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Lớp IELTS-1</td>
+                            <td>IELTS</td>
+                            <td>Phạm Minh Tuấn</td>
+                            <td>18:30 - 20:30</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
         </div>
         <!-- End Container Fluid -->

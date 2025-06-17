@@ -300,7 +300,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/statistical">
+                            <a class="nav-link" href="{{ route('admin.quizz') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:document-report"></iconify-icon>
                                 </span>
