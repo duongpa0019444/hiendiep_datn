@@ -33,6 +33,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 
+
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
     {{-- LINK Jquery --}}
@@ -277,7 +278,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#order">
+                            <a class="nav-link" href=" {{ route('admin.course-list') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:clipboard-list"></iconify-icon>
                                 </span>

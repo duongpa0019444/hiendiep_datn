@@ -195,7 +195,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="fw-bold">{{ $payment->class->name }}</div>
-                                                    <div class="fs-6">Khóa: {{ $payment->course->name }}</div>
+                                                    {{-- <div class="fs-6">Khóa: {{ $payment->courses->name }}</div> --}}
                                                 </td>
                                                 <td>
                                                     {{ $payment->payment_date ? \Carbon\Carbon::parse($payment->payment_date)->format('H:i d/m/Y') : '' }}
