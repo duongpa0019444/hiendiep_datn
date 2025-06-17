@@ -3,9 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class classes extends Model
 {
+    use SoftDeletes;
+    protected $dates = ['deleted_at']; // Cột lưu thời gian xóa mềm
+    protected $table = 'classes';
+
+    protected $fillable = ['name', 'courses_id', 'number_of_sessions', 'status', 'created_at', 'updated_at'];
 
     // Quan hệ với khóa học (courses)
     public function course()

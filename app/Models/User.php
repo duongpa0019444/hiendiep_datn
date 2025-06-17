@@ -18,7 +18,7 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-     protected $fillable = [
+    protected $fillable = [
         'name',
         'email',
         'phone',
@@ -27,7 +27,7 @@ class User extends Authenticatable
         'gender',
         'birth_date',
         'role',
-        
+
     ];
 
     /**
@@ -53,11 +53,15 @@ class User extends Authenticatable
         ];
     }
 
-   
 
     public function hasAnyRole(array $roles)
     {
-         return in_array($this->role, $roles);
+        return in_array($this->role, $roles);
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class, 'teacher_id');
     }
 
 
