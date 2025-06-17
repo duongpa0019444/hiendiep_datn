@@ -18,41 +18,39 @@ class loginController extends Controller
     public function login(Request $request)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $request->validate([
-                'email' => 'required|string|email|max:255',
-                'password' => 'required|string|min:6',
-            ], [
-                'email.required' => 'Email không được để trống!',
-                'email.string' => 'Email phải là dạng chuỗi!',
-                'email.email' => 'Email không đúng định dạng!',
-                'email.max' => 'Email không được vượt quá 255 ký tự!',
+            $username = $request->input('username');
+            $password = $request->input('password');
 
-                'password.required' => 'Mật khẩu không được để trống!',
-                'password.string' => 'Mật khẩu phải là dạng chuỗi!',
-                'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự!',
-            ]);
-
-
-            $user = User::where('email', '=', $request->input('email'))->first();
-
-            if ($user && Hash::check($request->input('password'), $user->password)) {
-                // dd($user);
-                Auth::login($user);
-                // sau khi đăng nhập nên chuyển về trang chủ
-                if ($user->role === 'admin' || $user->role === 'staff') {
-                    return redirect()->route('admin.dashboard')->with('success', 'Đăng nhập thành công!');
-
-                } else {
-                    return redirect()->route('client.information')->with('success', 'Đăng nhập thành công!');
-
-                }
-            } else {
-                return redirect()->back()->with('error', 'Sai email hoặc mật khẩu!');
+            if (empty($username) || empty($password)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Sai tên đăng nhập hoặc mật khẩu!'
+                ]);
             }
-        } else {
-            return view('auth.login');
+
+            $user = User::where('username', $username)->first();
+
+            if ($user && Hash::check($password, $user->password)) {
+                Auth::login($user);
+
+                $redirect = in_array($user->role, ['admin', 'staff'])
+                    ? route('admin.dashboard')
+                    : route('client.information');
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Đăng nhập thành công!',
+                    'redirect' => $redirect
+                ]);
+            }
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Sai tên đăng nhập hoặc mật khẩu!'
+            ]);
         }
     }
+
 
     public function register(Request $request)
     {
@@ -162,7 +160,6 @@ class loginController extends Controller
         } catch (\Exception $e) {
             return back()->withErrors(['email' => 'Không thể gửi email. Vui lòng thử lại sau.']);
         }
-
     }
 
     // Hiển thị form đặt lại mật khẩu
@@ -220,7 +217,4 @@ class loginController extends Controller
         // Trả về phản hồi
         return redirect()->route('auth.login')->with('success', 'Mật khẩu đã được đặt lại thành công!');
     }
-
-
-
 }

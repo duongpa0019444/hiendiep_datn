@@ -1,0 +1,2 @@
+- thêm ng dùng: mật khẩu có thể mặc định là email luôn
+- quản lí điểm số có thể nhập excel vào 
