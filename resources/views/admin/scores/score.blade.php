@@ -5,9 +5,41 @@
 
     <div class="page-content">
         <div class="container-fluid ">
-          
-
+            <div class="row">
+                <div class="col-lg-3">
+                    <form method="GET" action="{{route('admin.score.search')}}" class="app-search d-none d-md-block ms-2">
+                        <div class="position-relative">
+                            <input type="search" name="query" class="form-control" placeholder="Tìm lớp học và khóa học..." autocomplete="off" value="{{ request()->query('query') ?? '' }}">
+                            <iconify-icon icon="solar:magnifer-linear" class="search-widget-icon"></iconify-icon>
+                        </div>
+                    </form>
+                </div>
+            </div>
             
+            <div class="row mt-3">
+                @foreach ($data as $class)
+                    <div class="col-lg-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <a href="{{ route('admin.score.detail', ['class_id' => $class->id, 'course_id' => $class->courses_id ])}}">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <h4 class="card-title mb-2 d-flex align-items-center ">Lớp:</h4>
+                                            <h4 class="card-title mb-2 d-flex align-items-center ">khóa học:</h4>
+                                        </div>
+                                        <div>
+                                            <h4 class="card-title mb-2 d-flex align-items-center ">{{ $class->name }}</h4>
+                                            <h4 class="card-title mb-2 d-flex align-items-center ">{{ $class->course->name }}
+                                            </h4>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div> 
+
         </div>
         <!-- end row -->
         <!-- End Container Fluid -->

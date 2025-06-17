@@ -26,74 +26,33 @@
                             action="{{ route('admin.account.update', ['role' => request('role'), 'id' => request('id')]) }}"
                             enctype="multipart/form-data">
                             @csrf
+                            @method('PUT')
                             <div class="card-body">
                                 <div class="row">
 
-                                    {{-- <div class="dropzone" id="myDropzone">
-                                        <div class="fallback">
-                                            <input name="avatar" type="file" multiple="multiple">
-                                        </div>
-                                        <div class="dz-message needsclick">
-                                            <i class="h1 bx bx-cloud-upload"></i>
-                                            <h3>Drop files here or click to upload.</h3>
-                                            <span class="text-muted fs-13">
-                                                (This is just a demo dropzone. Selected files are <strong>not</strong>
-                                                actually uploaded.)
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <ul class="list-unstyled mb-0" id="dropzone-preview">
-                                        <li class="mt-2" id="dropzone-preview-list">
-                                            <!-- This is used as the file preview template -->
-                                            <div class="border rounded">
-                                                <div class="d-flex p-2">
-                                                    <div class="flex-shrink-0 me-3">
-                                                        <div class="avatar-sm bg-light rounded">
-                                                            <img data-dz-thumbnail class="img-fluid rounded d-block"
-                                                                src="{{ asset($info->avatar) }}"
-                                                                alt="{{ $info->avatar }}" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex-grow-1">
-                                                        <div class="pt-1">
-                                                            <h5 class="fs-14 mb-1" data-dz-name>&nbsp;</h5>
-                                                            <p class="fs-13 text-muted mb-0" data-dz-size></p>
-                                                            <strong class="error text-danger" data-dz-errormessage></strong>
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex-shrink-0 ms-3">
-                                                        <button data-dz-remove class="btn btn-sm btn-danger">Delete</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul> --}}
-                                    <!-- end dropzon-preview -->
-
-
                                     <div class="col-lg-6">
-                                        <div class="mb-3">
+                                        <div class=" d-flex justify-content-start align-items-start gap-4">
                                             @if (!empty($info->avatar))
-                                                <div class="mb-2">
-                                                    <img src="{{ asset($info->avatar) }}" alt="Ảnh đại diện" width="100">
-
+                                                <div>
+                                                    <label class="form-label d-block mb-2">Ảnh hiện tại</label>
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <img src="{{ asset($info->avatar) }}" alt="Ảnh đại diện"
+                                                            style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid #ccc;">
+                                                    </div>
                                                 </div>
-                                                <label for="roles-name" class="form-label">Sửa ảnh</label>
-                                                <input type="file" name="avatar" value="{{ $info->avatar }}"
-                                                    class="form-control">
-                                            @else
-                                                <label for="roles-name" class="form-label">Ảnh </label>
-                                                <input type="file" name="avatar" value="{{ $info->avatar }}"
-                                                    class="form-control">
                                             @endif
 
-
+                                            <div>
+                                                <label for="avatar" class="form-label">Chọn ảnh mới</label>
+                                                <input type="file" name="avatar" id="avatar" class="form-control">
+                                            </div>
                                         </div>
                                     </div>
+
+
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="roles-name" class="form-label">Tên </label>
+                                            <label for="roles-name" class="form-label">Tên người dùng</label>
                                             <input type="text" value="{{ $info->name }}" id="roles-name" name="name"
                                                 class="form-control" placeholder="Nhập tên ...">
                                         </div>
@@ -101,9 +60,16 @@
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
+                                            <label for="user-name" class="form-label">Tên đăng nhập</label>
+                                            <input type="text" value="{{ $info->username }}" id="user-name" name="username"
+                                                class="form-control" placeholder="Nhập tên đăng nhập...">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="mb-3">
                                             <label for="user-name" class="form-label">Email</label>
                                             <input type="email" value="{{ $info->email }}" id="user-name" name="email"
-                                                class="form-control" placeholder="Nhập email...">
+                                                class="form-control" placeholder="Nhập Email...">
                                         </div>
                                     </div>
 
@@ -155,7 +121,7 @@
 
                             </div>
                             <div class="card-footer border-top">
-                                <button type="submit" class="btn btn-primary">Create Roles</button>
+                                <button type="submit" class="btn btn-primary">Cập nhật người dùng</button>
                             </div>
                         </form>
                     </div>

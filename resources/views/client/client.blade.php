@@ -99,7 +99,8 @@
                                         <a href="blog.html" class="offcanvas__sub_menu_item">Tin tức giáo dục</a>
                                     </li>
                                     <li class="offcanvas__sub_menu_li">
-                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Tin tức công nghệ</a>
+                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Tin tức công
+                                            nghệ</a>
                                     </li>
                                 </ul>
                             </li>
@@ -114,7 +115,8 @@
                             </li>
 
                             <li class="offcanvas__menu_li mt-4">
-                                <a class="offcanvas__menu_item" href="blog.html"><i class="icofont-user me-2"></i>Tài khoản của bạn</a>
+                                <a class="offcanvas__menu_item" href="blog.html"><i class="icofont-user me-2"></i>Tài
+                                    khoản của bạn</a>
                                 <ul class="offcanvas__sub_menu">
                                     <li class="offcanvas__sub_menu_li">
                                         <a href="blog.html" class="offcanvas__sub_menu_item">Dashboard</a>
@@ -122,14 +124,15 @@
                                     <li class="offcanvas__sub_menu_li">
                                         <a href="blog-details.html" class="offcanvas__sub_menu_item">Lịch học</a>
                                     </li>
-                                     <li class="offcanvas__sub_menu_li">
+                                    <li class="offcanvas__sub_menu_li">
                                         <a href="blog-details.html" class="offcanvas__sub_menu_item">Điểm số</a>
                                     </li>
-                                      <li class="offcanvas__sub_menu_li">
+                                    <li class="offcanvas__sub_menu_li">
                                         <a href="blog-details.html" class="offcanvas__sub_menu_item">Bài quizz</a>
                                     </li>
-                                         <li class="offcanvas__sub_menu_li">
-                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Thông tin tài khoản</a>
+                                    <li class="offcanvas__sub_menu_li">
+                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Thông tin tài
+                                            khoản</a>
                                     </li>
                                 </ul>
                             </li>
@@ -224,6 +227,13 @@
 
                                                     <img src="{{ asset('client/images/icons/studentBoy.svg') }}"
                                                         alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px">
+                                                </a>
+                                            @elseif (Auth::user()->role == 'admin')
+                                                <a href="{{ route('admin.dashboard') }}">
+                                                    <span class="fw-medium name-user">{{ Auth::user()->name }} </span>
+                                                    {{-- 
+                                                    <img src="{{ asset('client/images/icons/studentBoy.svg') }}"
+                                                        alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px"> --}}
                                                 </a>
                                             @endif
 
@@ -480,24 +490,24 @@
                         <img src="{{ asset('client/images/logo.svg') }}" alt="logo" />
                     </a>
                     <h3 class="ed-auth__modal-title">Sign In Now</h3>
-                    <p class="ed-auth__modal-text">
-                        Didn’t Create an account?
-                        <button type="button" data-bs-toggle="modal" data-bs-target="#registerModal">
-                            Sign Up
-                        </button>
-                    </p>
+
                 </div>
 
                 <!-- Auth Body  -->
                 <div class="ed-auth__modal-body">
+                    <div class="alert alert-danger" id="alert-login" role="alert" style="display: none">
+                        Sai tên đăng nhập hoặc mật khẩu
+                    </div>
                     <form action="{{ route('loginAuth') }}" method="POST" class="ed-auth__modal-form">
                         @csrf
                         <div class="form-group">
-                            <input type="email" name="email" placeholder="Enter user email" required />
+                            <input type="text" id="usernameLogin" name="username" placeholder="Enter password"
+                                required />
                         </div>
 
                         <div class="form-group">
-                            <input type="password" name="password" placeholder="Enter password" required />
+                            <input type="password" id="passwordLogin" name="password" placeholder="Enter password"
+                                required />
                         </div>
 
                         <div class="form-check">
@@ -507,43 +517,20 @@
                                 Remember me
                             </label>
                         </div>
-                        <div class="ed-auth__form-btn">
-                            <button type="submit" class="ed-btn">Sign In<i
+                        <div class="ed-auth__form-btn d-flex justify-content-end">
+                            <button id="btn-login" type="submit" class="ed-btn">Sign In<i
                                     class="fi fi-rr-arrow-small-right"></i></button>
                         </div>
                     </form>
                 </div>
-                <!-- Auth Footer  -->
-                <div class="ed-auth__modal-footer">
-                    <div class="ed-auth__modal-third-party">
-                        <p>Or Sign In with</p>
-                        <ul class="ed-auth__modal-third-party-list">
-                            <li>
-                                <a class="google-login" href="https://www.google.com/"><img
-                                        src="{{ asset('client/images/icons/icon-color-google.svg') }}"
-                                        alt="icon-color-google" /></a>
-                            </li>
 
-                            <li>
-                                <a class="facebook-login" href="https://facebook.com/"><img
-                                        src="{{ asset('client/images/icons/icon-color-facebook.svg') }}"
-                                        alt="icon-color-facebook" /></a>
-                            </li>
-                            <li>
-                                <a class="linkedin-login" href="https://www.linkedin.com/"><img
-                                        src="{{ asset('client/images/icons/icon-color-linkedin.svg') }}"
-                                        alt="icon-color-linkedin" /></a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
     <!-- End Login Modal -->
 
     <!-- Start Register Modal -->
-    <div class="modal fade ed-auth__modal" id="registerModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    {{-- <div class="modal fade ed-auth__modal" id="registerModal" tabindex="-1" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="ed-auth__modal-content modal-content">
@@ -646,7 +633,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <!-- End Register Modal -->
 
 
@@ -762,8 +749,9 @@
                         <li class="text-black">
                             <strong>Tên học sinh:</strong> <span
                                 id="studentName">{{ Auth::user()->name ?? '' }}</span>
-                            <strong class="ms-4">Ngày sinh:</strong> <span`
-                                id="studentName">{{ \Carbon\Carbon::parse(Auth::user()->birth_date??"")->format('d/m/Y') }}</span>
+                            <strong class="ms-4">Ngày sinh:</strong>
+                            <span` id="studentName">
+                                {{ \Carbon\Carbon::parse(Auth::user()->birth_date ?? '')->format('d/m/Y') }}</span>
 
                         </li>
 
@@ -878,6 +866,34 @@
     <script src="{{ asset('client/plugins/js/active.js') }}"></script>
 
     @stack('script')
+    <script>
+        $('#btn-login').on('click', function(e) {
+            e.preventDefault();
+
+            const username = $('#usernameLogin').val();
+            const password = $('#passwordLogin').val();
+            $.ajax({
+                url: "{{ route('loginAuth') }}",
+                type: 'POST',
+                data: {
+                    username: username,
+                    password: password,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.status && response.redirect) {
+                        window.location.href = response.redirect;
+                    } else {
+                        $('#alert-login').show();  
+                    }
+                },
+                error: function(xhr) {
+                    const res = xhr.responseJSON;
+                    // alert(res?.message || 'Đăng nhập thất bại');
+                }
+            });
+        });
+    </script>
 </body>
 
 <!-- Mirrored from bizantheme.com/php/eduna-php/index.php by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 13 May 2025 09:12:16 GMT -->

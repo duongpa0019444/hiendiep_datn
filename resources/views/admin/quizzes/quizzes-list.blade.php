@@ -622,7 +622,7 @@
                                     <ul class="dropdown-menu">
                                          <li><a href="/admin/quizzes/${quiz.id}/detail"
                                                                     class="dropdown-item text-info"
-                                                                    data-quiz-id="{{ $quiz->id }}"><iconify-icon
+                                                                    data-quiz-id="${ $quiz->id }"><iconify-icon
                                                                         icon="solar:eye-broken"
                                                                         class="me-1"></iconify-icon> Chi tiết</a></li>
                                         <li><a class="dropdown-item text-warning btn-edit-quiz" href="#" data-bs-toggle="modal" data-bs-target="#modal-add-quiz" data-quiz-id="${quiz.id}"><iconify-icon icon="solar:pen-2-broken" class="me-1"></iconify-icon> Sửa</a></li>

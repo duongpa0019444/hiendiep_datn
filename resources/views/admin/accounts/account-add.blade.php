@@ -1,5 +1,5 @@
 @extends('admin.admin')
-@section('title', 'Thêm ' . request('role'))
+@section('title', 'Nhập điểm')
 @section('description', '')
 @section('content')
 
@@ -20,7 +20,7 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Thông tin {{ request('role') }}</h4>
+                            <h4 class="card-title fw-bold">Thêm {{ request('role') }}</h4>
                         </div>
                         <form method="POST" action="{{ route('admin.account.store', ['role' => request('role')]) }}"
                             enctype="multipart/form-data">
@@ -28,82 +28,41 @@
                             <div class="card-body">
                                 <div class="row">
 
-                                    {{-- <div class="dropzone" id="myDropzone">
-                                        <div class="fallback">
-                                            <input name="avatar" type="file" multiple="multiple">
-                                        </div>
-                                        <div class="dz-message needsclick">
-                                            <i class="h1 bx bx-cloud-upload"></i>
-                                            <h3>Drop files here or click to upload.</h3>
-                                            <span class="text-muted fs-13">
-                                                (This is just a demo dropzone. Selected files are <strong>not</strong>
-                                                actually uploaded.)
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <ul class="list-unstyled mb-0" id="dropzone-preview">
-                                        <li class="mt-2" id="dropzone-preview-list">
-                                            <!-- This is used as the file preview template -->
-                                            <div class="border rounded">
-                                                <div class="d-flex p-2">
-                                                    <div class="flex-shrink-0 me-3">
-                                                        <div class="avatar-sm bg-light rounded">
-                                                            <img data-dz-thumbnail class="img-fluid rounded d-block"
-                                                                src="{{ old('avatar') }}" alt="" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex-grow-1">
-                                                        <div class="pt-1">
-                                                            <h5 class="fs-14 mb-1" data-dz-name>&nbsp;</h5>
-                                                            <p class="fs-13 text-muted mb-0" data-dz-size></p>
-                                                            <strong class="error text-danger" data-dz-errormessage></strong>
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex-shrink-0 ms-3">
-                                                        <button data-dz-remove class="btn btn-sm btn-danger">Delete</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul> --}}
-                                    <!-- end dropzon-preview -->
-
-
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="roles-name" class="form-label">Ảnh </label>
+                                            <label for="roles-name" class="form-label fw-semibold">Ảnh </label>
                                             <input type="file" name="avatar" class="form-control">
 
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="roles-name" class="form-label">Tên </label>
-                                            <input type="text" id="roles-name" name="name" class="form-control"
-                                                placeholder="Nhập tên ...">
+                                            <label for="roles-name" class="form-label fw-semibold">Tên người dùng</label>
+                                            <input type="text"  name="name" class="form-control"
+                                                placeholder="Nhập tên người dùng...">
                                         </div>
                                     </div>
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="user-name" class="form-label">Email</label>
-                                            <input type="text" id="user-name" name="email" class="form-control"
-                                                placeholder="Nhập email...">
+                                            <label for="user-name" class="form-label fw-semibold">Tên đăng nhập</label>
+                                            <input type="text" name="username" class="form-control"
+                                                placeholder="Nhập tên đăng nhập...">
+                                                <i>Lưu ý: mật khẩu mặc định là tên đăng nhập</i>
                                         </div>
                                     </div>
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="" class="form-label">password</label>
-                                            <input type="text" name="password" class="form-control"
-                                                placeholder="Nhập password...">
+                                            <label for="user-name" class="form-label fw-semibold">Email</label>
+                                            <input type="email" name="email" class="form-control"
+                                                placeholder="Nhập email..">
                                         </div>
                                     </div>
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="" class="form-label">phone</label>
+                                            <label for="" class="form-label fw-semibold">phone</label>
                                             <input type="tel" name="phone" class="form-control"
                                                 placeholder="Nhập phone...">
                                         </div>
@@ -111,14 +70,14 @@
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="" class="form-label">birth_date</label>
+                                            <label for="" class="form-label fw-semibold">birth_date</label>
                                             <input type="date" name="birth_date" class="form-control"
                                                 placeholder="Nhập birth_date...">
                                         </div>
                                     </div>
 
                                     <div class="col-lg-6">
-                                        <p>Giới tính</p>
+                                        <p class="fw-semibold">Giới tính</p>
                                         <div class="d-flex gap-2 align-items-center">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" value="boy"

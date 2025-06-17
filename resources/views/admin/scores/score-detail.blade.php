@@ -1,5 +1,5 @@
 @extends('admin.admin')
-@section('title', 'Quản lí ' . request('role'))
+@section('title', 'Bảng điểm')
 @section('description', '')
 @section('content')
 
@@ -12,52 +12,55 @@
                 </div>
             @endif
             <div class="row">
+                
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="card-title">Danh sách {{ request('role') }}</h4>
-                        @if (request('role'))
-                            <a href="{{ route('admin.account.add', ['role' => request('role')]) }}"
-                                class="btn btn-sm btn-primary">
-                                Thêm người dùng
+                        <h4 class="card-title">Bảng điểm </h4>
+                        <div>
+                            <a href="{{ route('admin.score.add', [request('class_id')]) }}" class="btn btn-sm btn-primary">
+                                Nhập điểm mới
                             </a>
-                        @endif
+                            <a href="{{ route('admin.scores.export', [request('class_id')  , request('course_id')]) }}" class="btn btn-sm btn-success">
+                                Xuất Excel  
+                            </a>
+                        </div>
 
                     </div> <!-- end card-header-->
                     <div class="card-body p-0">
-                        <div class="px-3" >
+                        <div class="px-3">
                             <table class="table table-hover mb-0 table-centered">
                                 <thead>
                                     <tr>
-                                        <th>Ảnh đại diện</th>
-                                        <th>Tên</th>
-                                        <th>Giới tính</th>
-                                        <th>Ngày sinh nhật</th>
-                                        <th>Email</th>
-                                        <th>Số điện thoại</th>
+                                        <th>Họ Tên</th>
+                                        <th>Lớp</th>
+                                        <th>Khóa học</th>
+                                        <th>Loại Điểm</th>
+                                        <th>Điểm</th>
+                                        <th>Ngày</th>
                                         <th>Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($role as $data)
+                                    @foreach ($data as $score)
+                                    
                                         <tr>
-                                            <td><img class="rounded" src="{{ asset($data->avatar) }}" width="50"
-                                                    alt="{{ $data->name }}">
-                                            </td>
-                                            <td>{{ $data->name }}</td>
-                                            <td>{{ $data->gender }}</td>
-                                            <td>{{ $data->birth_date }}</td>
-                                            <td>{{ $data->email }}</td>
-                                            <td>{{ $data->phone }}</td>
+                                            {{-- sử lí bảng score và thêm modol score vào --}}
+                                            <td>{{ $score->student->name }}</td>
+                                            <td>{{ $score->class->name }}</td>
+                                            <td>{{ $score->class->course->name }}</td>
+                                            <td>{{ $score->score_type }}</td> {{-- làm hàm trong model score --}}
+                                            <td>{{ $score->score }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($score->exam_date)->format('d/m/Y') }}</td>
                                             <td>
                                                 <div class="d-flex gap-2">
 
-                                                    <a href="{{ route('admin.account.edit', ['role' => request('role'), 'id' => $data->id]) }}"
+                                                    <a href="{{ route('admin.score.edit', ['class_id' => request('class_id'), 'id' => $score->id]) }}"
                                                         class="btn btn-soft-primary btn-sm"><iconify-icon
                                                             icon="solar:pen-2-broken"
                                                             class="align-middle fs-18"></iconify-icon></a>
-                                                    <a href="{{ route('admin.account.delete', ['role' => request('role'), 'id' => $data->id]) }}"
+                                                    <a href="{{ route('admin.score.delete', ['id' => $score->id ]) }}"
                                                         class="btn btn-soft-danger btn-sm"
-                                                        onclick="return confirm('Bạn có muốn xóa {{ request('role') }} {{ $data->name }} ?')">
+                                                        onclick="return confirm('Bạn có muốn xóa {{ $score->scoreTypeVN() }} của học sinh {{ $score->student->name }} ?')">
                                                         <iconify-icon icon="solar:trash-bin-minimalistic-2-broken"
                                                             class="align-middle fs-18"></iconify-icon></a>
                                                 </div>
@@ -71,7 +74,7 @@
                     </div> <!-- end card body -->
                     <div class="card-footer border-top">
                         <nav aria-label="Page navigation">
-                            {!! $role->links('pagination::bootstrap-5') !!}
+                            {!! $data->links('pagination::bootstrap-5') !!}
                         </nav>
                     </div>
                 </div>
