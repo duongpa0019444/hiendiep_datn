@@ -565,6 +565,7 @@
                                                 <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
                                             </button>
                                         </li>` : ''}
+
                                 <li data-bs-target="#modal-course-payment">
                                     <button class="dropdown-item text-warning btn-edit-course-payment" data-coursePayment_id="${ payment.id }">
                                         <iconify-icon icon="solar:pen-2-broken" class="me-1"></iconify-icon> Sửa
@@ -806,11 +807,13 @@
                                         <ul class="dropdown-menu">
 
                                             ${payment.status === 'paid' ? `
+
                                                     <li data-bs-target="#modal-printCoursePayment">
                                                         <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
                                                             <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
                                                         </button>
                                                     </li>` : ''}
+
 
                                             <li data-bs-target="#modal-course-payment">
                                                 <button class="dropdown-item text-warning btn-edit-course-payment" data-coursePayment_id="${ payment.id }">

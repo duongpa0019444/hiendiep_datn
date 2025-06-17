@@ -235,6 +235,7 @@
                                 </p>
                             </div>
                         </div>
+
                     </div>
                     <!-- Single Features Card  -->
                     <div class="col-lg-4 col-md-6 col-12">
@@ -295,6 +296,7 @@
                                     <div class="ed-course__teacher">
                                         <i class="fi-rr-user"></i>
                                         <p>Nguyễn Minh Anh</p>
+
                                     </div>
                                 </div>
 
