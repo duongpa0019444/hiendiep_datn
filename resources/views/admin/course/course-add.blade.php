@@ -16,12 +16,11 @@
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Thêm ảnh</h4>
-                                
                         </div>
                         <div class="card-body">
                             <!-- File Upload -->
                             <div class="fallback">
-                                <input type="file" name="image" accept="image/*" multiple>
+                                <input type="file" name="image"  multiple>
                             </div>
                         </div>
                     </div>

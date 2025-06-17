@@ -114,6 +114,8 @@ class CourseController  extends Controller
         $course->teaching_goals = $request->input('teaching_goals');
 
         $course->save();
+    // dd($request->all()); 
+
 
         return redirect()->route('admin.course-list')->with('success', 'Thêm khóa học thành công');
     }

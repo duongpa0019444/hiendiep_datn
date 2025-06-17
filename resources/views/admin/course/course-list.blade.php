@@ -247,12 +247,9 @@
                                                 <div class="d-flex align-items-center gap-2">
                                                     <div
                                                         class="rounded bg-light avatar-md d-flex align-items-center justify-content-center">
-                                                        @if ($course->image)
-                                                            <img src="{{ asset($course->image) }}"
+                                                        
+                                                        <img src="{{ $course->image }}"
                                                                 width="80" height="auto">
-                                                        @else
-                                                            <span>Không có ảnh</span>
-                                                        @endif
                                                     </div>
 
                                                 </div>
