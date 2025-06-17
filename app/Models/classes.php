@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class classes extends Model
 {
+      protected $table = 'classes'; 
 
+      
     // Quan hệ với khóa học (courses)
     public function course()
     {

@@ -10,14 +10,14 @@ use App\Http\Controllers\admin\coursePaymentController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckRoleClient;
 use Illuminate\Support\Facades\Route;
-
+use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
-Route::get('logout',[loginController::class, 'logout'])->name('auth.logout');
-Route::post('login', [loginController::class, 'login'])->name('loginAuth');
-Route::post('register', [loginController::class, 'register'])->name('registerAuth');
+Route::get('/logout', [loginController::class, 'logout'])->name('auth.logout');
+Route::post('/login', [loginController::class, 'login'])->name('loginAuth');
+// Route::post('register', [loginController::class, 'register'])->name('registerAuth');
 
 Route::get('/forgot-password', [loginController::class, 'showForgotPasswordForm'])->name('password.request');
 Route::post('/forgot-password', [loginController::class, 'sendResetLinkEmail'])->name('password.email');
@@ -37,8 +37,20 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/account-add/{role}', [AccountController::class, 'add'])->name('admin.account.add');
     Route::post('/account-store/{role}', [AccountController::class, 'store'])->name('admin.account.store');
     Route::get('/account-edit/{role}/{id}', [AccountController::class, 'edit'])->name('admin.account.edit');
-    Route::post('/account-store/{role}/{id}', [AccountController::class, 'update'])->name('admin.account.update');
+    Route::put('/account-update/{role}/{id}', [AccountController::class, 'update'])->name('admin.account.update');
     Route::get('/account-delete/{role}/{id}', [AccountController::class, 'delete'])->name('admin.account.delete');
+
+    // Quản lí điểm số
+    Route::get('/score', [ScoreController::class, 'index'])->name('admin.score');
+    Route::get('/score-search', [ScoreController::class, 'scoreSearch'])->name('admin.score.search');
+    Route::get('/score/{class_id}/{course_id}', [ScoreController::class, 'detail'])->name('admin.score.detail');
+    Route::get('/score-add/{class_id}', [ScoreController::class, 'add'])->name('admin.score.add');
+    Route::post('/score-store/{class_id}', [ScoreController::class, 'store'])->name('admin.score.store');
+    Route::get('/score-edit/{class_id}/{id}', [ScoreController::class, 'edit'])->name('admin.score.edit');
+    Route::put('/score-update/{class_id}/{id}', [ScoreController::class, 'update'])->name('admin.score.update');
+    Route::get('/score-delete/{id}', [ScoreController::class, 'delete'])->name('admin.score.delete');
+    Route::get('/admin/scores/export/{class_id}/{course_id}', [ScoreController::class, 'export'])->name('admin.scores.export');
+
 
     // Trang quản lý học phí Thanh toán
     Route::get('course-payments', [coursePaymentController::class, 'index'])->name('admin.course_payments');
@@ -50,8 +62,6 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('course-payments/{id}/show', [coursePaymentController::class, 'show'])->name('admin.course_payments.show');
     Route::get('course-payments/{id}/download', [coursePaymentController::class, 'download'])->name('admin.course_payments.download');
     Route::get('/admin/course-payments/export', [coursePaymentController::class, 'exportExcel'])->name('admin.course_payments.export');
-
-
 });
 
 
@@ -67,6 +77,4 @@ Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function
     Route::get('account', [UserController::class, 'account'])->name('client.account');
     Route::get('course-payments/infomation', [coursePaymentController::class, 'showPaymentStudent']); //Lấy thông tin thanh toán của học sinh
     Route::post('course-payments/updatePayment', [coursePaymentController::class, 'updatePayment'])->name('admin.course_payments.updatePayment');
-
 });
-

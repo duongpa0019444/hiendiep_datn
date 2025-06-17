@@ -14,7 +14,7 @@ class AccountController extends Controller
 {
     public function account()
     {   
-        $role = User::orderBy('id', 'desc')->paginate(7);
+        $role = User::orderBy('id', 'desc')->paginate(10);
 
         $roleCounts = User::select('role', DB::raw('count(*) as total'))
             ->groupBy('role')
@@ -41,13 +41,14 @@ class AccountController extends Controller
     {
 
         $validated = $request->validate([
-            'name'       => 'required|string|max:255|unique:users',
-            'email'      => 'required|email|max:255|unique:users',
-            'phone' => 'required|digits_between:8,20',
-            'password'   => 'required|string|min:6',
-            'gender'     => 'required|in:boy,girl',
-            'birth_date' => 'required|date',
-            'avatar'     => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'name'       => 'required|string|max:255',
+            'username'       => 'required|string|max:255|unique:users',
+            'email'      => 'nullable|string|email|max:255',
+            'phone'     => 'nullable|digits_between:8,20',
+            'password'   => 'nullable|string',
+            'gender'     => 'nullable|in:boy,girl',
+            'birth_date' => 'nullable|date',
+            'avatar'     => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $role = $request->route('role');
@@ -74,7 +75,7 @@ class AccountController extends Controller
         }
 
         $validated['role'] = $role;
-        $validated['password'] = Hash::make($validated['password']);
+        $validated['password'] = Hash::make($validated['username']);
 
         $user = User::create($validated);
 
@@ -93,12 +94,13 @@ class AccountController extends Controller
         $user = User::findOrFail($id);
 
         $validated = $request->validate([
-            'name'       => 'required|string|max:255|unique:users,name,' . $user->id,
-            'email'      => 'required|email|max:255|unique:users,email,' . $user->id,
-            'phone'      => 'required|digits_between:8,20',
-            'password'   => 'nullable|string|min:6',
-            'gender'     => 'required|in:boy,girl',
-            'birth_date' => 'required|date',
+            'name'       => 'required|string|max:255',
+            'username'   => 'required|string|max:255|unique:users,name,' . $user->id,
+            'email'      => 'nullable|string||min:6',
+            'phone'      => 'nullable|digits_between:8,20',
+            'password'   => 'nullable|string',
+            'gender'     => 'nullable|in:boy,girl',
+            'birth_date' => 'nullable|date',
             'avatar'     => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
