@@ -12,7 +12,7 @@
                 </div>
             @endif
             <div class="row">
-                
+
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="card-title">Bảng điểm </h4>
@@ -20,8 +20,20 @@
                             <a href="{{ route('admin.score.add', [request('class_id')]) }}" class="btn btn-sm btn-primary">
                                 Nhập điểm mới
                             </a>
-                            <a href="{{ route('admin.scores.export', [request('class_id')  , request('course_id')]) }}" class="btn btn-sm btn-success">
-                                Xuất Excel  
+                            <form action="{{ route('admin.scores.import') }}" method="POST" enctype="multipart/form-data"
+                                class="d-inline-block">
+                                @csrf
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="file" name="file" accept=".xlsx,.xls"
+                                        class="form-control form-control-sm" style="max-width: 220px;" required>
+                                    <button type="submit" class="btn btn-sm btn-primary">📥 Nhập điểm</button>
+                                </div>
+                            </form>
+
+
+                            <a href="{{ route('admin.scores.export', [request('class_id'), request('course_id')]) }}"
+                                class="btn btn-sm btn-success">
+                                Xuất điểm Excel
                             </a>
                         </div>
 
@@ -42,7 +54,6 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($data as $score)
-                                    
                                         <tr>
                                             {{-- sử lí bảng score và thêm modol score vào --}}
                                             <td>{{ $score->student->name }}</td>
@@ -58,7 +69,7 @@
                                                         class="btn btn-soft-primary btn-sm"><iconify-icon
                                                             icon="solar:pen-2-broken"
                                                             class="align-middle fs-18"></iconify-icon></a>
-                                                    <a href="{{ route('admin.score.delete', ['id' => $score->id ]) }}"
+                                                    <a href="{{ route('admin.score.delete', ['id' => $score->id]) }}"
                                                         class="btn btn-soft-danger btn-sm"
                                                         onclick="return confirm('Bạn có muốn xóa {{ $score->scoreTypeVN() }} của học sinh {{ $score->student->name }} ?')">
                                                         <iconify-icon icon="solar:trash-bin-minimalistic-2-broken"

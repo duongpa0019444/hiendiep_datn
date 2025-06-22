@@ -45,7 +45,7 @@
                                             </td>
                                             <td>{{ $data->name }}</td>
                                             <td>{{ $data->gender }}</td>
-                                            <td>{{ $data->birth_date }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($data->birth_date)->format('d/m/Y')}}</td>
                                             <td>{{ $data->email }}</td>
                                             <td>{{ $data->phone }}</td>
                                             <td>

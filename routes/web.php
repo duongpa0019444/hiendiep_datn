@@ -8,6 +8,7 @@ use App\Http\Controllers\client\loginController;
 use App\Http\Controllers\client\UserController;
 use App\Http\Controllers\admin\coursePaymentController;
 use App\Http\Controllers\admin\quizzesController;
+use App\Http\Controllers\client\CourseController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckRoleClient;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,9 @@ Route::get('/forgot-password', [loginController::class, 'showForgotPasswordForm'
 Route::post('/forgot-password', [loginController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('/reset-password', [loginController::class, 'showResetPasswordForm'])->name('password.reset');
 Route::post('/reset-password', [loginController::class, 'resetPassword'])->name('password.update');
+
+
+Route::get('/course', [CourseController::class, 'index'])->name('client.course');
 
 // Route dành cho admin và nhân viên --
 Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(function () {
@@ -53,6 +57,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::put('/score-update/{class_id}/{id}', [ScoreController::class, 'update'])->name('admin.score.update');
     Route::get('/score-delete/{id}', [ScoreController::class, 'delete'])->name('admin.score.delete');
     Route::get('/admin/scores/export/{class_id}/{course_id}', [ScoreController::class, 'export'])->name('admin.scores.export');
+    Route::post('/admin/scores/import', [ScoreController::class, 'import'])->name('admin.scores.import');
 
 
     // Trang quản lý học phí Thanh toán
