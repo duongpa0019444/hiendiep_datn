@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Exports\ScoresExport;
+use App\Exports\ScoresImport;
 use App\Http\Controllers\Controller;
 use App\Models\classes;
 use App\Models\classStudent;
@@ -11,6 +12,9 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ScoreController extends Controller
 {
@@ -48,8 +52,10 @@ class ScoreController extends Controller
         $data = ClassStudent::with('student')  // lấy quan hệ đến bảng users (học sinh)
             ->where('class_id', $class_id)
             ->get();
+        // lấy thêm tên khóa học từ bảng classes
+        $class = classes::where('id',$class_id)->select('courses_id', 'name')->first();
 
-        return view('admin.scores.score-add', compact('data'));
+        return view('admin.scores.score-add', compact('data','class'));
     }
 
     public function store($class_id, Request $request)
@@ -81,7 +87,10 @@ class ScoreController extends Controller
 
         $score = score::find($id);
 
-        return view('admin.scores.score-edit', compact('data', 'score'));
+        $class = classes::where('id',$class_id)->select('courses_id', 'name')?->first();
+
+
+        return view('admin.scores.score-edit', compact('data', 'score', 'class'));
     }
 
     public function update($class_id, Request $request)
@@ -123,6 +132,43 @@ class ScoreController extends Controller
         ])->with('success', 'Đã cập nhật điểm thành công!');
     }
 
+
+    public function import(Request $request)
+    {
+        Excel::import(new ScoresImport, $request->file('file'));
+        return back()->with('success', 'Đã nhập điểm thành công!');
+    }
+
+    public static function parseExcelDate($value): ?string
+    {
+        try {
+            // Nếu là object DateTime (Excel kiểu date chuẩn)
+            if ($value instanceof \DateTimeInterface) {
+                return \Carbon\Carbon::instance($value)->format('Y-m-d');
+            }
+
+            // Nếu là số serial Excel
+            if (is_numeric($value)) {
+                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value)->format('Y-d-m');
+            }
+
+            // Nếu là chuỗi có dấu /
+            if (strpos($value, '/') !== false) {
+                return \Carbon\Carbon::createFromFormat('d/m/Y', trim($value))->format('Y-d-m');
+            }
+
+            // Nếu là chuỗi có dấu -
+            if (strpos($value, '-') !== false) {
+                return \Carbon\Carbon::createFromFormat('Y-m-d', trim($value))->format('Y-d-m');
+            }
+
+            // Cuối cùng thử auto parse
+            return \Carbon\Carbon::parse($value)->format('Y-d-m');
+        } catch (\Throwable $e) {
+            Log::warning("❌ Lỗi parse ngày: [$value] - " . $e->getMessage());
+            return null;
+        }
+    }
 
 
 

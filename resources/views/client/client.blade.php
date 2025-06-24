@@ -73,22 +73,8 @@
                             </li>
 
                             <li class="offcanvas__menu_li">
-                                <a class="offcanvas__menu_item" href="course-1.html">Khóa học</a>
-                                <ul class="offcanvas__sub_menu">
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="course-1.html" class="offcanvas__sub_menu_item">Course One</a>
-                                    </li>
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="course-2.html" class="offcanvas__sub_menu_item">Course Two</a>
-                                    </li>
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="course-3.html" class="offcanvas__sub_menu_item">Course Three</a>
-                                    </li>
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="course-details.html" class="offcanvas__sub_menu_item">Course
-                                            Details</a>
-                                    </li>
-                                </ul>
+                                <a class="offcanvas__menu_item" href="{{ route('client.course') }}">Khóa học</a>
+                                
                             </li>
 
 
@@ -169,13 +155,9 @@
 
                                     </li>
                                     <li>
-                                        <a href="javascript:void(0)">Khóa học<i
-                                                class="fi fi-ss-angle-small-down"></i></a>
-                                        <ul class="sub-menu">
-                                            <li><a href="#">Khóa Tiếng anh 1</a></li>
-                                            <li><a href="#">Khóa Tiếng anh 2</a></li>
-                                            <li><a href="#">Khóa Tiếng anh 3</a></li>
-                                        </ul>
+                                        <a href="{{ route('client.course')}}">Khóa học<i
+                                                class=""></i></a>
+                                
                                     </li>
 
                                     <li>
