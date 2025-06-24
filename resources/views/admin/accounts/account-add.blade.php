@@ -1,12 +1,30 @@
+@php
+    $roles = [
+        'student' => 'Học sinh',
+        'teacher' => 'Giáo viên',
+        'admin' => 'Quản trị viên',
+        'staff' => 'Nhân viên',
+    ];
+@endphp
 @extends('admin.admin')
-@section('title', 'Nhập điểm')
+@section('title', 'Thêm ' . $roles[request('role')] ?? request('role'))
 @section('description', '')
 @section('content')
 
     <div class="page-content">
         <div class="container-fluid">
+            <nav aria-label="breadcrumb p-0">
+                <ol class="breadcrumb py-0">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.account') }}">Quản lí người dùng</a></li>
+                    <li class="breadcrumb-item"><a
+                            href="{{ route('admin.account.list', request('role')) }}">{{ $roles[request('role')] ?? request('role') }}</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Thêm
+                        {{ $roles[request('role')] ?? request('role') }}</li>
+                </ol>
+            </nav>
             <div class="row">
-
                 @if ($errors->any())
                     <div class="alert alert-danger">
                         <ul class="mb-0">
@@ -38,7 +56,7 @@
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="roles-name" class="form-label fw-semibold">Tên người dùng</label>
-                                            <input type="text"  name="name" class="form-control"
+                                            <input type="text" name="name" class="form-control"
                                                 placeholder="Nhập tên người dùng...">
                                         </div>
                                     </div>
@@ -48,7 +66,7 @@
                                             <label for="user-name" class="form-label fw-semibold">Tên đăng nhập</label>
                                             <input type="text" name="username" class="form-control"
                                                 placeholder="Nhập tên đăng nhập...">
-                                                <i>Lưu ý: mật khẩu mặc định là tên đăng nhập</i>
+                                            <i>Lưu ý: mật khẩu mặc định là tên đăng nhập</i>
                                         </div>
                                     </div>
 
@@ -147,7 +165,7 @@
 
                     myDropzone.on("success", function() {
                         document.querySelector("form")
-                    .submit(); // submit form sau khi upload thành công
+                            .submit(); // submit form sau khi upload thành công
                     });
                 });
             }

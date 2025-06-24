@@ -7,7 +7,10 @@ use App\Http\Controllers\admin\ScoreController;
 use App\Http\Controllers\client\loginController;
 use App\Http\Controllers\client\UserController;
 use App\Http\Controllers\admin\coursePaymentController;
+use App\Http\Controllers\admin\NotificationsController;
 use App\Http\Controllers\admin\quizzesController;
+use App\Http\Controllers\admin\TeacherRulesController;
+use App\Http\Controllers\admin\TeacherSalaryController;
 use App\Http\Controllers\client\CourseController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckRoleClient;
@@ -15,7 +18,9 @@ use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
+Route::get('/course', [CourseController::class, 'index'])->name('client.course');
+Route::get('/course/{slug}_{id}', [CourseController::class, 'detail'])->name('client.course.detail');
+Route::get('/course-search', [CourseController::class, 'search'])->name('client.course.search');
 
 
 Route::get('/logout', [loginController::class, 'logout'])->name('auth.logout');
@@ -28,7 +33,6 @@ Route::get('/reset-password', [loginController::class, 'showResetPasswordForm'])
 Route::post('/reset-password', [loginController::class, 'resetPassword'])->name('password.update');
 
 
-Route::get('/course', [CourseController::class, 'index'])->name('client.course');
 
 // Route dành cho admin và nhân viên --
 Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(function () {
@@ -81,6 +85,24 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::put('quizzes/{id}/update', [quizzesController::class, 'update'])->name('admin.quizzes.update');
 
 
+    //Trang quản lý lương giáo viên
+    Route::get('teacher-salaries', [TeacherSalaryController::class, 'index'])->name('admin.teacher_salaries');
+    Route::get('/api/salary-data', [TeacherSalaryController::class, 'getData'])->name('admin.teacher_salaries.data');
+    Route::post('/api/salary-data', [TeacherSalaryController::class, 'save'])->name('admin.teacher_salaries.save');
+    Route::post('/admin/teacher-salaries/update-payment', [TeacherSalaryController::class, 'updatePayment'])->name('admin.teacher_salaries.upload');
+    Route::get('/admin/teacher-salaries/filter', [TeacherSalaryController::class, 'filter'])->name('admin.teacher_salaries.filter');
+
+
+    //Chi tiết lương giáo viên
+    Route::get('/admin/teacher-salary-rules/{id}/details', [TeacherRulesController::class, 'details'])->name('admin.teacher_salary_rules.details');
+    Route::get('/teacher-salary-rules/index', [TeacherRulesController::class, 'indexRules'])->name('admin.teacher-salary-rules.indexRules');
+    Route::post('/admin/teacher-salary-rules/store', [TeacherRulesController::class, 'store'])->name('admin.teacher-salary-rules.store');
+
+    // Gửi thông báo
+    Route::get('admin/notifications', [NotificationsController::class, 'index'])->name('admin.notifications');
+    Route::get('/admin/notifications/filter', [NotificationsController::class, 'filter'])->name('admin.notifications.filter');
+    Route::post('admin/notifications/seed', [NotificationsController::class, 'seed'])->name('admin.notifications.seed');
+    Route::post('/admin/notifications/delete', [NotificationsController::class, 'destroy'])->name('admin.notifications.delete');
 });
 
 

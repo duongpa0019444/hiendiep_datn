@@ -1,10 +1,27 @@
+
+@php
+    $roles = [
+    'student' => 'Học sinh',
+    'teacher' => 'Giáo viên',
+    'admin'   => 'Quản trị viên',
+    'staff'   => 'Nhân viên',
+];
+@endphp
 @extends('admin.admin')
-@section('title', 'Quản lí ' . request('role'))
+@section('title', 'Quản lí ' . $roles[request('role')] ?? request('role'))
 @section('description', '')
 @section('content')
 
     <div class="page-content">
         <div class="container-fluid">
+            <nav aria-label="breadcrumb p-0">
+                <ol class="breadcrumb py-0">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.account') }}">Quản lí người dùng</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ $roles[request('role')] ?? request('role') }}</li>
+                </ol>
+            </nav>
+
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
@@ -14,11 +31,11 @@
             <div class="row">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="card-title">Danh sách {{ request('role') }}</h4>
+                        <h4 class="card-title">Danh sách </h4>
                         @if (request('role'))
                             <a href="{{ route('admin.account.add', ['role' => request('role')]) }}"
                                 class="btn btn-sm btn-primary">
-                                Thêm người dùng
+                                Thêm {{ $roles[request('role')] ?? request('role') }}
                             </a>
                         @endif
 

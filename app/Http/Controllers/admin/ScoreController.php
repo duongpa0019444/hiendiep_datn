@@ -52,8 +52,10 @@ class ScoreController extends Controller
         $data = ClassStudent::with('student')  // lấy quan hệ đến bảng users (học sinh)
             ->where('class_id', $class_id)
             ->get();
+        // lấy thêm tên khóa học từ bảng classes
+        $class = classes::where('id',$class_id)->select('courses_id', 'name')->first();
 
-        return view('admin.scores.score-add', compact('data'));
+        return view('admin.scores.score-add', compact('data','class'));
     }
 
     public function store($class_id, Request $request)
@@ -85,7 +87,10 @@ class ScoreController extends Controller
 
         $score = score::find($id);
 
-        return view('admin.scores.score-edit', compact('data', 'score'));
+        $class = classes::where('id',$class_id)->select('courses_id', 'name')?->first();
+
+
+        return view('admin.scores.score-edit', compact('data', 'score', 'class'));
     }
 
     public function update($class_id, Request $request)

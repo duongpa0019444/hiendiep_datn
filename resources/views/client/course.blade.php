@@ -6,17 +6,17 @@
 
     <main>
         <!--<< Breadcrumb Section Start >>-->
-        <div class="section-bg hero-bg">
+        <div style="margin-top: 90px;">
             <!-- Start Bredcrumbs Area -->
             <section class="ed-breadcrumbs background-image"
-                style="background-image: url('assets/images/breadcrumbs-bg.png');">
+                style="background-image: url('client/images/breadcrumbs-bg.png');">
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-lg-6 col-md-6 col-12">
                             <div class="ed-breadcrumbs__content">
                                 <h3 class="ed-breadcrumbs__title">Tất cả khóa học của chúng tôi</h3>
                                 <ul class="ed-breadcrumbs__menu">
-                                    <li class="active"><a href="index.html">Home</a></li>
+                                    <li class="active"><a href="{{ route('home') }}">Home</a></li>
                                     <li>/</li>
                                     <li>khóa học</li>
                                 </ul>
@@ -34,12 +34,15 @@
                     <div class="col-12">
                         <div class="ed-course__filter">
                             <p class="ed-course__filter-text">
-                                Showing 1-6 Of 15 Results
+                                <span class="ed-course__filter-count">{{ $data->count() }}</span> Khóa học
+                                hiện có
                             </p>
                             <div class="ed-course__filter-search">
-                                <form action="#" method="post" class="ed-hero__search-form">
-                                    <input type="search" name="search" placeholder="Search your courses..." required />
-                                    <button type="submit">Search<i class="fi-rr-search"></i></button>
+                                <form action="{{ route('client.course.search') }}" method="GET"
+                                    class="ed-hero__search-form">
+                                    <input type="search" name="client_course_search" placeholder="Nhập tên khóa học..."
+                                        value="{{ request('client_course_search') }}" required />
+                                    <button type="submit">Tìm kiếm<i class="fi-rr-search"></i></button>
                                 </form>
                             </div>
                         </div>
@@ -50,11 +53,14 @@
                     @foreach ($data as $course)
                         <div class="col-lg-6 col-xl-4 col-md-6 col-12">
                             <div class="ed-course__card wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
-                                <a href="{{-- {{ asset('assets/images/course/course-1/1.png') }} --}}" class="ed-course__img">
-                                    <img src="{{ asset('uploads/course/' . $course->image ) }}" alt="course-img" />
+                                <a href="{{ route('client.course.detail', ['slug' => Str::slug($course->name), 'id' => $course->id]) }}" class="ed-course__img">
+                                    {{-- <input type="hidden" name="course_id" value="{{ $course->id }}"> --}}
+                                    <img src="{{ asset('uploads/course/' . $course->image) }}" alt="{{ $course->name }}" />
                                 </a>
 
-                                <a href="course-1.html" class="ed-course__tag">{{ $course->name }}</a>
+                                <a href="{{ route('client.course.detail', ['slug' => Str::slug($course->name), 'id' => $course->id]) }}" class="ed-course__tag">
+                                    {{-- <input type="hidden" name="course_id" value="{{ $course->id }}"> --}}
+                                    {{ $course->name }}</a>
 
                                 <div class="ed-course__body">
                                     <div class="ed-course__lesson">
@@ -62,14 +68,16 @@
                                             <i class="fi-rr-book"></i>
                                             <p>{{ $course->lessons->count() }} Bài giảng</p>
                                         </div>
-                                        <div class="ed-course__teacher">
+                                        {{-- <div class="ed-course__teacher">
                                             <i class="fi-rr-user"></i>
-                                            {{-- <p>{{ $course->teachers->name }}</p> --}}
-                                        </div>
+                                            <p>{{ $course->teachers->name }}</p>
+                                        </div> --}}
                                     </div>
 
-                                    <a href="#" class="ed-course__title">
+                                    <a href="{{ route('client.course.detail', ['slug' => Str::slug($course->name), 'id' => $course->id]) }}" class="ed-course__title">
                                         <h5>
+                                            {{-- <input type="hidden" name="course_id" value="{{ $course->id }}"> --}}
+
                                             {{ $course->description }}
                                         </h5>
                                     </a>
@@ -86,10 +94,12 @@
                                     </div>
 
                                     <div class="ed-course__bottom">
-                                        <span class="ed-course__price">{{ number_format($course->price, 0, ',', '.') }} VNĐ</span>
+                                        <span class="ed-course__price">{{ number_format($course->price, 0, ',', '.') }}
+                                            VNĐ</span>
                                         <div class="ed-course__students">
                                             <i class="fi fi-rr-graduation-cap"></i>
-                                            <p>{{ $course->students->count() }} học sinh</p>
+                                            {{-- Laravel sẽ tự động gọi getStudentCountAttribute() --}}
+                                            <p>{{ $course->student_count  }} học sinh</p>
                                         </div>
                                     </div>
                                 </div>
@@ -105,15 +115,38 @@
                     <div class="col-12">
                         <div class="ed-pagination">
                             <ul class="ed-pagination__list">
-                                <li class="active">
-                                    <a href="#">01</a>
-                                </li>
-                                <li>
-                                    <a href="#">02</a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="fi-rr-arrow-small-right"></i></a>
-                                </li>
+                                {{-- Trang trước --}}
+                                @if ($data->hasPages())
+                                    <ul class="ed-pagination__list">
+                                        {{-- Prev --}}
+                                        @if ($data->onFirstPage())
+                                            <li class="disabled"><span><i class="fi-rr-arrow-small-left"></i></span></li>
+                                        @else
+                                            <li><a
+                                                    href="{{ $data->previousPageUrl() }}&client_course_search={{ request('client_course_search') }}"><i
+                                                        class="fi-rr-arrow-small-left"></i></a></li>
+                                        @endif
+
+                                        {{-- Page links --}}
+                                        @foreach ($data->getUrlRange(1, $data->lastPage()) as $page => $url)
+                                            @php $url .= '&client_course_search=' . urlencode(request('client_course_search')); @endphp
+                                            @if ($page == $data->currentPage())
+                                                <li class="active"><a href="#">{{ sprintf('%02d', $page) }}</a></li>
+                                            @else
+                                                <li><a href="{{ $url }}">{{ sprintf('%02d', $page) }}</a></li>
+                                            @endif
+                                        @endforeach
+
+                                        {{-- Next --}}
+                                        @if ($data->hasMorePages())
+                                            <li><a
+                                                    href="{{ $data->nextPageUrl() }}&client_course_search={{ request('client_course_search') }}"><i
+                                                        class="fi-rr-arrow-small-right"></i></a></li>
+                                        @else
+                                            <li class="disabled"><span><i class="fi-rr-arrow-small-right"></i></span></li>
+                                        @endif
+                                    </ul>
+                                @endif
                             </ul>
                         </div>
                     </div>

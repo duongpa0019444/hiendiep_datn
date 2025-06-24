@@ -6,9 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class classes extends Model
 {
-      protected $table = 'classes'; 
+    protected $table = 'classes';
 
-      
+
+    public function students()
+    {
+        return $this->belongsToMany(User::class, 'class_student', 'class_id', 'student_id');
+    }
+
     // Quan hệ với khóa học (courses)
     public function course()
     {

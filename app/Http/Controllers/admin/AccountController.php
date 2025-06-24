@@ -131,6 +131,7 @@ class AccountController extends Controller
 
     public function delete($role, $id)
     {
+        
         User::find($id)->delete();
         return redirect()->route('admin.account.list', ['role' => $role])->with('success', 'Xóa người dùng thành công');
     }

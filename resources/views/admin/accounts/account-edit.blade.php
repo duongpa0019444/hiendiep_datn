@@ -1,10 +1,29 @@
+@php
+    $roles = [
+        'student' => 'Học sinh',
+        'teacher' => 'Giáo viên',
+        'admin' => 'Quản trị viên',
+        'staff' => 'Nhân viên',
+    ];
+@endphp
 @extends('admin.admin')
-@section('title', 'Thêm ' . request('role'))
+@section('title', 'Cập nhật ' . $roles[request('role')] ?? request('role'))
 @section('description', '')
 @section('content')
 
     <div class="page-content">
         <div class="container-fluid">
+            <nav aria-label="breadcrumb p-0">
+                <ol class="breadcrumb py-0">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.account') }}">Quản lí người dùng</a></li>
+                    <li class="breadcrumb-item"><a
+                            href="{{ route('admin.account.list', request('role')) }}">{{ $roles[request('role')] ?? request('role') }}</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Cập nhật
+                        {{ $roles[request('role')] ?? request('role') }}</li>
+                </ol>
+            </nav>
             <div class="row">
 
                 @if ($errors->any())
@@ -20,7 +39,7 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Thông tin {{ request('role') }}</h4>
+                            <h4 class="card-title">Thông tin</h4>
                         </div>
                         <form method="POST"
                             action="{{ route('admin.account.update', ['role' => request('role'), 'id' => request('id')]) }}"
@@ -34,7 +53,7 @@
                                         <div class=" d-flex justify-content-start align-items-start gap-4">
                                             @if (!empty($info->avatar))
                                                 <div>
-                                                    <label class="form-label d-block mb-2">Ảnh hiện tại</label>
+                                                    <label class="form-label fw-semibold d-block mb-2">Ảnh hiện tại</label>
                                                     <div class="d-flex align-items-center mb-3">
                                                         <img src="{{ asset($info->avatar) }}" alt="Ảnh đại diện"
                                                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid #ccc;">
@@ -43,7 +62,7 @@
                                             @endif
 
                                             <div>
-                                                <label for="avatar" class="form-label">Chọn ảnh mới</label>
+                                                <label for="avatar" class="form-label fw-semibold">Chọn ảnh mới</label>
                                                 <input type="file" name="avatar" id="avatar" class="form-control">
                                             </div>
                                         </div>
@@ -52,22 +71,22 @@
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="roles-name" class="form-label">Tên người dùng</label>
-                                            <input type="text" value="{{ $info->name }}" id="roles-name" name="name"
-                                                class="form-control" placeholder="Nhập tên ...">
+                                            <label for="roles-name" class="form-label fw-semibold">Tên người dùng</label>
+                                            <input type="text" value="{{ $info->name ?? '' }}" id="roles-name"
+                                                name="name" class="form-control" placeholder="Nhập tên ...">
                                         </div>
                                     </div>
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="user-name" class="form-label">Tên đăng nhập</label>
-                                            <input type="text" value="{{ $info->username }}" id="user-name" name="username"
-                                                class="form-control" placeholder="Nhập tên đăng nhập...">
+                                            <label for="user-name" class="form-label fw-semibold">Tên đăng nhập</label>
+                                            <input type="text" value="{{ $info->username ?? '' }}" id="user-name"
+                                                name="username" class="form-control" placeholder="Nhập tên đăng nhập...">
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="user-name" class="form-label">Email</label>
+                                            <label for="user-name" class="form-label fw-semibold">Email</label>
                                             <input type="email" value="{{ $info->email }}" id="user-name" name="email"
                                                 class="form-control" placeholder="Nhập Email...">
                                         </div>
@@ -75,7 +94,7 @@
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="" class="form-label">password</label>
+                                            <label for="" class="form-label fw-semibold">password</label>
                                             <input type="password" name="password" class="form-control"
                                                 placeholder="Nhập password mới (nếu muốn thay đổi)">
                                         </div>
@@ -83,7 +102,7 @@
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="" class="form-label">phone</label>
+                                            <label for="" class="form-label fw-semibold">phone</label>
                                             <input type="tel" value="{{ $info->phone }}" name="phone"
                                                 class="form-control" placeholder="Nhập phone...">
                                         </div>
@@ -91,24 +110,26 @@
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="" class="form-label">birth_date</label>
+                                            <label for="" class="form-label fw-semibold">birth_date</label>
                                             <input type="date" value="{{ $info->birth_date }}" name="birth_date"
                                                 class="form-control" placeholder="Nhập birth_date...">
                                         </div>
                                     </div>
 
                                     <div class="col-lg-6">
-                                        <p>Giới tính</p>
+                                        <label for="" class="form-label fw-semibold">Giới tính</label>
                                         <div class="d-flex gap-2 align-items-center">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="radio" value="boy" name="gender"
+                                                <input class="form-check-input" type="radio" value="boy"
+                                                    name="gender"
                                                     {{ old('gender', $info->gender ?? '') === 'boy' ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="gender_boy">
                                                     Nam
                                                 </label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="radio" value="girl" name="gender"
+                                                <input class="form-check-input" type="radio" value="girl"
+                                                    name="gender"
                                                     {{ old('gender', $info->gender ?? '') === 'girl' ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="gender_girl">
                                                     Nữ
