@@ -9,6 +9,7 @@ use App\Http\Controllers\client\UserController;
 use App\Http\Controllers\admin\coursePaymentController;
 use App\Http\Controllers\admin\questionsController;
 use App\Http\Controllers\admin\NotificationsController;
+use App\Http\Controllers\admin\questionsController;
 use App\Http\Controllers\admin\quizzesController;
 use App\Http\Controllers\admin\TeacherRulesController;
 use App\Http\Controllers\admin\TeacherSalaryController;
