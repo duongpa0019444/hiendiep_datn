@@ -49,8 +49,8 @@ class CoursePaymentsExport implements FromCollection, WithHeadings
                 $payment->course->name ?? '',
                 optional($payment->payment_date)->format('d/m/Y H:i'),
                 number_format($payment->amount, 0, ',', '.'),
-                $payment->status === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán',
-                $payment->method === 'Cash' ? 'Tiền mặt' : 'Chuyển khoản',
+                $payment->status === 'paid' ? 'Đã thanh toán' : ($payment->status === 'unpaid' ? 'Chưa thanh toán' : ''),
+                $payment->method === 'Cash' ? 'Tiền mặt' : ($payment->method === 'Bank Transfer' ? 'Chuyển khoản' : ''),
                 $payment->note,
             ];
         });
