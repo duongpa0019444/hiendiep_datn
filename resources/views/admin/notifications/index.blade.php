@@ -1,7 +1,7 @@
 @extends('admin.admin')
 @section('title', 'Trang admin')
 @section('description', '')
-@section('content')\
+@section('content')
 
 <style>
     .btn-group .btn.active {
@@ -68,7 +68,7 @@
                                     <option value="staff">Nhân viên</option>
                                 </select>
                             </div>
-                            
+
                             <button type="submit" class="btn btn-primary" onclick="return confirm('Bạn có chắc muốn gửi thông báo?')">Gửi thông báo</button>
                         </form>
                     </div>
@@ -102,10 +102,10 @@
                                             </button>
                                         </div>
                                     </div>
-                                  
+
                                 </div>
                              @endforeach
-                        </div>   
+                        </div>
                     </div>
                 </div>
             </div>
@@ -188,7 +188,7 @@
         const button = $(this);
         const notiId = button.data('id');
 
-        if (!confirm('Bạn có chắc muốn xóa thông báo này?')) return;     
+        if (!confirm('Bạn có chắc muốn xóa thông báo này?')) return;
 
         $.ajax({
             url: "{{ route('admin.notifications.delete') }}",

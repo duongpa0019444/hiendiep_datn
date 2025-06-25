@@ -62,15 +62,17 @@ class dashboardController extends Controller
             ->join('users as u', 's.teacher_id', '=', 'u.id')
             ->select([
                 's.id as schedule_id',
+                's.status as schedule_status',
                 'c.name as class_name',
                 'co.name as course_name',
                 'u.name as teacher_name',
                 DB::raw("CONCAT(s.start_time, ' - ', s.end_time) as time_range"),
                 DB::raw("
                     CASE
-                        WHEN NOW() < s.start_time THEN 'Chưa học'
-                        WHEN NOW() BETWEEN s.start_time AND s.end_time THEN 'Đang học'
-                        WHEN NOW() > s.end_time THEN 'Đã kết thúc'
+                        WHEN s.date > CURDATE() THEN 'Chưa học'
+                        WHEN s.date = CURDATE() AND NOW() < s.start_time THEN 'Chưa học'
+                        WHEN s.date = CURDATE() AND NOW() BETWEEN s.start_time AND s.end_time THEN 'Đang học'
+                        WHEN s.date < CURDATE() OR (s.date = CURDATE() AND NOW() > s.end_time) THEN 'Đã kết thúc'
                         ELSE 'Không xác định'
                     END as status_label
                 ")
@@ -121,14 +123,16 @@ class dashboardController extends Controller
             ->select([
                 's.id as schedule_id',
                 'c.name as class_name',
+                's.status as schedule_status',
                 'co.name as course_name',
                 'u.name as teacher_name',
                 DB::raw("CONCAT(s.start_time, ' - ', s.end_time) as time_range"),
                 DB::raw("
                     CASE
-                        WHEN NOW() < s.start_time THEN 'Chưa học'
-                        WHEN NOW() BETWEEN s.start_time AND s.end_time THEN 'Đang học'
-                        WHEN NOW() > s.end_time THEN 'Đã kết thúc'
+                        WHEN s.date > CURDATE() THEN 'Chưa học'
+                        WHEN s.date = CURDATE() AND NOW() < s.start_time THEN 'Chưa học'
+                        WHEN s.date = CURDATE() AND NOW() BETWEEN s.start_time AND s.end_time THEN 'Đang học'
+                        WHEN s.date < CURDATE() OR (s.date = CURDATE() AND NOW() > s.end_time) THEN 'Đã kết thúc'
                         ELSE 'Không xác định'
                     END as status_label
                 ")
@@ -137,9 +141,59 @@ class dashboardController extends Controller
             ->orderBy('s.start_time')
             ->get();
 
+        //Lấy điểm danh của lịch học
+        $attendance = DB::table('attendances')
+            ->join('users', 'attendances.user_id', '=', 'users.id')
+            ->select([
+                'attendances.id as attendance_id',
+                'users.name as student_name',
+                'attendances.status as attendance_status',
+                'attendances.created_at as attendance_time',
+                'attendances.note as attendance_note'
+            ])
+            ->where('schedule_id', $id)
+            ->get();
+
         return response()->json([
-            'schedule' => $schedule[0]
+            'schedule' => $schedule[0],
+            'attendances' => $attendance
         ]);
 
+    }
+
+
+
+    public function getSchedulesByDate($date) {
+        $carbonDate = Carbon::parse($date); // Ép kiểu string -> Carbon
+
+        $schedule = DB::table('schedules as s')
+            ->join('classes as c', 's.class_id', '=', 'c.id')
+            ->join('courses as co', 'c.courses_id', '=', 'co.id')
+            ->join('users as u', 's.teacher_id', '=', 'u.id')
+            ->select([
+                's.id as schedule_id',
+                'c.name as class_name',
+                's.status as schedule_status',
+                'co.name as course_name',
+                'u.name as teacher_name',
+                DB::raw("CONCAT(s.start_time, ' - ', s.end_time) as time_range"),
+                DB::raw("
+                    CASE
+                        WHEN s.date > CURDATE() THEN 'Chưa học'
+                        WHEN s.date = CURDATE() AND NOW() < s.start_time THEN 'Chưa học'
+                        WHEN s.date = CURDATE() AND NOW() BETWEEN s.start_time AND s.end_time THEN 'Đang học'
+                        WHEN s.date < CURDATE() OR (s.date = CURDATE() AND NOW() > s.end_time) THEN 'Đã kết thúc'
+                        ELSE 'Không xác định'
+                    END as status_label
+                ")
+            ])
+            ->whereDate('s.date', $date)
+            ->orderBy('s.start_time')
+            ->get();
+
+        return response()->json([
+            'schedules' => $schedule,
+            'formattedDate' => $carbonDate->format('d/m/Y') // ✅ đúng cách dùng format
+        ]);
     }
 }

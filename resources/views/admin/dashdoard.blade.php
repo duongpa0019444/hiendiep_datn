@@ -200,9 +200,9 @@
             <div class="card mt-2 p-2">
                 <div class="table-container">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="card-title mb-0">Lịch học ({{ $formattedDate  }})</h4>
+                        <h4 class="card-title mb-0 title-date-schedules">Lịch học ({{ $formattedDate  }})</h4>
                         <div class="d-flex align-items-center">
-                            <input type="text" id="basic-datepicker" class="form-control me-2" placeholder="Date"
+                            <input type="text" id="basic-datepicker" class="form-control me-2 " placeholder="Date"
                                 data-provider="flatpickr" data-date-format="d/m/Y" value="{{ $formattedDate  }}">
                             <button id="todayBtn" class="btn btn-primary  today-btn">Today</button>
                         </div>
@@ -215,7 +215,8 @@
                                 <th scope="col">Môn học</th>
                                 <th scope="col">Giáo viên</th>
                                 <th scope="col">Thời gian</th>
-                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Trạng thái buổi học</th>
+                                <th scope="col">Trạng thái điểm danh</th>
                                 <th scope="col">Hành động</th>
                             </tr>
                         </thead>
@@ -228,8 +229,8 @@
                                     <td>{{ $schedule->course_name }}</td>
                                     <td>{{ $schedule->teacher_name }}</td>
                                     <td>{{ $schedule->time_range }}</td>
-                                    <td>
-                                        <span class="badge
+                                    <td class="text-center">
+                                        <span class="badge p-1
                                             @if ($schedule->status_label === 'Chưa học') bg-warning
                                             @elseif ($schedule->status_label === 'Đang học') bg-success
                                             @elseif ($schedule->status_label === 'Đã kết thúc') bg-secondary
@@ -239,12 +240,20 @@
                                             {{ $schedule->status_label }}
                                         </span>
                                     </td>
-
+                                    <td class="text-center">
+                                        <span class="badge p-1
+                                            @if ($schedule->schedule_status === 0) bg-info
+                                            @elseif ($schedule->schedule_status === 1) bg-success
+                                            @else bg-secondary
+                                            @endif
+                                        ">
+                                            {{ $schedule->schedule_status == 0 ? 'Chưa điểm danh' : 'Đã điểm danh' }}
+                                        </span>
                                     <td>
                                         <button class="btn btn-outline-primary btn-sm view-details-schedule-btn"
                                                 data-schedule-id="{{ $schedule->schedule_id }}"
                                                 data-bs-target="#detailsModal">
-                                            Xem chi tiết
+                                            Xem nhanh
                                         </button>
                                     </td>
                                 </tr>
@@ -278,7 +287,7 @@
                                             <p><strong>Thời gian:</strong> <span id="modalTime"></span></p>
                                         </div>
                                         <div class="col-md-6 mb-2">
-                                            <p><strong>Trạng thái:</strong> <span id="modalStatus" class=""></span></p>
+                                            <p class="d-flex align-items-center"><strong>Trạng thái buổi học:</strong> <span id="modalStatus" class="ms-2"></span></p>
                                         </div>
                                     </div>
                                 </div>
@@ -298,7 +307,8 @@
                                 </table>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                                <a href=""><button type="button" class="btn btn-primary">Chi tiết</button></a>
                             </div>
                         </div>
                     </div>
@@ -339,7 +349,7 @@
             // Hàm tải dữ liệu và cập nhật biểu đồ
             function loadClasses(courseId) {
                 $.ajax({
-                    url: `dashboard/chart/${courseId}`, // Đảm bảo route đúng
+                    url: `/admin/dashboard/chart/${courseId}`, // Đảm bảo route đúng
                     method: 'GET',
                     dataType: 'json',
                     success: function(response) {
@@ -507,7 +517,7 @@
                     method: 'GET',
                     dataType: 'json',
                     success: function(response) {
-                        console.log('Dữ liệu chi tiết lịch học:', response.schedule);
+                        console.log('Dữ liệu chi tiết lịch học:', response.attendances);
                         // Cập nhật nội dung modal với dữ liệu trả về
                         $('#modalClass').text(response.schedule.class_name);
                         $('#modalSubject').text(response.schedule.course_name);
@@ -517,25 +527,40 @@
                         $('#modalStatus').addClass(
                             'badge px-2 py-1 rounded fw-bold ' +
                             (
-                                response.schedule.status_label === 'Chưa học' ? 'bg-warning text-dark' :
+                                response.schedule.status_label === 'Chưa học' ? 'bg-warning text-white' :
                                 response.schedule.status_label === 'Đang học' ? 'bg-success text-white' :
                                 response.schedule.status_label === 'Đã kết thúc' ? 'bg-secondary text-white' :
                                 'bg-light text-dark'
                             )
                         );
                         // Cập nhật danh sách điểm danh
-                        // var attendanceBody = '';
-                        // response.attendance.forEach(function(attendance, index) {
-                        //     attendanceBody += '<tr>' +
-                        //         '<td>' + (index + 1) + '</td>' +
-                        //         '<td>' + attendance.student_name + '</td>' +
-                        //         '<td>' + attendance.status + '</td>' +
-                        //         '<td>' + (attendance.note || 'Không có ghi chú') + '</td>' +
-                        //         '</tr>';
-                        // });
-                        // $('#attendanceBody').html(attendanceBody);
+                        var attendanceBody = '';
+                        response.attendances.forEach(function(attendance, index) {
+                            // Gán class màu tương ứng
+                            let statusClass = '';
+                            if (attendance.attendance_status === 'present') {
+                                statusClass = 'bg-success text-white';
+                            } else if (attendance.attendance_status === 'absent') {
+                                statusClass = 'bg-warning text-dark';
+                            } else {
+                                statusClass = 'bg-light text-dark';
+                            }
 
-                        // Hiển thị modal
+                            attendanceBody += '<tr>' +
+                                '<td>' + (index + 1) + '</td>' +
+                                '<td>' + attendance.student_name + '</td>' +
+                                '<td class="' + statusClass + '">' + (attendance.attendance_status === 'present' ? 'Có mặt' : 'Vắng mặt') + '</td>' +
+                                '<td>' + (attendance.attendance_note || 'Không có ghi chú') + '</td>' +
+                                '</tr>';
+                        });
+
+
+                        //kiểm tra nếu không có điểm danh nào
+                        if (response.schedule.schedule_status == 0) {
+                            attendanceBody = '<tr><td colspan="4" class="text-center bg-info text-white">Chưa điểm danh!</td></tr>';
+                        }
+                        $('#attendanceBody').html(attendanceBody);
+
                         $('#detailsModal').modal('show');
                     },
                     error: function(xhr, status, error) {
@@ -545,6 +570,67 @@
             });
 
 
+
+            //Xử lý lọc ngày
+            $('#basic-datepicker').on('change', function() {
+                var selectedDate = $(this).val();
+                if (selectedDate) {
+                    // Chuyển đổi định dạng ngày sang định dạng YYYY-MM-DD
+                    var dateParts = selectedDate.split('/');
+                    var formattedDate = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0];
+                    // Gửi yêu cầu AJAX để lấy lịch học theo ngày đã chọn
+                    $.ajax({
+                        url: `/admin/dashboard/schedules/date/${formattedDate}`,
+                        method: 'GET',
+                        dataType: 'json',
+                        success: function(response) {
+                            $(".title-date-schedules").html('Lịch học ('+  response.formattedDate +')')
+                            renderSchedules(response.schedules);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Lỗi khi tải lịch học:', error);
+                        }
+                    });
+                }
+            });
+
+            //Hàm render lịch học
+            function renderSchedules(schedules) {
+                var tableBody = $('#tableBody');
+                tableBody.empty(); // Xóa nội dung cũ
+
+                schedules.forEach(function(schedule, index) {
+                    var statusLabel = '';
+                    if (schedule.status_label === 'Chưa học') {
+                        statusLabel = '<span class="badge bg-warning text-dark p-1">' + schedule.status_label + '</span>';
+                    } else if (schedule.status_label === 'Đang học') {
+                        statusLabel = '<span class="badge bg-success text-white p-1">' + schedule.status_label + '</span>';
+                    } else if (schedule.status_label === 'Đã kết thúc') {
+                        statusLabel = '<span class="badge bg-secondary text-white p-1">' + schedule.status_label + '</span>';
+                    } else {
+                        statusLabel = '<span class="badge bg-light text-dark p-1">' + schedule.status_label + '</span>';
+                    }
+
+                    var attendanceStatus = schedule.schedule_status == 0 ? 'Chưa điểm danh' : 'Đã điểm danh';
+                    var attendanceBadgeClass = schedule.schedule_status == 0 ? 'bg-info text-white' : 'bg-success text-white';
+
+                    tableBody.append(
+                        `<tr>
+                            <td>${index + 1}</td>
+                            <td>${schedule.class_name}</td>
+                            <td>${schedule.course_name}</td>
+                            <td>${schedule.teacher_name}</td>
+                            <td>${schedule.time_range}</td>
+                            <td class="text-center">${statusLabel}</td>
+                            <td class="text-center"><span class="badge ${attendanceBadgeClass} p-1">${attendanceStatus}</span></td>
+                            <td><button class="btn btn-outline-primary btn-sm view-details-schedule-btn" data-schedule-id="${schedule.schedule_id}" data-bs-target="#detailsModal">Xem nhanh</button></td>
+                        </tr>`
+                    );
+                });
+            }
+
+
         document.getElementById('basic-datepicker').flatpickr();
+
     </script>
 @endpush

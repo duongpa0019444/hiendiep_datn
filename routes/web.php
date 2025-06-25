@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\admin\AccountController;
+use App\Http\Controllers\admin\AttendanceController;
+use App\Http\Controllers\admin\ClassController;
 use App\Http\Controllers\client\HomeController;
 use App\Http\Controllers\admin\dashboardController;
 use App\Http\Controllers\admin\ScoreController;
@@ -9,7 +11,9 @@ use App\Http\Controllers\client\UserController;
 use App\Http\Controllers\admin\coursePaymentController;
 use App\Http\Controllers\admin\questionsController;
 use App\Http\Controllers\admin\NotificationsController;
+use App\Http\Controllers\admin\questionsController;
 use App\Http\Controllers\admin\quizzesController;
+use App\Http\Controllers\admin\SchedulesController;
 use App\Http\Controllers\admin\TeacherRulesController;
 use App\Http\Controllers\admin\TeacherSalaryController;
 use App\Http\Controllers\client\CourseController;
@@ -41,7 +45,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('dashboard', [DashboardController::class, 'dashBoard'])->name('admin.dashboard');
     Route::get('dashboard/chart/{course_id}', [DashboardController::class, 'chart']);
     Route::get('dashboard/schedules/{id}/views', [DashboardController::class, 'getSchedulesViews'])->name('admin.dashboard.schedules.views');
-
+    Route::get('dashboard/schedules/date/{date}', [DashboardController::class, 'getSchedulesByDate'])->name('admin.dashboard.schedules.date');
     // Quản lí điểm số
     Route::get('/score', [ScoreController::class, 'score'])->name('admin.score');
 
@@ -77,6 +81,9 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('course-payments/{id}/show', [coursePaymentController::class, 'show'])->name('admin.course_payments.show');
     Route::get('course-payments/{id}/download', [coursePaymentController::class, 'download'])->name('admin.course_payments.download');
     Route::get('/admin/course-payments/export', [coursePaymentController::class, 'exportExcel'])->name('admin.course_payments.export');
+
+    Route::get('course-payments/trash', [coursePaymentController::class, 'trash'])->name('admin.course_payments.trash');
+    Route::get('course-payments/trash/filter', [coursePaymentController::class, 'filterTrash'])->name('admin.course_payments.trash.filter');
 
 
     //Trang quản lý quizz
@@ -128,6 +135,51 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/admin/notifications/filter', [NotificationsController::class, 'filter'])->name('admin.notifications.filter');
     Route::post('admin/notifications/seed', [NotificationsController::class, 'seed'])->name('admin.notifications.seed');
     Route::post('/admin/notifications/delete', [NotificationsController::class, 'destroy'])->name('admin.notifications.delete');
+
+
+
+
+
+
+
+
+  // Quản lý lớp học
+    Route::get('/admin/classes', [ClassController::class, 'index'])->name('admin.classes.index');
+    Route::get('/admin/classes/create', [ClassController::class, 'create'])->name('admin.classes.create');
+    Route::post('/admin/classes', [ClassController::class, 'store'])->name('admin.classes.store');
+    Route::get('/admin/classes/{id}', [ClassController::class, 'show'])->name('admin.classes.detail');
+    Route::get('/admin/classes/{id}/edit', [ClassController::class, 'edit'])->name('admin.classes.edit');
+    Route::put('/admin/classes/{id}', [ClassController::class, 'update'])->name('admin.classes.update');
+    Route::patch('/admin/classes/{id}/toggle-status', [ClassController::class, 'toggleStatus'])->name('admin.classes.toggle-status');
+    Route::delete('/classes/{id}', [ClassController::class, 'destroy'])->name('admin.classes.destroy');
+    Route::post('/admin/classes/{id}/restore', [ClassController::class, 'restore'])->name('admin.classes.restore');
+    // Xem danh sách học sinh trong lớp
+    Route::get('/admin/classes/{id}/students', [ClassController::class, 'students'])->name('admin.classes.students');
+    Route::post('/admin/classes/{id}/students', [ClassController::class, 'addStudent'])->name('admin.classes.add-student');
+    Route::delete('/admin/classes/{id}/students/{studentId}', [ClassController::class, 'removeStudent'])->name('admin.classes.remove-student');
+    // Danh sách lịch hoc của lớp
+    Route::get('/classes/{id}/schedules', [ClassController::class, 'schedules'])->name('admin.classes.schedules');
+
+       // Quản lý lịch học
+    Route::get('/admin/schedules', [SchedulesController::class, 'index'])->name('admin.schedules.index');
+    Route::get('/admin/schedules/{id}/create', [SchedulesController::class, 'create'])->name('admin.schedules.create');
+    Route::post('/admin/schedules/store', [SchedulesController::class, 'store'])->name('admin.schedules.store');
+    Route::get('/schedules/{id}/edit', [SchedulesController::class, 'edit'])->name('admin.schedules.edit');
+    Route::put('/schedules/{id}', [SchedulesController::class, 'update'])->name('admin.schedules.update');
+    // Route::put('/admin/schedules/{id}', [SchedulesController::class, 'update'])->name('admin.schedules.update');
+    Route::delete('/schedules/{id}', [SchedulesController::class, 'destroy'])->name('admin.schedules.destroy');
+    Route::post('/admin/schedules/{id}/restore', [SchedulesController::class, 'restore'])->name('admin.schedules.restore');
+    Route::get('/admin/schedules/{id}/students', [SchedulesController::class, 'students'])->name('admin.schedules.students');
+    Route::post('/admin/schedules/{id}/students', [SchedulesController::class, 'addStudent'])->name('admin.schedules.add-student');
+    Route::delete('/admin/schedules/{id}/students/{studentId}', [SchedulesController::class, 'removeStudent'])->name('admin.schedules.remove-student');
+    //
+    Route::get('classes/{id}/data', [SchedulesController::class, 'getClassData'])->name('admin.classes.show');
+
+    // Quản lý điểm danh
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('admin.attendance.index');
+    Route::get('/attendance/getSchedules', [AttendanceController::class, 'getSchedules'])->name('admin.attendance.getSchedules');
+
+    Route::get('/attendance/schedules/{id}', [AttendanceController::class, 'attendanceClass'])->name('admin.attendance.class');
 });
 
 
