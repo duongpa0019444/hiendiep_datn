@@ -4,10 +4,15 @@ use App\Http\Controllers\admin\AccountController;
 use App\Http\Controllers\client\HomeController;
 use App\Http\Controllers\admin\dashboardController;
 use App\Http\Controllers\admin\ScoreController;
+
+use App\Http\Controllers\admin\ClassController;
+use App\Http\Controllers\admin\SchedulesController;
+
 use App\Http\Controllers\client\loginController;
 use App\Http\Controllers\client\UserController;
 use App\Http\Controllers\admin\coursePaymentController;
 use App\Http\Controllers\admin\quizzesController;
+use App\Http\Controllers\admin\AttendanceController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckRoleClient;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +21,9 @@ use Maatwebsite\Excel\Facades\Excel;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
+Route::get('logout', [loginController::class, 'logout'])->name('auth.logout');
+Route::get('login', [loginController::class, 'login'])->name('auth.login');
+Route::post('login', [loginController::class, 'login'])->name('loginAuth');
 
 Route::get('/logout', [loginController::class, 'logout'])->name('auth.logout');
 Route::post('/login', [loginController::class, 'login'])->name('loginAuth');
@@ -74,7 +82,44 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::delete('quizzes/{id}/delete', [quizzesController::class, 'delete'])->name('admin.quizzes.delete');
     Route::post('quizzes/store', [quizzesController::class, 'store'])->name('admin.quizzes.store');
     Route::put('quizzes/{id}/update', [quizzesController::class, 'update'])->name('admin.quizzes.update');
+    // Quản lý lớp học
+    Route::get('/admin/classes', [ClassController::class, 'index'])->name('admin.classes.index');
+    Route::get('/admin/classes/create', [ClassController::class, 'create'])->name('admin.classes.create');
+    Route::post('/admin/classes', [ClassController::class, 'store'])->name('admin.classes.store');
+    Route::get('/admin/classes/{id}', [ClassController::class, 'show'])->name('admin.classes.detail');
+    Route::get('/admin/classes/{id}/edit', [ClassController::class, 'edit'])->name('admin.classes.edit');
+    Route::put('/admin/classes/{id}', [ClassController::class, 'update'])->name('admin.classes.update');
+    Route::patch('/admin/classes/{id}/toggle-status', [ClassController::class, 'toggleStatus'])->name('admin.classes.toggle-status');
+    Route::delete('/classes/{id}', [ClassController::class, 'destroy'])->name('admin.classes.destroy');
+    Route::post('/admin/classes/{id}/restore', [ClassController::class, 'restore'])->name('admin.classes.restore');
+    // Xem danh sách học sinh trong lớp
+    Route::get('/admin/classes/{id}/students', [ClassController::class, 'students'])->name('admin.classes.students');
+    Route::post('/admin/classes/{id}/students', [ClassController::class, 'addStudent'])->name('admin.classes.add-student');
+    Route::delete('/admin/classes/{id}/students/{studentId}', [ClassController::class, 'removeStudent'])->name('admin.classes.remove-student');
+    // Danh sách lịch hoc của lớp
+    Route::get('/classes/{id}/schedules', [ClassController::class, 'schedules'])->name('admin.classes.schedules');
 
+
+    // Quản lý lịch học
+    Route::get('/admin/schedules', [SchedulesController::class, 'index'])->name('admin.schedules.index');
+    Route::get('/admin/schedules/{id}/create', [SchedulesController::class, 'create'])->name('admin.schedules.create');
+    Route::post('/admin/schedules/store', [SchedulesController::class, 'store'])->name('admin.schedules.store');
+    Route::get('/schedules/{id}/edit', [SchedulesController::class, 'edit'])->name('admin.schedules.edit');
+    Route::put('/schedules/{id}', [SchedulesController::class, 'update'])->name('admin.schedules.update');
+    // Route::put('/admin/schedules/{id}', [SchedulesController::class, 'update'])->name('admin.schedules.update');
+    Route::delete('/schedules/{id}', [SchedulesController::class, 'destroy'])->name('admin.schedules.destroy');
+    Route::post('/admin/schedules/{id}/restore', [SchedulesController::class, 'restore'])->name('admin.schedules.restore');
+    Route::get('/admin/schedules/{id}/students', [SchedulesController::class, 'students'])->name('admin.schedules.students');
+    Route::post('/admin/schedules/{id}/students', [SchedulesController::class, 'addStudent'])->name('admin.schedules.add-student');
+    Route::delete('/admin/schedules/{id}/students/{studentId}', [SchedulesController::class, 'removeStudent'])->name('admin.schedules.remove-student');
+    //
+    Route::get('classes/{id}/data', [SchedulesController::class, 'getClassData'])->name('admin.classes.show');
+
+    // Quản lý điểm danh
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('admin.attendance.index');
+    Route::get('/attendance/getSchedules', [AttendanceController::class, 'getSchedules'])->name('admin.attendance.getSchedules');
+
+    Route::get('/attendance/schedules/{id}', [AttendanceController::class, 'attendanceClass'])->name('admin.attendance.class');
 
 });
 

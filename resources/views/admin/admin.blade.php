@@ -3,17 +3,15 @@
 
 
 <!-- Mirrored from techzaa.in/larkon/admin/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 28 Oct 2024 06:27:43 GMT -->
-
 <head>
     <!-- Title Meta -->
     <meta charset="utf-8" />
     <title>@yield('title')</title>
+    <meta name="description" content="@yield('description')">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A fully responsive premium admin dashboard template" />
     <meta name="author" content="Techzaa" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
 
     <!-- App favicon -->
     <link rel="shortcut icon" href="assets/images/favicon.ico">
@@ -39,6 +37,20 @@
 
     {{-- LINK Jquery --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- Font Awesome 6 CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Iconify Icons -->
+    <script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
+{{-- 
+    <!-- Js Vector Map -->
+    <link rel="stylesheet" href="{{ asset('admin/vendor/jsvectormap/css/jsvectormap.min.css') }}">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ asset('admin/css/custom.css') }}"> --}}
+
+    @stack('styles')
 </head>
 
 <body>
@@ -259,21 +271,22 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.account')}}">
+
+                            <a class="nav-link" href="{{ route('admin.classes.index') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:beer-alt-twotone-loop"></iconify-icon>
+                                    <iconify-icon icon="line-md:calendar"></iconify-icon>
                                 </span>
-                                <span class="nav-text">Quản lí người dùng</span>
+                                <span class="nav-text"> Quản lý lớp học </span>
                             </a>
 
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#sidebarCategory">
+                            <a class="nav-link" href="{{ route('admin.schedules.index') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:calendar"></iconify-icon>
+                                    <iconify-icon icon="line-md:beer-alt-twotone-loop"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Quản lý lớp học </span>
+                                <span class="nav-text">Quản lý lịch học</span>
                             </a>
 
                         </li>
@@ -289,7 +302,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#user" data-bs-toggle="collapse" role="button"
+                            <a class="nav-link" href="#order" data-bs-toggle="collapse" role="button"
                                 aria-expanded="false" aria-controls="user">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:account-small"></iconify-icon>
@@ -325,7 +338,7 @@
 
 
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/statistical">
+                            <a class="nav-link" href="{{route('admin.attendance.index')}}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:document-report"></iconify-icon>
                                 </span>

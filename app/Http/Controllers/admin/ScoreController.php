@@ -128,6 +128,6 @@ class ScoreController extends Controller
 
     public function export($classId, $courseId)
     {
-        return Excel::download(new ScoresExport($classId, $courseId), 'bangdiem.xlsx');
+        // return Excel::download(new ScoresExport($classId, $courseId), 'bangdiem.xlsx');
     }
 }

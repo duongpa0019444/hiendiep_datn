@@ -60,10 +60,15 @@ class User extends Authenticatable
     }
 
 
-
     public function hasAnyRole(array $roles)
     {
         return in_array($this->role, $roles);
+
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class, 'teacher_id');
     }
 
 
