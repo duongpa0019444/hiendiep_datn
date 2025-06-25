@@ -267,11 +267,22 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#sidebarCategory">
+
+                            <a class="nav-link" href="{{ route('admin.classes.index') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:calendar"></iconify-icon>
                                 </span>
                                 <span class="nav-text"> Quản lý lớp học </span>
+                            </a>
+
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.schedules.index') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="line-md:beer-alt-twotone-loop"></iconify-icon>
+                                </span>
+                                <span class="nav-text">Quản lý lịch học</span>
                             </a>
 
                         </li>

@@ -174,7 +174,7 @@
             <hr>
             <h4>HÓA ĐƠN HỌC PHÍ</h4>
             <p>
-                <strong>Mã hóa đơn:</strong> {{ $payment->payment_code }} |
+
                 <strong>Ngày xuất:</strong> {{ now()->format('d/m/Y') }}
             </p>
 
@@ -233,7 +233,7 @@
             </p>
             <p><strong>Ngày thanh toán:</strong> {{ \Carbon\Carbon::parse($payment->payment_date)->format('d/m/Y') }}
             </p>
-            <p><strong>Ghi chú:</strong> {{ $payment->note ?? 'Không có ghi chú' }}</p>
+            <p><strong>Ghi chú:</strong> {{ $payment->note ?? '' }}</p>
         </div>
 
         <!-- Footer -->
