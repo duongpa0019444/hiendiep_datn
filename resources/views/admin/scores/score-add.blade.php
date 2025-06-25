@@ -5,6 +5,15 @@
 
     <div class="page-content">
         <div class="container-fluid">
+            <nav aria-label="breadcrumb p-0">
+                <ol class="breadcrumb py-0">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.score') }}">Quản lí điểm số</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.score.detail', ['class_id' => request('class_id'), 'course_id' => $class->courses_id])}}">{{ $class->name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Nhập điểm </li>
+                </ol>
+            </nav>
+
             <div class="row">
 
                 @if ($errors->any())
@@ -20,7 +29,7 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title fw-bold">Nhập điểm mới</h4>
+                            <h4 class="card-title fw-bold">Thông tin</h4>
                             
                         </div>
                         <form method="POST" action="{{ route('admin.score.store', [request('class_id')]) }}">

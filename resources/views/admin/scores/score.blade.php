@@ -5,6 +5,13 @@
 
     <div class="page-content">
         <div class="container-fluid ">
+             <nav aria-label="breadcrumb p-0">
+                <ol class="breadcrumb py-0">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Quản lí điểm số</li>
+                </ol>
+            </nav>
+
             <div class="row">
                 <div class="col-lg-3">
                     <form method="GET" action="{{route('admin.score.search')}}" class="app-search d-none d-md-block ms-2">
