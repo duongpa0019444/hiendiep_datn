@@ -8,11 +8,17 @@
 
         <!-- Start Container Fluid -->
         <div class="container-fluid">
-
+            <nav aria-label="breadcrumb p-0">
+                <ol class="breadcrumb py-0">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Trang Dashboard</a></li>
+                </ol>
+            </nav>
             <!-- Start here.... -->
             <div class="row mt-2">
                 <div class="col-xxl-5">
+
                     <div class="row">
+
                         <h4 class="card-title mb-1">Tổng quan (Overview)</h4>
 
                         @foreach ($users as $user)
@@ -166,7 +172,7 @@
                     </div> <!-- end row -->
                 </div> <!-- end col -->
 
-                <div class="col-xxl-7 mt-1">
+                <div class="col-xxl-7 mt-3">
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
@@ -192,41 +198,111 @@
                 </div> <!-- end col -->
             </div> <!-- end row -->
             <div class="card mt-2 p-2">
-                <table class="table table-centered table-hover">
-                    <h4 class="card-title mb-1">Lớp học (ngày 16/06/2025)</h4>
-                    <thead class="table-dark">
-                        <tr>
-                            <th scope="col">STT</th>
-                            <th scope="col">Lớp học</th>
-                            <th scope="col">Môn học</th>
-                            <th scope="col">Giáo viên</th>
-                            <th scope="col">Thời gian</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Lớp IELTS-1</td>
-                            <td>IELTS</td>
-                            <td>Phạm Minh Tuấn</td>
-                            <td>18:30 - 20:30</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lớp IELTS-1</td>
-                            <td>IELTS</td>
-                            <td>Phạm Minh Tuấn</td>
-                            <td>18:30 - 20:30</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Lớp IELTS-1</td>
-                            <td>IELTS</td>
-                            <td>Phạm Minh Tuấn</td>
-                            <td>18:30 - 20:30</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="card-title mb-0">Lịch học ({{ $formattedDate  }})</h4>
+                        <div class="d-flex align-items-center">
+                            <input type="text" id="basic-datepicker" class="form-control me-2" placeholder="Date"
+                                data-provider="flatpickr" data-date-format="d/m/Y" value="{{ $formattedDate  }}">
+                            <button id="todayBtn" class="btn btn-primary  today-btn">Today</button>
+                        </div>
+                    </div>
+                    <table class="table table-centered table-hover" id="scheduleTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">STT</th>
+                                <th scope="col">Lớp học</th>
+                                <th scope="col">Môn học</th>
+                                <th scope="col">Giáo viên</th>
+                                <th scope="col">Thời gian</th>
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            @foreach ($schedules as $key => $schedule)
+
+                                <tr>
+                                    <td>{{ $key + 1 }}</td>
+                                    <td>{{ $schedule->class_name }}</td>
+                                    <td>{{ $schedule->course_name }}</td>
+                                    <td>{{ $schedule->teacher_name }}</td>
+                                    <td>{{ $schedule->time_range }}</td>
+                                    <td>
+                                        <span class="badge
+                                            @if ($schedule->status_label === 'Chưa học') bg-warning
+                                            @elseif ($schedule->status_label === 'Đang học') bg-success
+                                            @elseif ($schedule->status_label === 'Đã kết thúc') bg-secondary
+                                            @else bg-light text-dark
+                                            @endif
+                                        ">
+                                            {{ $schedule->status_label }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <button class="btn btn-outline-primary btn-sm view-details-schedule-btn"
+                                                data-schedule-id="{{ $schedule->schedule_id }}"
+                                                data-bs-target="#detailsModal">
+                                            Xem chi tiết
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Modal chi tiết -->
+                <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="detailsModalLabel">Chi tiết lớp học</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-1">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-2">
+                                            <p><strong>Lớp học:</strong> <span id="modalClass"></span></p>
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <p><strong>Môn học:</strong> <span id="modalSubject"></span></p>
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <p><strong>Giáo viên:</strong> <span id="modalTeacher"></span></p>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <p><strong>Thời gian:</strong> <span id="modalTime"></span></p>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <p><strong>Trạng thái:</strong> <span id="modalStatus" class=""></span></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr>
+                                <h4>Danh sách điểm danh</h4>
+                                <table class="table table-bordered attendance-table">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Tên học viên</th>
+                                            <th>Trạng thái</th>
+                                            <th>Ghi chú</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="attendanceBody"></tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -415,5 +491,60 @@
                 loadClasses(courseId);
             });
         });
+
+
+
+
+
+
+            // Xử lý sự kiện click vào nút "Xem chi tiết"
+            $(document).on('click', '.view-details-schedule-btn', function() {
+                var scheduleId = $(this).data('schedule-id');
+
+                // Gửi yêu cầu AJAX để lấy thông tin chi tiết
+                $.ajax({
+                    url: `/admin/dashboard/schedules/${scheduleId}/views`,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log('Dữ liệu chi tiết lịch học:', response.schedule);
+                        // Cập nhật nội dung modal với dữ liệu trả về
+                        $('#modalClass').text(response.schedule.class_name);
+                        $('#modalSubject').text(response.schedule.course_name);
+                        $('#modalTeacher').text(response.schedule.teacher_name);
+                        $('#modalTime').text(response.schedule.time_range);
+                        $('#modalStatus').text(response.schedule.status_label);
+                        $('#modalStatus').addClass(
+                            'badge px-2 py-1 rounded fw-bold ' +
+                            (
+                                response.schedule.status_label === 'Chưa học' ? 'bg-warning text-dark' :
+                                response.schedule.status_label === 'Đang học' ? 'bg-success text-white' :
+                                response.schedule.status_label === 'Đã kết thúc' ? 'bg-secondary text-white' :
+                                'bg-light text-dark'
+                            )
+                        );
+                        // Cập nhật danh sách điểm danh
+                        // var attendanceBody = '';
+                        // response.attendance.forEach(function(attendance, index) {
+                        //     attendanceBody += '<tr>' +
+                        //         '<td>' + (index + 1) + '</td>' +
+                        //         '<td>' + attendance.student_name + '</td>' +
+                        //         '<td>' + attendance.status + '</td>' +
+                        //         '<td>' + (attendance.note || 'Không có ghi chú') + '</td>' +
+                        //         '</tr>';
+                        // });
+                        // $('#attendanceBody').html(attendanceBody);
+
+                        // Hiển thị modal
+                        $('#detailsModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Lỗi khi tải chi tiết lịch học:', error);
+                    }
+                });
+            });
+
+
+        document.getElementById('basic-datepicker').flatpickr();
     </script>
 @endpush

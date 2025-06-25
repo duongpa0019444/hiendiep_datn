@@ -170,7 +170,7 @@
                                         @foreach ($quizzes as $quiz)
                                             <tr>
                                                 <td>
-                                                    <div class="fw-bold">{{ $quiz->title }}</div>
+                                                    <div class="fw-bold">{{ $quiz->title }} <p class="text-danger"> {{ $quiz->status == 'published' ? '' : ' (Bản nháp)' }}</p></div>
                                                 </td>
                                                 <td>
                                                     @if ($quiz->is_public)
@@ -221,7 +221,7 @@
                                                                     </button>
                                                                 </form>
                                                             </li>
-                                                            <li><a class="dropdown-item" href="#"><iconify-icon
+                                                            <li><a class="dropdown-item" href="{{ route('admin.quizzes.results', $quiz->id) }}"><iconify-icon
                                                                         icon="solar:chart-broken"
                                                                         class="me-1"></iconify-icon> Xem kết quả</a></li>
                                                         </ul>
@@ -259,7 +259,7 @@
                     <div class="modal-content">
                         <div class="modal-header custom-modal-header bg-light-subtle">
                             <h5 class="modal-title d-flex align-items-center gap-2" id="addQuizModalLabel">
-                                <iconify-icon icon="solar:pen-2-broken" class="text-primary"></iconify-icon>
+                                <iconify-izcon icon="solar:pen-2-broken" class="text-primary"></iconify-izcon>
                                 <span id="modal-title-text">Thêm bài quiz</span>
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
@@ -310,8 +310,9 @@
                                     <select class="form-select form-select-sm" id="class_id" name="class_id">
                                         <option value="">Chọn lớp</option>
                                         @foreach (\DB::table('classes')->get() as $class)
-                                            <option value="{{ $class->id }}">{{ $class->name }}</option>
+                                            <option value="{{ $class->id }}" data-course="{{ $class->courses_id }}">{{ $class->name }}</option>
                                         @endforeach
+
                                     </select>
                                 </div>
                                 <div class="mb-3 col-12 col-md-6 p-2 class-course-fields" id="course_field">
@@ -396,9 +397,23 @@
             quizIdInput.val('');
             form[0].reset();
             $('#is_public_0').prop('checked', true); // chọn mặc định là private
+            $('#course_id').val('').prop('disabled', false);
             toggleFields();
             errorContainer.hide().empty();
         });
+        //sử lý chọn lớp và khóa khi thêm quizz
+        $(document).ready(function () {
+            $('#class_id').on('change', function () {
+                const courseId = $(this).find('option:selected').data('course');
+
+                if (courseId) {
+                    $('#course_id').val(courseId).prop('disabled', true); // Gán và khóa lại
+                } else {
+                    $('#course_id').val('').prop('disabled', false); // Reset và cho chọn lại nếu không có khóa
+                }
+            });
+        });
+
 
         // Mở modal Sửa quiz
         $(document).on('click', '.btn-edit-quiz', function() {
@@ -433,11 +448,11 @@
 
         $('#quiz-form').on('submit', function(e) {
             e.preventDefault();
-
+            $('#course_id').prop('disabled', false);
             const form = $(this);
             const actionUrl = form.attr('action');
             const method = form.find('input[name="_method"]').val() || form.attr('method');
-
+            console.log(form.serialize());
             errorContainer.hide().empty();
 
             $.ajax({
@@ -622,7 +637,7 @@
                                     <ul class="dropdown-menu">
                                          <li><a href="/admin/quizzes/${quiz.id}/detail"
                                                                     class="dropdown-item text-info"
-                                                                    data-quiz-id="${ $quiz->id }"><iconify-icon
+                                                                    data-quiz-id="{{ $quiz->id }}"><iconify-icon
                                                                         icon="solar:eye-broken"
                                                                         class="me-1"></iconify-icon> Chi tiết</a></li>
                                         <li><a class="dropdown-item text-warning btn-edit-quiz" href="#" data-bs-toggle="modal" data-bs-target="#modal-add-quiz" data-quiz-id="${quiz.id}"><iconify-icon icon="solar:pen-2-broken" class="me-1"></iconify-icon> Sửa</a></li>
