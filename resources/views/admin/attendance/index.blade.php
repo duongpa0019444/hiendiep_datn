@@ -425,7 +425,7 @@
         }
 
         function loadSchedules() {
-            // Gọi API 
+            // Gọi API
             fetch("{{ route('admin.attendance.getSchedules') }}", {
                     method: 'GET',
                     headers: {

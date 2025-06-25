@@ -349,7 +349,7 @@
             // Hàm tải dữ liệu và cập nhật biểu đồ
             function loadClasses(courseId) {
                 $.ajax({
-                    url: `dashboard/chart/${courseId}`, // Đảm bảo route đúng
+                    url: `/admin/dashboard/chart/${courseId}`, // Đảm bảo route đúng
                     method: 'GET',
                     dataType: 'json',
                     success: function(response) {

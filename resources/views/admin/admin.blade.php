@@ -37,6 +37,9 @@
       {{-- LINK Jquery --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
+    <!-- Font Awesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    @stack('styles')
 </head>
 
 <body>
@@ -334,7 +337,7 @@
 
 
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/statistical">
+                              <a class="nav-link" href="{{route('admin.attendance.index')}}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:document-report"></iconify-icon>
                                 </span>
