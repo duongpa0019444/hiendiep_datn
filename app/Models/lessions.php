@@ -9,16 +9,25 @@ class lessions extends Model
     //
     protected $table = 'lessons';
 
-    protected $fillable = ['name', 'link_document', 'quizzes_id', 'course_id ', 'created_at','updated_at'];
+    protected $fillable = ['name', 'link_document', 'quizzes_id', 'course_id ', 'created_at', 'updated_at'];
 
     // Quan hệ với bảng course_payment
-   
-    public function lessions(){
-        return self::all();
 
+    public function lessions()
+    {
+        return self::all();
     }
     public function getCourseById($id)
     {
         return self::find($id);
     }
+    //     public function quizz()
+    // {
+    //     return $this->hasOne(Quizzes::class);
+    // }
+   public function quizz()
+{
+    return $this->belongsTo(\App\Models\Quizzes::class, 'quizzes_id', 'id');
+}
+
 }

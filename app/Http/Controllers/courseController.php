@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\classes;
 use App\Models\lessions;
 use App\Models\courses;
+use App\Models\Quizzes;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
@@ -72,14 +73,18 @@ class CourseController  extends Controller
     }
 
     public function show($id)
+
     {
-        $lessions = Lessions::where('course_id', $id)->get(); // ✔ lấy theo điều kiện
+        $quizz = Quizzes::where('course_id', $id)->get(); // ✔ lấy theo điều kiện
+        // $lessions = Lessions::with('quizz')->where('course_id', $id)->get();
+        $lessions = Lessions::with('quizz')->where('course_id', $id)->get();
+
         $course = courses::findOrFail($id);
-        return view('admin.course.course-detail', compact('course', 'lessions'));
+        return view('admin.course.course-detail', compact('course', 'lessions', 'quizz'));
     }
     public function delete($id)
     {
-        
+
         try {
             $course = courses::findOrFail($id);
             $course->delete();
@@ -90,15 +95,13 @@ class CourseController  extends Controller
             if ($class) {
                 return redirect()->route('admin.course-list')
                     ->with('error', 'Không thể xóa khóa học vì đã có lớp học liên kết. Vui lòng xóa lớp học trước.');
-            }else if ($lession) {
+            } else if ($lession) {
                 return redirect()->route('admin.course-list')
                     ->with('error', 'Không thể xóa khóa học vì đã có bài giảng liên kết. Vui lòng xóa bài giảng trước.');
             } else {
                 return redirect()->route('admin.course-list')
                     ->with('error', 'Không thể xóa khóa học vì đã có liên kết khác.');
             }
-                
-            
         }
     }
     public function add()
@@ -108,26 +111,27 @@ class CourseController  extends Controller
     public function create(Request $request)
     {
         $request->validate([
-    'name' => 'required|string|max:255',
-    'price' => 'required|numeric|min:0',
-    'total_sessions' => 'required|integer|min:1',
-], [
-    'name.required' => 'Vui lòng nhập tên khóa học.',
-    'price.required' => 'Vui lòng nhập giá khóa học.',
-    'total_sessions.required' => 'Vui lòng nhập số buổi học.',
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'total_sessions' => 'required|integer|min:1',
+        ], [
+            'name.required' => 'Vui lòng nhập tên khóa học.',
+            'price.required' => 'Vui lòng nhập giá khóa học.',
+            'total_sessions.required' => 'Vui lòng nhập số buổi học.',
 
-]);
+        ]);
+
         $course = new courses();
         if ($request->hasFile('image')) {
-        $file = $request->file('image');
-        $fileName = time() . '_' . $file->getClientOriginalName();
+            $file = $request->file('image');
+            $fileName = time() . '_' . $file->getClientOriginalName();
 
-        // Lưu trực tiếp vào thư mục public/uploads/courses/
-        $file->move(public_path('uploads/courses'), $fileName);
+            // Lưu trực tiếp vào thư mục public/uploads/courses/
+            $file->move(public_path('uploads/courses'), $fileName);
 
-        // Lưu đường dẫn tương đối để truy cập được từ trình duyệt
-        $course->image = 'uploads/courses/' . trim($fileName);
-    }
+            // Lưu đường dẫn tương đối để truy cập được từ trình duyệt
+            $course->image = 'uploads/courses/' . trim($fileName);
+        }
         $course->name = $request->input('name');
         $course->price = $request->input('price');
         $course->total_sessions = $request->input('total_sessions');
@@ -152,26 +156,26 @@ class CourseController  extends Controller
     }
     public function update(Request $request, $id)
     {
-         $request->validate([
-    'name' => 'required|string|max:255',
-    'price' => 'required|numeric|min:0',
-    'total_sessions' => 'required|integer|min:1',
-],  [
-    'name.required' => 'Vui lòng nhập tên khóa học.',
-    'price.required' => 'Vui lòng nhập giá khóa học.',
-    'total_sessions.required' => 'Vui lòng nhập số buổi học.',
-]);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'total_sessions' => 'required|integer|min:1',
+        ],  [
+            'name.required' => 'Vui lòng nhập tên khóa học.',
+            'price.required' => 'Vui lòng nhập giá khóa học.',
+            'total_sessions.required' => 'Vui lòng nhập số buổi học.',
+        ]);
         $course = courses::find($id);
-         if ($request->hasFile('image')) {
-        $file = $request->file('image');
-        $fileName = time() . '_' . $file->getClientOriginalName();
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $fileName = time() . '_' . $file->getClientOriginalName();
 
-        // Lưu trực tiếp vào thư mục public/uploads/courses/
-        $file->move(public_path('uploads/courses'), $fileName);
+            // Lưu trực tiếp vào thư mục public/uploads/courses/
+            $file->move(public_path('uploads/courses'), $fileName);
 
-        // Lưu đường dẫn tương đối để truy cập được từ trình duyệt
-        $course->image = 'uploads/courses/' . trim($fileName);
-    }
+            // Lưu đường dẫn tương đối để truy cập được từ trình duyệt
+            $course->image = 'uploads/courses/' . trim($fileName);
+        }
         $course->name = $request->input('name');
         $course->price = $request->input('price');
         $course->total_sessions = $request->input('total_sessions');
@@ -195,21 +199,26 @@ class CourseController  extends Controller
     public function addLession($id)
     {
         $course = courses::findOrFail($id);
-        return view('admin.course.lession-add', compact('id'));
+        $quizz = Quizzes::all(); // lấy toàn bộ
+        return view('admin.course.lession-add', compact('id', 'course', 'quizz'));
     }
+
 
     public function createLession(Request $request, $id)
     {
         $request->validate([
-    'name' => 'required|string|max:255',
-    'link_document' => 'nullable|url|max:500',
-    'updated_at' => 'nullable|date',
-],  [
-    'name.required' => 'Vui lòng nhập tên khóa học.',
-    'link_document.required' => 'Vui lòng nhập link bài giảng .',
-    'updated_at.required' => 'Vui lòng nhập ngày chỉnh sửa .',
-]);
+            'name' => 'required|string|max:255',
+            'link_document' => 'nullable|url|max:500',
+            'updated_at' => 'nullable|date',
+        ],  [
+            'name.required' => 'Vui lòng nhập tên khóa học.',
+            'link_document.required' => 'Vui lòng nhập link bài giảng .',
+            'updated_at.required' => 'Vui lòng nhập ngày chỉnh sửa .',
+        ]);
         $lesson = new Lessions();
+
+        $lesson->quizzes_id = $request->input('quizz_id'); // ← THÊM DÒNG NÀY
+
         $lesson->course_id = $id;
         $lesson->name = $request->input('name');
         $lesson->link_document = $request->input('link_document');
@@ -230,14 +239,14 @@ class CourseController  extends Controller
     public function updateLession(Request $request, $course_id, $id)
     {
         $request->validate([
-    'name' => 'required|string|max:255',
-    'link_document' => 'nullable|url|max:500',
-    'updated_at' => 'nullable|date',
-],  [
-    'name.required' => 'Vui lòng nhập tên khóa học.',
-    'link_document.required' => 'Vui lòng nhập link bài giảng .',
-    'updated_at.required' => 'Vui lòng nhập ngày chỉnh sửa .',
-]);
+            'name' => 'required|string|max:255',
+            'link_document' => 'nullable|url|max:500',
+            'updated_at' => 'nullable|date',
+        ],  [
+            'name.required' => 'Vui lòng nhập tên khóa học.',
+            'link_document.required' => 'Vui lòng nhập link bài giảng .',
+            'updated_at.required' => 'Vui lòng nhập ngày chỉnh sửa .',
+        ]);
         $course_id = $course_id;
         $lession = Lessions::findOrFail($id);
         $lession->name = $request->input('name');
@@ -247,17 +256,14 @@ class CourseController  extends Controller
 
         return redirect()->route('admin.course-detail', ['id' => $course_id])->with('success', 'Cập nhật bài học thành công!');
     }
-    
-// noi bat 
+
+    // noi bat 
     public function toggleFeatured($id)
-{
-    $course = courses::findOrFail($id);
-    $course->is_featured = !$course->is_featured;
-    $course->save();
+    {
+        $course = courses::findOrFail($id);
+        $course->is_featured = !$course->is_featured;
+        $course->save();
 
-    return response()->json(['success' => true, 'status' => $course->is_featured]);
+        return response()->json(['success' => true, 'status' => $course->is_featured]);
+    }
 }
-
-    
-}
-

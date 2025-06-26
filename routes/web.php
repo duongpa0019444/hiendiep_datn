@@ -25,6 +25,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/course', [ClientCourseController::class, 'index'])->name('client.course');
+
 Route::get('/course/{slug}_{id}', [ClientCourseController::class, 'detail'])->name('client.course.detail');
 Route::get('/course-search', [ClientCourseController::class, 'search'])->name('client.course.search');
 
@@ -182,8 +183,9 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/attendance/getSchedules', [AttendanceController::class, 'getSchedules'])->name('admin.attendance.getSchedules');
 
     Route::get('/attendance/schedules/{id}', [AttendanceController::class, 'attendanceClass'])->name('admin.attendance.class');
-});
-  // Trang quản lý khóa học
+
+
+     // Trang quản lý khóa học
     Route::get('/course', [CourseController::class, 'index'])->name('admin.course-list');
     // Chi tiết khóa học
     Route::get('/course/detail/{id}', [CourseController::class, 'show'])->name('admin.course-detail');
@@ -209,6 +211,8 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     // Route::delete('/admin/courses/bulk-delete', [CourseController::class, 'bulkDelete'])->name('admin.course-bulk-delete');
     // nổi bật khóa học
     Route::post('/admin/courses/{id}/toggle-featured', [CourseController::class, 'toggleFeatured'])->name('admin.course.toggle-featured');
+});
+ 
 
 
 

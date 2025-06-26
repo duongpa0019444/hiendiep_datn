@@ -9,7 +9,7 @@ class courses extends Model
     //
     protected $table = 'courses';
 
-    protected $fillable = ['name','image', 'price', 'total_sessions', 'description','teaching_method','teaching_goals'];
+    protected $fillable = ['name','image', 'price', 'total_sessions', 'description','teaching_method','teaching_goals','is_featured'];
 
     // Quan hệ với bảng course_payment
     public function payments()
