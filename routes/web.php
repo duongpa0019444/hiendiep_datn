@@ -11,21 +11,22 @@ use App\Http\Controllers\client\UserController;
 use App\Http\Controllers\admin\coursePaymentController;
 use App\Http\Controllers\admin\questionsController;
 use App\Http\Controllers\admin\NotificationsController;
-use App\Http\Controllers\admin\questionsController;
 use App\Http\Controllers\admin\quizzesController;
 use App\Http\Controllers\admin\SchedulesController;
 use App\Http\Controllers\admin\TeacherRulesController;
 use App\Http\Controllers\admin\TeacherSalaryController;
-use App\Http\Controllers\client\CourseController;
+use App\Http\Controllers\client\CourseController as ClientCourseController;
+use App\Http\Controllers\courseController;
+
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckRoleClient;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/course', [CourseController::class, 'index'])->name('client.course');
-Route::get('/course/{slug}_{id}', [CourseController::class, 'detail'])->name('client.course.detail');
-Route::get('/course-search', [CourseController::class, 'search'])->name('client.course.search');
+Route::get('/course', [ClientCourseController::class, 'index'])->name('client.course');
+Route::get('/course/{slug}_{id}', [ClientCourseController::class, 'detail'])->name('client.course.detail');
+Route::get('/course-search', [ClientCourseController::class, 'search'])->name('client.course.search');
 
 
 Route::get('/logout', [loginController::class, 'logout'])->name('auth.logout');
@@ -84,6 +85,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
 
     Route::get('course-payments/trash', [coursePaymentController::class, 'trash'])->name('admin.course_payments.trash');
     Route::get('course-payments/trash/filter', [coursePaymentController::class, 'filterTrash'])->name('admin.course_payments.trash.filter');
+
 
 
     //Trang quản lý quizz
@@ -181,6 +183,34 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
 
     Route::get('/attendance/schedules/{id}', [AttendanceController::class, 'attendanceClass'])->name('admin.attendance.class');
 });
+  // Trang quản lý khóa học
+    Route::get('/course', [CourseController::class, 'index'])->name('admin.course-list');
+    // Chi tiết khóa học
+    Route::get('/course/detail/{id}', [CourseController::class, 'show'])->name('admin.course-detail');
+    // Cập nhật khóa học
+    Route::get('/course/edit/{id}', [CourseController::class, 'edit'])->name('admin.course-edit');
+    Route::put('/course/edit/{id}', [CourseController::class, 'update'])->name('admin.course-update');
+    // Xoá khóa học
+    Route::delete('/course/delete/{id}', [CourseController::class, 'delete'])->name('admin.course-delete');
+    // Thêm khóa học
+    Route::get('/course/add', [CourseController::class, 'add'])->name('admin.course-add');
+    Route::post('/course/add', [CourseController::class, 'create'])->name('admin.course-create');
+
+    // Xóa bài giảng
+    Route::delete('/course/lessions/delete/{id}', [CourseController::class, 'deleteLession'])->name('admin.lession-delete');
+    // Thêm bài giảng
+    Route::get('/course/lessions/add/{id}', [CourseController::class, 'addLession'])->name('admin.lession-add');
+    Route::post('/course/lessions/add/{id}', [CourseController::class, 'createLession'])->name('admin.lession-create');
+    // Cập nhật bài giảng
+    Route::get('/course/{course_id}/lessions/edit/{id}', [CourseController::class, 'editLession'])->name('admin.lession-edit');
+    Route::put('/course/{course_id}/lessions/edit/{id}', [CourseController::class, 'updateLession'])->name('admin.lession-update');
+
+    // Xóa Nhiều 
+    // Route::delete('/admin/courses/bulk-delete', [CourseController::class, 'bulkDelete'])->name('admin.course-bulk-delete');
+    // nổi bật khóa học
+    Route::post('/admin/courses/{id}/toggle-featured', [CourseController::class, 'toggleFeatured'])->name('admin.course.toggle-featured');
+
+
 
 
 
