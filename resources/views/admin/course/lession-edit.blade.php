@@ -44,6 +44,20 @@
                                     </div>
                                 </div>
 
+                                <!-- Chọn Bài quizz qua các option -->
+
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        <select name="quizz_id" id="quizz_id" class="form-select">
+                                            <option value=" {{ $quizz->name }}"></option>
+                                            @foreach ($quizz as $quiz)
+                                                <option value="{{ $quiz->id }}">{{ $quiz->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                
+
+
                                       <!-- Ngày cập nhật -->
                                 <div class="col-lg-6">
                                     <div class="mb-3">

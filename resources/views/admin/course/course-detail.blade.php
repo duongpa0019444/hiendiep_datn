@@ -10,13 +10,14 @@
 
           <!-- Start Container Fluid -->
           <div class="container-xxl">
-            <nav aria-label="breadcrumb p-0">
-                <ol class="breadcrumb py-0">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('admin.course-list') }}">Quản lí khóa học</a> </li>
-                    <li class="breadcrumb-item active" aria-current="page">Chi tiết khóa học </li>
-                </ol>
-            </nav>
+              <nav aria-label="breadcrumb p-0">
+                  <ol class="breadcrumb py-0">
+                      <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                      <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('admin.course-list') }}">Quản lí
+                              khóa học</a> </li>
+                      <li class="breadcrumb-item active" aria-current="page">Chi tiết khóa học </li>
+                  </ol>
+              </nav>
 
               <div class="row">
                   <div class="col-lg-4">
@@ -27,7 +28,8 @@
                                   <div class="carousel-inner" role="listbox">
                                       <div class="carousel-item active">
                                           @if ($course->image)
-                                              <img src="{{ asset($course->image) }}" style="width: 100%; height: 300px; object-fit: cover;"
+                                              <img src="{{ asset($course->image) }}"
+                                                  style="width: 100%; height: 300px; object-fit: cover;"
                                                   class="d-block w-100" alt="...">
                                           @else
                                               <span>Không có ảnh</span>
@@ -91,6 +93,7 @@
                                           <tr>
                                               <th scope="col">Tên Bài Giảng </th>
                                               <th scope="col">tài Liệu Học </th>
+                                              <th scope="col">Bài Tập</th>
                                               <th scope="col">Ngày Cập Nhật </th>
                                               <th scope="col">hành Động </th>
                                               <th scope="col"><a
@@ -102,7 +105,21 @@
                                           @foreach ($lessions as $lession)
                                               <tr>
                                                   <td>{{ $lession->name }}</td>
-                                                  <td>{{ $lession->link_document }}</td>
+                                                  <td><a href="{{ $lession->link_document }}"><iconify-icon
+                                                              icon="mdi:file-pdf-box" class="text-danger"
+                                                              style="font-size: 40px;"></iconify-icon>
+                                                      </a></td>
+                                                  <td>
+                                                      @if ($lession->quizz)
+                                                          <a
+                                                              href="{{ route('admin.quizzes.detail', ['id' => $lession->quizz->id]) }}">
+                                                              {{ $lession->quizz->title }}
+                                                          </a>
+                                                      @else
+                                                          <span class="text-muted">Chưa có bài tập</span>
+                                                      @endif
+                                                  </td>
+
                                                   <td>{{ $lession->updated_at }}</td>
                                                   <td>
                                                       <a href="{{ route('admin.lession-edit', ['course_id' => $course->id, 'id' => $lession->id]) }} "
@@ -134,7 +151,8 @@
                               <div class="mt-3">
                                   <button class="btn btn-soft-primary">
                                       <a href="{{ route('admin.course-list') }}"
-                                          class="link-primary text-decoration-underline link-offset-2" style="color: black">Trở về trang khóa học <i
+                                          class="link-primary text-decoration-underline link-offset-2"
+                                          style="color: black">Trở về trang khóa học <i
                                               class="bx bx-arrow-to-right align-middle fs-16"></i></a>
                                   </button>
                               </div>
