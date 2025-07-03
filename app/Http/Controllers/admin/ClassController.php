@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\classes;
 use App\Models\classStudent;
+// use App\Models\coursePayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +21,7 @@ class ClassController extends Controller
             'classes.created_at as start_date',
             'courses.name as course_name',
             'courses.description as course_description',
-            DB::raw("(SELECT COUNT(*) FROM class_student 
+            DB::raw("(SELECT COUNT(*) FROM class_student
             WHERE class_student.class_id = classes.id) AS so_hoc_sinh"),
         )
             ->leftJoin('courses', 'classes.courses_id', '=', 'courses.id');
@@ -121,7 +122,7 @@ class ClassController extends Controller
             'classes.updated_at',
             'courses.name as course_name',
             'courses.description as course_description',
-            DB::raw("(SELECT COUNT(*) FROM class_student 
+            DB::raw("(SELECT COUNT(*) FROM class_student
             WHERE class_student.class_id = classes.id) AS so_hoc_sinh"),
         )
             ->leftJoin('courses', 'classes.courses_id', '=', 'courses.id')

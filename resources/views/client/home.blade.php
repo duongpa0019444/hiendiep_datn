@@ -133,7 +133,7 @@
                                     </h3>
                                 </div>
                                 <div class="ed-section-head__btn">
-                                    <a href="courses.html" class="ed-btn">Khám phá khóa học<i
+                                    <a href="{{ route('admin.course-list') }}" class="ed-btn">Khám phá khóa học<i
                                             class="fi fi-rr-arrow-small-right"></i></a>
                                 </div>
                             </div>
@@ -141,57 +141,46 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-12">
-                            <div class="ed-category__wrapper">
-                                <!-- Single Course Card  -->
-                                <a href="courses.html" class="ed-category__card wow fadeInUp" data-wow-delay=".3s"
-                                    data-wow-duration="1s">
-                                    <div class="ed-category__icon bg-1">
-                                        <img src="{{ asset('client/images/category/category-1/1.svg') }}" alt="icon" />
+                        @forelse ($featuredCourses as $course)
+                            <!-- Hiển thị khóa học -->
+                            <div class="col-lg-6 col-xl-4 col-md-6 col-12">
+                                <div class="ed-course__card wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
+                                    <a href="{{ route('admin.course-detail', $course->id) }}" class="ed-course__img">
+                                        <img src="{{ asset($course->image) }}" alt="course-img" style="height:150px"/>
+                                    </a>
+
+                                    <a href="#" class="ed-course__tag">Tiếng Anh</a>
+
+                                    <div class="ed-course__body">
+                                        <div class="ed-course__lesson">
+                                            <div class="ed-course__part">
+                                                <i class="fi-rr-book"></i>
+                                                <p>{{ $course->total_sessions }} Buổi học</p>
+                                            </div>
+                                            <div class="ed-course__teacher">
+                                                <i class="fi-rr-user"></i>
+                                                <p>{{ $course->teacher_name ?? 'Giảng viên' }}</p>
+                                            </div>
+                                        </div>
+
+                                        <a href="{{ route('admin.course-detail', $course->id) }}"
+                                            class="ed-course__title">
+                                            <h5>{{ $course->name }}</h5>
+                                        </a>
+
+                                        <div class="ed-course__bottom">
+                                            <span class="ed-course__price">{{ number_format($course->price) }} VNĐ</span>
+                                            <div class="ed-course__students">
+                                                <i class="fi fi-rr-graduation-cap"></i>
+                                                <p>{{ $course->students_count ?? 0 }} Học viên</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="ed-category__info">
-                                        <h4>Tiếng Anh giao tiếp</h4>
-                                        <p>10 Khóa học</p>
-                                    </div>
-                                </a>
-                                <!-- Single Course Card  -->
-                                <a href="courses.html" class="ed-category__card wow fadeInUp" data-wow-delay=".5s"
-                                    data-wow-duration="1s">
-                                    <div class="ed-category__icon bg-2">
-                                        <img src="{{ asset('client/images/category/category-1/2.svg') }}"
-                                            alt="icon" />
-                                    </div>
-                                    <div class="ed-category__info">
-                                        <h4>Luyện thi IELTS</h4>
-                                        <p>5 Khóa học</p>
-                                    </div>
-                                </a>
-                                <!-- Single Course Card  -->
-                                <a href="courses.html" class="ed-category__card wow fadeInUp" data-wow-delay=".7s"
-                                    data-wow-duration="1s">
-                                    <div class="ed-category__icon bg-3">
-                                        <img src="{{ asset('client/images/category/category-1/3.svg') }}"
-                                            alt="icon" />
-                                    </div>
-                                    <div class="ed-category__info">
-                                        <h4>Tiếng Anh trẻ em</h4>
-                                        <p>8 Khóa học</p>
-                                    </div>
-                                </a>
-                                <!-- Single Course Card  -->
-                                <a href="courses.html" class="ed-category__card wow fadeInUp" data-wow-delay=".9s"
-                                    data-wow-duration="1s">
-                                    <div class="ed-category__icon bg-4">
-                                        <img src="{{ asset('client/images/category/category-1/4.svg') }}"
-                                            alt="icon" />
-                                    </div>
-                                    <div class="ed-category__info">
-                                        <h4>Tiếng Anh doanh nghiệp</h4>
-                                        <p>3 Khóa học</p>
-                                    </div>
-                                </a>
+                                </div>
                             </div>
-                        </div>
+                        @empty
+                            <p class="text-center">Hiện chưa có khóa học nổi bật nào.</p>
+                        @endforelse
                     </div>
                 </div>
             </section>

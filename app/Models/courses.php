@@ -9,14 +9,13 @@ class courses extends Model
     //
     protected $table = 'courses';
 
-    protected $fillable = ['name', 'price', 'total_sessions', 'description'];
+    protected $fillable = ['name','image', 'price', 'total_sessions', 'description','teaching_method','teaching_goals','is_featured'];
 
     // Quan hệ với bảng course_payment
     public function payments()
     {
         return $this->hasMany(CoursePayment::class, 'course_id');
     }
-
     // quan hệ với bài giảng
     public function lessons()
     {
@@ -63,4 +62,15 @@ class courses extends Model
     // {
     //     return $this->belongsToMany(User::class, 'teacher_salary_rules', 'teacher_id');
     // }
+
+    public function course(){
+        return self::all();
+
+    }
+    public function getCourseById($id)
+    {
+        return self::find($id);
+    }
+    
+
 }
