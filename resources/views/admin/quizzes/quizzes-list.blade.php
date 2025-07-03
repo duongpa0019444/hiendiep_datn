@@ -287,11 +287,7 @@
                                     <input type="number" class="form-control form-control-sm" id="duration"
                                         name="duration_minutes" placeholder="Nhập thời gian" min="1">
                                 </div>
-                                <div class="mb-3 col-12 col-md-6 p-2">
-                                    <label for="access_code" class="form-label fw-bold">Mã truy cập</label>
-                                    <input type="text" class="form-control form-control-sm" id="access_code"
-                                        name="access_code" placeholder="Nhập mã (tùy chọn)">
-                                </div>
+
                                 <div class="mb-3 col-12 col-md-6 p-2">
                                     <label class="form-label fw-bold">Trạng thái công khai</label>
                                     <div class="form-check">

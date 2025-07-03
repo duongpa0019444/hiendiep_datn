@@ -157,65 +157,6 @@
 
         @endforeach
 
-        <!-- Question 1 -->
-        {{-- <div class="card mb-3 shadow-sm border-success border-2">
-            <div class="card-header border-bottom py-1 d-flex justify-content-between align-items-center">
-                <div class="fs-5"><strong>Câu 1:</strong> What is the capital of France?</div>
-                <span class="badge bg-success text-white py-1 px-2 d-flex align-items-center gap-1">
-                    <iconify-icon icon="solar:check-circle-broken" class="fs-16"></iconify-icon> Đúng
-                </span>
-            </div>
-            <div class="card-body py-2">
-                <ul class="list-unstyled mb-2">
-                    <li class="mb-1 d-flex align-items-center">
-                        <input type="radio" class="form-check-input me-2" disabled checked>
-                        <span class="text-success fs-5">Paris <span class="ms-1"><iconify-icon icon="solar:check-circle-broken" class="fs-14 text-success"></iconify-icon></span></span>
-                    </li>
-                    <li class="mb-1 d-flex align-items-center">
-                        <input type="radio" class="form-check-input me-2" disabled>
-                        <span class="fs-5">Berlin</span>
-                    </li>
-                </ul>
-                <div class="alert alert-info mb-0 py-1 px-2 fs-5">
-                    <strong>Giải thích:</strong> Paris là thủ đô của Pháp.
-                </div>
-            </div>
-        </div> --}}
-
-        <!-- Question 2 -->
-        {{-- <div class="card mb-3 shadow-sm border-danger border-2">
-            <div class="card-header border-bottom py-1 d-flex justify-content-between align-items-center">
-                <div class="fs-5"><strong>Câu 2:</strong> Điền từ: "She ___ to school every day."</div>
-                <span class="badge bg-danger text-white py-1 px-2 d-flex align-items-center gap-1">
-                    <iconify-icon icon="solar:close-circle-broken" class="fs-16"></iconify-icon> Sai
-                </span>
-            </div>
-            <div class="card-body py-2">
-                <p class="mb-1 fs-5"><strong>Học viên trả lời:</strong> <span class="text-danger">go <iconify-icon icon="solar:close-circle-broken" class="fs-14 text-danger"></iconify-icon></span></p>
-                <p class="mb-2 fs-5"><strong>Đáp án đúng:</strong> <span class="text-success">goes <iconify-icon icon="solar:check-circle-broken" class="fs-14 text-success"></iconify-icon></span></p>
-                <div class="alert alert-info mb-0 py-1 px-2 fs-5">
-                    <strong>Giải thích:</strong> Với "She", động từ cần chia là "goes" (thì hiện tại đơn).
-                </div>
-            </div>
-        </div> --}}
-
-        <!-- Question 3 -->
-        {{-- <div class="card mb-3 shadow-sm border-success border-2">
-            <div class="card-header border-bottom py-1 d-flex justify-content-between align-items-center">
-                <div class="fs-5"><strong>Câu 3:</strong> Sắp xếp câu: ["goes", "to", "school", "She"]</div>
-                <span class="badge bg-success text-white py-1 px-2 d-flex align-items-center gap-1">
-                    <iconify-icon icon="solar:check-circle-broken" class="fs-16"></iconify-icon> Đúng
-                </span>
-            </div>
-            <div class="card-body py-2">
-                <p class="mb-1 fs-5"><strong>Học viên sắp xếp:</strong> <span class="text-success">She goes to school <iconify-icon icon="solar:check-circle-broken" class="fs-14 text-success"></iconify-icon></span></p>
-                <p class="mb-2 fs-5"><strong>Thứ tự đúng:</strong> <span class="text-success">She goes to school <iconify-icon icon="solar:check-circle-broken" class="fs-14 text-success"></iconify-icon></span></p>
-                <div class="alert alert-info mb-0 py-1 px-2 fs-5">
-                    <strong>Giải thích:</strong> Câu được sắp xếp đúng theo cấu trúc ngữ pháp tiếng Anh.
-                </div>
-            </div>
-        </div> --}}
-
     </div>
 </div>
 @endsection

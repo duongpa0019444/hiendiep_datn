@@ -78,7 +78,7 @@
         //Hàm render dữ liệu thông tin thanh toán trong modal thông báo
         function renderPaymentInfo() {
             $.ajax({
-                url: 'course-payments/infomation',
+                url: 'student/course-payments/infomation',
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
@@ -112,14 +112,18 @@
             return Number(amount).toLocaleString('vi-VN');
         }
 
-        // Nếu chưa từng hiển thị, thì hiển thị modal thông báo đóng học phí
-        if (!localStorage.getItem('customModalShown')) {
-            renderPaymentInfo();
-            showModal('customModal');
-            localStorage.setItem('customModalShown', 'true');
+
+
+        //kiểm tra xem có thông báo thanh toán hay khôn g, nếu có thì hiển thị modal
+        const infomationPayment = $("#infomation-payment");
+        if(infomationPayment.length > 0){
+            // Nếu chưa từng hiển thị, thì hiển thị modal thông báo đóng học phí
+            if (!localStorage.getItem('customModalShown')) {
+                renderPaymentInfo();
+                showModal('customModal');
+                localStorage.setItem('customModalShown', 'true');
+            }
         }
-
-
 
         function closeModal(id) {
             const modal = document.getElementById(id);
@@ -169,7 +173,7 @@
             console.log('clicked');
             if (e.target.classList.contains('btn-showQr-payment')) {
                 $.ajax({
-                    url: 'course-payments/infomation',
+                    url: 'student/course-payments/infomation',
                     method: 'GET',
                     dataType: 'json',
                     success: function(response) {
@@ -254,7 +258,7 @@
                     closeModal('qrModal');
 
                     $.ajax({
-                        url: 'course-payments/updatePayment',
+                        url: 'student/course-payments/updatePayment',
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'

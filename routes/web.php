@@ -9,17 +9,22 @@ use App\Http\Controllers\admin\ScoreController;
 use App\Http\Controllers\client\loginController;
 use App\Http\Controllers\client\UserController;
 use App\Http\Controllers\admin\coursePaymentController;
+use App\Http\Controllers\admin\newsController;
 use App\Http\Controllers\admin\questionsController;
 use App\Http\Controllers\admin\NotificationsController;
 use App\Http\Controllers\admin\quizzesController;
 use App\Http\Controllers\admin\SchedulesController;
 use App\Http\Controllers\admin\TeacherRulesController;
 use App\Http\Controllers\admin\TeacherSalaryController;
+use App\Http\Controllers\admin\topicsController;
+use App\Http\Controllers\client\quizzesController as ClientQuizzesController;
 use App\Http\Controllers\client\CourseController as ClientCourseController;
 use App\Http\Controllers\courseController;
 
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckRoleClient;
+use App\Models\news;
+use App\Models\topics;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -146,7 +151,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
 
 
 
-  // Quản lý lớp học
+    // Quản lý lớp học
     Route::get('/admin/classes', [ClassController::class, 'index'])->name('admin.classes.index');
     Route::get('/admin/classes/create', [ClassController::class, 'create'])->name('admin.classes.create');
     Route::post('/admin/classes', [ClassController::class, 'store'])->name('admin.classes.store');
@@ -163,7 +168,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     // Danh sách lịch hoc của lớp
     Route::get('/classes/{id}/schedules', [ClassController::class, 'schedules'])->name('admin.classes.schedules');
 
-       // Quản lý lịch học
+    // Quản lý lịch học
     Route::get('/admin/schedules', [SchedulesController::class, 'index'])->name('admin.schedules.index');
     Route::get('/admin/schedules/{id}/create', [SchedulesController::class, 'create'])->name('admin.schedules.create');
     Route::post('/admin/schedules/store', [SchedulesController::class, 'store'])->name('admin.schedules.store');
@@ -184,6 +189,37 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
 
     Route::get('/attendance/schedules/{id}', [AttendanceController::class, 'attendanceClass'])->name('admin.attendance.class');
 
+
+    // Quản lý bài viết & tin tức
+    Route::get('/news', [newsController::class, 'index'])->name('admin.news.index');
+    Route::get('/news/filter', [newsController::class, 'filter'])->name('admin.news.filter');
+    Route::get('/news/create', [NewsController::class, 'create'])->name('admin.news.create');
+    Route::get('/news/{id}/edit', [NewsController::class, 'edit'])->name('admin.news.edit');
+    Route::post('/news/store', [newsController::class, 'store'])->name('admin.news.store');
+    Route::put('/news/{id}/update', [newsController::class, 'update'])->name('admin.news.update');
+    Route::delete('/news/{id}/delete', [newsController::class, 'delete'])->name('admin.news.delete');
+
+    Route::get('/news/upload', [newsController::class, 'upload'])->name('admin.news.temp-upload');
+    Route::post('/news/update-toggle', [newsController::class, 'updateToggle']);
+
+    Route::get('/news/trash', [newsController::class, 'trash'])->name('admin.news.trash');
+    Route::post('/news/{id}/restore', [NewsController::class, 'restore'])->name('admin.news.restore');
+    Route::delete('/news/{id}/force-delete', [NewsController::class, 'forceDelete'])->name('admin.news.forceDelete');
+    Route::get('/news/trash/filter', [newsController::class, 'filterTrash'])->name('admin.news.trash.filter');
+
+    //Quản lý topics
+    Route::get('/topics', [topicsController::class, 'index'])->name('admin.topics.index');
+    Route::get('/topics/filter', [topicsController::class, 'filter'])->name('admin.topics.filter');
+    Route::get('/topics/create', [topicsController::class, 'create'])->name('admin.topics.create');
+    Route::get('/topics/edit/{id}', [topicsController::class, 'edit'])->name('admin.topics.edit');
+    Route::post('/topics/store', [topicsController::class, 'store'])->name('admin.topics.store');
+    Route::put('/topics/{id}/update', [topicsController::class, 'update'])->name('admin.topics.update');
+    Route::delete('/topics/delete/{id}', [topicsController::class, 'delete'])->name('admin.topics.delete');
+
+    Route::get('/topics/trash', [topicsController::class, 'trash'])->name('admin.topics.trash');
+    Route::post('/topics/{id}/restore', [topicsController::class, 'restore'])->name('admin.topics.restore');
+    Route::delete('/topics/{id}/force-delete', [topicsController::class, 'forceDelete'])->name('admin.topics.forceDelete');
+    Route::get('/topics/trash/filter', [topicsController::class, 'filterTrash'])->name('admin.topics.trash.filter');
 
      // Trang quản lý khóa học
     Route::get('/course', [CourseController::class, 'index'])->name('admin.course-list');
@@ -211,6 +247,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     // Route::delete('/admin/courses/bulk-delete', [CourseController::class, 'bulkDelete'])->name('admin.course-bulk-delete');
     // nổi bật khóa học
     Route::post('/admin/courses/{id}/toggle-featured', [CourseController::class, 'toggleFeatured'])->name('admin.course.toggle-featured');
+
 });
  
 
@@ -221,12 +258,21 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
 
 // Routes dành cho client
 Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function () {
-    // trang quản trị cho người dùng
+
     Route::get('information', [UserController::class, 'information'])->name('client.information');
     Route::get('schedule', [UserController::class, 'schedule'])->name('client.schedule');
     Route::get('score', [UserController::class, 'score'])->name('client.score');
     Route::get('quizz', [UserController::class, 'quizz'])->name('client.quizz');
     Route::get('account', [UserController::class, 'account'])->name('client.account');
-    Route::get('course-payments/infomation', [coursePaymentController::class, 'showPaymentStudent']); //Lấy thông tin thanh toán của học sinh
-    Route::post('course-payments/updatePayment', [coursePaymentController::class, 'updatePayment'])->name('admin.course_payments.updatePayment');
+
+});
+
+//Dành cho học sinh
+Route::middleware([CheckRoleClient::class . ':student'])->prefix('student')->group(function () {
+    Route::get('/course-payments/infomation', [coursePaymentController::class, 'showPaymentStudent']); //Lấy thông tin thanh toán của học sinh
+    Route::post('/course-payments/updatePayment', [coursePaymentController::class, 'updatePayment']);
+    Route::get('/quizz/start', [ClientQuizzesController::class, 'start'])->name('student.quizzes.start');
+    Route::get('/quizz/{quiz}/show-result', [ClientQuizzesController::class, 'showResult'])->name('student.quizzes.showResult');
+    Route::get('/quizz/{quiz}/show-result/{attempt}', [ClientQuizzesController::class, 'resultsQuizzStudent']);
+    Route::get('/check-access-code/{code}', [ClientQuizzesController::class, 'checkAccessCode']);
 });

@@ -6369,7 +6369,7 @@ if (!Element.prototype.closest) {
 	CustomEvent.prototype = window.Event.prototype;
 
 	window.CustomEvent = CustomEvent;
-	
+
 })();
 (function (root, factory) {
 	if ( typeof define === 'function' && define.amd ) {
@@ -17018,10 +17018,10 @@ exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate :
             setCalendarWidth();
             var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
             /* TODO: investigate this further
-        
+
               Currently, there is weird positioning behavior in safari causing pages
               to scroll up. https://github.com/chmln/flatpickr/issues/563
-        
+
               However, most browsers are not Safari and positioning is expensive when used
               in scale. https://github.com/chmln/flatpickr/issues/1096
             */
@@ -19420,7 +19420,7 @@ module.exports = function (options) {
   }
   /**
    * Handles touchstart event.
-   * @param {TouchEvent} e 
+   * @param {TouchEvent} e
    */
 
 
@@ -19430,7 +19430,7 @@ module.exports = function (options) {
   }
   /**
    * Handles touchend event.
-   * @param {TouchEvent} e 
+   * @param {TouchEvent} e
    */
 
 
@@ -19441,7 +19441,7 @@ module.exports = function (options) {
   }
   /**
    * Handles touchend event.
-   * @param {TouchEvent} e 
+   * @param {TouchEvent} e
    */
 
 
