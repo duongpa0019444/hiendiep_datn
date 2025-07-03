@@ -270,20 +270,20 @@
             </div>
 
             <!-- Calendar Legend -->
-            {{-- <div class="calendar-legend">
+            <div class="calendar-legend">
                 <div class="legend-item">
-                    <div class="legend-color legend-class"></div>
-                    <span>Lớp học</span>
+                    ✅
+                    <span>Đã điểm danh</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color legend-attendance"></div>
-                    <span>Điểm danh</span>
+                    ❌
+                    <span>Chưa điểm danh</span>
                 </div>
-                <div class="legend-item">
+                {{-- <div class="legend-item">
                     <div class="legend-color legend-exam"></div>
                     <span>Kiểm tra</span>
-                </div>
-            </div> --}}
+                </div> --}}
+            </div>
 
             <!-- Calendar Container -->
             <div class="calendar-container">
@@ -649,7 +649,7 @@
 
             // console.log(props.scheduleId || 'Ngu');
 
-            // Hiển thị nút điểm danh nếu sự kiện thuộc ngày hôm nay
+            // Hiển thị nút điểm danh nếu sự kiện thuộc ngày hôm nay và nếu chưa điểm danh
             if (today.getTime() === eventDate.getTime() && props.students && props.students > 0 && props.status === 0) {
                 $('#attendanceBtn').show().off('click').on('click', function() {
                     window.location.href = `/admin/attendance/schedules/${props.scheduleId || ''}`;
