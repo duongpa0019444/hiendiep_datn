@@ -33,6 +33,25 @@ class coursePaymentController extends Controller
         return view('admin.course_payments.coursePayment-list', compact('payments'));
     }
 
+    public function trash(Request $request)
+    {
+        // Lấy các bản ghi đã bị xóa mềm
+        $deletedPayments = coursePayment::onlyTrashed()
+            ->with(['user', 'course', 'class'])
+            ->orderByDesc('deleted_at')
+            ->paginate(10);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'deletedPayments' => $deletedPayments,
+                'pagination' => $deletedPayments->links('pagination::bootstrap-5')->toHtml()
+            ]);
+        }
+
+        // Trả về view hiển thị thùng rác
+        return view('admin.course_payments.coursePayment-trashCan', compact('deletedPayments'));
+    }
+
 
     public function filter(Request $request)
     {
@@ -43,8 +62,7 @@ class coursePaymentController extends Controller
             'pagination' => $payments->links('pagination::bootstrap-5')->toHtml()
         ]);
     }
-
-    private function getFilteredPayments(Request $request)
+     private function getFilteredPayments(Request $request)
     {
         $query = coursePayment::query();
 
@@ -74,6 +92,53 @@ class coursePaymentController extends Controller
 
         return $query->with(['user', 'course', 'class'])->orderByDesc('created_at')->paginate($request->limit);
     }
+
+
+    public function filterTrash(Request $request){
+        $deletedPayments = $this->getFilteredPaymentsTrash($request);
+        $deletedPayments->appends($request->all());
+        return response()->json([
+            'deletedPayments' => $deletedPayments,
+            'pagination' => $deletedPayments->links('pagination::bootstrap-5')->toHtml()
+        ]);
+    }
+    private function getFilteredPaymentsTrash(Request $request)
+    {
+        // Lọc các bản ghi đã bị soft delete
+        $query = coursePayment::onlyTrashed();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('method')) {
+            $query->where('method', $request->method);
+        }
+
+        if ($request->filled('status_class')) {
+            $query->whereHas('class', function ($q) use ($request) {
+                $q->where('status', $request->status_class);
+            });
+        }
+
+        if ($request->filled('class_id')) {
+            $query->whereHas('class', function ($q) use ($request) {
+                $q->where('id', $request->class_id);
+            });
+        }
+
+        if ($request->filled('keyword')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->keyword . '%');
+            });
+        }
+
+        return $query->with(['user', 'course', 'class'])
+            ->orderByDesc('created_at')
+            ->paginate($request->limit ?? 10); // fallback limit
+    }
+
+
 
 
     public function update(Request $request, $id)

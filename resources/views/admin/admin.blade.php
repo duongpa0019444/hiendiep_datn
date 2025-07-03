@@ -5,6 +5,7 @@
 <!-- Mirrored from techzaa.in/larkon/admin/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 28 Oct 2024 06:27:43 GMT -->
 
 <head>
+
     <!-- Title Meta -->
     <meta charset="utf-8" />
     <title>@yield('title')</title>
@@ -26,26 +27,33 @@
 
     <!-- App css (Require in all Page) -->
     <link href="{{ asset('admin/css/app.min.css') }}" rel="stylesheet" type="text/css" />
+    <!-- Gọi CKEditor từ thư mục nội bộ -->
 
 
     <!-- Theme Config js (Require in all Page) -->
     <script src="{{ asset('admin/js/config.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+    {{-- <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script> --}}
+
 
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
       {{-- LINK Jquery --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
+    <!-- Font Awesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     {{-- LINK Jquery --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script src="{{ asset('ckeditor4/ckeditor/ckeditor.js') }}"></script>
+    @stack('styles')
+
 </head>
 
 <body>
 
     <!-- START Wrapper -->
     <div class="wrapper">
-
         <!-- ========== Topbar Start ========== -->
         <header class="topbar">
             <div class="container-fluid">
@@ -269,7 +277,8 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#sidebarCategory">
+
+                            <a class="nav-link" href="{{ route('admin.classes.index') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:calendar"></iconify-icon>
                                 </span>
@@ -279,7 +288,19 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#order">
+
+                            <a class="nav-link" href="{{ route('admin.schedules.index') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="line-md:beer-alt-twotone-loop"></iconify-icon>
+                                </span>
+                                <span class="nav-text">Quản lý lịch học</span>
+                            </a>
+
+                        </li>
+
+                        <li class="nav-item">
+
+                            <a class="nav-link" href=" {{ route('admin.course-list') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:clipboard-list"></iconify-icon>
                                 </span>
@@ -325,7 +346,7 @@
 
 
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/statistical">
+                              <a class="nav-link" href="{{route('admin.attendance.index')}}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:document-report"></iconify-icon>
                                 </span>
@@ -402,6 +423,26 @@
 
                         </li>
 
+
+
+                        <li class="nav-item">
+                              <a class="nav-link menu-arrow" href="#news" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="news">
+                                   <span class="nav-icon">
+                                        <iconify-icon icon="line-md:clipboard-list-twotone"></iconify-icon>
+                                   </span>
+                                   <span class="nav-text"> Quản lý bài viết </span>
+                              </a>
+                              <div class="collapse" id="news">
+                                   <ul class="nav sub-navbar-nav">
+                                        <li class="sub-nav-item">
+                                             <a class="sub-nav-link" href="{{ route('admin.news.index') }}">Danh sách bài viết</a>
+                                        </li>
+                                        <li class="sub-nav-item">
+                                             <a class="sub-nav-link" href="{{ route('admin.topics.index') }}">Chủ đề</a>
+                                        </li>
+                                   </ul>
+                              </div>
+                         </li>
                         <li class="nav-item mt-3">
                             <a class="nav-link" href="{{ route('auth.logout') }}">
                                 <span class="nav-icon">
@@ -411,6 +452,7 @@
                             </a>
 
                         </li>
+
                     @elseif (auth()->user()->isUser())
                         <li class="menu-title">Quản lý</li>
 

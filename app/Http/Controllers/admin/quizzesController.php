@@ -4,7 +4,13 @@ namespace App\Http\Controllers\admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\answers;
+use App\Models\classes;
+use App\Models\questions;
+use App\Models\quizAttempts;
 use App\Models\quizzes;
+use App\Models\sentenceAnswers;
+use App\Models\sentenceQuestions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request as FacadesRequest;
@@ -85,6 +91,14 @@ class quizzesController extends Controller
         $quiz->delete();
     }
 
+    public function generateUniqueAccessCode()
+    {
+        do {
+            $code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        } while (quizzes::where('access_code', $code)->exists());
+
+        return $code;
+    }
 
     public function store(Request $request)
     {
@@ -139,7 +153,7 @@ class quizzesController extends Controller
             'description' => $validated['description'],
             'status' => 'draft',
             'duration_minutes' => $validated['duration_minutes'],
-            'access_code' => $validated['access_code'] ?? null,
+            'access_code' => $this->generateUniqueAccessCode(),
             'is_public' => $validated['is_public'],
             'class_id' => $validated['is_public'] ? null : $validated['class_id'],
             'course_id' => $validated['is_public'] ? null : $validated['course_id'],
@@ -224,18 +238,501 @@ class quizzesController extends Controller
         ], 200);
     }
 
+    public function updateStatus($id, $status){
+        $quiz = quizzes::findOrFail($id);
+        $quiz->status = $status;
+        $quiz->save();
 
+        return response()->json([
+            'message' => 'Lưu trạng thái ' . ($status == "published" ? 'xuất bản' : 'nháp') . ' bài quiz thành công!',
+            'quiz' => $quiz,
+        ], 200);
+    }
 
 
     public function detail($id, Request $request)
     {
+
         $quiz = quizzes::with(['creator', 'course', 'class'])->findOrFail($id);
 
+        $mcQuestions = questions::where('quiz_id', $id)
+            ->get()
+            ->map(function ($q) {
+                $q->question_type = 'multiple_choice';
+                return $q;
+            });
+
+        $fillQuestions = sentenceQuestions::where('quiz_id', $id)
+            ->get()
+            ->map(function ($q) {
+                $q->question_type = 'fill_blank';
+                return $q;
+            });
+
+        // Gộp lại và sắp xếp theo thời gian thêm
+        $allQuestions = $mcQuestions->concat($fillQuestions)->sortBy('created_at')->values();
+        $answers = answers::whereIn('question_id', $mcQuestions->pluck('id'))->get();
         // Kiểm tra nếu là AJAX request
         if ($request->ajax()) {
             return response()->json($quiz);
         }
-
-        return view('admin.quizzes.quizzes-detail', compact('quiz'));
+        return view('admin.quizzes.quizzes-detail', compact('quiz','allQuestions', 'answers'));
     }
+
+
+
+
+
+
+
+
+
+
+    // Quản lý kết quả quizz
+
+    // Hiển thị kết quả danh sách lớp học có học sinh làm quizz
+    public function results($id, Request $request)
+    {
+        $quiz = quizzes::findOrFail($id);
+        $statistics = DB::select("
+           SELECT
+            (
+                SELECT COUNT(DISTINCT c.id)
+                FROM class_student cs
+                JOIN classes c ON c.id = cs.class_id
+                JOIN quiz_attempts qa ON qa.user_id = cs.student_id
+                WHERE qa.deleted_at IS NULL
+                AND qa.quiz_id = ?
+            ) AS total_classes_with_quiz,
+
+            (
+                SELECT COUNT(DISTINCT qa.user_id)
+                FROM quiz_attempts qa
+                WHERE qa.deleted_at IS NULL
+                AND qa.quiz_id = ?
+            ) AS total_students_attempted,
+
+            (
+                SELECT COUNT(*)
+                FROM quiz_attempts qa
+                WHERE qa.deleted_at IS NULL
+                AND qa.quiz_id = ?
+            ) AS total_attempts_for_quiz;
+
+        ",[$id, $id, $id]);
+
+        $classes =  DB::table('classes as c')
+            ->join('courses as co', 'co.id', '=', 'c.courses_id')
+            ->join('class_student as cs', 'cs.class_id', '=', 'c.id')
+            ->join('quiz_attempts as qa', function ($join) use ($id) {
+                $join->on('qa.user_id', '=', 'cs.student_id')
+                    ->where('qa.quiz_id', '=', $id)
+                    ->whereColumn('qa.class_id', '=', 'cs.class_id')
+                    ->whereNull('qa.deleted_at');
+            })
+            ->select([
+                'c.id as class_id',
+                'c.name as class_name',
+                'co.name as course_name',
+                DB::raw('(SELECT COUNT(*) FROM class_student cs2 WHERE cs2.class_id = c.id) as total_students'),
+                DB::raw('COUNT(DISTINCT qa.user_id) as students_attempted'),
+                DB::raw('COUNT(qa.id) as total_attempts')
+            ])
+            ->groupBy('c.id', 'c.name', 'co.name', 'c.created_at')
+            ->orderByDesc('c.created_at')
+            ->paginate(10);
+
+        // Kiểm tra nếu là AJAX request
+        if ($request->ajax()) {
+            return response()->json([
+                'classes' => $classes,
+                'pagination' => $classes->links('pagination::bootstrap-5')->toHtml()
+            ]);
+        }
+
+        return view('admin.quizzes.results.classes', compact('statistics', 'classes', 'quiz'));
+    }
+
+
+    public function filterResults(Request $request)
+    {
+        $classes = $this->getFilterResults($request);
+        $classes->appends($request->all()); // Giữ lại bộ lọc khi phân trang
+
+        return response()->json([
+            'classes' => $classes,
+            'pagination' => $classes->links('pagination::bootstrap-5')->toHtml()
+        ]);
+    }
+
+
+    private function getFilterResults(Request $request)
+    {
+        $quizId = $request->quiz_id;
+
+        $query = DB::table('classes as c')
+            ->join('courses as co', 'co.id', '=', 'c.courses_id')
+            ->join('class_student as cs', 'cs.class_id', '=', 'c.id')
+            ->join('quiz_attempts as qa', function ($join) use ($quizId) {
+                $join->on('qa.user_id', '=', 'cs.student_id')
+                    ->where('qa.quiz_id', '=', $quizId)
+                    ->whereNull('qa.deleted_at');
+            })
+            ->select([
+                'c.id as class_id',
+                'c.name as class_name',
+                'co.name as course_name',
+                DB::raw('(SELECT COUNT(*) FROM class_student cs2 WHERE cs2.class_id = c.id) as total_students'),
+                DB::raw('COUNT(DISTINCT qa.user_id) as students_attempted'),
+                DB::raw('COUNT(qa.id) as total_attempts'),
+                'c.created_at'
+            ])
+            ->groupBy('c.id', 'c.name', 'co.name', 'c.created_at')
+            ->orderByDesc('c.created_at');
+
+        if ($request->filled('class_id')) {
+            $query->where('c.id', $request->class_id);
+        }
+
+        if ($request->filled('course_id')) {
+            $query->where('co.id', $request->course_id);
+        }
+
+        if ($request->filled('class_status')) {
+            $query->where('c.status', $request->class_status);
+        }
+
+        return $query->paginate($request->limit ?? 10);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function resultsClass($id, $class, Request $request)
+    {
+
+
+        $statistics = DB::select("
+            SELECT
+                c.id AS class_id,
+                c.name AS class_name,
+                COUNT(DISTINCT cs.student_id) AS total_students, -- Tổng số học viên trong lớp
+
+                COUNT(DISTINCT qa.user_id) AS students_attempted, -- Số học viên trong lớp đã làm quiz
+
+                COUNT(qa.id) AS total_attempts -- Tổng số lượt làm bài
+
+            FROM classes c
+            JOIN class_student cs ON cs.class_id = c.id
+            LEFT JOIN quiz_attempts qa
+                ON qa.user_id = cs.student_id
+                AND qa.quiz_id = ?
+                AND qa.deleted_at IS NULL
+
+            WHERE c.id = ?
+            GROUP BY c.id, c.name;
+
+        ", [$id, $class]);
+
+        $quiz = quizzes::findOrFail($id);
+        $class = classes::findOrFail($class);
+
+        // Lấy danh sách học sinh trong lớp đã làm quiz
+        $students = DB::table('users as u')
+            ->join('class_student as cs', 'cs.student_id', '=', 'u.id')
+            ->join('quiz_attempts as qa', function ($join) use ($id) {
+                $join->on('qa.user_id', '=', 'u.id')
+                    ->where('qa.quiz_id', $id)
+                    ->whereNull('qa.deleted_at');
+            })
+            ->where('u.role', 'student')
+            ->where('cs.class_id', $class->id)
+            ->select([
+                'u.id as student_id',
+                'u.name as student_name',
+                DB::raw("DATE_FORMAT(u.birth_date, '%d/%m/%Y') as birthday"),
+                'u.gender',
+                DB::raw('COUNT(qa.id) as total_attempts'),
+                DB::raw('ROUND(AVG(qa.score), 2) as average_score'),
+            ])
+            ->groupBy('u.id', 'u.name', 'u.birth_date', 'u.gender')
+            ->orderBy('u.name')
+            ->paginate(10);
+
+                // Kiểm tra nếu là AJAX request
+        if ($request->ajax()) {
+            return response()->json([
+                'students' => $students,
+                'pagination' => $students->links('pagination::bootstrap-5')->toHtml()
+            ]);
+        }
+
+        return view('admin.quizzes.results.classes-detail', compact('statistics', 'quiz', 'class', 'students'));
+    }
+
+    public function filterAttemptsClassStudent(Request $request)
+    {
+        $students = $this->getFilterAttemptsClassStudent($request);
+        $students->appends($request->all()); // Giữ lại bộ lọc khi phân trang
+
+        return response()->json([
+            'students' => $students,
+            'pagination' => $students->links('pagination::bootstrap-5')->toHtml()
+        ]);
+    }
+
+    private function getFilterAttemptsClassStudent(Request $request)
+    {
+        $quizId = $request->quiz_id;
+        $classId = $request->class_id;
+
+        $query =DB::table('users as u')
+            ->join('class_student as cs', 'cs.student_id', '=', 'u.id')
+            ->join('quiz_attempts as qa', function ($join) use ($quizId) {
+                $join->on('qa.user_id', '=', 'u.id')
+                    ->where('qa.quiz_id', $quizId)
+                    ->whereNull('qa.deleted_at');
+            })
+            ->where('u.role', 'student')
+            ->where('cs.class_id', $classId)
+            ->select([
+                'u.id as student_id',
+                'u.name as student_name',
+                DB::raw("DATE_FORMAT(u.birth_date, '%d/%m/%Y') as birthday"),
+                'u.gender',
+                DB::raw('COUNT(qa.id) as total_attempts'),
+                DB::raw('ROUND(AVG(qa.score), 2) as average_score'),
+            ])
+            ->groupBy('u.id', 'u.name', 'u.birth_date', 'u.gender')
+            ->orderBy('u.name');
+
+            // Tên học sinh
+            if ($request->filled('keyword')) {
+                $query->where('u.name', 'like', '%' . $request->keyword . '%');
+            }
+
+            // Giới tính
+            if ($request->filled('gender')) {
+               $query->where('u.gender', $request->gender);
+            }
+
+            // Ngày sinh
+            if ($request->filled('birth_date')) {
+                $query->whereDate('u.birth_date', $request->birth_date);
+            }
+
+            // Điểm trung bình
+            if ($request->filled('avg_score')) {
+                $query->havingRaw('ROUND(AVG(qa.score), 2) = ?', [$request->avg_score]);
+            }
+
+            // Số lượt làm bài
+            if ($request->filled('attempts')) {
+                $query->havingRaw('COUNT(qa.id) = ?', [$request->attempts]);
+            }
+
+            return $query->orderBy('u.name')->paginate($request->limit ?? 10);
+    }
+
+
+
+
+
+
+
+
+    public function resultsClassStudent($id, $class, $student, Request $request)
+    {
+        $quiz = quizzes::findOrFail($id);
+        $class = classes::findOrFail($class);
+        $student = DB::table('users')->where('id', $student)->where('role', 'student')->first();
+
+        $statistics = DB::select("
+                    SELECT
+                u.id AS student_id,
+                u.name AS student_name,
+                COUNT(qa.id) AS total_attempts,
+                ROUND(AVG(qa.score), 2) AS average_score,
+                ROUND(AVG(TIMESTAMPDIFF(MINUTE, qa.started_at, qa.submitted_at)), 2) AS average_time_minutes
+            FROM users u
+            JOIN class_student cs ON cs.student_id = u.id
+            LEFT JOIN quiz_attempts qa
+                ON qa.user_id = u.id
+            AND qa.quiz_id = ?
+                AND qa.deleted_at IS NULL
+            WHERE u.role = 'student'
+                AND cs.class_id = ?
+                AND u.id = ?
+            GROUP BY u.id, u.name
+            ORDER BY u.name;"
+        , [$id, $class->id, $student->id]);
+
+        $attempts = DB::table('quiz_attempts as qa')
+            ->select([
+                'qa.id as attempt_id',
+                'qa.user_id',
+                'qa.quiz_id',
+                'qa.score',
+                'qa.total_correct',
+                DB::raw("(
+                    SELECT COUNT(*) FROM (
+                        SELECT id FROM questions WHERE quiz_id = $quiz->id
+                        UNION ALL
+                        SELECT id FROM sentence_questions WHERE quiz_id = $quiz->id
+                    ) as all_questions
+                ) as total_questions"),
+                DB::raw('TIMESTAMPDIFF(MINUTE, qa.started_at, qa.submitted_at) as duration_minutes'),
+                DB::raw("DATE_FORMAT(qa.submitted_at, '%d/%m/%Y') as completed_date")
+            ])
+            ->where('qa.quiz_id', $quiz->id)
+            ->where('qa.user_id', $student->id)
+            ->orderBy('qa.started_at', 'asc')
+            ->paginate(10);
+        // dd($attempts);
+        if ($request->ajax()) {
+            return response()->json([
+                'attempts' => $attempts,
+                'pagination' => $attempts->links('pagination::bootstrap-5')->toHtml()
+            ]);
+        }
+        return view('admin.quizzes.results.classes-detail-student', compact('quiz', 'class', 'student', 'statistics', 'attempts'));
+    }
+    public function filterResultsClassStudent(Request $request)
+    {
+        $attempts = $this->getFilterResultsClassStudent($request);
+        $attempts->appends($request->all()); // Giữ lại bộ lọc khi phân trang
+
+        return response()->json([
+            'attempts' => $attempts,
+            'pagination' => $attempts->links('pagination::bootstrap-5')->toHtml()
+        ]);
+    }
+
+    private function getFilterResultsClassStudent(Request $request)
+    {
+        $quizId = $request->quiz_id;
+        $studentId = $request->student_id;
+
+        $query = DB::table('quiz_attempts as qa')
+            ->select([
+                'qa.id as attempt_id',
+                'qa.user_id',
+                'qa.quiz_id',
+                'qa.score',
+                'qa.total_correct',
+                DB::raw("(
+                    SELECT COUNT(*) FROM (
+                        SELECT id FROM questions WHERE quiz_id = $quizId
+                        UNION ALL
+                        SELECT id FROM sentence_questions WHERE quiz_id = $quizId
+                    ) as all_questions
+                ) as total_questions"),
+                DB::raw('TIMESTAMPDIFF(MINUTE, qa.started_at, qa.submitted_at) as duration_minutes'),
+                DB::raw("DATE_FORMAT(qa.submitted_at, '%d/%m/%Y') as completed_date")
+            ])
+            ->where('qa.quiz_id', $quizId)
+            ->where('qa.user_id', $studentId)
+            ->whereNull('qa.deleted_at');
+
+        // Lọc theo ngày làm bài
+        if ($request->filled('completed_at')) {
+            $query->whereDate('qa.submitted_at', $request->completed_at);
+        }
+
+        // Lọc theo điểm từ (>=)
+        if ($request->filled('score')) {
+            $query->where('qa.score', '=', $request->score);
+        }
+
+        // Lọc theo thời gian làm bài (<=)
+        if ($request->filled('max_duration')) {
+            $query->whereRaw('TIMESTAMPDIFF(MINUTE, qa.started_at, qa.submitted_at) <= ?', [$request->max_duration]);
+        }
+
+        return $query->orderBy('qa.started_at', 'asc')->paginate($request->limit ?? 10);
+    }
+
+
+
+
+
+
+
+
+
+    public function quizAttemptsStudentAnswer($id, $class, $student, $attemptId){
+        $quiz = quizzes::findOrFail($id);
+        $class = classes::findOrFail($class);
+        $student = DB::table('users')->where('id', $student)->where('role', 'student')->first();
+
+        $attempt = DB::table('quiz_attempts as qa')
+            ->select([
+                'qa.id as attempt_id',
+                'qa.user_id',
+                'qa.quiz_id',
+                'qa.score',
+                'qa.total_correct',
+                DB::raw("(
+                    SELECT COUNT(*) FROM (
+                        SELECT id FROM questions WHERE quiz_id = {$quiz->id}
+                        UNION ALL
+                        SELECT id FROM sentence_questions WHERE quiz_id = {$quiz->id}
+                    ) as all_questions
+                ) as total_questions"),
+                DB::raw('TIMESTAMPDIFF(MINUTE, qa.started_at, qa.submitted_at) as duration_minutes'),
+                DB::raw("DATE_FORMAT(qa.submitted_at, '%d/%m/%Y') as completed_date")
+            ])
+            ->where('qa.quiz_id', $quiz->id)
+            ->where('qa.user_id', $student->id)
+            ->where('qa.id', $attemptId)
+            ->whereNull('qa.deleted_at')
+            ->orderBy('qa.started_at', 'asc')
+            ->first();
+        // dd($attempt);
+        // Load câu hỏi
+        $mcQuestions = questions::where('quiz_id', $id)->get()->map(function ($q) {
+            $q->question_type = 'multiple_choice';
+            return $q;
+        });
+
+        $fillQuestions = sentenceQuestions::where('quiz_id', $id)->get()->map(function ($q) {
+            $q->question_type = 'fill_blank';
+            return $q;
+        });
+
+        $allQuestions = $mcQuestions->concat($fillQuestions)->sortBy('created_at')->values();
+        $answers = answers::whereIn('question_id', $mcQuestions->pluck('id'))->get();
+
+
+        // Lấy câu trả lời trắc nghiệm của học sinh trong lần làm bài này
+        $studentMcAnswers = DB::table('student_answers')
+            ->where('attempt_id', $attemptId)
+            ->get();
+        // Lấy câu trả lời điền từ/sắp xếp câu
+        $studentSentenceAnswers = DB::table('sentence_answers')
+            ->where('attempt_id', $attemptId)
+            ->get();
+        // dd($studentMcAnswers->all());
+        return view('admin.quizzes.results.answer_detail', compact(
+            'quiz', 'class', 'student', 'attempt', 'allQuestions', 'answers', 'studentMcAnswers', 'studentSentenceAnswers'
+        ));
+    }
+
 }

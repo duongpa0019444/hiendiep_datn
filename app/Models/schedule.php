@@ -15,6 +15,7 @@ class Schedule extends Model
         'end_time',
         'teacher_id',
         'room',
+        'status'
     ];
 
     protected $casts = [

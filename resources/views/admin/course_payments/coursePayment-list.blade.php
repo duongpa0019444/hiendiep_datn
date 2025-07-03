@@ -102,11 +102,17 @@
                     </div>
                 </div>
             </div>
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between mb-1">
                 <h4 class="card-title mb-1">Danh sách thanh toán học phí</h4>
-                <a id="export-btn" href="#" class="btn btn-outline-primary btn-sm">
-                    <iconify-icon icon="material-symbols:download" class="fs-20"></iconify-icon> Xuất file
-                </a>
+                <div class="d-flex gap-2 align-items-center">
+                    <a id="" href="{{ route('admin.course_payments.trash') }}" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1">
+                        <iconify-icon icon="mdi:trash-can-outline" class="fs-20 me-1"></iconify-icon> <span>Thùng rác</span>
+                    </a>
+
+                    <a id="export-btn" href="#" class="btn btn-primary btn-sm">
+                        <iconify-icon icon="material-symbols:download" class="fs-20"></iconify-icon> Xuất file
+                    </a>
+                </div>
 
             </div>
 
@@ -211,8 +217,10 @@
                                                     <div class="fs-6">{{ $payment->user->email ?? '' }}</div>
                                                 </td>
                                                 <td>
-                                                    <div class="fw-bold">{{ $payment->class->name ?? '' }}</div>
-                                                    <div class="fs-6">Khóa: {{ $payment->course->name ?? '' }}</div>
+
+                                                    <div class="fw-bold">{{ $payment->class->name }}</div>
+                                                    {{-- <div class="fs-6">Khóa: {{ $payment->courses->name }}</div> --}}
+
                                                 </td>
                                                 <td>
                                                     {{ $payment->payment_date ? \Carbon\Carbon::parse($payment->payment_date)->format('H:i d/m/Y') : '' }}
@@ -258,7 +266,7 @@
                                                                         icon="solar:pen-2-broken"
                                                                         class="me-1"></iconify-icon> Sửa</button>
                                                             </li>
-                                                            <li>
+                                                            {{-- <li>
                                                                 <form
                                                                     action="{{ route('admin.course_payments.delete', $payment->id) }}"
                                                                     method="post">
@@ -272,7 +280,7 @@
                                                                             class="me-1"></iconify-icon> Xóa
                                                                     </button>
                                                                 </form>
-                                                            </li>
+                                                            </li> --}}
                                                         </ul>
                                                     </div>
                                                 </td>
@@ -415,7 +423,7 @@
                     <p>Hotline: 0123 456 789 | Email: contact@hiendiep.edu.vn</p>
                     <hr>
                     <h4>HÓA ĐƠN HỌC PHÍ</h4>
-                    <p>Mã hóa đơn: <strong>${payment.payment_code || 'N/A'}</strong> | Ngày xuất: <strong>${new Date().toLocaleDateString('vi-VN')}</strong></p>
+                    <p>Ngày xuất: <strong>${new Date().toLocaleDateString('vi-VN')}</strong></p>
                 </div>
                 <div class="student-details">
                     <h5>Thông tin học viên</h5>
@@ -462,7 +470,7 @@
                     <h5>Thông tin thanh toán</h5>
                     <p><strong>Phương thức:</strong> ${payment.method === 'Cash' ? 'Tiền mặt' : (payment.method === 'Bank Transfer' ? 'Chuyển khoản' : 'N/A')}</p>
                     <p><strong>Ngày thanh toán:</strong> ${payment.payment_date ? new Date(payment.payment_date).toLocaleString('vi-VN') : 'N/A'}</p>
-                    <p><strong>Ghi chú:</strong> ${payment.note || 'N/A'}</p>
+                    <p><strong>Ghi chú:</strong> ${payment.note || ''}</p>
                 </div>
                 <div class="invoice-footer text-center mt-4">
                     <p><strong>Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi!</strong></p>
@@ -571,15 +579,7 @@
                                         <iconify-icon icon="solar:pen-2-broken" class="me-1"></iconify-icon> Sửa
                                     </button>
                                 </li>
-                                <li>
-                                    <form action="/admin/course-payments/${payment.id}/delete" method="post">
-                                        <input type="hidden" name="_token" value="${csrfToken}">
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        <button type="button" class="dropdown-item text-danger sweetalert-params-coursepayment">
-                                            <iconify-icon icon="solar:trash-bin-minimalistic-2-broken" class="me-1"></iconify-icon> Xóa
-                                        </button>
-                                    </form>
-                                </li>
+
                             </ul>
                         </div>
                     </td>
@@ -820,15 +820,7 @@
                                                     <iconify-icon icon="solar:pen-2-broken" class="me-1"></iconify-icon> Sửa
                                                 </button>
                                             </li>
-                                            <li>
-                                                <form action="/admin/course-payments/${payment.id}/delete" method="post">
-                                                    <input type="hidden" name="_token" value="${csrfToken}">
-                                                    <input type="hidden" name="_method" value="DELETE">
-                                                    <button type="button" class="dropdown-item text-danger sweetalert-params-coursepayment">
-                                                        <iconify-icon icon="solar:trash-bin-minimalistic-2-broken" class="me-1"></iconify-icon> Xóa
-                                                    </button>
-                                                </form>
-                                            </li>
+
                                         </ul>
                                     </div>
                                 </td>
