@@ -204,7 +204,7 @@
                         <div class="d-flex align-items-center">
                             <input type="text" id="basic-datepicker" class="form-control me-2 " placeholder="Date"
                                 data-provider="flatpickr" data-date-format="d/m/Y" value="{{ $formattedDate  }}">
-                            <button id="todayBtn" class="btn btn-primary  today-btn">Today</button>
+                            <button id="todayBtn" class="btn btn-primary  today-btn" data-today="{{ $formattedDate }}">Today</button>
                         </div>
                     </div>
                     <table class="table table-centered table-hover" id="scheduleTable">
@@ -570,6 +570,12 @@
             });
 
 
+            $("#todayBtn").on('click', function (){
+                const date = $(this).data('today');
+                $("#basic-datepicker").val(date);
+                $("#basic-datepicker").trigger('change');
+
+            })
 
             //Xử lý lọc ngày
             $('#basic-datepicker').on('change', function() {

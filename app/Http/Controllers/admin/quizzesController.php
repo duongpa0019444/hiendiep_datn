@@ -91,6 +91,14 @@ class quizzesController extends Controller
         $quiz->delete();
     }
 
+    public function generateUniqueAccessCode()
+    {
+        do {
+            $code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        } while (quizzes::where('access_code', $code)->exists());
+
+        return $code;
+    }
 
     public function store(Request $request)
     {
@@ -145,7 +153,7 @@ class quizzesController extends Controller
             'description' => $validated['description'],
             'status' => 'draft',
             'duration_minutes' => $validated['duration_minutes'],
-            'access_code' => $validated['access_code'] ?? null,
+            'access_code' => $this->generateUniqueAccessCode(),
             'is_public' => $validated['is_public'],
             'class_id' => $validated['is_public'] ? null : $validated['class_id'],
             'course_id' => $validated['is_public'] ? null : $validated['course_id'],
@@ -319,6 +327,7 @@ class quizzesController extends Controller
             ->join('quiz_attempts as qa', function ($join) use ($id) {
                 $join->on('qa.user_id', '=', 'cs.student_id')
                     ->where('qa.quiz_id', '=', $id)
+                    ->whereColumn('qa.class_id', '=', 'cs.class_id')
                     ->whereNull('qa.deleted_at');
             })
             ->select([
@@ -594,7 +603,6 @@ class quizzesController extends Controller
             ])
             ->where('qa.quiz_id', $quiz->id)
             ->where('qa.user_id', $student->id)
-            ->whereNull('qa.deleted_at')
             ->orderBy('qa.started_at', 'asc')
             ->paginate(10);
         // dd($attempts);
