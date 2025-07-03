@@ -56,14 +56,21 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
   // Quản lí điểm số
   Route::get('/score', [ScoreController::class, 'score'])->name('admin.score');
 
-  // Trang quản lý tài khoản
-  Route::get('/account', [AccountController::class, 'account'])->name('admin.account');
-  Route::get('/account/{role}', [AccountController::class, 'list'])->name('admin.account.list');
-  Route::get('/account-add/{role}', [AccountController::class, 'add'])->name('admin.account.add');
-  Route::post('/account-store/{role}', [AccountController::class, 'store'])->name('admin.account.store');
-  Route::get('/account-edit/{role}/{id}', [AccountController::class, 'edit'])->name('admin.account.edit');
-  Route::put('/account-update/{role}/{id}', [AccountController::class, 'update'])->name('admin.account.update');
-  Route::get('/account-delete/{role}/{id}', [AccountController::class, 'delete'])->name('admin.account.delete');
+    // Trang quản lý tài khoản
+    Route::get('/account', [AccountController::class, 'account'])->name('admin.account');
+    Route::get('/account-search', [AccountController::class, 'search'])->name('admin.account.search');
+    Route::get('/account/{role}', [AccountController::class, 'list'])->name('admin.account.list');
+    Route::get('/account-add/{role}', [AccountController::class, 'add'])->name('admin.account.add');
+    Route::post('/account-store/{role}', [AccountController::class, 'store'])->name('admin.account.store');
+    Route::get('/account-edit/{role}/{id}', [AccountController::class, 'edit'])->name('admin.account.edit');
+    Route::put('/account-update/{role}/{id}', [AccountController::class, 'update'])->name('admin.account.update');
+    // check nguoi dung co đang liên kết với các bảng khác không
+    Route::get('/account/check/{id}', [AccountController::class, 'check'])->name('admin.account.check');
+    Route::get('/account/delete/{role}/{id}', [AccountController::class, 'delete'])->name('admin.account.delete');
+    Route::get('/account-trash', [AccountController::class, 'trash'])->name('admin.account.trash');
+    Route::post('/account/restore/{id}', [AccountController::class, 'restore'])->name('admin.account.restore');
+    Route::delete('/account/force-delete/{id}', [AccountController::class, 'forceDelete'])->name('admin.account.forceDelete');
+
 
   // Quản lí điểm số
   Route::get('/score', [ScoreController::class, 'index'])->name('admin.score');
