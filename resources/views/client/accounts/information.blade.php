@@ -4,7 +4,6 @@
 @section('description', '')
 
 @section('content')
-
     <main>
         <div class="section-bg hero-bg background-image"
             style="background-image: url('{{ asset('client/images/hero/home-1/hero-bg.png') }}');">

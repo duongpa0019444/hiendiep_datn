@@ -423,6 +423,26 @@
 
                         </li>
 
+
+
+                        <li class="nav-item">
+                              <a class="nav-link menu-arrow" href="#news" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="news">
+                                   <span class="nav-icon">
+                                        <iconify-icon icon="line-md:clipboard-list-twotone"></iconify-icon>
+                                   </span>
+                                   <span class="nav-text"> Quản lý bài viết </span>
+                              </a>
+                              <div class="collapse" id="news">
+                                   <ul class="nav sub-navbar-nav">
+                                        <li class="sub-nav-item">
+                                             <a class="sub-nav-link" href="{{ route('admin.news.index') }}">Danh sách bài viết</a>
+                                        </li>
+                                        <li class="sub-nav-item">
+                                             <a class="sub-nav-link" href="{{ route('admin.topics.index') }}">Chủ đề</a>
+                                        </li>
+                                   </ul>
+                              </div>
+                         </li>
                         <li class="nav-item mt-3">
                             <a class="nav-link" href="{{ route('auth.logout') }}">
                                 <span class="nav-icon">
@@ -432,6 +452,7 @@
                             </a>
 
                         </li>
+
                     @elseif (auth()->user()->isUser())
                         <li class="menu-title">Quản lý</li>
 

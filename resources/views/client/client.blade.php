@@ -29,8 +29,7 @@
     <!-- Main CSS -->
     <link rel="stylesheet" href="{{ asset('client/style.css') }}" />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
+    <script src="{{ asset('client/plugins/js/jquery.min.js') }}"></script>
 
 </head>
 
@@ -74,7 +73,7 @@
 
                             <li class="offcanvas__menu_li">
                                 <a class="offcanvas__menu_item" href="{{ route('client.course') }}">Khóa học</a>
-                                
+
                             </li>
 
 
@@ -100,25 +99,26 @@
                                 <a class="offcanvas__menu_item" href="contact.html">Liên hệ</a>
                             </li>
 
+
                             <li class="offcanvas__menu_li mt-4">
-                                <a class="offcanvas__menu_item" href="blog.html"><i class="icofont-user me-2"></i>Tài
+                                <a class="offcanvas__menu_item" href=""><i class="icofont-user me-2"></i>Tài
                                     khoản của bạn</a>
                                 <ul class="offcanvas__sub_menu">
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="blog.html" class="offcanvas__sub_menu_item">Dashboard</a>
+
+                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.information') }}" class="offcanvas__sub_menu_item" data-section="dashboard">
+                                            <i class="icofont-chart-bar-graph"></i>Dashboard</a>
                                     </li>
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Lịch học</a>
+                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.schedule') }}" class="offcanvas__sub_menu_item" data-section="schedule">
+                                            <i class="icofont-calendar"></i> Lịch học</a>
                                     </li>
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Điểm số</a>
+                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.score') }}" class="offcanvas__sub_menu_item" data-section="grades">
+                                            <i class="icofont-book-alt"></i>Điểm Số</a>
                                     </li>
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Bài quizz</a>
+                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.quizz') }}" class="offcanvas__sub_menu_item" data-section="quizzes">
+                                            <i class="icofont-pencil-alt-2"></i> Bài Quiz</a>
                                     </li>
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Thông tin tài
-                                            khoản</a>
+                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.account') }}" class="offcanvas__sub_menu_item" data-section="account">
+                                            <i class="icofont-user"></i>Thông Tin Tài Khoản</a>
                                     </li>
                                 </ul>
                             </li>
@@ -155,9 +155,9 @@
 
                                     </li>
                                     <li>
-                                        <a href="{{ route('client.course') }}">Khóa học<i
-                                                class=""></i></a>
-                                
+
+                                        <a href="{{ route('client.course') }}">Khóa học<i class=""></i></a>
+
                                     </li>
 
                                     <li>
@@ -213,7 +213,7 @@
                                             @elseif (Auth::user()->role == 'admin')
                                                 <a href="{{ route('admin.dashboard') }}">
                                                     <span class="fw-medium name-user">{{ Auth::user()->name }} </span>
-                                                    {{-- 
+                                                    {{--
                                                     <img src="{{ asset('client/images/icons/studentBoy.svg') }}"
                                                         alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px"> --}}
                                                 </a>
@@ -227,7 +227,9 @@
                                     @endauth
 
                                 </div>
+
                             </div>
+
 
                             <!-- Mobile Menu Button -->
                             <button type="button" class="mobile-menu-offcanvas-toggler" data-bs-toggle="modal"
@@ -866,7 +868,7 @@
                     if (response.status && response.redirect) {
                         window.location.href = response.redirect;
                     } else {
-                        $('#alert-login').show();  
+                        $('#alert-login').show();
                     }
                 },
                 error: function(xhr) {

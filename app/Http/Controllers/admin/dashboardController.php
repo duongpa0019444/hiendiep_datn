@@ -95,13 +95,21 @@ class dashboardController extends Controller
             ->select('classes.name as class_name', 'classes.id')
             ->selectRaw('COALESCE((SELECT COUNT(DISTINCT cs.student_id) FROM class_student cs WHERE cs.class_id = classes.id AND EXISTS (SELECT 1 FROM course_payments cp WHERE cp.student_id = cs.student_id AND cp.class_id = cs.class_id AND cp.status = \'paid\')), 0) as paid_students')
             ->selectRaw('COALESCE((SELECT COUNT(DISTINCT cs.student_id) FROM class_student cs WHERE cs.class_id = classes.id AND NOT EXISTS (SELECT 1 FROM course_payments cp WHERE cp.student_id = cs.student_id AND cp.class_id = cs.class_id AND cp.status = \'paid\')), 0) as unpaid_students')
-            ->where('status', '=', 'in_progress')
-            ->orWhere('status', '=', 'not_started')
+            ->where(function ($query) {
+                $query->where('status', 'in_progress')
+                    ->orWhere('status', 'not_started');
+            })
             ->when($course_id != 0, function ($query) use ($course_id) {
                 return $query->where('courses_id', $course_id);
             })
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('class_student as cs')
+                    ->whereColumn('cs.class_id', 'classes.id');
+            })
             ->orderBy('name')
             ->paginate(6);
+
 
         return response()->json([
             'data' => $classes_informations,
