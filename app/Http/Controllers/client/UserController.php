@@ -9,6 +9,7 @@ use App\Models\coursePayment;
 use Database\Seeders\user;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
+
 use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
@@ -25,6 +26,7 @@ class UserController extends Controller
 
             return view('client.accounts.teachers.dashboard');
         }
+
     }
 
     public function schedule()
@@ -35,6 +37,7 @@ class UserController extends Controller
             return view('client.accounts.teachers.schedule');
 
         }
+
     }
 
     public function score()
@@ -45,6 +48,7 @@ class UserController extends Controller
 
             return view('client.accounts.teachers.score');
         }
+
     }
 
     public function quizz()
@@ -117,6 +121,7 @@ class UserController extends Controller
 
             return view('client.accounts.teachers.quizz');
         }
+
     }
 
 
@@ -128,5 +133,6 @@ class UserController extends Controller
 
             return view('client.accounts.teachers.account');
         }
+
     }
 }

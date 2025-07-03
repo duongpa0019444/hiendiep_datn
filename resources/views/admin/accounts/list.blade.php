@@ -1,14 +1,14 @@
-
 @php
     $roles = [
-    'student' => 'Học sinh',
-    'teacher' => 'Giáo viên',
-    'admin'   => 'Quản trị viên',
-    'staff'   => 'Nhân viên',
-];
+        'student' => 'Học sinh',
+        'teacher' => 'Giáo viên',
+        'admin' => 'Quản trị viên',
+        'staff' => 'Nhân viên',
+    ];
 @endphp
+
 @extends('admin.admin')
-@section('title', 'Quản lí ' . $roles[request('role')] ?? request('role'))
+@section('title', 'Quản lí ' . ($roles[request('role')] ?? request('role') ?? 'người dùng'))
 @section('description', '')
 @section('content')
 
@@ -18,16 +18,38 @@
                 <ol class="breadcrumb py-0">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('admin.account') }}">Quản lí người dùng</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ $roles[request('role')] ?? request('role') }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ $roles[request('role')] ?? request('role') }}
+                    </li>
                 </ol>
             </nav>
 
             @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {  
+                        const toastElement = document.createElement('div');
+                        toastElement.setAttribute('data-toast', '');
+                        toastElement.setAttribute('data-toast-text', "{{ session('success') }}");
+                        toastElement.setAttribute('data-toast-gravity', 'top');
+                        toastElement.setAttribute('data-toast-position', 'center');
+                        toastElement.setAttribute('data-toast-className', 'success');
+                        toastElement.setAttribute('data-toast-duration', '4000');
+                        document.body.appendChild(toastElement);
+
+                        // Kích hoạt toast (nếu thư viện bạn đang dùng có hàm gọi)
+                        if (typeof Toastify !== 'undefined') {
+                            Toastify({
+                                text: toastElement.getAttribute('data-toast-text'),
+                                gravity: toastElement.getAttribute('data-toast-gravity'),
+                                position: toastElement.getAttribute('data-toast-position'),
+                                className: toastElement.getAttribute('data-toast-className'),
+                                duration: parseInt(toastElement.getAttribute('data-toast-duration'))
+                            }).showToast();
+                        }
+                    });
+                </script>
             @endif
+
+
             <div class="row">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -41,7 +63,7 @@
 
                     </div> <!-- end card-header-->
                     <div class="card-body p-0">
-                        <div class="px-3" >
+                        <div class="px-3">
                             <table class="table table-hover mb-0 table-centered">
                                 <thead>
                                     <tr>
@@ -62,7 +84,7 @@
                                             </td>
                                             <td>{{ $data->name }}</td>
                                             <td>{{ $data->gender }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($data->birth_date)->format('d/m/Y')}}</td>
+                                            <td>{{ \Carbon\Carbon::parse($data->birth_date)->format('d/m/Y') }}</td>
                                             <td>{{ $data->email }}</td>
                                             <td>{{ $data->phone }}</td>
                                             <td>
@@ -72,9 +94,8 @@
                                                         class="btn btn-soft-primary btn-sm"><iconify-icon
                                                             icon="solar:pen-2-broken"
                                                             class="align-middle fs-18"></iconify-icon></a>
-                                                    <a href="{{ route('admin.account.delete', ['role' => request('role'), 'id' => $data->id]) }}"
-                                                        class="btn btn-soft-danger btn-sm"
-                                                        onclick="return confirm('Bạn có muốn xóa {{ request('role') }} {{ $data->name }} ?')">
+                                                    <a href="#" class="btn btn-soft-danger btn-sm"
+                                                        onclick="showDeleteConfirm({{ $data->id }}, '{{ $data->name }}', '{{ request('role') }}')">
                                                         <iconify-icon icon="solar:trash-bin-minimalistic-2-broken"
                                                             class="align-middle fs-18"></iconify-icon></a>
                                                 </div>
@@ -113,5 +134,96 @@
         </footer>
 
     </div>
+
+    <script>
+        function showDeleteConfirm(userId, userName, role) {
+            $.ajax({
+                url: `{{ route('admin.account.check', '') }}/${userId}`,
+
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                success: function(data) {
+                    let msg = `⚠️ ${role} "${userName}" đang có dữ liệu: \n\n`;
+
+                    if (data.classes.length)
+                        msg += `Lớp : ${data.classes.map(c => c.name).join(', ')}\n`;
+                    if (data.payments.length)
+                        msg += `Và Thanh toán: ${data.payments.length} khoản\n`;
+                    if (data.quizzes.length)
+                        msg += `Và Bài quiz: ${data.quizzes.length} lần\n`;
+                     if (data.schedules.length)
+                        msg += `Lịch dạy: ${data.schedules.length} buổi \n`;
+                    // nếu trùng 1 lớp 3 buổi thì sao
+
+                    if (data.classes.length || data.payments.length || data.quizzes.length || data.schedules.length) {
+                        Swal.fire({
+                            title: `Bạn có chắc muốn xóa ${role}?`,
+                            text: msg,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Vâng, xóa!',
+                            cancelButtonText: 'Không, hủy',
+                            confirmButtonClass: 'btn btn-danger w-xs me-2 mt-2',
+                            cancelButtonClass: 'btn btn-secondary w-xs mt-2',
+                            buttonsStyling: false,
+                        }).then(function(result) {
+                            if (result.isConfirmed) {
+                                window.location.href = "{{ url('/admin/account/delete') }}/" + role + "/" + userId;
+
+                            } else {
+                                Swal.fire({
+                                    title: 'Đã hủy',
+                                    text: 'Người dùng chưa bị xóa.',
+                                    icon: 'info',
+                                    confirmButtonClass: 'btn btn-primary mt-2',
+                                    buttonsStyling: false
+                                });
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: `Bạn có chắc muốn xóa ${role}?`,
+                            text: `Thao tác này không thể hoàn tác.`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Vâng, xóa!',
+                            cancelButtonText: 'Không, hủy',
+                            confirmButtonClass: 'btn btn-danger w-xs me-2 mt-2',
+                            cancelButtonClass: 'btn btn-secondary w-xs mt-2',
+                            buttonsStyling: false,
+                        }).then(function(result) {
+                            if (result.isConfirmed) {
+                               window.location.href = "{{ url('/admin/account/delete') }}/" + role + "/" + userId;
+
+                            } else {
+                                Swal.fire({
+                                    title: 'Đã hủy',
+                                    text: 'Người dùng chưa bị xóa.',
+                                    icon: 'info',
+                                    confirmButtonClass: 'btn btn-primary mt-2',
+                                    buttonsStyling: false
+                                });
+                            }
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        title: 'Lỗi kết nối!',
+                        text: 'Không thể kiểm tra liên kết người dùng.',
+                        icon: 'error',
+                        confirmButtonClass: 'btn btn-danger mt-2',
+                        buttonsStyling: false
+                    });
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+    </script>
+
+
 
 @endsection
