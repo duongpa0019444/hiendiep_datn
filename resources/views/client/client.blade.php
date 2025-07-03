@@ -155,7 +155,9 @@
 
                                     </li>
                                     <li>
-                                        <a href="{{ route('client.course') }}">Khóa học<i class=""></i></a>
+
+                                        <a href="{{ route('client.course') }}">Khóa học<i
+                                                class=""></i></a>
 
                                     </li>
 
