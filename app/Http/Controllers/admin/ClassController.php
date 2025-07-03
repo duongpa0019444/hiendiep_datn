@@ -350,7 +350,7 @@ class ClassController extends Controller
             ->where('class_id', $classId)
             ->where('student_id', $studentId)
             ->first();
-            
+
         // Kiểm tra xem bản ghi có tồn tại và đã bị xóa mềm hay không
         if (!$classStudent || !$classStudent->trashed()) {
             return redirect()->back()->with('error', 'Không tìm thấy học viên đã bị xóa.');
@@ -412,7 +412,7 @@ class ClassController extends Controller
 
 
 
-    // Lịch học 
+    // Lịch học
     public function schedules(Request $request, $id)
     {
         // Lấy thông tin lớp học
