@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\classes;
+use App\Models\classStudent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -207,13 +208,60 @@ class ClassController extends Controller
             }
 
             // Lấy danh sách học sinh trong lớp
-            $students = DB::table('class_student')
+            $query = DB::table('class_student')
                 ->join('users', 'class_student.student_id', '=', 'users.id')
                 ->where('class_student.class_id', $id)
-                // ->whereNull('users.deleted_at') // Lọc học sinh chưa bị xóa
-                ->select('users.id', 'users.name', 'users.email')
-                ->orderBy('class_student.created_at', 'desc') // Sắp xếp theo created_at giảm dần
+                ->whereNull('class_student.deleted_at') // Lọc học sinh chưa bị xóa
+                ->select('users.id', 'users.name', 'users.email');
+
+            // Debug để kiểm tra
+            // dd(get_class($students), $students); // "Illuminate\Pagination\LengthAwarePaginator"
+
+            // Xử lý tìm kiếm
+        if (request('search')) {
+            $search = request('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('users.name', 'like', "%{$search}%")
+                  ->orWhere('users.email', 'like', "%{$search}%");
+            });
+        }
+
+        // Xử lý sắp xếp
+        $sortBy = request('sort_by', 'created_at_desc'); // Mặc định sắp xếp theo created_at giảm dần
+        switch ($sortBy) {
+            case 'name':
+                $query->orderBy('users.name', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('users.name', 'desc');
+                break;
+            case 'email':
+                $query->orderBy('users.email', 'asc');
+                break;
+            case 'email_desc':
+                $query->orderBy('users.email', 'desc');
+                break;
+            case 'created_at':
+                $query->orderBy('class_student.created_at', 'asc');
+                break;
+            case 'created_at_desc':
+            default:
+                $query->orderBy('class_student.created_at', 'desc');
+                break;
+        }
+
+        // Xử lý số bản ghi mỗi trang
+        $perPage = request('per_page', 10); // Mặc định 10 bản ghi mỗi trang
+        $students = $query->paginate($perPage);
+
+            // Lấy danh sách học viên đã bị xóa mềm
+            $trashedStudents = classStudent::onlyTrashed()
+                ->where('class_id', $id)
+                ->join('users', 'class_student.student_id', '=', 'users.id')
+                ->select('users.id', 'users.name', 'users.email', 'class_student.deleted_at')
                 ->get();
+
+            // dd($trashedStudents);
 
             // Lấy danh sách học sinh chưa thuộc lớp này
             $studentIdsInClass = $students->pluck('id')->toArray();
@@ -229,7 +277,7 @@ class ClassController extends Controller
                 ->select('name')
                 ->first();
 
-            return view('admin.classes.students', compact('class', 'students', 'course', 'availableStudents'));
+            return view('admin.classes.students', compact('class', 'students', 'trashedStudents', 'course', 'availableStudents'));
             // ->with('success', 'Lấy thông tin lớp học thành công.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi lấy thông tin lớp học: ' . $e->getMessage());
@@ -282,15 +330,88 @@ class ClassController extends Controller
 
     public function removeStudent($classId, $studentId)
     {
-        // Xóa học sinh khỏi lớp
-        DB::table('class_student')
-            ->where('class_id', $classId)
+        // Xóa mềm học sinh khỏi lớp
+        classStudent::where('class_id', $classId)
             ->where('student_id', $studentId)
+            ->first()
             ->delete();
 
         return redirect()->back()->with('success', 'Học sinh đã được xóa khỏi lớp thành công.');
     }
 
+    /**
+     * Khôi phục học viên đã bị xóa mềm
+     */
+    public function restoreStudent($classId, $studentId)
+    {
+        // Tìm bản ghi ClassStudent, bao gồm cả bản ghi đã xóa mềm
+        $classStudent = classStudent::withTrashed()
+            ->where('class_id', $classId)
+            ->where('student_id', $studentId)
+            ->first();
+            
+        // Kiểm tra xem bản ghi có tồn tại và đã bị xóa mềm hay không
+        if (!$classStudent || !$classStudent->trashed()) {
+            return redirect()->back()->with('error', 'Không tìm thấy học viên đã bị xóa.');
+        }
+
+        // Lấy tất cả lịch học của lớp này
+        $classSchedules = DB::table('schedules')
+            ->where('class_id', $classId)
+            ->get();
+
+        foreach ($classSchedules as $schedule) {
+            // Kiểm tra học viên này có bị trùng lịch với các lớp khác không
+            $conflict = DB::table('schedules')
+                ->join('class_student', 'schedules.class_id', '=', 'class_student.class_id')
+                ->where('class_student.student_id', $studentId)
+                ->where('schedules.class_id', '!=', $classId)
+                ->where('schedules.date', $schedule->date)
+                ->where(function ($q) use ($schedule) {
+                    $q->where('schedules.start_time', '<', $schedule->end_time)
+                        ->where('schedules.end_time', '>', $schedule->start_time);
+                })
+                ->exists();
+
+            if ($conflict) {
+                // Trả về redirect với session lỗi
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Học viên bị trùng lịch với lớp khác vào ngày ' . \Carbon\Carbon::parse($schedule->date)->format('d/m/Y') . ', tiết ' . $schedule->start_time . ' - ' . $schedule->end_time);
+            }
+        }
+
+        // Khôi phục bản ghi đã xóa mềm
+        $classStudent->restore();
+
+        return redirect()->back()->with('success', 'Đã khôi phục học viên vào lớp.');
+    }
+
+    /**
+     * Xóa vĩnh viễn học viên khỏi lớp
+     */
+    public function forceDeleteStudent($classId, $studentId)
+    {
+        // Tìm bản ghi ClassStudent, bao gồm cả bản ghi đã xóa mềm
+        $classStudent = classStudent::withTrashed()
+            ->where('class_id', $classId)
+            ->where('student_id', $studentId)
+            ->first();
+
+        // Kiểm tra xem bản ghi có tồn tại và đã bị xóa mềm hay không
+        if (!$classStudent || !$classStudent->trashed()) {
+            return redirect()->back()->with('error', 'Không tìm thấy học viên đã bị xóa.');
+        }
+
+        // Xóa vĩnh viễn bản ghi
+        $classStudent->forceDelete();
+
+        return redirect()->back()->with('success', 'Đã xóa vĩnh viễn học viên khỏi lớp.');
+    }
+
+
+
+    // Lịch học 
     public function schedules(Request $request, $id)
     {
         // Lấy thông tin lớp học
