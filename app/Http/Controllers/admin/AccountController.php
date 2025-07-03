@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\classes;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +14,7 @@ use Illuminate\Support\Str;
 class AccountController extends Controller
 {
     public function account()
-    {   
+    {
         $role = User::orderBy('id', 'desc')->paginate(10);
 
         $roleCounts = User::select('role', DB::raw('count(*) as total'))
@@ -23,6 +24,34 @@ class AccountController extends Controller
 
         return view('admin.accounts.account', compact('roleCounts', 'role'));
     }
+    public function search(Request $request)
+    {
+
+        $roleCounts = User::select('role', DB::raw('count(*) as total'))
+            ->groupBy('role')
+            ->pluck('total', 'role') // ['admin' => 10, 'teacher' => 5, ...]
+            ->toArray();
+
+        $filter = $request->query('filter');
+        $search = trim($request->query('queryAccount'));
+
+        $query = User::query();
+
+        if ($filter) {
+            $query->where('role', $filter);
+        }
+
+        if ($search) {
+            $query->where('name', 'like', "%$search%");
+        }
+
+        $role = $query->orderBy('id', 'desc')->paginate(10);
+
+        return view('admin.accounts.account', compact('role', 'filter', 'search', 'roleCounts'));
+    }
+
+
+
 
     public function list($role)
     {
@@ -129,10 +158,81 @@ class AccountController extends Controller
             ->with('success', 'Cập nhật người dùng thành công');
     }
 
+    //check người dùng có đang liên kết với các bảng khác không
+    public function check($id)
+    {
+
+        $classes = DB::table('class_student')
+            ->join('classes', 'class_student.class_id', '=', 'classes.id')
+            ->where('class_student.student_id', $id)
+            ->select('classes.id', 'classes.name')
+            ->get();
+        $schedules = DB::table('schedules as sd')
+            ->join('classes as c', 'sd.class_id', '=', 'c.id')
+            ->where('sd.teacher_id', $id)
+            ->select('sd.id', 'c.name as class_name')
+            ->get();
+
+        $payments = DB::table('course_payments')
+            ->where('student_id', $id)
+            ->select('id', 'amount', 'method', 'note', 'created_at')
+            ->get();
+
+        $quizzes = DB::table('quiz_attempts')
+            ->where('user_id', $id)
+            ->select('id', 'quiz_id', 'score', 'submitted_at')
+            ->get();
+
+        return response()->json([
+            'classes' => $classes,
+            'payments' => $payments,
+            'quizzes' => $quizzes,
+            'schedules' => $schedules,
+        ]);
+    }
+
+
     public function delete($role, $id)
     {
-        
+
         User::find($id)->delete();
         return redirect()->route('admin.account.list', ['role' => $role])->with('success', 'Xóa người dùng thành công');
+    }
+
+    public function trash(Request $request)
+    {
+        $query = trim($request->query('accountTrash'));
+        $role = $request->query('role');
+
+        $trashQuery = User::onlyTrashed()->orderBy('deleted_at', 'desc');
+
+        if ($query) {
+            $trashQuery->where('name', 'like', "%$query%");
+        }
+
+        if ($role) {
+            $trashQuery->where('role', $role);
+        }
+
+        $trash = $trashQuery->paginate(10);
+
+        return view('admin.accounts.trash', compact('trash', 'query', 'role'));
+    }
+
+
+
+
+    public function restore($id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+        $user->restore();
+        return redirect()->route('admin.account.trash')->with('success', 'Khôi phục tài khoản thành công');
+    }
+
+    public function forceDelete($id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+        $user->forceDelete();
+        return redirect()->route('admin.account.trash')->with('success', 'Xóa vĩnh viễn tài khoản thành công');
     }
 }

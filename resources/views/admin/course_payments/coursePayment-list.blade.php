@@ -207,12 +207,12 @@
                                         @foreach ($payments as $payment)
                                             <tr data-payment-id="{{ $payment->id }}">
                                                 <td>
-                                                    <div class="fw-bold">{{ $payment->user->name }}</div>
-                                                    <div class="fs-6">{{ $payment->user->email }}</div>
+                                                    <div class="fw-bold">{{ $payment->user->name ?? '' }}</div>
+                                                    <div class="fs-6">{{ $payment->user->email ?? '' }}</div>
                                                 </td>
                                                 <td>
-                                                    <div class="fw-bold">{{ $payment->class->name }}</div>
-                                                    <div class="fs-6">Khóa: {{ $payment->course->name }}</div>
+                                                    <div class="fw-bold">{{ $payment->class->name ?? '' }}</div>
+                                                    <div class="fs-6">Khóa: {{ $payment->course->name ?? '' }}</div>
                                                 </td>
                                                 <td>
                                                     {{ $payment->payment_date ? \Carbon\Carbon::parse($payment->payment_date)->format('H:i d/m/Y') : '' }}
