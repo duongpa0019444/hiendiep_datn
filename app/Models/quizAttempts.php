@@ -21,11 +21,6 @@ class quizAttempts extends Model
         'class_id'
     ];
 
-    protected $dates = [
-        'started_at',
-        'submitted_at',
-        'deleted_at'
-    ];
 
     // Relationships
     public function quiz()

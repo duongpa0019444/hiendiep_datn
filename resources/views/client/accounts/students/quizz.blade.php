@@ -120,7 +120,7 @@
                                             </div>
 
                                             <div class="quiz-footer">
-                                                <a href="{{ route('student.quizzes.start') }}"
+                                                <a href="{{ route('student.quizzes.start', ['id'=> $quiz->id]) }}"
                                                     class="btn btn-outline-primary-quiz quiz-action-btn">
                                                     <i class="icofont-play-alt-1 me-1"></i> Bắt đầu
                                                 </a>
@@ -206,11 +206,19 @@
                 </div>
             </div>
 
-
+            <div class="modal-footer">
+                <div class="quiz-footer">
+                    <a href=""
+                        class="btn btn-outline-primary-quiz quiz-action-btn-result">
+                        <i class="icofont-play-alt-1 me-1"></i> Làm Lại
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<!-- Modal Thông Tin Quiz -->
+
+<!-- Modal Thông Tin khi ấn tìm kiếm bằng mã Quiz -->
 <div class="modal fade" id="quizInfoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -218,13 +226,17 @@
                 <h5 class="modal-title">Thông tin Quiz</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="quiz-info-body">
-                <!-- Nội dung quiz sẽ được thêm bằng JS -->
+            <div class="modal-body p-4" id="quiz-info-body">
+
             </div>
+
             <div class="modal-footer">
-                <a href="#" id="start-quiz-btn" class="btn btn-primary">
-                    <i class="fas fa-play me-1"></i> Bắt đầu làm
-                </a>
+                <div class="quiz-footer">
+                    <a href=""
+                        class="btn btn-outline-primary-quiz quiz-action-btn-search">
+                        <i class="icofont-play-alt-1 me-1"></i> Bắt đầu
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -455,27 +467,7 @@
                 });
             });
 
-            // Join quiz button functionality
-            const joinBtn = document.querySelector('.btn-join');
-            if (joinBtn) {
-                joinBtn.addEventListener('click', function() {
-                    const codeInput = document.querySelector('.quiz-code-input');
-                    const code = codeInput ? codeInput.value.trim() : '';
 
-                    if (code) {
-                        this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang tham gia...';
-                        this.disabled = true;
-                        setTimeout(() => {
-                            this.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Tham gia Quiz';
-                            this.disabled = false;
-                            alert('Tham gia quiz với mã: ' + code);
-                        }, 2000);
-                    } else {
-                        alert('Vui lòng nhập mã quiz!');
-                        codeInput.focus();
-                    }
-                });
-            }
         });
 
 
@@ -523,6 +515,7 @@
                         `;
                     });
                     $('#body-modal-result').html(html);
+                    $('.quiz-action-btn-result').attr('href', `/student/quizz/start/${response[0].quiz_id}`);
                     $('#resultModal').modal('show');
                 },
                 error: function(xhr, status, error) {
@@ -571,31 +564,98 @@
 
 
         // hàm kiểm tra mã code quizz
-        $('.btn-join').on('click', function () {
+        $('.btn-join').on('click', function() {
             const code = $('.quiz-code-input').val().trim().toUpperCase();
-
             if (!code) {
-                return alert('Vui lòng nhập mã quiz!');
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: 'Vui lòng nhập mã quizz!',
+                    icon: 'warning',
+                    confirmButtonClass: 'btn btn-success w-xs mt-2',
+                    buttonsStyling: true
+                });
+                return;
             }
-
             $.ajax({
                 url: `/student/check-access-code/${code}`, // Route xử lý ở server
                 method: 'GET',
-                success: function (response) {
-                    // Gắn link bắt đầu quiz
-                    $('#start-quiz-btn').attr('href', `/quiz/start/${response.quiz.id}`);
+                success: function(response) {
+                    const quiz = response;
+                    const createdAt = new Date(quiz.created_at);
+                    const createdDate = createdAt.toLocaleDateString('vi-VN');
+
+                    // Gắn nội dung động
+                    $("#quiz-info-body").html(`
+                        <div class="row mb-3">
+                            <div class="col-12 text-end">
+                                <small class="text-muted fst-italic d-block d-sm-inline">
+                                    Ngày tạo: <i class="icofont-calendar me-1"></i> ${createdDate}
+                                </small>
+                            </div>
+                        </div>
+
+                        <h4 class="fw-semibold mb-3 text-primary">
+                            <i class="icofont-paper me-2"></i> Tiêu đề Quiz: <span class="text-dark">${quiz.title}</span>
+                        </h4>
+
+                        <p class="mb-4 text-muted fst-italic">
+                            <i class="icofont-info-circle me-1"></i> Mô tả: ${quiz.description ?? 'Không có mô tả.'}
+                        </p>
+
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-start">
+                                <i class="icofont-key fs-5 me-2 text-secondary"></i>
+                                <div  class="d-flex align-items-center gap-1">
+                                    <strong>Mã truy cập:</strong><br>
+                                    <span class="text-uppercase text-dark">${quiz.access_code}</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-start">
+                                <i class="icofont-clock-time fs-5 me-2 text-secondary"></i>
+                                <div  class="d-flex align-items-center gap-1">
+                                    <strong>Thời lượng:</strong><br>
+                                    <span>${quiz.duration_minutes} phút</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-start">
+                                <i class="icofont-question-circle fs-5 me-2 text-secondary"></i>
+                                <div class="d-flex align-items-center gap-1">
+                                    <strong>Tổng số câu hỏi:</strong><br>
+                                    <span>${quiz.total_questions}</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-start">
+                                <i class="icofont-teacher fs-5 me-2 text-secondary"></i>
+                                <div class="d-flex align-items-center gap-1">
+                                    <strong>Giáo viên:</strong><br>
+                                    <span>${quiz.creator.name ?? 'Không rõ'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    `);
+
+                    // Gắn link bắt đầu làm bài
+                    $('.quiz-action-btn-search').attr('href', `/student/quizz/start/${quiz.id}`);
 
                     // Hiển thị modal
                     const modal = new bootstrap.Modal(document.getElementById('quizInfoModal'));
                     modal.show();
                 },
-                error: function (xhr) {
-                    alert(xhr.responseJSON?.message ?? 'Mã quiz không hợp lệ!');
+
+                error: function(xhr) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Mã Quiz không hợp lệ. Vui lòng nhập lại mã!',
+                        icon: 'error',
+                        confirmButtonClass: 'btn btn-success w-xs mt-2',
+                        buttonsStyling: true
+                    });
                 }
             });
         });
-
-
-
     </script>
 @endpush

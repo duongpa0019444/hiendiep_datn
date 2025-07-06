@@ -61,6 +61,11 @@ class User extends Authenticatable
     }
 
 
+    public function classStudents()
+    {
+        return $this->hasMany(classStudent::class, 'student_id', 'id');
+    }
+
 
     public function hasAnyRole(array $roles)
     {

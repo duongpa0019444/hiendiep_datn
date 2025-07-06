@@ -5,19 +5,52 @@ namespace App\Http\Controllers\client;
 use App\Http\Controllers\Controller;
 use App\Models\answers;
 use App\Models\classes;
+use App\Models\classStudent;
 use App\Models\questions;
 use App\Models\quizAttempts;
 use App\Models\Quizzes;
+use App\Models\sentenceAnswers;
 use App\Models\sentenceQuestions;
-use Illuminate\Http\Client\Request;
+use App\Models\studentAnswers;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+
+use function PHPUnit\Framework\isArray;
 
 class quizzesController extends Controller
 {
 
-    public function start(){
-        return view('client.quizzes.start-quiz');
+    public function start($id){
+        $quiz = quizzes::withCount(['questions', 'sentenceQuestions'])->with(['class'])->findOrFail($id);
+        // dd(Auth::user()->classStudents);
+
+
+        $classStudent = DB::table('class_student')
+            ->join('classes', 'class_student.class_id', '=', 'classes.id')
+            ->where('class_student.student_id', Auth::user()->id)
+            ->where('classes.status', 'in_progress')
+            ->orderBy('classes.created_at', 'asc')
+            ->select('class_student.*','classes.name as class_name') // chỉ lấy dữ liệu từ bảng class_student
+            ->first();
+
+        //lấy câu hỏi trắc nghiệm
+        $mcQuestions = questions::where('quiz_id', $id)->get()->map(function ($q) {
+            $q->question_type = 'multiple_choice';
+            return $q;
+        });
+        //lấy câu hỏi điền từ/sắp xếp câu
+        $fillQuestions = sentenceQuestions::where('quiz_id', $id)->get()->map(function ($q) {
+            $q->question_type = 'fill_blank';
+            return $q;
+        });
+
+        //gộp mảng
+        $allQuestions = $mcQuestions->concat($fillQuestions)->sortBy('created_at')->values();
+        $answers = answers::whereIn('question_id', $mcQuestions->pluck('id'))->get();//  Lấy tất cả các đáp án trắc nghiệm cho các câu hỏi đã lấy ở trên.
+
+        return view('client.quizzes.start-quiz', compact('classStudent','quiz', 'allQuestions', 'answers'));
     }
 
     public function showResult($quizId){
@@ -77,8 +110,135 @@ class quizzesController extends Controller
     }
 
     public function checkAccessCode($code){
-        $quiz = quizzes::where('access_code', $code)->where('staus', 'published')->where('is_public', 1)->first();
+        $quiz = Quizzes::select('quizzes.*')
+        ->selectRaw('(SELECT COUNT(*) FROM questions WHERE quiz_id = quizzes.id) +
+                    (SELECT COUNT(*) FROM sentence_questions WHERE quiz_id = quizzes.id) AS total_questions')
+        ->where('access_code', $code)
+        ->where('status', 'published')
+        ->where('is_public', 1)
+        ->with(['creator'])
+        ->first();
+
+        return response()->json($quiz);
+    }
+
+    public function submitQuiz(Request $request, $quizId, $classId){
+        // dd($request->all());
+        //Lấy đáp án chính xác của quizz
+        $mcQuestions = questions::where('quiz_id', $quizId)->get()->map(function ($q) {
+            $q->question_type = 'multiple_choice';
+            return $q;
+        });
+
+        $fillQuestions = sentenceQuestions::where('quiz_id', $quizId)->get()->map(function ($q) {
+            $q->question_type = 'fill_blank';
+            return $q;
+        });
+
+        $allQuestions = $mcQuestions->concat($fillQuestions)->sortBy('created_at')->values();
+        $answers = answers::whereIn('question_id', $mcQuestions->pluck('id'))->get();
+        // dd($answers);
+
+        $scoreStudent = 0;
+        $total_correct = 0;
+        $total_questions = count($allQuestions);
+        $answersStudent = []; //để lưu đáp án trắc nghiệm của học sinh
+        $sentenceAnswersStudent = []; //để lưu đáp án điền từ/sắp xếp câu của học sinh
+
+        foreach ($allQuestions as $index => $question) {
+            $questionId = $question->id;
+            $inputName = 'q' . ($index + 1); // ví dụ q1, q2...
+
+            $studentAnswer = $request->input($inputName); // có thể là string hoặc array
+
+            if ($question->question_type == 'multiple_choice') {
+                if ($question->type == 'single') {
+                    // 1 đáp án đúng
+                    $correctId = $answers->where('question_id', $questionId)->where('is_correct', 1)->pluck('id')->first();//đáp án đúng
+                    if ((int)$studentAnswer === (int)$correctId) {
+                        $scoreStudent+=$question->points;
+                        $total_correct++;
+
+                    }
+                    $answersStudent[] = [
+                        'question_id' => $questionId,
+                        'answer_id' => $studentAnswer
+                    ];
+
+                } elseif ($question->type == 'multiple') {
+                    // nhiều đáp án đúng
+                    $correctIds = $answers->where('question_id', $questionId)->where('is_correct', 1)->pluck('id')->sort()->values()->toArray(); //đáp án đúng
+                    $selectedIds = is_array($studentAnswer) ? $studentAnswer : []; //đáp án của học sinh
+
+                    sort($selectedIds);
+
+                    if ($correctIds === $selectedIds) {
+                        $scoreStudent+=$question->points;
+                        $total_correct++;
+
+                    }
+
+                    foreach ($selectedIds as $correctId) {
+                        $answersStudent[] = [
+                            'question_id' => $questionId,
+                            'answer_id' => $correctId
+                        ];
+                    }
+                }
+            } elseif ($question->question_type == 'fill_blank') {
+                $correctAnswer = trim(strtolower($question->correct_answer));
+                $studentText = trim(strtolower($studentAnswer));
+
+                if ($correctAnswer === $studentText) {
+                    $scoreStudent+=$question->points;
+                    $total_correct++;
+                }
+                $sentenceAnswersStudent[] = [
+                    'question_id' => $questionId,
+                    'user_answer' => $studentAnswer,
+                    'is_correct' => $correctAnswer === $studentText ? 1 : 0
+                ];
+            }
+
+        }
+
+        //Lưu kết quả vào bảng quiz_attempts
+        $quizAttempts = quizAttempts::create([
+            'quiz_id' => $quizId,
+            'user_id' => Auth::user()->id,
+            'started_at'  => $request->input('started_at'),
+            'submitted_at' => $request->input('submitted_at'),
+            'score' => $scoreStudent,
+            'total_correct' => $total_correct,
+            'total_questions' => $total_questions,
+            'class_id' => $classId
+
+        ]);
+
+        //Lưu đáp án trắc nghiệm của học sinh
+        foreach ($answersStudent as &$answer) {
+            $answer['attempt_id'] = $quizAttempts->id;
+        }
+        studentAnswers::insert($answersStudent);
+
+        //Lưu đáp án điền từ/sắp xếp câu của học sinh
+        foreach ($sentenceAnswersStudent as &$answer) {
+            $answer['attempt_id'] = $quizAttempts->id;
+        }
+        sentenceAnswers::insert($sentenceAnswersStudent);
+
+        $quiz = quizzes::findOrFail($quizId);
+
+        return redirect()->route('student.quizzes.resultsQuizzComplete', $quizAttempts->id);
+    }
+
+
+    public function resultsQuizzComplete($quizAttemptsId){
+        $quizAttempts = quizAttempts::findOrFail($quizAttemptsId);
+        $quiz = quizzes::findOrFail($quizAttempts->quiz_id);
+        return view('client.quizzes.results-student', compact('quiz', 'quizAttempts'));
 
     }
+
 
 }

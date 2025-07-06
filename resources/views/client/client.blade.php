@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="{{ asset('client/style.css') }}" />
 
     <script src="{{ asset('client/plugins/js/jquery.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
 

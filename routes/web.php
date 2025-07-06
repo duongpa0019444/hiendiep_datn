@@ -314,8 +314,12 @@ Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function
 Route::middleware([CheckRoleClient::class . ':student'])->prefix('student')->group(function () {
     Route::get('/course-payments/infomation', [coursePaymentController::class, 'showPaymentStudent']); //Lấy thông tin thanh toán của học sinh
     Route::post('/course-payments/updatePayment', [coursePaymentController::class, 'updatePayment']);
-    Route::get('/quizz/start', [ClientQuizzesController::class, 'start'])->name('student.quizzes.start');
+    Route::get('/quizz/start/{id}', [ClientQuizzesController::class, 'start'])->name('student.quizzes.start');
     Route::get('/quizz/{quiz}/show-result', [ClientQuizzesController::class, 'showResult'])->name('student.quizzes.showResult');
     Route::get('/quizz/{quiz}/show-result/{attempt}', [ClientQuizzesController::class, 'resultsQuizzStudent']);
     Route::get('/check-access-code/{code}', [ClientQuizzesController::class, 'checkAccessCode']);
+    Route::post('/submit-quiz/{quizId}/class/{classId}', [ClientQuizzesController::class, 'submitQuiz'])->name('student.quizzes.submit');
+    Route::get('/quizz/resulte-student/{quizzAttempts}', [ClientQuizzesController::class, 'resultsQuizzComplete'])->name('student.quizzes.resultsQuizzComplete');
+
+
 });

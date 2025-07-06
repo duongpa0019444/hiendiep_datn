@@ -111,7 +111,7 @@ class UserController extends Controller
                     'q.updated_at',
                     'c.name as class_name',
                     'u.name as creator_name',
-                    DB::raw('COUNT(DISTINCT ques.id) + COUNT(DISTINCT sq.id) as total_questions')
+                    DB::raw('COUNT(DISTINCT ques.id) + COUNT(DISTINCT sq.id) as `total_questions`')
                 )
                 ->orderBy('q.updated_at', 'desc')
                 ->get();
