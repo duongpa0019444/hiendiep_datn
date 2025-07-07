@@ -188,7 +188,7 @@
                                 <div class="ed-topbar__info-buttons">
 
                                     @guest
-                                        <button type="button" class="register-btn" data-bs-toggle="modal"
+                                        <button type="button" class="" data-bs-toggle="modal"
                                             data-bs-target="#loginModal"><i class="icofont-user me-2"></i>
                                             Đăng nhập
                                         </button>
