@@ -33,5 +33,6 @@ class UserController extends Controller
         return view('client.accounts.students.account');
 
     }
+   
 
 }

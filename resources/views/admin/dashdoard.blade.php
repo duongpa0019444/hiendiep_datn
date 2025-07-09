@@ -339,6 +339,7 @@
 
 @endsection
 @push('scripts')
+<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
     <script>
         $(document).ready(function() {
             // Khởi tạo mảng toàn cục
@@ -631,6 +632,38 @@
 
 
         document.getElementById('basic-datepicker').flatpickr();
+
+        // xử lý phần liên hệ
+         const pusher = new Pusher("YOUR_PUSHER_KEY", {
+        cluster: "YOUR_PUSHER_CLUSTER",
+        authEndpoint: "/broadcasting/auth",
+        auth: {
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        }
+    });
+
+    const channel = pusher.subscribe('presence-staff-support');
+
+    channel.bind('App\\Events\\SupportRequestCreated', function(data) {
+        if ({{ auth()->check() && auth()->user()->role == 'staff' ? 'true' : 'false' }}) {
+            if (confirm(`Yêu cầu mới từ ${data.support.name} (${data.support.phone}) - ${data.support.pl_content}: ${data.support.message}\nBạn nhận xử lý?`)) {
+                fetch(`/contact-support/${data.support.id}/handle`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(res => res.json())
+                .then(resp => alert(resp.message))
+                .catch(() => alert('Không thể nhận xử lý yêu cầu!'));
+            }
+        }
+    });
+
+
+    
 
     </script>
 @endpush

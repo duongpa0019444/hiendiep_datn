@@ -173,7 +173,7 @@
 
                                     </li>
                                     <li>
-                                        <a href="#">Liên hệ</a>
+                                        <a href="{{ route('client.contacts') }}">Liên hệ</a>
                                     </li>
                                 </ul>
                             </nav>

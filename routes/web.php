@@ -13,10 +13,13 @@ use App\Http\Controllers\admin\questionsController;
 use App\Http\Controllers\admin\NotificationsController;
 use App\Http\Controllers\admin\quizzesController;
 use App\Http\Controllers\admin\SchedulesController;
+use App\Http\Controllers\admin\contactController;
 use App\Http\Controllers\admin\TeacherRulesController;
 use App\Http\Controllers\admin\TeacherSalaryController;
 use App\Http\Controllers\client\CourseController as ClientCourseController;
 use App\Http\Controllers\courseController;
+use App\Http\Controllers\SupportRequestController;
+
 
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckRoleClient;
@@ -26,6 +29,13 @@ use Maatwebsite\Excel\Facades\Excel;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/course', [ClientCourseController::class, 'index'])->name('client.course');
 
+// phần liên hệ client 
+
+Route::get('contact', [ClientCourseController::class, 'contact'])->name('client.contacts');
+Route::post('/contact-support', [SupportRequestController::class, 'store'])->name('support.store');
+Route::post('/contact-support/{id}/handle', [SupportRequestController::class, 'handle'])->middleware('auth')->name('support.handle');
+
+// 
 Route::get('/course/{slug}_{id}', [ClientCourseController::class, 'detail'])->name('client.course.detail');
 Route::get('/course-search', [ClientCourseController::class, 'search'])->name('client.course.search');
 
@@ -207,10 +217,22 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/course/{course_id}/lessions/edit/{id}', [CourseController::class, 'editLession'])->name('admin.lession-edit');
     Route::put('/course/{course_id}/lessions/edit/{id}', [CourseController::class, 'updateLession'])->name('admin.lession-update');
 
-    // Xóa Nhiều 
-    // Route::delete('/admin/courses/bulk-delete', [CourseController::class, 'bulkDelete'])->name('admin.course-bulk-delete');
+
     // nổi bật khóa học
-    Route::post('/admin/courses/{id}/toggle-featured', [CourseController::class, 'toggleFeatured'])->name('admin.course.toggle-featured');
+    Route::post('/courses/{id}/toggle-featured', [CourseController::class, 'toggleFeatured'])->name('admin.course.toggle-featured');
+    // Route::post('/admin/courses/{id}/toggle-featured', [CourseController::class, 'toggleFeatured']);
+
+    // quản lý hỗ trợ tin nhắn 
+    Route::get('/admin/contact', [contactController::class, 'contact'])->name('admin.contact');
+    Route::get('/admin/contact/{id}/detail', [contactController::class, 'contactDetail'])->name('admin.contactDetail');
+
+    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::put('/contact/{id}/approve', [ContactController::class, 'approve'])->name('contact.approve');
+    Route::get('/contact/{id}/reject', [ContactController::class, 'reject'])->name('contact.reject');
+});
+
+
+
 });
  
 
@@ -230,3 +252,5 @@ Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function
     Route::get('course-payments/infomation', [coursePaymentController::class, 'showPaymentStudent']); //Lấy thông tin thanh toán của học sinh
     Route::post('course-payments/updatePayment', [coursePaymentController::class, 'updatePayment'])->name('admin.course_payments.updatePayment');
 });
+
+

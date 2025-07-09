@@ -1,8 +1,8 @@
+@extends('admin.admin')
 @section('title', 'Trang admin')
 @section('description', '')
 @section('content')
     {{-- Hiển thị thông báo lỗi hoặc thành công --}}
-    @extends('admin.admin')
     @if (session('success'))
         <script>
             Swal.fire({
@@ -71,8 +71,8 @@
         }
 
         /* .stat-card .text-center {
-                            background-color: #e7c58f;
-                        } */
+                                background-color: #e7c58f;
+                            } */
 
         .stat-card .rounded {
             padding: 10px;
@@ -254,7 +254,7 @@
                                         <th>Giá Khóa Học </th>
                                         <th>Tổng Số Buổi Học </th>
                                         <th>Ngày Tạo Khóa Học </th>
-                                        <th>Mô Tả Khóa Học </th>
+                                        {{-- <th>Mô Tả Khóa Học </th> --}}
                                         <th>Nổi Bật </th>
                                         <th>Hành Động </th>
 
@@ -291,12 +291,13 @@
                                             <td>{{ $course->total_sessions }}</td>
 
                                             <td>{{ $course->created_at }}</td>
-                                            <td>{{ $course->description }}</td>
+                                            {{-- <td>{{ $course->description }}</td>s --}}
                                             <td style="width: 100px;">
                                                 <div class="form-check">
                                                     <input type="checkbox" class="form-check-input"
                                                         onchange="toggleFeatured({{ $course->id }})"
                                                         {{ $course->is_featured ? 'checked' : '' }}>
+
                                                 </div>
                                             </td>
 
@@ -399,33 +400,37 @@
             }
         });
     }
-     function toggleFeatured(courseId) {
-        fetch(`/admin/courses/${courseId}/toggle-featured`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Cập nhật thành công',
-                    text: data.status ? 'Khóa học đã được đánh dấu nổi bật' : 'Khóa học đã được bỏ đánh dấu nổi bật',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Lỗi:', error);
-            Swal.fire('Lỗi', 'Không thể cập nhật trạng thái nổi bật', 'error');
-        });
-    }
+
+    function toggleFeatured(courseId) {
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    fetch(`{{ url('/admin/courses') }}/${courseId}/toggle-featured`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': token,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Cập nhật thành công',
+                text: data.status ? 'Khóa học đã được đánh dấu nổi bật' : 'Khóa học đã được bỏ đánh dấu nổi bật',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } else {
+            Swal.fire('Lỗi', 'Không thể cập nhật nổi bật', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Lỗi:', error);
+        Swal.fire('Lỗi', 'Không thể cập nhật trạng thái nổi bật', 'error');
+    });
+}
 
 </script>
-
-   

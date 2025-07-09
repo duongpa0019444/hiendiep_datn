@@ -83,4 +83,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(CoursePayment::class, 'student_id');
     }
+    // app/Models/User.php
+public function isStaff()
+{
+    return $this->role === 'staff';
+}
+
 }
