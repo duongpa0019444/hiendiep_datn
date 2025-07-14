@@ -229,6 +229,8 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/contact/{id}/approve', [ContactController::class, 'approve'])->name('contact.approve');
     Route::get('/contact/{id}/reject', [ContactController::class, 'reject'])->name('contact.reject');
+        Route::delete('/contact/{id}/delete', [ContactController::class, 'delete'])->name('contact.delete');
+
 });
 
 
