@@ -163,7 +163,7 @@
                                                                 @csrf
                                                                 @method('DELETE')
                                                                 <button type="submit" class="dropdown-item text-danger"
-                                                                    onclick="return confirm('Bạn có chắc chắn muốn xóa tin nhắn này không?')">>
+                                                                    onclick="return confirm('Bạn có chắc chắn muốn xóa tin nhắn này không?')">
                                                                     <iconify-icon
                                                                         icon="solar:trash-bin-minimalistic-2-broken"
                                                                         class="align-middle fs-18 me-1"></iconify-icon>
