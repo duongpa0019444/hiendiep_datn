@@ -116,8 +116,9 @@
                                 </div>
 
                             </div>
-                            <div class="card-footer border-top">
-                                <button type="submit" class="btn btn-primary">Create Roles</button>
+                            <div class="card-footer border-top text-end pe-3">
+                                <a href="{{ route('admin.account.list', request('role')) }}" class="btn btn-secondary me-2">Quay Lại</a>
+                                <button type="submit" class="btn btn-primary">Lưu</button>
                             </div>
                         </form>
                     </div>

@@ -78,7 +78,7 @@
                                         <h5>
                                             {{-- <input type="hidden" name="course_id" value="{{ $course->id }}"> --}}
 
-                                            {{ $course->description }}
+                                            {{ $course->name }}
                                         </h5>
                                     </a>
 

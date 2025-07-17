@@ -31,6 +31,9 @@
 
     <script src="{{ asset('client/plugins/js/jquery.min.js') }}"></script>
 
+    
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 
 
@@ -105,19 +108,24 @@
                                     khoản của bạn</a>
                                 <ul class="offcanvas__sub_menu">
 
-                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.information') }}" class="offcanvas__sub_menu_item" data-section="dashboard">
+                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.information') }}"
+                                            class="offcanvas__sub_menu_item" data-section="dashboard">
                                             <i class="icofont-chart-bar-graph"></i>Dashboard</a>
                                     </li>
-                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.schedule') }}" class="offcanvas__sub_menu_item" data-section="schedule">
+                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.schedule') }}"
+                                            class="offcanvas__sub_menu_item" data-section="schedule">
                                             <i class="icofont-calendar"></i> Lịch học</a>
                                     </li>
-                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.score') }}" class="offcanvas__sub_menu_item" data-section="grades">
+                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.score') }}"
+                                            class="offcanvas__sub_menu_item" data-section="grades">
                                             <i class="icofont-book-alt"></i>Điểm Số</a>
                                     </li>
-                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.quizz') }}" class="offcanvas__sub_menu_item" data-section="quizzes">
+                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.quizz') }}"
+                                            class="offcanvas__sub_menu_item" data-section="quizzes">
                                             <i class="icofont-pencil-alt-2"></i> Bài Quiz</a>
                                     </li>
-                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.account') }}" class="offcanvas__sub_menu_item" data-section="account">
+                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.account') }}"
+                                            class="offcanvas__sub_menu_item" data-section="account">
                                             <i class="icofont-user"></i>Thông Tin Tài Khoản</a>
                                     </li>
                                 </ul>
@@ -185,7 +193,7 @@
                                 <div class="ed-topbar__info-buttons">
 
                                     @guest
-                                        <button type="button" class="register-btn" data-bs-toggle="modal"
+                                        <button type="button" class="" data-bs-toggle="modal"
                                             data-bs-target="#loginModal"><i class="icofont-user me-2"></i>
                                             Đăng nhập
                                         </button>
@@ -492,13 +500,13 @@
                                 required />
                         </div>
 
-                        <div class="form-check">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                <input class="form-check-input" type="checkbox" value=""
-                                    id="flexCheckDefault" />
-                                Remember me
-                            </label>
+                        <div class=" mt-2">
+                            <a href="{{ route('password.request') }}"
+                                class="text-decoration-none text-primary fw-medium">
+                                Quên mật khẩu?
+                            </a>
                         </div>
+
                         <div class="ed-auth__form-btn d-flex justify-content-end">
                             <button id="btn-login" type="submit" class="ed-btn">Sign In<i
                                     class="fi fi-rr-arrow-small-right"></i></button>
