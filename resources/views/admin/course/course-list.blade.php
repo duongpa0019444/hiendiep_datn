@@ -1,8 +1,8 @@
-@extends('admin.admin')
 @section('title', 'Trang admin')
 @section('description', '')
 @section('content')
     {{-- Hiển thị thông báo lỗi hoặc thành công --}}
+    @extends('admin.admin')
     @if (session('success'))
         <script>
             Swal.fire({
@@ -27,219 +27,149 @@
         </script>
         {{ session()->forget('error') }}
     @endif
-    <style>
-        .form-control-sm,
-        .form-select-sm {
-            min-width: 430px;
-            max-width: 100%;
-            flex: 1 1 auto;
-        }
-
-        .form-label {
-            font-weight: 500;
-            font-size: 1rem;
-        }
-
-        .stat-card img {
-            width: 100%;
-            max-width: 120px;
-            height: auto;
-            object-fit: cover;
-            border-radius: 12px;
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card img:hover {
-            transform: scale(1.05);
-        }
-
-        .stat-card h4 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #333;
-            margin-top: 15px;
-        }
-
-        .stat-card p {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #555;
-        }
-
-        .stat-card .card-body {
-            padding: 1.5rem;
-        }
-
-        /* .stat-card .text-center {
-                                background-color: #e7c58f;
-                            } */
-
-        .stat-card .rounded {
-            padding: 10px;
-            background-color: #ecae84;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .custom-alert {
-            padding: 15px 25px;
-            border-radius: 8px;
-            font-size: 16px;
-            text-align: center;
-            max-width: 600px;
-            margin: 20px auto;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            font-weight: 500;
-        }
-
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-    </style>
-
-
 
     <div class="page-content">
 
         <!-- Start Container Fluid -->
         <div class="container-xxl">
-            <div class="row">
-                <nav aria-label="breadcrumb p-0">
-                    <ol class="breadcrumb py-0">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Quản lí khóa học </li>
-                    </ol>
-                </nav>
+            <div class="row g-2 mb-2">
+                <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-light px-3 py-1 rounded shadow-sm">
+                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Quản lí khóa học</li>
+                        </ol>
+                    </nav>
+                </div>
+
                 <!-- Tổng khóa học -->
                 <div class="col-md-6 col-xl-3">
-                    <div class="card stat-card">
-                        <div class="card-body text-center">
-                            <div class="rounded mx-auto d-flex justify-content-center align-items-center">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center row">
+                            <div class="col-4">
                                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTP-n3YOmyI1QcbUFS8MHj9jDrcQQOlctafZw&s"
-                                    alt="Tổng khóa học">
+                                    alt="Tổng khóa học" class="img-fluid rounded" style="max-height: 80px;">
                             </div>
-                            <h4>Tổng khóa học</h4>
-                            <p>{{ $totalCourses }}</p>
+                            <div class="col-8">
+                                <h5 class="fw-bold">Tổng khóa học</h5>
+                                <p class="mb-0 fs-5 text-primary">{{ $totalCourses }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Tổng buổi học -->
                 <div class="col-md-6 col-xl-3">
-                    <div class="card stat-card">
-                        <div class="card-body text-center">
-                            <div class="rounded mx-auto d-flex justify-content-center align-items-center">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center row">
+                            <div class="col-4">
                                 <img src="https://ecorp.edu.vn/wp-content/uploads/ung-dung-hoc-tieng-anh-0.jpg"
-                                    alt="Tổng buổi học">
+                                    alt="Tổng buổi học" class="img-fluid rounded" style="max-height: 80px;">
                             </div>
-                            <h4>Tổng buổi học</h4>
-                            <p>{{ $totalSessions }}</p>
+                            <div class="col-8">
+                                <h5 class="fw-bold">Tổng buổi học</h5>
+                                <p class="mb-0 fs-5 text-primary">{{ $totalSessions }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Tổng giá trị khóa học -->
                 <div class="col-md-6 col-xl-3">
-                    <div class="card stat-card">
-                        <div class="card-body text-center">
-                            <div class="rounded mx-auto d-flex justify-content-center align-items-center">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center row">
+                            <div class="col-4">
                                 <img src="https://media.kenhtuyensinh.vn/images/cms/2018/07/top-10-website-hoc-tieng-anh-online-mien-phi-danh-cho-hssv2.png"
-                                    alt="Tổng giá trị khóa học">
+                                    alt="Tổng giá trị khóa học" class="img-fluid rounded" style="max-height: 80px;">
                             </div>
-                            <h4>Tổng giá trị khóa học</h4>
-                            <p>{{ number_format($totalRevenue) }} VNĐ</p>
+                            <div class="col-8">
+                                <h5 class="fw-bold">Tổng giá trị khóa học</h5>
+                                <p class="mb-0 fs-5 text-success">{{ number_format($totalRevenue) }} VNĐ</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Khóa học tháng này -->
                 <div class="col-md-6 col-xl-3">
-                    <div class="card stat-card">
-                        <div class="card-body text-center">
-                            <div class="rounded mx-auto d-flex justify-content-center align-items-center">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center row">
+                            <div class="col-4">
                                 <img src="https://stepup.edu.vn/wp-content/uploads/2020/11/anh-bia-tai-lieu-luyen-nghe-tieng-anh.jpg"
-                                    alt="Khóa học tháng này">
+                                    alt="Khóa học tháng này" class="img-fluid rounded" style="max-height: 80px;">
                             </div>
-                            <h4>Trong tháng này</h4>
-                            <p>{{ $coursesThisMonth }}</p>
+                            <div class="col-8">
+                                <h5 class="fw-bold">Trong tháng này</h5>
+                                <p class="mb-0 fs-5 text-primary">{{ $coursesThisMonth }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
 
             <div class="row">
                 <div class="col-xl-12">
                     <div class="card">
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-end flex-wrap w-100">
-
-                                {{-- Tiêu đề bên trái --}}
-                                <p class="card-title mb-0"
-                                    style="font-family: 'Poppins', sans-serif; color: #ff7f0e; font-size: 20px; font-weight: 600; margin-left: 25px;">
-                                    Quản lý danh sách khóa học
-                                </p>
-                                {{-- Form lọc bên phải --}}
                                 <form action="{{ route('admin.course-list') }}" method="GET"
-                                    class="d-flex flex-wrap align-items-end gap-2 w-100 justify-content-end">
+                                    class="row g-2 align-items-end w-100"> <!-- Thêm w-100 ở đây -->
 
-                                    {{-- Từ khóa --}}
-                                    <div>
+                                    <!-- Từ khóa -->
+                                    <div class="col">
                                         <label for="name" class="form-label mb-1">Từ khóa</label>
                                         <input type="text" name="name" id="name"
                                             class="form-control form-control-sm" placeholder="Tên khóa học"
                                             value="{{ request('name') }}">
                                     </div>
 
-                                    {{-- Tháng tạo --}}
-                                    <div>
+                                    <!-- Tháng tạo -->
+                                    <div class="col">
                                         <label for="month" class="form-label mb-1">Tháng tạo</label>
                                         <select name="month" id="month" class="form-select form-select-sm">
                                             <option value="">Tất cả</option>
                                             @for ($i = 1; $i <= 12; $i++)
                                                 <option value="{{ $i }}"
-                                                    {{ request('month') == $i ? 'selected' : '' }}>Tháng
-                                                    {{ $i }}</option>
+                                                    {{ request('month') == $i ? 'selected' : '' }}>
+                                                    Tháng {{ $i }}
+                                                </option>
                                             @endfor
                                         </select>
                                     </div>
 
-                                    {{-- Sắp xếp giá --}}
-                                    <div>
+                                    <!-- Sắp xếp giá -->
+                                    <div class="col">
                                         <label for="sort" class="form-label mb-1">Sắp xếp giá</label>
                                         <select name="sort" id="sort" class="form-select form-select-sm">
                                             <option value="">Tất cả</option>
                                             <option value="price_asc"
-                                                {{ request('sort') == 'price_asc' ? 'selected' : '' }}>
-                                                Tăng dần</option>
+                                                {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Tăng dần</option>
                                             <option value="price_desc"
-                                                {{ request('sort') == 'price_desc' ? 'selected' : '' }}>
-                                                Giảm dần</option>
+                                                {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giảm dần</option>
                                         </select>
                                     </div>
 
-                                    {{-- Nút lọc và xóa --}}
-                                    <div class="d-flex gap-2 align-items-end">
-                                        <button type="submit" class="btn btn-success btn-sm">Lọc</button>
-                                        <a href="{{ route('admin.course-list') }}" class="btn btn-danger btn-sm">Xóa</a>
+                                    <!-- Nút Lọc & Xóa -->
+                                    <div class="col">
+                                        <label class="form-label mb-1 d-block">Tác vụ</label>
+                                        <div class="d-flex gap-1">
+                                            <button type="submit" class="btn btn-success btn-sm w-100">Lọc</button>
+                                            <a href="{{ route('admin.course-list') }}"
+                                                class="btn btn-danger btn-sm w-100">Xóa</a>
+                                        </div>
                                     </div>
 
-                                    {{-- Nút thêm khóa học --}}
-                                    <div class="d-flex align-items-end">
-                                        <a href="{{ route('admin.course-add') }}" class="btn btn-warning btn-sm">Thêm khóa
-                                            học</a>
+                                    <!-- Nút Thêm khóa học -->
+                                    <div class="col">
+                                        <a href="{{ route('admin.course-add') }}" class="btn btn-warning btn-sm w-100">Thêm
+                                            khóa học</a>
                                     </div>
                                 </form>
                             </div>
                         </div>
                     </div>
+
 
                     <div>
                         <div class="table-responsive">
@@ -254,7 +184,7 @@
                                         <th>Giá Khóa Học </th>
                                         <th>Tổng Số Buổi Học </th>
                                         <th>Ngày Tạo Khóa Học </th>
-                                        {{-- <th>Mô Tả Khóa Học </th> --}}
+                                        <th>Mô Tả Khóa Học </th>
                                         <th>Nổi Bật </th>
                                         <th>Hành Động </th>
 
@@ -291,13 +221,12 @@
                                             <td>{{ $course->total_sessions }}</td>
 
                                             <td>{{ $course->created_at }}</td>
-                                            {{-- <td>{{ $course->description }}</td>s --}}
+                                            <td>{{ $course->description }}</td>
                                             <td style="width: 100px;">
                                                 <div class="form-check">
                                                     <input type="checkbox" class="form-check-input"
                                                         onchange="toggleFeatured({{ $course->id }})"
                                                         {{ $course->is_featured ? 'checked' : '' }}>
-
                                                 </div>
                                             </td>
 
@@ -344,7 +273,7 @@
                                             </td>
 
                                         </tr>
-                                    @endforeach;
+                                    @endforeach
 
 
                                 </tbody>
@@ -402,35 +331,30 @@
     }
 
     function toggleFeatured(courseId) {
-    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-    fetch(`{{ url('/admin/courses') }}/${courseId}/toggle-featured`, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': token,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Cập nhật thành công',
-                text: data.status ? 'Khóa học đã được đánh dấu nổi bật' : 'Khóa học đã được bỏ đánh dấu nổi bật',
-                timer: 1500,
-                showConfirmButton: false
+        fetch(`/admin/courses/${courseId}/toggle-featured`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Cập nhật thành công',
+                        text: data.status ? 'Khóa học đã được đánh dấu nổi bật' :
+                            'Khóa học đã được bỏ đánh dấu nổi bật',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                Swal.fire('Lỗi', 'Không thể cập nhật trạng thái nổi bật', 'error');
             });
-        } else {
-            Swal.fire('Lỗi', 'Không thể cập nhật nổi bật', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Lỗi:', error);
-        Swal.fire('Lỗi', 'Không thể cập nhật trạng thái nổi bật', 'error');
-    });
-}
-
+    }
 </script>
