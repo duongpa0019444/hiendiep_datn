@@ -394,7 +394,7 @@
                     <div class="card-header row d-flex justify-content-between align-items-center">
                         <h4 class="card-title col-4">Danh sách tất cả người dùng</h4>
                         <div class="col-8 gap-2">
-                            <form method="GET" action="{{ route('admin.account.search') }}"
+                            <form id="filterAccountForm" method="GET" action="{{ route('admin.account.search') }}"
                                 class="form-inline d-flex gap-2 align-items-center">
                                 <a href="{{ route('admin.account.trash') }}" class="btn btn-sm btn-primary">
                                     Thùng rác tài khoản
@@ -426,8 +426,8 @@
 
                                 <button type="submit" class="btn btn-success">Lọc</button>
 
-                                <a href="{{ route('admin.account.trash') }}"><button
-                                        class="btn btn-danger">Xóa</button></a>
+                                <button id="clearFilterAccountBtn" type="button"
+                                        class="btn btn-danger">Xóa Lọc</button>
                             </form>
 
 
@@ -492,6 +492,18 @@
 
     </div>
 
+<script>
 
+    document.getElementById('clearFilterAccountBtn').addEventListener('click', function () {
+        const form = document.getElementById('filterAccountForm');
+
+        // Xóa tất cả input/select trong form
+        form.reset();
+
+        // Redirect về URL gốc không có query
+        const baseUrl = "{{ route('admin.account') }}";
+        window.location.href = baseUrl;
+    });
+</script>
 
 @endsection

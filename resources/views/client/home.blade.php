@@ -3,7 +3,19 @@
 @section('title', 'Trang chủ')
 @section('description', '')
 @section('content')
-
+    @if (session('success'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Toastify({
+                        text: "{{ session('success') }}",
+                        gravity: "top",
+                        position: "center",
+                        className: "success",
+                        duration: 4000
+                    }).showToast();
+                });
+            </script>
+        @endif
 
     <main>
         <div class="section-bg hero-bg background-image"

@@ -48,6 +48,8 @@ class loginController extends Controller
                 'status' => false,
                 'message' => 'Sai tên đăng nhập hoặc mật khẩu!'
             ]);
+        }else{
+            return view('auth.login');
         }
     }
 
@@ -215,6 +217,6 @@ class loginController extends Controller
         session()->forget('reset_email');
 
         // Trả về phản hồi
-        return redirect()->route('auth.login')->with('success', 'Mật khẩu đã được đặt lại thành công!');
+        return redirect()->route('home')->with('success', 'Mật khẩu đã được đặt lại thành công!');
     }
 }
