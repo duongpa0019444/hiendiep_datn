@@ -1,7 +1,7 @@
 @extends('client.client')
 
-@section('title', 'Trang chủ')
-@section('description', '')
+@section('title', 'Trang tài khoản của bạn')
+@section('description', 'Thông tin của bạn!')
 
 @section('content')
     <main>

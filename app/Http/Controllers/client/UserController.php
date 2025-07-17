@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\classes;
 use App\Models\coursePayment;
+use App\Models\Quizzes;
 use Database\Seeders\user;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
@@ -26,29 +27,25 @@ class UserController extends Controller
 
             return view('client.accounts.teachers.dashboard');
         }
-
     }
 
     public function schedule()
     {
         if (Auth::user()->role == "student") {
             return view('client.accounts.students.schedule');
-        }elseif (Auth::user()->role == "teacher"){
+        } elseif (Auth::user()->role == "teacher") {
             return view('client.accounts.teachers.schedule');
-
         }
-
     }
 
     public function score()
     {
         if (Auth::user()->role == "student") {
             return view('client.accounts.students.score');
-        }elseif (Auth::user()->role == "teacher") {
+        } elseif (Auth::user()->role == "teacher") {
 
             return view('client.accounts.teachers.score');
         }
-
     }
 
     public function quizz()
@@ -117,11 +114,65 @@ class UserController extends Controller
                 ->get();
 
             return view('client.accounts.students.quizz', compact('quizzesDone', 'assignedQuizzes'));
-        }elseif (Auth::user()->role == "teacher") {
+        } elseif (Auth::user()->role == "teacher") {
 
-            return view('client.accounts.teachers.quizz');
+            $queryBase = DB::table('quizzes as q')
+                ->leftJoin('classes as c', 'q.class_id', '=', 'c.id')
+                ->leftJoin('users as u', 'q.created_by', '=', 'u.id')
+                ->leftJoin('questions as ques', 'q.id', '=', 'ques.quiz_id')
+                ->leftJoin('sentence_questions as sq', 'q.id', '=', 'sq.quiz_id')
+                ->select(
+                    'q.id',
+                    'q.title',
+                    'q.status',
+                    'q.class_id',
+                    'q.duration_minutes',
+                    'q.created_by',
+                    'q.updated_at',
+                    'q.deleted_at',
+                    'c.name as class_name',
+                    'u.name as creator_name',
+                    DB::raw('COUNT(DISTINCT ques.id) + COUNT(DISTINCT sq.id) as total_questions')
+                )
+                ->where('q.created_by', Auth::user()->id)
+                ->groupBy(
+                    'q.id',
+                    'q.title',
+                    'q.status',
+                    'q.class_id',
+                    'q.duration_minutes',
+                    'q.created_by',
+                    'q.updated_at',
+                    'q.deleted_at',
+                    'c.name',
+                    'u.name'
+                );
+
+            // Lấy tất cả quiz
+            $quizzesAll = (clone $queryBase)->whereNull('q.deleted_at')->orderBy('q.updated_at', 'desc')->get();
+
+            // Lấy quiz đã xuất bản
+            $quizzesPublished = (clone $queryBase)
+                ->where('q.status', 'published')
+                ->whereNull('q.deleted_at')
+                ->orderBy('q.updated_at', 'desc')
+                ->get();
+
+            // Lấy quiz lưu nháp
+            $quizzesDraft = (clone $queryBase)
+                ->where('q.status', 'draft')
+                ->whereNull('q.deleted_at')
+                ->orderBy('q.updated_at', 'desc')
+                ->get();
+
+            // Lấy quiz đã xóa
+            $quizzesTrashed = (clone $queryBase)
+                ->whereNotNull('q.deleted_at')
+                ->orderBy('q.updated_at', 'asc')
+                ->get();
+
+            return view('client.accounts.teachers.quizz', compact('quizzesAll', 'quizzesPublished', 'quizzesDraft', 'quizzesTrashed'));
         }
-
     }
 
 
@@ -129,10 +180,9 @@ class UserController extends Controller
     {
         if (Auth::user()->role == "student") {
             return view('client.accounts.students.account');
-        }elseif (Auth::user()->role == "teacher") {
+        } elseif (Auth::user()->role == "teacher") {
 
             return view('client.accounts.teachers.account');
         }
-
     }
 }

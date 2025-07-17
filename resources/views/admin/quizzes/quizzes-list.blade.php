@@ -85,7 +85,15 @@
             <!-- Title and Actions -->
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4 class="card-title mb-1">Danh sách bài quiz rèn luyện</h4>
-                <div>
+                <div class="d-flex align-items-center justify-content-center">
+                    <div class="col-auto me-1">
+                        <a href="{{ route('admin.quizzes.trash') }}"
+                            class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1">
+                            <iconify-icon icon="mdi:trash-can-outline" class="fs-20"></iconify-icon>
+                            <span>Thùng rác</span>
+                        </a>
+                    </div>
+
                     <button class="btn btn-primary btn-sm btn-add" id="btn-add-quizz" data-bs-target="#modal-add-quiz">
                         <iconify-icon icon="solar:plus-circle-broken" class="fs-20"></iconify-icon> Thêm bài quiz
                     </button>
@@ -170,7 +178,9 @@
                                         @foreach ($quizzes as $quiz)
                                             <tr>
                                                 <td>
-                                                    <div class="fw-bold">{{ $quiz->title }} <p class="text-danger"> {{ $quiz->status == 'published' ? '' : ' (Bản nháp)' }}</p></div>
+                                                    <div class="fw-bold">{{ $quiz->title }} <p class="text-danger">
+                                                            {{ $quiz->status == 'published' ? '' : ' (Bản nháp)' }}</p>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     @if ($quiz->is_public)
@@ -221,7 +231,8 @@
                                                                     </button>
                                                                 </form>
                                                             </li>
-                                                            <li><a class="dropdown-item" href="{{ route('admin.quizzes.results', $quiz->id) }}"><iconify-icon
+                                                            <li><a class="dropdown-item"
+                                                                    href="{{ route('admin.quizzes.results', $quiz->id) }}"><iconify-icon
                                                                         icon="solar:chart-broken"
                                                                         class="me-1"></iconify-icon> Xem kết quả</a></li>
                                                         </ul>
@@ -303,22 +314,32 @@
                                 </div>
                                 <div class="mb-3 col-12 col-md-6 p-2 class-course-fields" id="class_field">
                                     <label for="class_id" class="form-label fw-bold">Lớp học</label>
-                                    <select class="form-select form-select-sm" id="class_id" name="class_id">
+                                    <select class="form-select form-select-sm" id="class_id" name="class_id"
+                                        data-choices>
                                         <option value="">Chọn lớp</option>
                                         @foreach (\DB::table('classes')->get() as $class)
-                                            <option value="{{ $class->id }}" data-course="{{ $class->courses_id }}">{{ $class->name }}</option>
+                                            <option value="{{ $class->id }}" data-course="{{ $class->courses_id }}">
+                                                {{ $class->name }}</option>
                                         @endforeach
 
                                     </select>
                                 </div>
                                 <div class="mb-3 col-12 col-md-6 p-2 class-course-fields" id="course_field">
                                     <label for="course_id" class="form-label fw-bold">Khóa học</label>
-                                    <select class="form-select form-select-sm" id="course_id" name="course_id">
+                                    <select class="form-select form-select-sm" id="course_id" name="course_id"
+                                        data-choices>
                                         <option value="">Chọn khóa học</option>
                                         @foreach (\DB::table('courses')->get() as $course)
                                             <option value="{{ $course->id }}">{{ $course->name }}</option>
                                         @endforeach
                                     </select>
+                                </div>
+                                <div class="col-12 text-muted small d-flex align-items-center mt-2">
+                                    <iconify-icon icon="mdi:information" class="me-2 text-warning"></iconify-icon>
+
+                                    Quiz chỉ có thể được tạo cho "một lớp" hoặc "một khóa học" hoặc để "công khai"
+                                    không
+                                    đồng thời nhiều đối tượng!
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -386,6 +407,15 @@
         // Mở modal Thêm quiz
         $('#btn-add-quizz').on('click', function() {
             $("#modal-add-quiz").modal("show");
+            if (window.myChoicesInstance) {
+                window.myChoicesInstance.destroy();
+            }
+
+            window.myChoicesInstance = new Choices('#my-select', {
+                searchEnabled: true,
+                itemSelectText: '',
+                shouldSort: false
+            });
 
             form.attr('action', '{{ route('admin.quizzes.store') }}');
             formMethod.val('POST');
@@ -396,16 +426,31 @@
             $('#course_id').val('').prop('disabled', false);
             toggleFields();
             errorContainer.hide().empty();
-        });
-        //sử lý chọn lớp và khóa khi thêm quizz
-        $(document).ready(function () {
-            $('#class_id').on('change', function () {
-                const courseId = $(this).find('option:selected').data('course');
 
-                if (courseId) {
-                    $('#course_id').val(courseId).prop('disabled', true); // Gán và khóa lại
+
+        });
+
+
+
+
+        $(document).ready(function() {
+            $('#class_id').on('change', function() {
+                const classId = $(this).val();
+                if (classId) {
+                    $('#course_field').hide();
+
                 } else {
-                    $('#course_id').val('').prop('disabled', false); // Reset và cho chọn lại nếu không có khóa
+                    $('#course_field').show();
+                }
+            });
+
+            $('#course_id').on('change', function() {
+                const courseId = $(this).val();
+                if (courseId) {
+                    $('#class_field').hide();
+
+                } else {
+                    $('#class_field').show();
                 }
             });
         });
@@ -568,7 +613,7 @@
             const actionUrl = form.attr('action');
             Swal.fire({
                 title: 'Bạn có chắc chắn?',
-                text: "Bạn sẽ không thể hoàn tác hành động này!",
+                text: "Bài quiz sẽ được đưa vào thùng rác!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Vâng, xóa nó!',
@@ -611,11 +656,11 @@
                             <td><div class="fw-bold">${quiz.title}</div></td>
                             <td>
                                 ${quiz.is_public ? `
-                                                    <div class="fw-bold">Tất cả</div>
-                                                ` : `
-                                                    <div class="fw-bold">${quiz.class?.name || 'Tất cả'}</div>
-                                                    <div class="fs-6">Khóa: ${quiz.course?.name || 'Tất cả'}</div>
-                                                `}
+                                                            <div class="fw-bold">Tất cả</div>
+                                                        ` : `
+                                                            <div class="fw-bold">${quiz.class?.name || 'Tất cả'}</div>
+                                                            <div class="fs-6">Khóa: ${quiz.course?.name || 'Tất cả'}</div>
+                                                        `}
                             </td>
                             <td>${quiz.creator?.name || 'Không rõ'}</td>
                             <td>${quiz.duration_minutes}</td>
