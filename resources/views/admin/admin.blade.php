@@ -386,16 +386,6 @@
                                 <span class="nav-text"> Quản lí lương giáo viên</span>
                             </a>
 
-                            {{-- <div class="collapse" id="user">
-                            <ul class="nav sub-navbar-nav">
-                                <li class="sub-nav-item">
-                                    <a class="sub-nav-link" href="/admin/user/list">Tạo khoản thu</a>
-                                </li>
-
-
-                            </ul>
-                        </div> --}}
-
                         </li>
 
                         <li class="nav-item">
@@ -406,16 +396,17 @@
                                 <span class="nav-text"> Quản lí thông báo </span>
                             </a>
 
-                            {{-- <div class="collapse" id="user">
-                                <ul class="nav sub-navbar-nav">
-                                    <li class="sub-nav-item">
-                                        <a class="sub-nav-link" href="/admin/user/list">Tạo thông báo</a>
-                                    </li>
+                       
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.contact') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lí tin nhắn cần hỗ trợ </span>
+                            </a>
 
-
-                                </ul>
-                            </div> --}}
-
+                       
                         </li>
 
 
@@ -502,6 +493,17 @@
 
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.contact') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý hỗ trợ tin nhắn  </span>
+                            </a>
+
+                        </li>
+
+
 
                         <li class="nav-item mt-3">
                             <a class="nav-link" href="{{ route('auth.logout') }}">
@@ -547,6 +549,11 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    @if (auth()->check() && auth()->user()->isStaff())
+    @if (auth()->check() && auth()->user()->isStaff())
+
+@endif
+
     <script>
         AOS.init();
         setTimeout(() => {
@@ -568,7 +575,14 @@
                     console.error('Lỗi:', error.message);
                 });
         }, 300000); // 5phút
-    </script>
+
+        
+
+
+
+</script>
+@endif
+
 
 
     @stack('scripts')

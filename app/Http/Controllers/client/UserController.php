@@ -270,6 +270,7 @@ class UserController extends Controller
         score::find($id)->delete();
         return redirect()->back()->with('success', 'Xóa điểm thành công!');
     }
+   
 
     public function Scoreimport(Request $request)
     {

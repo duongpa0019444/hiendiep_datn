@@ -9,6 +9,7 @@ use App\Models\Quizzes;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 
@@ -87,6 +88,13 @@ class CourseController  extends Controller
 
         try {
             $course = courses::findOrFail($id);
+             // Xóa file ảnh nếu tồn tại
+        if ($course->image) {
+            $imagePath = public_path($course->image);
+            if (File::exists($imagePath)) {
+                File::delete($imagePath);
+            }
+        }
             $course->delete();
             return redirect()->route('admin.course-list')->with('success', 'Xóa khóa học thành công');
         } catch (QueryException $e) {
@@ -258,12 +266,24 @@ class CourseController  extends Controller
     }
 
     // noi bat 
-    public function toggleFeatured($id)
-    {
-        $course = courses::findOrFail($id);
-        $course->is_featured = !$course->is_featured;
-        $course->save();
+    // public function toggleFeatured($id)
+    // {
+    //     $course = courses::findOrFail($id);
+    //     $course->is_featured = !$course->is_featured;
+    //     $course->save();
 
-        return response()->json(['success' => true, 'status' => $course->is_featured]);
-    }
+    //     return response()->json(['success' => true, 'status' => $course->is_featured]);
+    // }
+    public function toggleFeatured($id)
+{
+    $course = courses::findOrFail($id);
+    $course->is_featured = !$course->is_featured;
+    $course->save();
+
+    return response()->json([
+        'success' => true,
+        'status' => $course->is_featured
+    ]);
+}
+
 }

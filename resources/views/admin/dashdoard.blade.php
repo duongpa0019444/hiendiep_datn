@@ -76,7 +76,7 @@
 
 
                         @foreach ($classs as $class)
-                            <div class="col-md-12"  data-aos="fade-right" data-aos-delay="500">
+                            <div class="col-md-12" data-aos="fade-right" data-aos-delay="500">
                                 <div class="card overflow-hidden">
                                     <div class="card-body">
                                         <div class="row">
@@ -126,7 +126,7 @@
 
 
                         @foreach ($countPayments as $countPayment)
-                            <div class="col-md-12"  data-aos="fade-right" data-aos-delay="700">
+                            <div class="col-md-12" data-aos="fade-right" data-aos-delay="700">
                                 <div class="card overflow-hidden">
                                     <div class="card-body">
                                         <div class="row">
@@ -201,7 +201,8 @@
             </div> <!-- end row -->
 
             <div class="card">
-                <div class="d-flex align-items-center justify-content-center gap-2 col-xxl-12"  data-aos="fade-up" data-aos-delay="300">
+                <div class="d-flex align-items-center justify-content-center gap-2 col-xxl-12" data-aos="fade-up"
+                    data-aos-delay="300">
                     <!-- Nút chuyển năm -->
                     <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center"
                         id="prevYear">
@@ -220,7 +221,7 @@
                     </button>
                 </div>
                 <div class="row">
-                    <div class="col-xxl-7"  data-aos="fade-right" data-aos-delay="300">
+                    <div class="col-xxl-7" data-aos="fade-right" data-aos-delay="300">
                         <div class="">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -232,7 +233,7 @@
                             </div> <!-- end card body -->
                         </div> <!-- end card -->
                     </div> <!-- end col -->
-                    <div class="col-xxl-5"  data-aos="fade-left" data-aos-delay="300">
+                    <div class="col-xxl-5" data-aos="fade-left" data-aos-delay="300">
                         <div class="">
                             <div class="card-body">
                                 <h4 class="card-title mb-3  anchor" id="simple_donut">Doanh thu theo khóa học</h4>
@@ -247,7 +248,7 @@
             </div>
 
 
-            <div class="card mt-2 p-2"  data-aos="fade-up" data-aos-delay="300">
+            <div class="card mt-2 p-2" data-aos="fade-up" data-aos-delay="300">
                 <div class="table-container">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="card-title mb-0 title-date-schedules">Lịch học ({{ $formattedDate }})</h4>
@@ -407,6 +408,7 @@
 
 @endsection
 @push('scripts')
+    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
     <script>
         $(document).ready(function() {
             // Khởi tạo mảng toàn cục
@@ -732,6 +734,38 @@
 
 
 
+        // xử lý phần liên hệ
+        const pusher = new Pusher("YOUR_PUSHER_KEY", {
+            cluster: "YOUR_PUSHER_CLUSTER",
+            authEndpoint: "/broadcasting/auth",
+            auth: {
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            }
+        });
+
+        const channel = pusher.subscribe('presence-staff-support');
+
+        channel.bind('App\\Events\\SupportRequestCreated', function(data) {
+            if ({{ auth()->check() && auth()->user()->role == 'staff' ? 'true' : 'false' }}) {
+                if (confirm(
+                        `Yêu cầu mới từ ${data.support.name} (${data.support.phone}) - ${data.support.pl_content}: ${data.support.message}\nBạn nhận xử lý?`
+                    )) {
+                    fetch(`/contact-support/${data.support.id}/handle`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(resp => alert(resp.message))
+                        .catch(() => alert('Không thể nhận xử lý yêu cầu!'));
+                }
+            }
+        });
+
+
         //Bắt đầu lấy dữ liệu khi tải lại trang thgeo năm hiện tại
         $(document).ready(function() {
             // Khởi tạo năm hiện tại từ hệ thống
@@ -922,6 +956,8 @@
                         ],
                     },
                 };
+
+
 
                 // Nếu đã có chart → destroy trước khi tạo mới
                 if (chartRevenue !== null) {
