@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\answers;
 use App\Models\classes;
+use App\Models\courses;
 use App\Models\questions;
 use App\Models\quizAttempts;
 use App\Models\quizzes;
@@ -41,6 +42,20 @@ class quizzesController extends Controller
         }
 
         return view('admin.quizzes.quizzes-list', compact('quizzes', 'statistics'));
+    }
+
+    public function trash(Request $request)
+    {
+        $quizzes = quizzes::onlyTrashed()->orderByDesc('created_at')->with(['creator', 'course', 'class'])->paginate(1);
+        // Kiểm tra nếu là AJAX request
+        if ($request->ajax()) {
+            return response()->json([
+                'quizzes' => $quizzes,
+                'pagination' => $quizzes->links('pagination::bootstrap-5')->toHtml()
+            ]);
+        }
+
+        return view('admin.quizzes.quizzes-trash', compact('quizzes'));
     }
 
 
@@ -85,11 +100,114 @@ class quizzesController extends Controller
         return $query->with(['creator', 'course', 'class'])->orderByDesc('created_at')->paginate($request->limit);
     }
 
+    public function filterTrash(Request $request)
+    {
+        $quizzes = $this->getFilterTrashQuizzes($request);
+        $quizzes->appends($request->all());
+        return response()->json([
+            'quizzes' => $quizzes,
+            'pagination' => $quizzes->links('pagination::bootstrap-5')->toHtml()
+        ]);
+    }
+
+    private function getFilterTrashQuizzes(Request $request)
+    {
+        $query = quizzes::onlyTrashed();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('is_public')) {
+            $query->where('is_public', $request->is_public);
+        }
+
+        if ($request->filled('class_id')) {
+            $query->whereHas('class', function ($q) use ($request) {
+                $q->where('id', $request->class_id);
+            });
+        }
+
+        if ($request->filled('course_id')) {
+            $query->whereHas('course', function ($q) use ($request) {
+                $q->where('id', $request->course_id);
+            });
+        }
+
+        if ($request->filled('keyword')) {
+            $query->where('title', 'like', '%' . $request->keyword . '%');
+        }
+
+        return $query->with(['creator', 'course', 'class'])->orderByDesc('created_at')->paginate($request->limit);
+    }
+
+
     public function delete($id)
     {
-        $quiz = quizzes::findOrFail($id);
+        $quiz = Quizzes::with('creator')->findOrFail($id);
         $quiz->delete();
+
+        // Truy vấn số câu hỏi dạng multiple + sentence
+        $counts = DB::table('quizzes as q')
+            ->leftJoin('questions as ques', 'q.id', '=', 'ques.quiz_id')
+            ->leftJoin('sentence_questions as sq', 'q.id', '=', 'sq.quiz_id')
+            ->where('q.id', $quiz->id)
+            ->selectRaw('COUNT(DISTINCT ques.id) + COUNT(DISTINCT sq.id) as total_questions')
+            ->first();
+
+        $quiz->total_questions = $counts->total_questions ?? 0;
+
+        return response()->json($quiz);
     }
+
+
+    public function forceDelete($id)
+    {
+        DB::transaction(function () use ($id) {
+            $quiz = Quizzes::onlyTrashed()->findOrFail($id);
+
+            // Lấy các câu hỏi thường (multiple choice)
+            $questionIds = DB::table('questions')->where('quiz_id', $id)->pluck('id');
+            if ($questionIds->isNotEmpty()) {
+                DB::table('answers')->whereIn('question_id', $questionIds)->delete();
+                DB::table('questions')->whereIn('id', $questionIds)->delete();
+            }
+
+            // Lấy các câu hỏi dạng điền câu (sentence)
+            $sentenceQuestionIds = DB::table('sentence_questions')->where('quiz_id', $id)->pluck('id');
+            if ($sentenceQuestionIds->isNotEmpty()) {
+                DB::table('sentence_answers')->whereIn('sentence_question_id', $sentenceQuestionIds)->delete();
+                DB::table('sentence_questions')->whereIn('id', $sentenceQuestionIds)->delete();
+            }
+
+            // Xóa bài làm của học sinh
+            DB::table('quiz_attempts')->where('quiz_id', $id)->delete();
+
+            // Xóa vĩnh viễn quiz
+            $quiz->forceDelete();
+        });
+
+        return redirect()->back()->with('success', 'Đã xóa vĩnh viễn quiz và toàn bộ dữ liệu liên quan.');
+    }
+
+    public function restore(Request $request, $id)
+    {
+        $quizzes = quizzes::onlyTrashed()->findOrFail($id);
+        $quizzes->restore();
+        if ($request->ajax()) {
+            $counts = DB::table('quizzes as q')
+                ->leftJoin('questions as ques', 'q.id', '=', 'ques.quiz_id')
+                ->leftJoin('sentence_questions as sq', 'q.id', '=', 'sq.quiz_id')
+                ->where('q.id', $quizzes->id)
+                ->selectRaw('COUNT(DISTINCT ques.id) + COUNT(DISTINCT sq.id) as total_questions')
+                ->first();
+
+            $quizzes->total_questions = $counts->total_questions ?? 0;
+            return response()->json($quizzes);
+        }
+        return redirect()->back()->with('success', 'Khôi phục quiz thành công!');
+    }
+
 
     public function generateUniqueAccessCode()
     {
@@ -133,8 +251,8 @@ class quizzesController extends Controller
         $validator->after(function ($validator) use ($request) {
             if ($request->input('is_public') == 0) {
                 if (empty($request->input('class_id')) && empty($request->input('course_id'))) {
-                    $validator->errors()->add('class_id', 'Bạn phải chọn ít nhất lớp học hoặc khóa học nếu quiz là riêng tư.');
-                    $validator->errors()->add('course_id', 'Bạn phải chọn ít nhất lớp học hoặc khóa học nếu quiz là riêng tư.');
+                    $validator->errors()->add('class_id', 'Bạn phải chọn ít nhất lớp học nếu quiz là riêng tư.');
+                    $validator->errors()->add('course_id', 'Bạn phải chọn ít nhất khóa học nếu quiz là riêng tư.');
                 }
             }
         });
@@ -173,7 +291,6 @@ class quizzesController extends Controller
     public function update(Request $request, $id)
     {
         $quiz = quizzes::findOrFail($id);
-
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -224,7 +341,7 @@ class quizzesController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'],
             'duration_minutes' => $validated['duration_minutes'],
-            'access_code' => $validated['access_code'],
+            'access_code' => $quiz->access_code,
             'is_public' => $validated['is_public'],
             'class_id' => $validated['is_public'] ? null : $validated['class_id'],
             'course_id' => $validated['is_public'] ? null : $validated['course_id'],
@@ -238,7 +355,8 @@ class quizzesController extends Controller
         ], 200);
     }
 
-    public function updateStatus($id, $status){
+    public function updateStatus($id, $status)
+    {
         $quiz = quizzes::findOrFail($id);
         $quiz->status = $status;
         $quiz->save();
@@ -276,7 +394,11 @@ class quizzesController extends Controller
         if ($request->ajax()) {
             return response()->json($quiz);
         }
-        return view('admin.quizzes.quizzes-detail', compact('quiz','allQuestions', 'answers'));
+        if (Auth::user()->role == 'admin') {
+            return view('admin.quizzes.quizzes-detail', compact('quiz', 'allQuestions', 'answers'));
+        } elseif (Auth::user()->role == 'teacher') {
+            return view('client.quizzes.quizzes-detail', compact('quiz', 'allQuestions', 'answers'));
+        }
     }
 
 
@@ -319,7 +441,7 @@ class quizzesController extends Controller
                 AND qa.quiz_id = ?
             ) AS total_attempts_for_quiz;
 
-        ",[$id, $id, $id]);
+        ", [$id, $id, $id]);
 
         $classes =  DB::table('classes as c')
             ->join('courses as co', 'co.id', '=', 'c.courses_id')
@@ -327,7 +449,7 @@ class quizzesController extends Controller
             ->join('quiz_attempts as qa', function ($join) use ($id) {
                 $join->on('qa.user_id', '=', 'cs.student_id')
                     ->where('qa.quiz_id', '=', $id)
-                    ->whereColumn('qa.class_id', '=', 'cs.class_id')
+                    // ->whereColumn('qa.class_id', '=', 'cs.class_id')
                     ->whereNull('qa.deleted_at');
             })
             ->select([
@@ -476,7 +598,7 @@ class quizzesController extends Controller
             ->orderBy('u.name')
             ->paginate(10);
 
-                // Kiểm tra nếu là AJAX request
+        // Kiểm tra nếu là AJAX request
         if ($request->ajax()) {
             return response()->json([
                 'students' => $students,
@@ -503,7 +625,7 @@ class quizzesController extends Controller
         $quizId = $request->quiz_id;
         $classId = $request->class_id;
 
-        $query =DB::table('users as u')
+        $query = DB::table('users as u')
             ->join('class_student as cs', 'cs.student_id', '=', 'u.id')
             ->join('quiz_attempts as qa', function ($join) use ($quizId) {
                 $join->on('qa.user_id', '=', 'u.id')
@@ -523,32 +645,32 @@ class quizzesController extends Controller
             ->groupBy('u.id', 'u.name', 'u.birth_date', 'u.gender')
             ->orderBy('u.name');
 
-            // Tên học sinh
-            if ($request->filled('keyword')) {
-                $query->where('u.name', 'like', '%' . $request->keyword . '%');
-            }
+        // Tên học sinh
+        if ($request->filled('keyword')) {
+            $query->where('u.name', 'like', '%' . $request->keyword . '%');
+        }
 
-            // Giới tính
-            if ($request->filled('gender')) {
-               $query->where('u.gender', $request->gender);
-            }
+        // Giới tính
+        if ($request->filled('gender')) {
+            $query->where('u.gender', $request->gender);
+        }
 
-            // Ngày sinh
-            if ($request->filled('birth_date')) {
-                $query->whereDate('u.birth_date', $request->birth_date);
-            }
+        // Ngày sinh
+        if ($request->filled('birth_date')) {
+            $query->whereDate('u.birth_date', $request->birth_date);
+        }
 
-            // Điểm trung bình
-            if ($request->filled('avg_score')) {
-                $query->havingRaw('ROUND(AVG(qa.score), 2) = ?', [$request->avg_score]);
-            }
+        // Điểm trung bình
+        if ($request->filled('avg_score')) {
+            $query->havingRaw('ROUND(AVG(qa.score), 2) = ?', [$request->avg_score]);
+        }
 
-            // Số lượt làm bài
-            if ($request->filled('attempts')) {
-                $query->havingRaw('COUNT(qa.id) = ?', [$request->attempts]);
-            }
+        // Số lượt làm bài
+        if ($request->filled('attempts')) {
+            $query->havingRaw('COUNT(qa.id) = ?', [$request->attempts]);
+        }
 
-            return $query->orderBy('u.name')->paginate($request->limit ?? 10);
+        return $query->orderBy('u.name')->paginate($request->limit ?? 10);
     }
 
 
@@ -564,7 +686,8 @@ class quizzesController extends Controller
         $class = classes::findOrFail($class);
         $student = DB::table('users')->where('id', $student)->where('role', 'student')->first();
 
-        $statistics = DB::select("
+        $statistics = DB::select(
+            "
                     SELECT
                 u.id AS student_id,
                 u.name AS student_name,
@@ -581,8 +704,9 @@ class quizzesController extends Controller
                 AND cs.class_id = ?
                 AND u.id = ?
             GROUP BY u.id, u.name
-            ORDER BY u.name;"
-        , [$id, $class->id, $student->id]);
+            ORDER BY u.name;",
+            [$id, $class->id, $student->id]
+        );
 
         $attempts = DB::table('quiz_attempts as qa')
             ->select([
@@ -677,7 +801,8 @@ class quizzesController extends Controller
 
 
 
-    public function quizAttemptsStudentAnswer($id, $class, $student, $attemptId){
+    public function quizAttemptsStudentAnswer($id, $class, $student, $attemptId)
+    {
         $quiz = quizzes::findOrFail($id);
         $class = classes::findOrFail($class);
         $student = DB::table('users')->where('id', $student)->where('role', 'student')->first();
@@ -731,8 +856,24 @@ class quizzesController extends Controller
             ->get();
         // dd($studentMcAnswers->all());
         return view('admin.quizzes.results.answer_detail', compact(
-            'quiz', 'class', 'student', 'attempt', 'allQuestions', 'answers', 'studentMcAnswers', 'studentSentenceAnswers'
+            'quiz',
+            'class',
+            'student',
+            'attempt',
+            'allQuestions',
+            'answers',
+            'studentMcAnswers',
+            'studentSentenceAnswers'
         ));
     }
 
+
+    public function getCourse($id){
+        $course = courses::join('classes', 'classes.courses_id', '=', 'courses.id')
+            ->select('courses.*')
+            ->where('classes.id', $id)
+            ->first();
+
+        return response()->json($course);
+    }
 }

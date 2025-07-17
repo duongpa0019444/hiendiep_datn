@@ -8,7 +8,8 @@
     <title>@yield('title')</title>
     <meta name="description" content="@yield('description')">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="shortcut icon" href="{{ asset('client/images/favicon.svg') }}" />
+    <link rel="shortcut icon" href="{{ asset('client/images/logo-icon.png') }}">
+
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="{{ asset('client/plugins/css/bootstrap.min.css') }}" />
@@ -30,8 +31,9 @@
     <link rel="stylesheet" href="{{ asset('client/style.css') }}" />
 
     <script src="{{ asset('client/plugins/js/jquery.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    
+
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
@@ -49,7 +51,40 @@
         </div>
     </div>
     <!-- End Preloader -->
-    <!-- Cursor Area Start -->
+
+
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="classSidebar">
+        <span class="close-btn" id="close-btn-sidebar">&times;</span>
+        <div class="d-flex justify-content-between align-items-start mt-3">
+            <h3 class="col-7">Danh sách lớp làm quiz</h3>
+            <div class="d-flex justify-content-end align-items-center flex-wrap col-5" id="statistics">
+
+            </div>
+        </div>
+
+        <ul class="class-list list-group" id="classList">
+
+        </ul>
+    </div>
+
+    <div class="sidebar" id="sidebarResultStudent">
+        <span class="close-btn" id="close-btn-sidebar-resultStudent">&times;</span>
+        <div class="d-flex justify-content-between align-items-start mt-3">
+            <h3 class="col-6" id="titleResultStudent"></h3>
+            <div class="d-flex justify-content-end align-items-center flex-wrap col-6" id="statisticsResulltStudent">
+
+            </div>
+        </div>
+
+        <ul class="class-list list-group">
+            <ul class="student-list list-group" id="resultStudentList">
+
+            </ul>
+
+        </ul>
+    </div>
 
 
     <!-- Start Mobile Menu Offcanvas -->
@@ -59,7 +94,7 @@
                 <div class="modal-header offcanvas-header">
                     <!-- Mobile Menu Logo -->
                     <div class="offcanvas-logo">
-                        <a href="index.html"><img src="{{ asset('client/images/logo.svg') }}" alt="#" /></a>
+                        <a href="index.html"><img src="{{ asset('client/images/logo.png') }}" alt="#" /></a>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                         <i class="fi fi-ss-cross"></i>
@@ -102,34 +137,6 @@
                                 <a class="offcanvas__menu_item" href="contact.html">Liên hệ</a>
                             </li>
 
-
-                            <li class="offcanvas__menu_li mt-4">
-                                <a class="offcanvas__menu_item" href=""><i class="icofont-user me-2"></i>Tài
-                                    khoản của bạn</a>
-                                <ul class="offcanvas__sub_menu">
-
-                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.information') }}"
-                                            class="offcanvas__sub_menu_item" data-section="dashboard">
-                                            <i class="icofont-chart-bar-graph"></i>Dashboard</a>
-                                    </li>
-                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.schedule') }}"
-                                            class="offcanvas__sub_menu_item" data-section="schedule">
-                                            <i class="icofont-calendar"></i> Lịch học</a>
-                                    </li>
-                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.score') }}"
-                                            class="offcanvas__sub_menu_item" data-section="grades">
-                                            <i class="icofont-book-alt"></i>Điểm Số</a>
-                                    </li>
-                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.quizz') }}"
-                                            class="offcanvas__sub_menu_item" data-section="quizzes">
-                                            <i class="icofont-pencil-alt-2"></i> Bài Quiz</a>
-                                    </li>
-                                    <li class="offcanvas__sub_menu_li"><a href="{{ route('client.account') }}"
-                                            class="offcanvas__sub_menu_item" data-section="account">
-                                            <i class="icofont-user"></i>Thông Tin Tài Khoản</a>
-                                    </li>
-                                </ul>
-                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -148,7 +155,7 @@
                                 <!-- Logo  -->
                                 <div class="ed-topbar__logo">
                                     <a href="{{ route('home') }}">
-                                        <img src="{{ asset('client/images/logo.svg') }}" alt="logo" />
+                                        <img src="{{ asset('client/images/logo.png') }}" alt="logo" />
                                     </a>
                                 </div>
 
@@ -202,33 +209,76 @@
                                     @auth
                                         <div class="d-flex align-items-center gap-3">
 
-                                            @if (Auth::user()->role == 'teacher')
-                                                <a href="{{ route('client.information') }}">
-                                                    <span class="fw-medium name-user">{{ Auth::user()->name }} </span>
+                                            <div class="dropdown">
+                                                <div class="d-flex justify-content-center align-items-center gap-2"
+                                                    data-bs-toggle="dropdown" aria-expanded="false" role="button">
+                                                    <span class="fw-semibold">{{ Auth::user()->name }}</span>
+                                                    <div
+                                                        class="avatar-dropdown-toggle d-flex align-items-center position-relative">
+                                                        <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('icons/user-solid.svg') }}"
+                                                            alt="Avatar" class="rounded-circle avatar-img ">
+                                                        <span
+                                                            class="dropdown-icon d-flex justify-content-center align-items-center">
+                                                            <i class="icofont-rounded-down"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
 
-                                                    <img src="{{ asset('client/images/icons/teacher.svg') }}"
-                                                        alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px">
-                                                </a>
-                                            @elseif (Auth::user()->role == 'student')
-                                                <a href="{{ route('client.information') }}">
-                                                    <span class="fw-medium name-user">{{ Auth::user()->name }} </span>
+                                                <ul
+                                                    class="dropdown-menu dropdown-menu-end shadow-sm mt-2 p-3 rounded-3 avatar-menu">
+                                                    <li>
+                                                        <a href="{{ route('client.information') }}"
+                                                            class="dropdown-item p-2" data-section="dashboard">
+                                                            <i class="icofont-chart-bar-graph me-2"></i> Dashboard
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('client.schedule') }}"
+                                                            class="dropdown-item p-2" data-section="schedule">
+                                                            <i class="icofont-calendar me-2"></i>
+                                                            {{ Auth::user()->role == 'teacher' ? 'Lịch dạy' : 'Lịch học' }}
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('client.score') }}" class="dropdown-item p-2"
+                                                            data-section="grades">
+                                                            <i class="icofont-book-alt me-2"></i> Điểm số
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('client.quizz') }}" class="dropdown-item p-2"
+                                                            data-section="quizzes">
+                                                            <i class="icofont-pencil-alt-2 me-2"></i> Bài Quiz
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('client.account') }}" class="dropdown-item p-2"
+                                                            data-section="account">
+                                                            <i class="icofont-user me-2"></i> Thông tin tài khoản
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <hr class="dropdown-divider">
+                                                    </li>
+                                                    <li>
+                                                        <form action="{{ route('auth.logout') }}" method="GET"
+                                                            class="px-3 m-0">
+                                                            @csrf
+                                                            <button type="submit"
+                                                                class="btn btn-outline-danger btn-sm w-100">
+                                                                <i class="icofont-logout me-1"></i> Đăng xuất
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
 
-                                                    <img src="{{ asset('client/images/icons/studentBoy.svg') }}"
-                                                        alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px">
-                                                </a>
-                                            @elseif (Auth::user()->role == 'admin')
-                                                <a href="{{ route('admin.dashboard') }}">
-                                                    <span class="fw-medium name-user">{{ Auth::user()->name }} </span>
-                                                    {{--
-                                                    <img src="{{ asset('client/images/icons/studentBoy.svg') }}"
-                                                        alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px"> --}}
-                                                </a>
-                                            @endif
 
-                                            <form action="{{ route('auth.logout') }}" method="GET" style="margin: 0">
+
+                                            {{-- <form action="{{ route('auth.logout') }}" method="GET" style="margin: 0">
                                                 @csrf
                                                 <button type="submit" class="text-decoration-none">Logout</button>
-                                            </form>
+                                            </form> --}}
                                         </div>
                                     @endauth
 
@@ -787,9 +837,149 @@
                 </div>
                 <div class="modal-body text-center">
                     <p>Quét mã QR để thanh toán:</p>
-                    <img src="https://via.placeholder.com/200" alt="QR Code" class="img-fluid" id="qrCode">
+                    <img src="" alt="QR Code" class="img-fluid" id="qrCode">
                     <p>Nội dung chuyển khoản: <span id="qrContent"></span></p>
                     <p>Số tiền: <span id="qrAmount"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal Thêm/Sửa Quiz -->
+    <div class="modal fade" id="modal-add-quiz" tabindex="-1" aria-labelledby="addQuizModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header custom-modal-header bg-light-subtle">
+                    <h5 class="modal-title d-flex align-items-center gap-2" id="addQuizModalLabel">
+                        <iconify-izcon icon="solar:pen-2-broken" class="text-primary"></iconify-izcon>
+                        <span id="modal-title-text">Thêm bài quiz</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="quiz-form" action="{{ route('admin.quizzes.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="_method" id="form-method" value="POST">
+                    <input type="hidden" name="quiz_id" id="quiz-id">
+
+                    <div class="modal-body" style="overflow-y: auto; max-height: 60vh;">
+                        <div class="row g-3">
+
+                            <div class="col-12">
+                                <label for="quiz_title" class="form-label fw-bold">Tiêu đề</label>
+                                <input type="text" class="form-control form-control-sm" id="quiz_title"
+                                    name="title" placeholder="Nhập tiêu đề bài quiz">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="description" class="form-label fw-bold">Mô tả</label>
+                                <input type="text" class="form-control form-control-sm" id="description"
+                                    name="description" placeholder="Nhập mô tả bài quiz">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="duration" class="form-label fw-bold">Thời gian (phút)</label>
+                                <input type="number" class="form-control form-control-sm" id="duration"
+                                    name="duration_minutes" placeholder="Nhập thời gian" min="1">
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Trạng thái công khai</label>
+                                <div class="">
+                                    <input class="" type="radio" name="is_public" id="is_public_1"
+                                        value="1">
+                                    <label class="" for="is_public_1">Công khai</label>
+                                </div>
+                                <div class="">
+                                    <input class="" type="radio" name="is_public" id="is_public_0"
+                                        value="0" checked>
+                                    <label class="" for="is_public_0">Không công khai</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 class-course-fields" id="class_field">
+                                <label for="class_id" class="form-label fw-bold w-100">Lớp học</label>
+                                <select class="form-select-sm w-100" id="class_id" name="class_id">
+                                    <option value="">Chọn lớp</option>
+
+                                    @php
+                                        $teacherClasses = \DB::table('schedules as cs')
+                                            ->join('classes as c', 'cs.class_id', '=', 'c.id')
+                                            ->where('cs.teacher_id', Auth::user()->id ?? 0)
+                                            ->where('c.status', '!=', 'completed')
+                                            ->select('c.id', 'c.name', 'c.courses_id')
+                                            ->distinct()
+                                            ->get();
+                                    @endphp
+                                    @foreach ($teacherClasses as $class)
+                                        <option value="{{ $class->id }}" data-course="{{ $class->courses_id }}">
+                                            {{ $class->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 class-course-fields" id="course_field">
+                                <label for="course_id" class="form-label fw-bold w-100">Khóa học</label>
+                                <select class="form-select-sm w-100" id="course_id" name="course_id">
+                                    <option value="">Khóa học</option>
+                                    @foreach (DB::table('courses')->get() as $course)
+                                        <option value="{{ $course->id }}">{{ $course->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-12 text-muted small d-flex align-items-center mt-2">
+                                <i class="icofont-info-circle me-2 text-warning"></i>
+                                Quiz chỉ có thể được tạo cho "một lớp" hoặc "một khóa học" hoặc để "công khai"
+                                không
+                                đồng thời nhiều đối tượng!
+                            </div>
+                            <div id="error-container" class="col-12" style="display: none;"></div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary custom-btn-cancel"
+                            data-bs-dismiss="modal">
+                            <iconify-icon icon="solar:close-circle-broken" class="me-1"></iconify-icon> Đóng
+                        </button>
+                        <button type="submit" class="btn btn-primary-quiz custom-btn-submit">
+                            <iconify-icon icon="solar:check-circle-broken" class="me-1"></iconify-icon> Tiếp theo
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal kết quả các lần làm bài quiz của học sinh -->
+    <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title d-flex align-items-center gap-2 fs-6 fs-md-5 fs-lg-4"
+                        id="resultModalLabel">
+                        <i class="icofont-chart-bar-graph text-primary"></i> Kết quả các lần làm bài
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row" id="body-modal-result">
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="quiz-footer">
+                        <a href="" class="btn btn-outline-primary-quiz quiz-action-btn-result">
+                            <i class="icofont-play-alt-1 me-1"></i> Làm Lại
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -812,6 +1002,7 @@
             <button class="custom-alert-btn" id="alertBtn">OK</button>
         </div>
     </div>
+
 
     <!-- Back to top area start here -->
     <!-- Start Back To Top  -->
@@ -884,6 +1075,8 @@
             });
         });
     </script>
+
+
 </body>
 
 <!-- Mirrored from bizantheme.com/php/eduna-php/index.php by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 13 May 2025 09:12:16 GMT -->

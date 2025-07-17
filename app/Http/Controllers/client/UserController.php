@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\classes;
 use App\Models\classStudent;
 use App\Models\coursePayment;
+use App\Models\Quizzes;
 use App\Models\notification;
 use App\Models\Schedule;
 use App\Models\score;
@@ -61,6 +62,7 @@ class UserController extends Controller
             return view('client.accounts.students.dashboard', compact('unPaymentInfo', 'notifications'));
         } elseif (Auth::user()->role == "teacher") {
 
+
             $user = Auth::user();
             $userId = $user->id;
             $unPaymentInfo = coursePayment::where('student_id', $userId)
@@ -110,7 +112,6 @@ class UserController extends Controller
     public function score()
     {
         if (Auth::user()->role == "student") {
-
             $data = score::with('class.course')->where('student_id', Auth::user()->id)->paginate(5);
             return view('client.accounts.students.score', compact('data'));
         } elseif (Auth::user()->role == "teacher") {
@@ -121,7 +122,6 @@ class UserController extends Controller
                 ->select('classes.*')
                 ->distinct()
                 ->paginate(18);
-
 
             return view('client.accounts.teachers.score', compact('data'));
         }
@@ -146,6 +146,7 @@ class UserController extends Controller
 
             return view('client.accounts.teachers.score', compact('data', 'query'));
         }
+
 
         return redirect()->route('client.score');
     }
@@ -264,6 +265,11 @@ class UserController extends Controller
         ])->with('success', 'Đã cập nhật điểm thành công!');
     }
 
+    public function Scoredelete($id)
+    {
+        score::find($id)->delete();
+        return redirect()->back()->with('success', 'Xóa điểm thành công!');
+    }
 
     public function Scoreimport(Request $request)
     {
@@ -390,7 +396,7 @@ class UserController extends Controller
                     'q.updated_at',
                     'c.name as class_name',
                     'u.name as creator_name',
-                    DB::raw('COUNT(DISTINCT ques.id) + COUNT(DISTINCT sq.id) as total_questions')
+                    DB::raw('COUNT(DISTINCT ques.id) + COUNT(DISTINCT sq.id) as `total_questions`')
                 )
                 ->orderBy('q.updated_at', 'desc')
                 ->get();
@@ -398,7 +404,62 @@ class UserController extends Controller
             return view('client.accounts.students.quizz', compact('quizzesDone', 'assignedQuizzes'));
         } elseif (Auth::user()->role == "teacher") {
 
-            return view('client.accounts.teachers.quizz');
+            $queryBase = DB::table('quizzes as q')
+                ->leftJoin('classes as c', 'q.class_id', '=', 'c.id')
+                ->leftJoin('users as u', 'q.created_by', '=', 'u.id')
+                ->leftJoin('questions as ques', 'q.id', '=', 'ques.quiz_id')
+                ->leftJoin('sentence_questions as sq', 'q.id', '=', 'sq.quiz_id')
+                ->select(
+                    'q.id',
+                    'q.title',
+                    'q.status',
+                    'q.class_id',
+                    'q.duration_minutes',
+                    'q.created_by',
+                    'q.updated_at',
+                    'q.deleted_at',
+                    'c.name as class_name',
+                    'u.name as creator_name',
+                    DB::raw('COUNT(DISTINCT ques.id) + COUNT(DISTINCT sq.id) as total_questions')
+                )
+                ->where('q.created_by', Auth::user()->id)
+                ->groupBy(
+                    'q.id',
+                    'q.title',
+                    'q.status',
+                    'q.class_id',
+                    'q.duration_minutes',
+                    'q.created_by',
+                    'q.updated_at',
+                    'q.deleted_at',
+                    'c.name',
+                    'u.name'
+                );
+
+            // Lấy tất cả quiz
+            $quizzesAll = (clone $queryBase)->whereNull('q.deleted_at')->orderBy('q.updated_at', 'desc')->get();
+
+            // Lấy quiz đã xuất bản
+            $quizzesPublished = (clone $queryBase)
+                ->where('q.status', 'published')
+                ->whereNull('q.deleted_at')
+                ->orderBy('q.updated_at', 'desc')
+                ->get();
+
+            // Lấy quiz lưu nháp
+            $quizzesDraft = (clone $queryBase)
+                ->where('q.status', 'draft')
+                ->whereNull('q.deleted_at')
+                ->orderBy('q.updated_at', 'desc')
+                ->get();
+
+            // Lấy quiz đã xóa
+            $quizzesTrashed = (clone $queryBase)
+                ->whereNotNull('q.deleted_at')
+                ->orderBy('q.updated_at', 'asc')
+                ->get();
+
+            return view('client.accounts.teachers.quizz', compact('quizzesAll', 'quizzesPublished', 'quizzesDraft', 'quizzesTrashed'));
         }
     }
 
@@ -487,6 +548,7 @@ class UserController extends Controller
             $file->move($destinationPath, $filename);
             $validated['avatar'] = 'uploads/avatar/' . $filename;
         }
+
 
         $user->update($validated);
 

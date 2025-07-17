@@ -63,21 +63,6 @@
                         </div>
                     </div>
                 </div>
-                {{-- <!-- Recent Quiz Codes -->
-                <div class="mt-4">
-                    <h5 class="mb-3">📝 Mã quiz gần đây</h5>
-                    <div class="row g-2">
-                        <div class="col-auto">
-                            <span class="badge bg-light text-dark p-2 border">MATH001</span>
-                        </div>
-                        <div class="col-auto">
-                            <span class="badge bg-light text-dark p-2 border">ENG202</span>
-                        </div>
-                        <div class="col-auto">
-                            <span class="badge bg-light text-dark p-2 border">PHY101</span>
-                        </div>
-                    </div>
-                </div> --}}
             </div>
 
             <!-- Tab 2: Assigned Quizzes -->
@@ -120,7 +105,7 @@
                                             </div>
 
                                             <div class="quiz-footer">
-                                                <a href="{{ route('student.quizzes.start') }}"
+                                                <a href="{{ route('student.quizzes.start', ['id' => $quiz->id]) }}"
                                                     class="btn btn-outline-primary-quiz quiz-action-btn">
                                                     <i class="icofont-play-alt-1 me-1"></i> Bắt đầu
                                                 </a>
@@ -190,27 +175,8 @@
         </div>
     </div>
 @endsection
-<!-- Modal -->
-<div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
 
-            <div class="modal-header">
-                <h5 class="modal-title" id="resultModalLabel">Kết quả các lần làm bài</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-                <div class="row" id="body-modal-result">
-
-                </div>
-            </div>
-
-
-        </div>
-    </div>
-</div>
-<!-- Modal Thông Tin Quiz -->
+<!-- Modal Thông Tin khi ấn tìm kiếm bằng mã Quiz -->
 <div class="modal fade" id="quizInfoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -218,13 +184,16 @@
                 <h5 class="modal-title">Thông tin Quiz</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="quiz-info-body">
-                <!-- Nội dung quiz sẽ được thêm bằng JS -->
+            <div class="modal-body p-4 text-black" id="quiz-info-body">
+
             </div>
+
             <div class="modal-footer">
-                <a href="#" id="start-quiz-btn" class="btn btn-primary">
-                    <i class="fas fa-play me-1"></i> Bắt đầu làm
-                </a>
+                <div class="quiz-footer">
+                    <a href="" class="btn btn-outline-primary-quiz quiz-action-btn-search">
+                        <i class="icofont-play-alt-1 me-1"></i> Bắt đầu
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -255,22 +224,6 @@
                     });
                 });
 
-                function updateScrollButtonsAssigned() {
-                    const scrollLeft = scrollWrapperAssigned.scrollLeft;
-                    const scrollWidth = scrollWrapperAssigned.scrollWidth;
-                    const clientWidth = scrollWrapperAssigned.clientWidth;
-                    scrollLeftBtnAssigned.disabled = scrollLeft <= 0;
-                    scrollRightBtnAssigned.disabled = scrollLeft >= scrollWidth - clientWidth - 10;
-                }
-
-                // Lắng nghe các sự kiện cuộn
-                scrollWrapperAssigned.addEventListener('scroll', updateScrollButtonsAssigned);
-
-                // Trạng thái nút ban đầu
-                updateScrollButtonsAssigned();
-
-                //Xử lý thay đổi kích thước
-                window.addEventListener('resize', updateScrollButtonsAssigned);
 
                 // Cuộn bằng cách kéo chuột
                 let isDownAssigned = false;
@@ -322,7 +275,7 @@
             const scrollRightBtnCompleted = document.getElementById('scrollRightCompleted');
 
             if (scrollWrapperCompleted && scrollLeftBtnCompleted && scrollRightBtnCompleted) {
-                const scrollAmount = 340; // Width of one card + gap
+                const scrollAmount = 340;
 
                 // Scroll left button
                 scrollLeftBtnCompleted.addEventListener('click', function() {
@@ -340,25 +293,6 @@
                     });
                 });
 
-                // Update button states based on scroll position
-                function updateScrollButtonsCompleted() {
-                    const scrollLeft = scrollWrapperCompleted.scrollLeft;
-                    const scrollWidth = scrollWrapperCompleted.scrollWidth;
-                    const clientWidth = scrollWrapperCompleted.clientWidth;
-                    scrollLeftBtnCompleted.disabled = scrollLeft <= 0;
-                    scrollRightBtnCompleted.disabled = scrollLeft >= scrollWidth - clientWidth - 10;
-                }
-
-                // Listen for scroll events
-                scrollWrapperCompleted.addEventListener('scroll', updateScrollButtonsCompleted);
-
-                // Initial button state
-                updateScrollButtonsCompleted();
-
-                // Handle window resize
-                window.addEventListener('resize', updateScrollButtonsCompleted);
-
-                // Touch/Mouse drag scrolling
                 let isDownCompleted = false;
                 let startXCompleted;
                 let scrollLeftStartCompleted;
@@ -420,7 +354,7 @@
                 });
             }
 
-            // Search functionality
+            // Search
             const searchInputs = document.querySelectorAll('.search-box input');
             searchInputs.forEach(input => {
                 input.addEventListener('input', function() {
@@ -455,27 +389,7 @@
                 });
             });
 
-            // Join quiz button functionality
-            const joinBtn = document.querySelector('.btn-join');
-            if (joinBtn) {
-                joinBtn.addEventListener('click', function() {
-                    const codeInput = document.querySelector('.quiz-code-input');
-                    const code = codeInput ? codeInput.value.trim() : '';
 
-                    if (code) {
-                        this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang tham gia...';
-                        this.disabled = true;
-                        setTimeout(() => {
-                            this.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Tham gia Quiz';
-                            this.disabled = false;
-                            alert('Tham gia quiz với mã: ' + code);
-                        }, 2000);
-                    } else {
-                        alert('Vui lòng nhập mã quiz!');
-                        codeInput.focus();
-                    }
-                });
-            }
         });
 
 
@@ -485,6 +399,8 @@
 
         $(document).on('click', '.quiz-result-completed', function(e) {
             e.preventDefault();
+             $('#simple-preloader').css('display', 'flex');
+
             const url = $(this).attr('href');
             $.ajax({
                 url: url,
@@ -493,37 +409,55 @@
                     console.log(response);
 
                     let html = '';
-                    response.forEach((item, index) => {
+                    response.quizAttempts.forEach((item, index) => {
                         html += `
                             <a href="/student/quizz/${item.quiz_id}/show-result/${item.id}" class="col-12 col-md-6 mb-4" id="modal-detail-result">
                                 <div class="card shadow-lg rounded-3 border-0 h-100 custom-hover">
                                     <div class="card-body p-3 d-flex flex-column justify-content-between h-100">
                                         <div>
+                                            <!-- Tiêu đề lượt làm -->
                                             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                                                 <h6 class="fw-bold text-dark mb-0">
-                                                    <i class="bi bi-journal-text me-2"></i>Lần ${index + 1}
+                                                    <i class="icofont-pencil-alt-2 me-2 text-secondary"></i>Lần ${index + 1}
                                                 </h6>
                                                 <span class="badge bg-primary px-3 py-2 rounded-pill">
-                                                    <i class="bi bi-star-fill me-1"></i>${item.score} Điểm
+                                                    <i class="icofont-star me-1"></i>${item.score} Điểm
                                                 </span>
                                             </div>
 
+                                            <!-- Thời gian nộp -->
                                             <p class="mb-2 text-muted">
-                                                <i class="bi bi-clock me-2 text-primary"></i>
+                                                <i class="icofont-clock-time me-2 text-primary"></i>
                                                 <strong>Thời gian nộp:</strong> ${item.submitted_at}
                                             </p>
+
+                                            <!-- Số câu đúng -->
                                             <p class="mb-0 text-muted">
-                                                <i class="bi bi-check-circle-fill me-2 text-success"></i>
+                                                <i class="icofont-check-circled me-2 text-success"></i>
                                                 <strong>Số câu đúng:</strong> ${item.total_correct}/${item.total_questions}
                                             </p>
                                         </div>
+
                                     </div>
                                 </div>
                             </a>
                         `;
                     });
                     $('#body-modal-result').html(html);
+                    $('.quiz-action-btn-result').attr('href',
+                        `/student/quizz/start/${response.quizAttempts[0].quiz_id}`);
+
+                    if (response.quiz.is_public == 0) {
+                        if (response.status == false) {
+                            $('.quiz-action-btn-result').hide();
+                        }
+                    } else {
+                        $('.quiz-action-btn-result').show();
+                    }
+
                     $('#resultModal').modal('show');
+
+                    $('#simple-preloader').fadeOut();
                 },
                 error: function(xhr, status, error) {
                     console.log(error);
@@ -551,6 +485,7 @@
 
         $(document).on('click', '#modal-detail-result', function(e) {
             e.preventDefault();
+              $('#simple-preloader').css('display', 'flex');
             const url = $(this).attr('href');
             $.ajax({
                 url: url,
@@ -562,6 +497,7 @@
                     // Hiển thị modal
                     const modal = new bootstrap.Modal(document.getElementById('resultModalDetail'));
                     modal.show();
+                    $('#simple-preloader').fadeOut();
                 }
             });
         });
@@ -571,31 +507,110 @@
 
 
         // hàm kiểm tra mã code quizz
-        $('.btn-join').on('click', function () {
+        $('.btn-join').on('click', function() {
             const code = $('.quiz-code-input').val().trim().toUpperCase();
-
             if (!code) {
-                return alert('Vui lòng nhập mã quiz!');
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: 'Vui lòng nhập mã quizz!',
+                    icon: 'warning',
+                    confirmButtonClass: 'btn btn-success w-xs mt-2',
+                    buttonsStyling: true
+                });
+                return;
             }
-
             $.ajax({
                 url: `/student/check-access-code/${code}`, // Route xử lý ở server
                 method: 'GET',
-                success: function (response) {
-                    // Gắn link bắt đầu quiz
-                    $('#start-quiz-btn').attr('href', `/quiz/start/${response.quiz.id}`);
+                success: function(response) {
+                    console.log(response);
+                    const quiz = response;
+                    const createdAt = new Date(quiz.created_at);
+                    const createdDate = createdAt.toLocaleDateString('vi-VN');
+                    if(!quiz){
+                        Swal.fire({
+                            title: 'Lỗi!',
+                            text: 'Mã Quiz không hợp lệ. Vui lòng nhập lại mã!',
+                            icon: 'error',
+                            confirmButtonClass: 'btn btn-success w-xs mt-2',
+                            buttonsStyling: true
+                        });
+                        return;
+                    }
+                    // Gắn nội dung động
+                    $("#quiz-info-body").html(`
+                        <div class="row mb-3">
+                            <div class="col-12 text-end">
+                                <small class="text-muted fst-italic d-block d-sm-inline">
+                                    Ngày tạo: <i class="icofont-calendar me-1"></i> ${createdDate}
+                                </small>
+                            </div>
+                        </div>
+
+                       <h4 class="fw-semibold mb-3 text-primary
+                                fs-6 fs-sm-5 fs-md-4 fs-lg-3 fs-xl-2">
+                            <i class="icofont-paper me-2"></i>
+                            Tiêu đề Quiz: <span class="text-dark">${quiz.title}</span>
+                        </h4>
+
+                        <p class="mb-4 text-muted fst-italic">
+                            <i class="icofont-info-circle me-1"></i> Mô tả: ${quiz.description ?? 'Không có mô tả.'}
+                        </p>
+
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-start">
+                                <i class="icofont-key fs-6 me-2 text-secondary"></i>
+                                <div  class="d-flex align-items-center gap-1">
+                                    <strong>Mã truy cập:</strong><br>
+                                    <span class="text-uppercase text-dark">${quiz.access_code}</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-start">
+                                <i class="icofont-clock-time fs-6 me-2 text-secondary"></i>
+                                <div  class="d-flex align-items-center gap-1">
+                                    <strong>Thời lượng:</strong><br>
+                                    <span>${quiz.duration_minutes} phút</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-start">
+                                <i class="icofont-question-circle fs-6 me-2 text-secondary"></i>
+                                <div class="d-flex align-items-center gap-1">
+                                    <strong>Tổng số câu hỏi:</strong><br>
+                                    <span>${quiz.total_questions}</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-start">
+                                <i class="icofont-teacher fs-6 me-2 text-secondary"></i>
+                                <div class="d-flex align-items-center gap-1">
+                                    <strong>Giáo viên:</strong><br>
+                                    <span>${quiz.creator.name ?? 'Không rõ'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    `);
+
+                    // Gắn link bắt đầu làm bài
+                    $('.quiz-action-btn-search').attr('href', `/student/quizz/start/${quiz.id}`);
 
                     // Hiển thị modal
                     const modal = new bootstrap.Modal(document.getElementById('quizInfoModal'));
                     modal.show();
                 },
-                error: function (xhr) {
-                    alert(xhr.responseJSON?.message ?? 'Mã quiz không hợp lệ!');
+
+                error: function(xhr) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Mã Quiz không hợp lệ. Vui lòng nhập lại mã!',
+                        icon: 'error',
+                        confirmButtonClass: 'btn btn-success w-xs mt-2',
+                        buttonsStyling: true
+                    });
                 }
             });
         });
-
-
-
     </script>
 @endpush
