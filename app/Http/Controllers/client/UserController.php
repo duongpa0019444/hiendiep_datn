@@ -265,6 +265,11 @@ class UserController extends Controller
         ])->with('success', 'Đã cập nhật điểm thành công!');
     }
 
+    public function Scoredelete($id)
+    {
+        score::find($id)->delete();
+        return redirect()->back()->with('success', 'Xóa điểm thành công!');
+    }
 
     public function Scoreimport(Request $request)
     {
