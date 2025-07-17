@@ -33,6 +33,9 @@
     <script src="{{ asset('client/plugins/js/jquery.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 
 
@@ -197,7 +200,7 @@
                                 <div class="ed-topbar__info-buttons">
 
                                     @guest
-                                        <button type="button" class="register-btn" data-bs-toggle="modal"
+                                        <button type="button" class="" data-bs-toggle="modal"
                                             data-bs-target="#loginModal"><i class="icofont-user me-2"></i>
                                             Đăng nhập
                                         </button>
@@ -547,13 +550,13 @@
                                 required />
                         </div>
 
-                        <div class="form-check">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                <input class="form-check-input" type="checkbox" value=""
-                                    id="flexCheckDefault" />
-                                Remember me
-                            </label>
+                        <div class=" mt-2">
+                            <a href="{{ route('password.request') }}"
+                                class="text-decoration-none text-primary fw-medium">
+                                Quên mật khẩu?
+                            </a>
                         </div>
+
                         <div class="ed-auth__form-btn d-flex justify-content-end">
                             <button id="btn-login" type="submit" class="ed-btn">Sign In<i
                                     class="fi fi-rr-arrow-small-right"></i></button>

@@ -33,11 +33,15 @@ Route::get('/course', [ClientCourseController::class, 'index'])->name('client.co
 Route::get('/course/{slug}_{id}', [ClientCourseController::class, 'detail'])->name('client.course.detail');
 Route::get('/course-search', [ClientCourseController::class, 'search'])->name('client.course.search');
 
-
+/* modal */
 Route::get('/logout', [loginController::class, 'logout'])->name('auth.logout');
 Route::post('/login', [loginController::class, 'login'])->name('loginAuth');
 // Route::post('register', [loginController::class, 'register'])->name('registerAuth');
 
+
+/* trang xử lí đăng nhập và quên mk*/
+
+Route::get('/login-page', [loginController::class, 'showForgotPasswordForm'])->name('auth.login');
 Route::get('/forgot-password', [loginController::class, 'showForgotPasswordForm'])->name('password.request');
 Route::post('/forgot-password', [loginController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('/reset-password', [loginController::class, 'showResetPasswordForm'])->name('password.reset');
@@ -122,6 +126,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('questions/{id}/edit', [questionsController::class, 'edit'])->name('admin.questions.edit');
     Route::put('questions/{id}/update', [questionsController::class, 'update'])->name('admin.questions.update');
 
+
     //Quản lý questions sentence
     Route::post('quizzes/{id}/questions-sentence/store', [questionsController::class, 'storeSentence'])->name('admin.questions.sentence.store');
     Route::delete('questions-sentence/{id}/delete', [questionsController::class, 'deleteSentence'])->name('admin.questions.sentence.delete');
@@ -139,6 +144,8 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
 
     Route::get('quizzes/{id}/results/class/{class}/student/{student}/attempts/{attempt}', [quizzesController::class, 'quizAttemptsStudentAnswer'])->name('admin.quizzes.results.class.student.attempts');
 
+
+
     //Trang quản lý lương giáo viên
     Route::get('teacher-salaries', [TeacherSalaryController::class, 'index'])->name('admin.teacher_salaries');
     Route::get('/api/salary-data', [TeacherSalaryController::class, 'getData'])->name('admin.teacher_salaries.data');
@@ -151,13 +158,14 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/admin/teacher-salary-rules/{id}/details', [TeacherRulesController::class, 'details'])->name('admin.teacher_salary_rules.details');
     Route::get('/teacher-salary-rules/index', [TeacherRulesController::class, 'indexRules'])->name('admin.teacher-salary-rules.indexRules');
     Route::post('/admin/teacher-salary-rules/store', [TeacherRulesController::class, 'store'])->name('admin.teacher-salary-rules.store');
+    Route::get('/teacher-salary-rules/by-teacher/{id}', [TeacherRulesController::class, 'getRulesByTeacher'])
+        ->name('admin.teacher-salary-rules.byTeacher');
 
     // Gửi thông báo
     Route::get('admin/notifications', [NotificationsController::class, 'index'])->name('admin.notifications');
     Route::get('/admin/notifications/filter', [NotificationsController::class, 'filter'])->name('admin.notifications.filter');
     Route::post('admin/notifications/seed', [NotificationsController::class, 'seed'])->name('admin.notifications.seed');
     Route::post('/admin/notifications/delete', [NotificationsController::class, 'destroy'])->name('admin.notifications.delete');
-
 
 
 
@@ -240,6 +248,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::delete('/topics/{id}/force-delete', [topicsController::class, 'forceDelete'])->name('admin.topics.forceDelete');
     Route::get('/topics/trash/filter', [topicsController::class, 'filterTrash'])->name('admin.topics.trash.filter');
 
+
     // Trang quản lý khóa học
     Route::get('/course', [CourseController::class, 'index'])->name('admin.course-list');
     // Chi tiết khóa học
@@ -297,6 +306,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::put('/topics/{id}/update', [topicsController::class, 'update'])->name('admin.topics.update');
     Route::delete('/topics/delete/{id}', [topicsController::class, 'delete'])->name('admin.topics.delete');
 
+
     Route::get('/topics/trash', [topicsController::class, 'trash'])->name('admin.topics.trash');
     Route::post('/topics/{id}/restore', [topicsController::class, 'restore'])->name('admin.topics.restore');
     Route::delete('/topics/{id}/force-delete', [topicsController::class, 'forceDelete'])->name('admin.topics.forceDelete');
@@ -313,11 +323,29 @@ Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function
 
     Route::get('information', [UserController::class, 'information'])->name('client.information');
     Route::get('schedule', [UserController::class, 'schedule'])->name('client.schedule');
+
+
+    // Quản lý điểm số
     Route::get('score', [UserController::class, 'score'])->name('client.score');
+    Route::get('/score-search', [UserController::class, 'scoreSearch'])->name('client.score.search');
+    Route::get('/score/{class_id}/{course_id}', [UserController::class, 'Scoredetail'])->name('client.score.detail');
+    Route::get('/score-student/{class_id}/{course_id}', [UserController::class, 'ScoredetailSearch'])->name('client.score.detailSearch');
+    Route::get('/score-add/{class_id}', [UserController::class, 'Scoreadd'])->name('client.score.add');
+    Route::post('/score-store/{class_id}', [UserController::class, 'Scorestore'])->name('client.score.store');
+    Route::get('/score-edit/{class_id}/{id}', [UserController::class, 'Scoreedit'])->name('client.score.edit');
+    Route::put('/score-update/{class_id}/{id}', [UserController::class, 'Scoreupdate'])->name('client.score.update');
+    Route::get('/score-delete/{id}', [UserController::class, 'Scoredelete'])->name('client.score.delete');
+    Route::get('/scores/export/{class_id}/{course_id}', [UserController::class, 'Scoreexport'])->name('client.scores.export');
+    Route::post('/scores/import', [UserController::class, 'Scoreimport'])->name('client.scores.import');
+
+
     Route::get('quizz', [UserController::class, 'quizz'])->name('client.quizz');
+
+    // Trang quản lý tài khoản
     Route::get('account', [UserController::class, 'account'])->name('client.account');
-
-
+    Route::get('account/edit', [UserController::class, 'editAccount'])->name('client.account.edit');
+    Route::put('account/update', [UserController::class, 'updateAccount'])->name('client.account.update');
+    Route::put('account/changePassword', [UserController::class, 'changePassword'])->name('client.account.changePassword');
 });
 
 //Dành cho học sinh
@@ -330,7 +358,6 @@ Route::middleware([CheckRoleClient::class . ':student'])->prefix('student')->gro
     Route::get('/check-access-code/{code}', [ClientQuizzesController::class, 'checkAccessCode']);
     Route::post('/submit-quiz/{quizId}/class/{classId}', [ClientQuizzesController::class, 'submitQuiz'])->name('student.quizzes.submit');
     Route::get('/quizz/resulte-student/{quizzAttempts}', [ClientQuizzesController::class, 'resultsQuizzComplete'])->name('student.quizzes.resultsQuizzComplete');
-
 });
 
 
@@ -373,4 +400,3 @@ Route::middleware([CheckRoleClient::class . ':teacher'])->prefix('teacher')->gro
 
 
 });
-

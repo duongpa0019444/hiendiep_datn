@@ -7,22 +7,48 @@
         Chào mừng {{ Auth::user()->name }} quay trở lại!
     </h2>
 
-    <!-- Notifications Section -->
-    <div class="card mb-2">
-        <div class="card-header">
-            <i class="icofont-notification me-2 text-white"></i>Thông Báo
+
+
+        <!-- Notifications Section -->
+        <div class="card mb-5">
+            <div class="card-header">Thông Báo</div>
+            <div class="card-body">
+                <ul class="list-group">
+                    @if (count($unPaymentInfo) > 0)
+                        <li class="list-group-item notification-item d-flex justify-content-between align-items-center flex-wrap"
+                            id="infomation-payment" style="cursor: pointer">
+                            <div class="notification-content">
+                                <strong class="text-danger">Thông báo đóng học phí<i class="fas fa-qrcode"></i></strong>
+                                <p class="mb-0 text-muted">Vui lòng thanh toán học phí cho khóa hiện tại trước ngày
+                                    {{ now()->addDays(7)->format('d/m/Y') }}.</p>
+                            </div>
+                            <span class="qr-code-button text-primary btn-showQr-payment">Hoàn thành <i
+                                    class='fi fi-ss-QR'></i></span>
+                        </li>
+                    @endif
+
+                   @forelse ($notifications as $noti)
+                        <li class="list-group-item notification-item">
+                            <div class="notification-content">
+                                <h5 class="mb-1 text-primary fw-bold">{{ $noti->title }}</h5>
+                                <div class="mb-2">{!! $noti->content !!}</div>
+                                <div class="d-flex justify-content-between text-muted small">
+                                    <span>Người gửi: {{ $noti->creator->name ?? 'Hệ thống' }}</span>
+                                    <span>{{ $noti->created_at->format('H:i d/m/Y') }}</span>
+                                </div>
+                            </div>
+                        </li>
+                    @empty
+                        <li class="list-group-item">Không có thông báo nào.</li>
+                    @endforelse
+                </ul>
+                <!-- Phân trang -->
+                {{-- <div class="mt-3">
+                    {{ $notifications->links() }}
+                </div> --}}
+            </div>
         </div>
-        <div class="card-body">
-            <ul class="list-group">
-                <li class="list-group-item notification-item d-flex gap-2">
-                    <i class="icofont-warning text-warning fs-5 mt-1"></i>
-                    <div class="notification-content">
-                        <strong>Thay đổi lịch học</strong> - {{ now()->subDays(2)->format('d/m/Y') }}
-                        <p class="mb-0 text-muted">Lớp A1-1 sẽ chuyển sang giờ học mới: Thứ 3, 5, 7 - 18:00-20:00.</p>
-                    </div>
-                </li>
-            </ul>
-        </div>
+
     </div>
 
     <!-- Lịch dạy hôm nay -->

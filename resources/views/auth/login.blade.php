@@ -206,9 +206,6 @@
                 <button type="submit">Đăng nhập</button>
             </form>
 
-            <div class="create-account">
-                <a href="{{ route('auth.register') }}">Tạo tài khoản</a>
-            </div>
         </div>
     </section>
 

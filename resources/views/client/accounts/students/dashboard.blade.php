@@ -30,16 +30,26 @@
                         </li>
                     @endif
 
-                    <li class="list-group-item notification-item d-flex align-items-start gap-2">
-                        <i class="icofont-warning-alt text-warning"></i>
-                        <div class="notification-content">
-                            <strong>Thay đổi lịch học</strong> - {{ now()->subDays(2)->format('d/m/Y') }}
-                            <p class="mb-0 text-muted">
-                                Lớp <strong>A1-1</strong> sẽ chuyển sang giờ học mới: Thứ 3, 5, 7 - 18:00-20:00.
-                            </p>
-                        </div>
-                    </li>
+
+                   @forelse ($notifications as $noti)
+                        <li class="list-group-item notification-item">
+                            <div class="notification-content">
+                                <strong class="text-primary">{{ $noti->title }}</strong>
+                                <div class="mb-2">{!! $noti->content !!}</div>
+                                <div class="d-flex justify-content-between text-muted small">
+                                    <span>Người gửi: {{ $noti->creator->name ?? 'Hệ thống' }}</span>
+                                    <span>{{ $noti->created_at->format('H:i d/m/Y') }}</span>
+                                </div>
+                            </div>
+                        </li>
+                    @empty
+                        <li class="list-group-item">Không có thông báo nào.</li>
+                    @endforelse
                 </ul>
+                <!-- Phân trang -->
+                {{-- <div class="mt-3">
+                    {{ $notifications->links() }}
+                </div> --}}
             </div>
         </div>
 
@@ -89,7 +99,7 @@
         //Hàm render dữ liệu thông tin thanh toán trong modal thông báo
         function renderPaymentInfo() {
             $.ajax({
-                url: 'student/course-payments/infomation',
+                url: 'course-payments/infomation',
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
@@ -124,7 +134,6 @@
         }
 
 
-
         //kiểm tra xem có thông báo thanh toán hay khôn g, nếu có thì hiển thị modal
         const infomationPayment = $("#infomation-payment");
         if (infomationPayment.length > 0) {
@@ -134,7 +143,10 @@
                 showModal('customModal');
                 localStorage.setItem('customModalShown', 'true');
             }
+
         }
+
+
 
         function closeModal(id) {
             const modal = document.getElementById(id);
@@ -184,7 +196,7 @@
             console.log('clicked');
             if (e.target.classList.contains('btn-showQr-payment')) {
                 $.ajax({
-                    url: 'student/course-payments/infomation',
+                    url: 'course-payments/infomation',
                     method: 'GET',
                     dataType: 'json',
                     success: function(response) {
@@ -269,7 +281,7 @@
                     closeModal('qrModal');
 
                     $.ajax({
-                        url: 'student/course-payments/updatePayment',
+                        url: 'course-payments/updatePayment',
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
