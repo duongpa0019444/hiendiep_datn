@@ -37,9 +37,18 @@ class coursePaymentController extends Controller
     {
         // Lấy các bản ghi đã bị xóa mềm
         $deletedPayments = coursePayment::onlyTrashed()
-            ->with(['user', 'course', 'class'])
+            ->with([
+                'user' => function ($query) {
+                    $query->withTrashed();
+                },
+                'class' => function ($query) {
+                    $query->withTrashed();
+                },
+                'course'
+            ])
             ->orderByDesc('deleted_at')
             ->paginate(10);
+
 
         if ($request->ajax()) {
             return response()->json([
@@ -147,11 +156,7 @@ class coursePaymentController extends Controller
         try {
 
             $payment = CoursePayment::findOrFail($id);
-            if ($payment->status == 'paid') {
-                $payment->payment_date = $request->payment_date;
-            } else {
-                $payment->payment_date = $request->payment_date  ?? now();
-            }
+            $payment->payment_date = $request->payment_date;
             $payment->method = $request->method;
             $payment->status = $request->status;
             $payment->note = $request->note;

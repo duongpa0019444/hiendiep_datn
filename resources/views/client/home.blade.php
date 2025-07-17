@@ -4,10 +4,25 @@
 @section('description', '')
 @section('content')
 
+    @if (session('success'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Toastify({
+                        text: "{{ session('success') }}",
+                        gravity: "top",
+                        position: "center",
+                        className: "success",
+                        duration: 4000
+                    }).showToast();
+                });
+            </script>
+        @endif
 
     <main>
         <div class="section-bg hero-bg background-image"
             style="background-image: url('{{ asset('client/images/hero/home-1/hero-bg.png') }}');">
+
+
             <!-- Start Hero Area -->
             <!-- Start Hero Area -->
             <section class="ed-hero">
@@ -146,7 +161,7 @@
                             <div class="col-lg-6 col-xl-4 col-md-6 col-12">
                                 <div class="ed-course__card wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
                                     <a href="{{ route('admin.course-detail', $course->id) }}" class="ed-course__img">
-                                        <img src="{{ asset($course->image) }}" alt="course-img" style="height:150px"/>
+                                        <img src="{{ asset($course->image) }}" alt="course-img" style="height:150px" />
                                     </a>
 
                                     <a href="#" class="ed-course__tag">Tiếng Anh</a>
@@ -412,6 +427,16 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="ed-section-bottom-btn">
+                            <a href="course-1.html" class="ed-btn">View All Courses<i
+                                    class="fi fi-rr-arrow-small-right"></i></a>
                         </div>
                     </div>
                 </div>

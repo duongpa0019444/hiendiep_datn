@@ -39,4 +39,14 @@ class Quizzes extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function questions()
+    {
+        return $this->hasMany(questions::class, 'quiz_id');
+    }
+
+    public function sentenceQuestions()
+    {
+        return $this->hasMany(sentenceQuestions::class, 'quiz_id');
+    }
 }

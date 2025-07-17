@@ -1,10 +1,9 @@
 @extends('client.client')
 
-@section('title', 'Trang chủ')
-@section('description', '')
+@section('title', 'Trang tài khoản của bạn')
+@section('description', 'Thông tin của bạn!')
 
 @section('content')
-
     <main>
         <div class="section-bg hero-bg background-image"
             style="background-image: url('{{ asset('client/images/hero/home-1/hero-bg.png') }}');">

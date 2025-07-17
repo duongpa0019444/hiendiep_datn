@@ -49,60 +49,85 @@ class TeacherRulesController extends Controller
         return response()->json(['success' => true, 'data' => $users]);
     }
 
+    public function getRulesByTeacher($teacherId)
+{
+    $rules = teacher_salary_rules::where('teacher_id', $teacherId)
+        ->orderBy('effective_date', 'desc')
+        ->get();
 
+    return response()->json([
+        'success' => true,
+        'data' => $rules
+    ]);
+}
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'teacher_id' => 'required|exists:users,id',
-            'pay_rate' => 'required|numeric|min:0',
-            'effective_date' => 'required|date',
-        ]);
+{
+    $request->validate([
+        'teacher_id' => 'required|exists:users,id',
+        'pay_rate' => 'required|numeric|min:0',
+        'effective_date' => 'required|date',
+    ]);
 
-        try {
-            // Lấy bảng lương mới nhất của giáo viên đó
-            $latest = DB::table('teacher_salary_rules')
-                ->where('teacher_id', $request->teacher_id)
-                ->orderByDesc('effective_date')
-                ->first();
+    try {
+        DB::beginTransaction();
 
-            // Nếu đã có bảng lương trước đó
-            if ($latest) {
-                // Kiểm tra nếu pay_rate giống
-                if ($latest->pay_rate == $request->pay_rate) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Mức lương mới phải khác mức lương hiện tại.'
-                    ]);
-                }
+        $teacherId = $request->teacher_id;
+        $newRate = $request->pay_rate;
+        $newEffective = $request->effective_date;
 
-                // Kiểm tra nếu ngày hiệu lực không lớn hơn
-                if ($request->effective_date <= $latest->effective_date) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Ngày hiệu lực phải lớn hơn lần trước.'
-                    ]);
-                }
+        // Lấy bảng lương mới nhất (chưa có end_pay_rate)
+        $latest = DB::table('teacher_salary_rules')
+            ->where('teacher_id', $teacherId)
+            ->whereNull('end_pay_rate')
+            ->orderByDesc('effective_date')
+            ->first();
+
+        if ($latest) {
+            if ($latest->pay_rate == $newRate) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Mức lương mới phải khác mức lương hiện tại.'
+                ]);
             }
 
-            // Insert bản ghi mới
-            DB::table('teacher_salary_rules')->insert([
-                'teacher_id' => $request->teacher_id,
-                'pay_rate' => $request->pay_rate,
-                'effective_date' => $request->effective_date,
-            ]);
+            if ($newEffective <= $latest->effective_date) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ngày hiệu lực phải lớn hơn mức lương hiện tại.'
+                ]);
+            }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Tạo bảng lương mới thành công.'
-            ]);
-            
-        } catch (\Exception $e) {
-            Log::error('Lỗi khi tạo bảng lương: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Đã xảy ra lỗi khi tạo bảng lương.'
-            ]);
+            // ✅ Cập nhật ngày kết thúc cho bản ghi cũ
+            DB::table('teacher_salary_rules')
+                ->where('id', $latest->id)
+                ->update([
+                    'end_pay_rate' => Carbon::parse($newEffective)->subDay()->toDateString()
+                ]);
         }
+
+        // ✅ Insert bản ghi mới
+        DB::table('teacher_salary_rules')->insert([
+            'teacher_id' => $teacherId,
+            'pay_rate' => $newRate,
+            'effective_date' => $newEffective,
+        ]);
+
+        DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tạo bảng lương mới thành công.'
+        ]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Lỗi khi tạo bảng lương: ' . $e->getMessage());
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Đã xảy ra lỗi khi tạo bảng lương.'
+        ]);
     }
+}
+
 }
