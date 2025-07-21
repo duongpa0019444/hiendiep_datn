@@ -36,6 +36,7 @@ class AttendanceController extends Controller
 
         return view('admin.attendance.index', compact('todayClassCount', 'attendanceRate', 'classesNeedAttendance'));
     }
+
     // Điểm danh
     public function getSchedules(Request $request)
     {
@@ -172,24 +173,30 @@ class AttendanceController extends Controller
 
             $scheduleId = $request->input('scheduleId');
 
+            // Đếm tổng số học sinh nên có mặt (dựa trên bảng schedules hoặc student_schedules)
+            $totalStudents = DB::table('attendances')
+                ->where('schedule_id', $scheduleId)
+                ->count();
+
+
             // Query để đếm số lượng theo từng status
             $summary = DB::table('attendances')
                 ->select(
                     DB::raw('SUM(CASE WHEN status = "present" THEN 1 ELSE 0 END) as present_count'),
                     DB::raw('SUM(CASE WHEN status = "absent" THEN 1 ELSE 0 END) as absent_count'),
-                    DB::raw('SUM(CASE WHEN status = "late" THEN 1 ELSE 0 END) as late_count'),
-                    DB::raw('SUM(CASE WHEN status = "excused" THEN 1 ELSE 0 END) as excused_count'),
-                    DB::raw('COUNT(*) as total_count')
+                    DB::raw('COUNT(*) as total_attended')
                 )
                 ->where('schedule_id', $scheduleId)
                 ->first();
+
+            // Tính số học sinh chưa điểm danh
+            $notAttended = $totalStudents - ($summary->total_attended ?? 0);
 
             // Chuẩn bị dữ liệu trả về
             $data = [
                 'present' => (int) ($summary->present_count ?? 0),
                 'absent' => (int) ($summary->absent_count ?? 0),
-                'late' => (int) ($summary->late_count ?? 0),
-                'excused' => (int) ($summary->excused_count ?? 0),
+                'undone' => (int) $notAttended, 
                 'total' => (int) ($summary->total_count ?? 0)
             ];
 
@@ -227,8 +234,8 @@ class AttendanceController extends Controller
                 'schedule_id' => 'required|exists:schedules,id',
                 'attendance_data' => 'required|array',
                 'attendance_data.*.student_id' => 'required|exists:users,id',
-                'attendance_data.*.status' => 'required|in:present,absent,late,excused',
-                // 'attendance_data.*.note' => 'nullable|string|max:255'
+                'attendance_data.*.status' => 'required|in:present,absent,undone',
+                'attendance_data.*.note' => 'nullable|string|max:500'
             ]);
             $scheduleId = $request->schedule_id;
             $attendanceData = $request->attendance_data;
@@ -248,7 +255,7 @@ class AttendanceController extends Controller
                     'schedule_id' => $scheduleId,
                     'user_id' => $data['student_id'],
                     'status' => $data['status'],
-                    // 'note' => $data['note'] ?? null,
+                    'note' => $data['note'] ?? null,
                     'date' => now()->toDateString(),
                     // 'created_by' => auth()->id(),
                 ]);

@@ -8,7 +8,7 @@
         <div class="container-xxl">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb py-0">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.attendance.index') }}">Quản lý điểm danh</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Điểm danh lớp học</li>
                 </ol>
             </nav>
@@ -52,28 +52,22 @@
                     <!-- Attendance Summary -->
                     <div class="attendance-summary">
                         <div class="row g-3">
-                            <div class="col-md-3 col-sm-6">
+                            <div class="col-md-4 col-sm-6">
                                 <div class="summary-item">
-                                    <span class="summary-number text-success" id="presentCount">0</span>
+                                    <span class="summary-number text-success" id="presentCount">-</span>
                                     <span class="summary-label">Có mặt</span>
                                 </div>
                             </div>
-                            <div class="col-md-3 col-sm-6">
+                            <div class="col-md-4 col-sm-6">
                                 <div class="summary-item">
-                                    <span class="summary-number text-danger" id="absentCount">0</span>
+                                    <span class="summary-number text-danger" id="absentCount">-</span>
                                     <span class="summary-label">Vắng mặt</span>
                                 </div>
                             </div>
-                            <div class="col-md-3 col-sm-6">
+                            <div class="col-md-4 col-sm-6">
                                 <div class="summary-item">
-                                    <span class="summary-number text-warning" id="lateCount">0</span>
-                                    <span class="summary-label">Muộn</span>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6">
-                                <div class="summary-item">
-                                    <span class="summary-number text-info" id="excusedCount">0</span>
-                                    <span class="summary-label">Có phép</span>
+                                    <span class="summary-number text-secondary" id="undoneCount">-</span>
+                                    <span class="summary-label">Chưa điểm danh</span>
                                 </div>
                             </div>
                         </div>
@@ -123,8 +117,8 @@
                                         $statusText = match ($status) {
                                             'present' => 'Có mặt',
                                             'absent' => 'Vắng',
-                                            'late' => 'Muộn',
-                                            'excused' => 'Có phép',
+                                            // 'late' => 'Muộn',
+                                            // 'excused' => 'Có phép',
                                             default => 'Chưa điểm danh',
                                         };
                                     @endphp
@@ -146,30 +140,49 @@
                                     </div>
                                 </div>
 
-                                <div class="attendance-controls">
+                                <div class="attendance-controls d-flex align-items-center gap-2">
                                     <button
                                         class="status-btn present {{ isset($attendance[$student->id]) && $attendance[$student->id]['status'] === 'present' ? 'active' : '' }}"
                                         onclick="setAttendance('{{ $student->id }}', 'present', '{{ $scheduleData->id }}')">
                                         <i class="fas fa-check"></i> Có mặt
                                     </button>
                                     <button
-                                        class="status-btn late {{ isset($attendance[$student->id]) && $attendance[$student->id]['status'] === 'late' ? 'active' : '' }}"
-                                        onclick="setAttendance('{{ $student->id }}', 'late', '{{ $scheduleData->id }}')">
-                                        <i class="fas fa-clock"></i> Muộn
-                                    </button>
-                                    <button
                                         class="status-btn absent {{ isset($attendance[$student->id]) && $attendance[$student->id]['status'] === 'absent' ? 'active' : '' }}"
                                         onclick="setAttendance('{{ $student->id }}', 'absent', '{{ $scheduleData->id }}')">
-                                        <i class="fas fa-times"></i> Vắng
+                                        <i class="fas fa-times"></i> Vắng mặt
                                     </button>
-                                    <button
-                                        class="status-btn excused {{ isset($attendance[$student->id]) && $attendance[$student->id]['status'] === 'excused' ? 'active' : '' }}"
-                                        onclick="setAttendance('{{ $student->id }}', 'excused', '{{ $scheduleData->id }}')">
-                                        <i class="fas fa-user-check"></i> Có phép
+
+                                    {{-- <input type="text" class="form-control flex-grow-1" id="attendance_{{ $student->id }}" placeholder="Nhập ghi chú điểm danh..."> --}}
+                                    <button class="status-btn note"
+                                        onclick="openNoteModal('{{ $student->id }}', '{{ $student->name }}')">
+                                        <i class="fas fa-sticky-note"></i> Ghi chú
                                     </button>
                                 </div>
                             </div>
                         @endforeach
+                    </div>
+
+                    <!-- Modal for Note -->
+                    <div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="noteModalLabel">Ghi chú điểm danh</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Học sinh:</strong> <span id="studentName"></span></p>
+                                    <textarea class="form-control" id="noteInput" rows="4" placeholder="Nhập ghi chú điểm danh..."></textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="button" class="btn btn-primary" onclick="saveNote()">Lưu ghi
+                                        chú</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- No Results Message -->
@@ -190,9 +203,6 @@
                     </button> --}}
                     <button type="button" class="btn btn-success" onclick="saveAttendance()">
                         <i class="fas fa-save me-1"></i>Lưu điểm danh
-                    </button>
-                    <button type="button" class="btn btn-info" onclick="exportAttendance()">
-                        <i class="fas fa-download me-1"></i>Xuất Excel
                     </button>
                 </div>
             </div>
@@ -239,20 +249,40 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer>
         console.log('Script loaded');
-        // Global variables
-        // Mảng lưu trữ dữ liệu điểm danh
-        let attendanceData = [];
+        let attendanceDataObj = @json($attendance);
+        let attendanceData = Object.entries(attendanceDataObj).map(([studentId, data]) => ({
+            student_id: Number(studentId),
+            status: data.status,
+            note: data.note
+        }));
+        // console.log('Initial attendanceData:', attendanceData);
         let scheduleId = '{{ $scheduleData->id }}';
         let totalStudents = {{ $students->count() }};
-        let loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+        // let loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
         let previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+        let currentStudentId = null;
 
         // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            const modalEl = document.getElementById('loadingModal');
+            if (modalEl) {
+                loadingModal = new bootstrap.Modal(modalEl, {
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            }
+            // Đồng bộ giao diện với attendanceData
+            attendanceData.forEach(item => {
+                updateStudentStatus(item.student_id, item.status);
+                if (item.note) {
+                    updateStudentNote(item.student_id, item.note);
+                }
+            });
             updateSummary();
             setupEventListeners();
 
             console.log('Attendance system initialized');
+            console.log('Initial attendanceData:', attendanceData);
         });
 
         function setupEventListeners() {
@@ -279,6 +309,73 @@
             });
         }
 
+        function openNoteModal(studentId, studentName) {
+            // Input validation
+            if (!studentId || !studentName) {
+                console.error('studentId and studentName are required');
+                return;
+            }
+
+            currentStudentId = studentId;
+            document.getElementById('studentName').textContent = studentName;
+
+            // Load existing note if any
+            const existingData = attendanceData.find(item => item.student_id == studentId);
+            const noteInput = document.getElementById('noteInput');
+
+            if (noteInput) {
+                noteInput.value = existingData ? existingData.note : '';
+                // Clear any previous validation states
+                noteInput.classList.remove('is-invalid');
+            }
+
+            // Show modal
+            const modalElement = document.getElementById('noteModal');
+            if (modalElement) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+                console.log(attendanceData);
+
+                // Focus on input when modal opens
+                modalElement.addEventListener('shown.bs.modal', function() {
+                    noteInput?.focus();
+                }, {
+                    once: true
+                });
+            } else {
+                console.error('noteModal element not found');
+            }
+        }
+
+
+        function saveNote() {
+            const note = document.getElementById('noteInput').value;
+
+            // Find existing data or create new
+            let existingIndex = attendanceData.findIndex(item => item.student_id == currentStudentId);
+
+            if (existingIndex >= 0) {
+                // Update existing note
+                attendanceData[existingIndex].note = note;
+            } else {
+                // Add new record
+                attendanceData.push({
+                    student_id: parseInt(currentStudentId),
+                    status: 'undone', // default status
+                    note: note
+                });
+            }
+
+            console.log('Current attendanceData:', attendanceData);
+
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('noteModal'));
+            modal.hide();
+
+            // Optional: Show success message
+            showToast('success', 'Đã lưu ghi chú thành công!');
+        }
+
         function filterStudents(searchTerm) {
             const studentItems = document.querySelectorAll('.student-item');
             let visibleCount = 0;
@@ -296,6 +393,7 @@
             document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
         }
 
+        // ...existing code...
         function setAttendance(studentId, status, scheduleId) {
             // Tìm xem studentId đã có trong attendanceData chưa
             const existingIndex = attendanceData.findIndex(item => item && item.student_id === parseInt(studentId));
@@ -304,20 +402,26 @@
             if (existingIndex !== -1) {
                 attendanceData[existingIndex] = {
                     student_id: parseInt(studentId),
-                    status: status
+                    status: status,
+                    note: attendanceData[existingIndex].note || '' // Lấy note cũ nếu có
                 };
             } else {
                 // Nếu chưa có, thêm mới
                 attendanceData.push({
                     student_id: parseInt(studentId),
-                    status: status
+                    status: status,
+                    note: '',
                 });
             }
 
             // Update UI
             updateStudentStatus(studentId, status);
+            // updateStudentNote(studentId, status);
             updateSummary();
             showToast('success', 'Đã cập nhật trạng thái điểm danh!');
+
+            // Log for debugging
+            console.log('Updated attendanceData:', attendanceData);
         }
 
         function updateStudentStatus(studentId, status) {
@@ -327,9 +431,9 @@
             // Cập nhật văn bản trạng thái
             const statusText = {
                 present: 'Có mặt',
-                late: 'Muộn',
-                absent: 'Vắng',
-                excused: 'Có phép'
+                // late: 'Muộn',
+                absent: 'Vắng mặt'
+                // excused: 'Có phép'
             } [status] || 'Chưa điểm danh';
             statusSpan.textContent = statusText;
             statusSpan.className = `student-status ${status}`;
@@ -343,12 +447,20 @@
             });
         }
 
+        function updateStudentNote(studentId, note) {
+            const studentItem = document.querySelector(`.student-item[data-id="${studentId}"]`);
+            const noteSpan = studentItem.querySelector('.student-note');
+            if (noteSpan) {
+                noteSpan.textContent = note || 'Chưa có ghi chú';
+            }
+        }
+
         function getStatusText(status) {
             const statusMap = {
                 'present': 'Có mặt',
-                'absent': 'Vắng',
-                'late': 'Muộn',
-                'excused': 'Có phép',
+                'absent': 'Vắng mặt',
+                // 'late': 'Muộn',
+                // 'excused': 'Có phép',
                 'undone': 'Chưa điểm danh'
             };
             return statusMap[status] || 'Chưa điểm danh';
@@ -400,26 +512,6 @@
             });
         }
 
-        function autoMarkPresent() {
-            Swal.fire({
-                title: 'Tự động điểm danh',
-                text: 'Hệ thống sẽ tự động đánh dấu "Có mặt" cho các học sinh chưa được điểm danh',
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonText: 'Thực hiện',
-                cancelButtonText: 'Hủy'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const unmarkedStudents = document.querySelectorAll('.student-item .student-status.undone');
-                    unmarkedStudents.forEach(statusBadge => {
-                        const studentItem = statusBadge.closest('.student-item');
-                        const studentId = studentItem.dataset.id;
-                        setAttendance(studentId, 'present', scheduleId);
-                    });
-                }
-            });
-        }
-
         async function updateSummary() {
             try {
                 const response = await fetch('/admin/attendance/summary', {
@@ -440,8 +532,7 @@
                     // Update UI with data from the database
                     document.getElementById('presentCount').textContent = result.data.present || 0;
                     document.getElementById('absentCount').textContent = result.data.absent || 0;
-                    document.getElementById('lateCount').textContent = result.data.late || 0;
-                    document.getElementById('excusedCount').textContent = result.data.excused || 0;
+                    document.getElementById('undoneCount').textContent = result.data.undone || 0;
                     // Note: totalStudents is static in the HTML and not updated here
                 } else {
                     console.error('Error fetching summary:', result.message);
@@ -458,8 +549,7 @@
             const stats = {
                 present: 0,
                 absent: 0,
-                late: 0,
-                excused: 0
+                undone: 0
             };
 
             // Count statuses from local attendanceData
@@ -472,53 +562,15 @@
             // Update UI with local counts
             document.getElementById('presentCount').textContent = stats.present;
             document.getElementById('absentCount').textContent = stats.absent;
-            document.getElementById('lateCount').textContent = stats.late;
-            document.getElementById('excusedCount').textContent = stats.excused;
+            document.getElementById('undoneCount').textContent = stats.undone;
         }
-        // function previewAttendance() {
-        //     const previewContent = document.getElementById('previewContent');
-        //     let html = '<div class="attendance-preview">';
-
-        //     const stats = {
-        //         present: 0,
-        //         absent: 0,
-        //         late: 0,
-        //         excused: 0,
-        //         undone: 0
-        //     };
-
-        //     document.querySelectorAll('.student-item').forEach(item => {
-        //         const studentId = item.dataset.id;
-        //         const studentName = item.querySelector('.student-name').textContent;
-        //         const status = attendanceData[studentId]?.status || 'undone';
-
-        //         stats[status]++;
-
-        //         html += `
-    //         <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
-    //             <span>${studentName}</span>
-    //             <span class="badge bg-${getStatusColor(status)}">${getStatusText(status)}</span>
-    //         </div>
-    //     `;
-        //     });
-
-        //     html += '</div>';
-        //     html += '<div class="mt-3"><h6>Thống kê:</h6>';
-        //     html +=
-        //         `<p>Có mặt: ${stats.present} | Vắng: ${stats.absent} | Muộn: ${stats.late} | Có phép: ${stats.excused} | Chưa điểm danh: ${stats.undone}</p>`;
-        //     html += '</div>';
-
-        //     previewContent.innerHTML = html;
-        //     previewModal.show();
-        // }
-
 
         function getStatusColor(status) {
             const colorMap = {
                 'present': 'success',
                 'absent': 'danger',
-                'late': 'warning',
-                'excused': 'info',
+                // 'late': 'warning',
+                // 'excused': 'info',
                 'undone': 'secondary'
             };
             return colorMap[status] || 'secondary';
@@ -541,7 +593,7 @@
                 cancelButtonText: 'Hủy'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // showLoading(true);
+                    showLoading(true);
 
                     fetch('{{ route('attendance.save') }}', {
                             method: 'POST',
@@ -557,6 +609,7 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
+                                console.log(attendanceData);
                                 showLoading(false); // Tắt loading trước
                                 Swal.fire({
                                     title: 'Thành công!',
@@ -564,11 +617,11 @@
                                     icon: 'success',
                                     confirmButtonText: 'OK'
                                 }).then(() => {
-                                    attendanceData = {};
+                                showLoading(false); // Tắt loading trước
+
+                                    // attendanceData = [];
                                     updateSummary();
-                                    // Clear local draft after successful save
-                                    localStorage.removeItem(`attendance_draft_${scheduleId}`);
-                                    disableAutoSave(); // Dừng auto-save
+                                    console.log(attendanceData);
                                     // Optionally redirect or refresh
                                     // window.location.href = '{{ route('admin.dashboard') }}';
                                 });
@@ -586,46 +639,6 @@
                         });
                 }
             });
-        }
-
-        function exportAttendance() {
-            // showLoading(true);
-
-            fetch('{{ route('attendance.export') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                    body: JSON.stringify({
-                        schedule_id: scheduleId,
-                        attendance_data: attendanceData
-                    })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.blob();
-                    }
-                    throw new Error('Export failed');
-                })
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = url;
-                    a.download = `diem-danh-${scheduleId}-${new Date().toISOString().split('T')[0]}.xlsx`;
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    showToast('success', 'Xuất file Excel thành công');
-                })
-                .catch(error => {
-                    console.error('Export error:', error);
-                    showToast('error', 'Đã xảy ra lỗi khi xuất file');
-                })
-                .finally(() => {
-                    showLoading(false);
-                });
         }
 
         function showLoading(show) {
@@ -661,213 +674,6 @@
             });
         }
 
-        // Auto-save functionality (optional)
-        let autoSaveInterval;
-
-        function enableAutoSave() {
-            autoSaveInterval = setInterval(() => {
-                if (Object.keys(attendanceData).length > 0) {
-                    // Save draft to localStorage as backup
-                    localStorage.setItem(`attendance_draft_${scheduleId}`, JSON.stringify(attendanceData));
-                    console.log('Auto-saved attendance data');
-                }
-            }, 30000); // Auto-save every 30 seconds
-        }
-
-        function disableAutoSave() {
-            if (autoSaveInterval) {
-                clearInterval(autoSaveInterval);
-                console.log('Auto-save disabled');
-            }
-        }
-
-        function loadDraft() {
-            const draftData = localStorage.getItem(`attendance_draft_${scheduleId}`);
-            if (draftData) {
-                // console.log(draftData);
-                try {
-                    const parsedData = JSON.parse(draftData);
-                    // Kiểm tra dữ liệu hợp lệ
-                    if (!parsedData || typeof parsedData !== 'object') {
-                        throw new Error('Dữ liệu draft không hợp lệ');
-                    }
-                    Swal.fire({
-                        title: 'Khôi phục dữ liệu',
-                        text: 'Tìm thấy dữ liệu điểm danh chưa lưu. Bạn có muốn khôi phục?',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Khôi phục',
-                        cancelButtonText: 'Bỏ qua'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            attendanceData = parsedData;
-                            // Update UI based on restored data
-                            console.log(attendanceData);
-                            Object.keys(attendanceData).forEach(index => {
-                                updateStudentStatus(attendanceData[index].student_id, attendanceData[index]
-                                    .status);
-                            });
-                            // updateSummary();
-                            showToast('success', 'Đã khôi phục dữ liệu điểm danh');
-                        } else {
-                            localStorage.removeItem(`attendance_draft_${scheduleId}`);
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error loading draft:', error);
-                    localStorage.removeItem(`attendance_draft_${scheduleId}`);
-                }
-            }
-        }
-
-        // Initialize auto-save and load draft
-        setTimeout(() => {
-            loadDraft();
-            enableAutoSave();
-        }, 1000);
-
-        // Clean up on page unload
-        window.addEventListener('beforeunload', function(e) {
-            if (Object.keys(attendanceData).length > 0) {
-                // Save current state
-                localStorage.setItem(`attendance_draft_${scheduleId}`, JSON.stringify(attendanceData));
-
-                // Show warning if there are unsaved changes
-                const hasUnsavedChanges = Object.keys(attendanceData).some(studentId => {
-                    // You might want to track which changes have been saved to server
-                    return true; // For now, assume all changes are unsaved
-                });
-
-                if (hasUnsavedChanges) {
-                    e.preventDefault();
-                    e.returnValue = 'Bạn có dữ liệu điểm danh chưa được lưu. Bạn có chắc chắn muốn rời khỏi trang?';
-                }
-            }
-        });
-
-        // Utility functions for statistics
-        function getAttendanceStats() {
-            const stats = {
-                present: 0,
-                absent: 0,
-                late: 0,
-                excused: 0,
-                undone: 0
-            };
-
-            document.querySelectorAll('.student-item').forEach(item => {
-                const studentId = item.dataset.id;
-                const status = attendanceData[studentId]?.status || 'undone';
-                stats[status]++;
-            });
-
-            return stats;
-        }
-
-
-        function getAttendanceRate() {
-            const stats = getAttendanceStats();
-            const total = totalStudents;
-            const attended = stats.present + stats.late + stats.excused;
-            return total > 0 ? Math.round((attended / total) * 100) : 0;
-        }
-
-        // Print functionality
-        function printAttendance() {
-            const stats = getAttendanceStats();
-            const attendanceRate = getAttendanceRate();
-
-            let printContent = `
-            <html>
-            <head>
-                <title>Bảng điểm danh</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    .header { text-align: center; margin-bottom: 30px; }
-                    .info { margin-bottom: 20px; }
-                    .stats { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-                    table { width: 100%; border-collapse: collapse; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background-color: #f8f9fa; }
-                    .status-present { background-color: #d4edda; color: #155724; }
-                    .status-absent { background-color: #f8d7da; color: #721c24; }
-                    .status-late { background-color: #fff3cd; color: #856404; }
-                    .status-excused { background-color: #d1ecf1; color: #0c5460; }
-                    .status-undone { background-color: #e2e3e5; color: #383d41; }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h2>BẢNG ĐIỂM DANH LỚP HỌC</h2>
-                </div>
-                <div class="info">
-                    <p><strong>Lớp:</strong> {{ $scheduleData->class_name ?? 'N/A' }}</p>
-                    <p><strong>Môn học:</strong> {{ $scheduleData->course_name ?? 'N/A' }}</p>
-                    <p><strong>Ngày:</strong> {{ $scheduleData->date ? \Carbon\Carbon::parse($scheduleData->date)->format('d/m/Y') : 'N/A' }}</p>
-                    <p><strong>Thời gian:</strong> {{ $scheduleData->start_time && $scheduleData->end_time ? \Carbon\Carbon::parse($scheduleData->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($scheduleData->end_time)->format('H:i') : 'N/A' }}</p>
-                </div>
-                <div class="stats">
-                    <h4>Thống kê điểm danh</h4>
-                    <p>Tổng số học sinh: ${totalStudents} | Tỷ lệ có mặt: ${attendanceRate}%</p>
-                    <p>Có mặt: ${stats.present} | Vắng: ${stats.absent} | Muộn: ${stats.late} | Có phép: ${stats.excused} | Chưa điểm danh: ${stats.undone}</p>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>STT</th>
-                            <th>Tên học sinh</th>
-                            <th>Giới tính</th>
-                            <th>Trạng thái</th>
-                            <th>Ghi chú</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-
-            let index = 1;
-            document.querySelectorAll('.student-item').forEach(item => {
-                const studentId = item.dataset.id;
-                const studentName = item.querySelector('.student-name').textContent;
-                const studentGender = item.querySelector('.student-id').textContent.includes('Nữ') ? 'Nữ' : 'Nam';
-                const status = attendanceData[studentId]?.status || 'undone';
-                const statusText = getStatusText(status);
-
-                printContent += `
-                <tr>
-                    <td>${index++}</td>
-                    <td>${studentName}</td>
-                    <td>${studentGender}</td>
-                    <td class="status-${status}">${statusText}</td>
-                    <td></td>
-                </tr>
-            `;
-            });
-
-            printContent += `
-                    </tbody>
-                </table>
-                <div style="margin-top: 50px; text-align: right;">
-                    <p>Ngày in: ${new Date().toLocaleDateString('vi-VN')}</p>
-                    <p>Người điểm danh: ________________________</p>
-                    <p style="margin-top: 30px;">Chữ ký: ________________________</p>
-                </div>
-            </body>
-            </html>
-        `;
-
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(printContent);
-            printWindow.document.close();
-            printWindow.print();
-        }
-
-        // Add print button to quick actions
-        //     document.querySelector('.quick-actions').insertAdjacentHTML('beforeend', `
-    //     <button class="quick-action-btn btn-outline-dark" onclick="printAttendance()">
-    //         <i class="fas fa-print me-1"></i>
-    //         In bảng điểm danh
-    //     </button>
-    // `);
 
         console.log('Attendance management system loaded successfully');
     </script>

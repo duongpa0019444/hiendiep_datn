@@ -25295,9 +25295,9 @@ p.no-span::after {
 
 
     .attendance-controls {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
+        /* display: flex; */
+        /* gap: 8px; */
+        /* flex-wrap: wrap; */
     }
 
     .status-btn {

@@ -26,29 +26,83 @@ class UserController extends Controller
 
             return view('client.accounts.teachers.dashboard');
         }
-
     }
 
     public function schedule()
     {
+        $userId = Auth::user()->id;
+
         if (Auth::user()->role == "student") {
-            return view('client.accounts.students.schedule');
-        }elseif (Auth::user()->role == "teacher"){
-            return view('client.accounts.teachers.schedule');
+            $schedules = DB::table('schedules')
+                ->join('class_student', 'schedules.class_id', '=', 'class_student.class_id')
+                ->join('classes', 'schedules.class_id', '=', 'classes.id')
+                ->join('courses', 'classes.courses_id', '=', 'courses.id')
+                ->join('users', 'schedules.teacher_id', '=', 'users.id')
+                ->where('class_student.student_id', $userId)
+                ->select(
+                    DB::raw('CASE schedules.day_of_week
+                        WHEN "Mon" THEN "Thứ 2"
+                        WHEN "Tue" THEN "Thứ 3"
+                        WHEN "Wed" THEN "Thứ 4"
+                        WHEN "Thu" THEN "Thứ 5"
+                        WHEN "Fri" THEN "Thứ 6"
+                        WHEN "Sat" THEN "Thứ 7"
+                        WHEN "Sun" THEN "Chủ nhật"
+                    END as day_of_week'),
+                    'schedules.date',
+                    'schedules.start_time',
+                    'schedules.end_time',
+                    'courses.name as course_name',
+                    'users.name as teacher_name'
+                )
+                ->paginate(10);
 
+            // Trả về view cho học sinh với dữ liệu lịch học
+            return view('client.accounts.students.schedule', [
+                'schedules' => $schedules
+            ]);
+        } elseif (Auth::user()->role == "teacher") {
+            $schedules = DB::table('schedules')
+                ->join('classes', 'schedules.class_id', '=', 'classes.id')
+                ->join('courses', 'classes.courses_id', '=', 'courses.id')
+                ->join('users', 'schedules.teacher_id', '=', 'users.id')
+                ->where('schedules.teacher_id', $userId)
+                ->select(
+                    DB::raw('CASE schedules.day_of_week
+                        WHEN "Mon" THEN "Thứ 2"
+                        WHEN "Tue" THEN "Thứ 3"
+                        WHEN "Wed" THEN "Thứ 4"
+                        WHEN "Thu" THEN "Thứ 5"
+                        WHEN "Fri" THEN "Thứ 6"
+                        WHEN "Sat" THEN "Thứ 7"
+                        WHEN "Sun" THEN "Chủ nhật"
+                    END as day_of_week'),   
+                    'schedules.id as schedule_id',
+                    'schedules.date',
+                    'schedules.start_time',
+                    'schedules.end_time',
+                    'courses.name as course_name',
+                    'users.name as teacher_name'
+                )
+                ->paginate(10);
+
+            return view('client.accounts.teachers.schedule', [
+                'schedules' => $schedules
+            ]);
+        } else {
+            // Xử lý trường hợp vai trò không hợp lệ
+            return redirect()->route('home')->with('error', 'Bạn không có quyền truy cập lịch học.');
         }
-
     }
 
     public function score()
     {
         if (Auth::user()->role == "student") {
             return view('client.accounts.students.score');
-        }elseif (Auth::user()->role == "teacher") {
+        } elseif (Auth::user()->role == "teacher") {
 
             return view('client.accounts.teachers.score');
         }
-
     }
 
     public function quizz()
@@ -117,11 +171,10 @@ class UserController extends Controller
                 ->get();
 
             return view('client.accounts.students.quizz', compact('quizzesDone', 'assignedQuizzes'));
-        }elseif (Auth::user()->role == "teacher") {
+        } elseif (Auth::user()->role == "teacher") {
 
             return view('client.accounts.teachers.quizz');
         }
-
     }
 
 
@@ -129,10 +182,9 @@ class UserController extends Controller
     {
         if (Auth::user()->role == "student") {
             return view('client.accounts.students.account');
-        }elseif (Auth::user()->role == "teacher") {
+        } elseif (Auth::user()->role == "teacher") {
 
             return view('client.accounts.teachers.account');
         }
-
     }
 }
