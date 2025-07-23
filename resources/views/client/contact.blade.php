@@ -111,7 +111,7 @@
                     <form action="{{ route('support.store') }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <select class="form-select @error('pl_content') is-invalid @enderror" name="pl_content">
+                            <select class=" @error('pl_content') is-invalid @enderror" name="pl_content">
                                 <option value="">-- Chọn phân loại --</option>
                                 <option value="khiếu nại" {{ old('pl_content') == 'khiếu nại' ? 'selected' : '' }}>Khiếu nại</option>
                                 <option value="góp ý" {{ old('pl_content') == 'góp ý' ? 'selected' : '' }}>Góp ý</option>
