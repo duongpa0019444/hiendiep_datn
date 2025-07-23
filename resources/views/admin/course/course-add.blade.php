@@ -105,7 +105,7 @@
                                                 placeholder="Nhập nội dung khóa học"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-lg-12">
+                                    {{-- <div class="col-lg-12">
                                         <div class="mb-0">
                                             <label for="teaching_method" class="form-label">Phương pháp dạy học </label>
                                             <textarea class="form-control bg-light-subtle ckeditor" name="teaching_method" id="teaching_method" rows="7"
@@ -118,7 +118,7 @@
                                             <textarea class="form-control bg-light-subtle ckeditor" name="teaching_goals" id="teaching_goals" rows="7"
                                                 placeholder="Nhập mục tiêu khóa học "></textarea>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                         </div>
@@ -129,7 +129,9 @@
                             <div class="row justify-content-end g-2">
 
                                 <div class="col-lg-2">
-                                    <button type="reset" class="btn btn-primary w-100">Cancel</button>
+                                    {{-- <button type="reset" class="btn btn-primary w-100">Cancel</button> --}}
+                                    <button type="button" class="btn btn-primary w-100" onclick="resetForm()">Cancel</button>
+
                                 </div>
 
                                 <div class="col-lg-2">
@@ -153,3 +155,34 @@
     </div>
 
 @endsection
+ @push('scripts')
+   <script>
+    function resetForm() {
+        if (!confirm("Bạn có chắc muốn hủy và xóa toàn bộ dữ liệu đã nhập?")) return;
+
+        const form = document.querySelector('form');
+        if (!form) return;
+
+        // Reset toàn bộ input, select, textarea (trừ CKEditor và file)
+        form.reset();
+
+        // Reset CKEditor
+        if (typeof CKEDITOR !== 'undefined') {
+            for (let instance in CKEDITOR.instances) {
+                CKEDITOR.instances[instance].setData('');
+            }
+        }
+
+        // Reset các input type="file"
+        const fileInputs = form.querySelectorAll('input[type="file"]');
+        fileInputs.forEach(input => {
+            input.value = '';
+        });
+
+        // Nếu bạn dùng file preview (hiện ảnh khi chọn), thì cũng clear nó nếu có
+        const imagePreviews = document.querySelectorAll('.image-preview');
+        imagePreviews.forEach(preview => preview.innerHTML = '');
+    }
+</script>
+     
+ @endpush

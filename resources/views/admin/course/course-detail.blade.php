@@ -19,69 +19,14 @@
                   </ol>
               </nav>
 
-              <div class="row">
-                  <div class="col-lg-4">
-                      <div class="card" style="width:70%;">
-                          <div class="card-body">
-                              <!-- Crossfade -->
-                              <div id="carouselExampleFade" class="carousel slide carousel-fade" data-bs-ride="carousel">
-                                  <div class="carousel-inner" role="listbox">
-                                      <div class="carousel-item active">
-                                          @if ($course->image)
-                                              <img src="{{ asset($course->image) }}"
-                                                  style="width: 100%; height: 300px; object-fit: cover;"
-                                                  class="d-block w-100" alt="...">
-                                          @else
-                                              <span>Không có ảnh</span>
-                                          @endif
-                                      </div>
 
-
-                                  </div>
-                              </div>
-                          </div>
-
-                      </div>
-                  </div>
-                  <div class="col-lg-8">
-                      <div class="card">
-                          <div class="card-body">
-                              <p class="mb-1">
-                                  <a href="#!" class="fs-24 text-dark fw-medium">{{ $course->name }}</a>
-                              </p>
-
-                              <h2 class="fw-medium my-3">{{ $course->price }} VND </h2>
-
-                              <div class="row align-items-center g-2 mt-3">
-
-
-                              </div>
-
-
-                              <h4 class="text-dark fw-medium">🧑‍🏫 Phương pháp giảng dạy:</h4>
-                              <p class="text-muted">{{ $course->teaching_method }}
-                              </p>
-                              <h4 class="text-dark fw-medium mt-3">🌈 Mục tiêu khóa học:</h4>
-                              <div class="d-flex align-items-center mt-2">
-                                  <i class="bx bxs-bookmarks text-success me-3 fs-20 mt-1"></i>
-                                  <p class="mb-0"><span class="fw-medium text-dark">
-                                          {{ $course->teaching_goals }}
-                              </div>
-                              <h4 class="text-dark fw-medium mt-3">🌈 Nội dung về khóa học :</h4>
-                              <div class="d-flex align-items-center mt-2">
-                                  <i class="bx bxs-bookmarks text-success me-3 fs-20 mt-1"></i>
-                                  <p class="mb-0"><span class="fw-medium text-dark">{{ $course->description }}
-                              </div>
-
-                          </div>
-                      </div>
-                  </div>
-              </div>
               <div class="row">
                   <div class="col-lg-0">
                       <div class="card">
-                          <div class="card-header">
-                              <h4 class="card-title"> Nội dung về bài giảng trong khóa học : </h4>
+                          <div class="card-header d-flex align-items-center justify-content-between" >
+                              <h4 class="card-title"> Nội dung về bài giảng trong khóa học : {{ $course->name }}</h4>
+                              <a href="{{ route('admin.lession-add', ['id' => $course->id]) }}"
+                                  class="btn btn-sm btn-primary">Thêm bài giảng</a>
 
                           </div>
                           <div class="card-body">
@@ -96,9 +41,7 @@
                                               <th scope="col">Bài Tập</th>
                                               <th scope="col">Ngày Cập Nhật </th>
                                               <th scope="col">hành Động </th>
-                                              <th scope="col"><a
-                                                      href="{{ route('admin.lession-add', ['id' => $course->id]) }}"
-                                                      class="btn btn-sm btn-primary">Thêm bài giảng</a></th>
+                                              {{-- <th scope="col"></th> --}}
                                           </tr>
                                       </thead>
                                       <tbody>
@@ -195,7 +138,8 @@
 
 
   @endsection
-  <script>
+          @push('scripts')
+                <script>
       function confirmDelete(lessionId) {
           Swal.fire({
               title: 'Bạn có chắc chắn?',
@@ -216,3 +160,4 @@
           });
       }
   </script>
+          @endpush

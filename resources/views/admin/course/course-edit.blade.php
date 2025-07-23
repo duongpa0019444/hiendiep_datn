@@ -103,7 +103,7 @@
                                         <div class="mb-0">
                                             <label for="description" class="form-label">Nội dung khóa học</label>
                                             <textarea class="form-control bg-light-subtle ckeditor" name="description" id="description" rows="7"
-                                                value="{{ $course->description }}"></textarea>
+                                                >{{ $course->description }}</textarea>
                                         </div>
                                     </div>
                                 </div>
