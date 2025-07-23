@@ -3,6 +3,7 @@
 @section('content-information')
     <div id="dashboard" class="content-section active mb-4">
         <h2 class="fs-5">Chào mừng {{ Auth::user()->name }} quay trở lại!</h2>
+
         <i class="icofont-exclamation-circle text-primary"></i> Ở đây bạn có thể xem thông tin lịch, điểm số, làm bài quiz và
         quản lý thông tin cá nhân.</p>
 
@@ -32,6 +33,7 @@
                     @endif
 
 
+
                     @forelse ($notifications as $noti)
                         <li class="list-group-item notification-item">
                             <div class="notification-content">
@@ -56,6 +58,7 @@
         <div class="row mb-2">
             <div class="col-md-6 mb-2">
                 <div class="card current-class">
+
                     <div class="card-header">
                         <i class="icofont-calendar me-2"></i> Lớp Đang Học
                     </div>
@@ -83,6 +86,7 @@
 
             <div class="col-md-6">
                 <div class="card completed-class">
+
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span><i class="icofont-chart-bar-graph me-2 text-white"></i>Học tập</span>
                         <select name="class" id="dashboardHoctap" class="form-control text-black w-50 m-0">

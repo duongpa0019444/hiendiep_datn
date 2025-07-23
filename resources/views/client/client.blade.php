@@ -225,6 +225,7 @@
                                                 </div>
 
                                                 <ul
+
                                                     class="dropdown-menu dropdown-menu-myaccount dropdown-menu-end shadow-sm mt-2 p-3 rounded-3 avatar-menu">
                                                     @if (Auth::user()->role == 'admin')
                                                         <li>

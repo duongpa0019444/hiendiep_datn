@@ -49,22 +49,22 @@
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="roles-name" class="form-label fw-semibold">Ảnh </label>
-                                            <input type="file" name="avatar" class="form-control">
+                                            <input type="file" name="avatar" value="{{ old('avatar')}}" class="form-control">
 
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="roles-name" class="form-label fw-semibold">Tên người dùng</label>
-                                            <input type="text" name="name" class="form-control"
+                                            <label for="roles-name" class="form-label fw-semibold">Tên người dùng *</label>
+                                            <input type="text" name="name" class="form-control" value="{{ old('name')}}"
                                                 placeholder="Nhập tên người dùng...">
                                         </div>
                                     </div>
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="user-name" class="form-label fw-semibold">Tên đăng nhập</label>
-                                            <input type="text" name="username" class="form-control"
+                                            <label for="user-name" class="form-label fw-semibold">Tên đăng nhập *</label>
+                                            <input type="text" name="username" class="form-control" value="{{ old('username')}}"
                                                 placeholder="Nhập tên đăng nhập...">
                                             <i>Lưu ý: mật khẩu mặc định là tên đăng nhập</i>
                                         </div>
@@ -73,7 +73,7 @@
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="user-name" class="form-label fw-semibold">Email</label>
-                                            <input type="email" name="email" class="form-control"
+                                            <input type="email" name="email" class="form-control" value="{{ old('email')}}"
                                                 placeholder="Nhập email..">
                                         </div>
                                     </div>
@@ -81,15 +81,23 @@
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="" class="form-label fw-semibold">phone</label>
-                                            <input type="tel" name="phone" class="form-control"
+                                            <input type="tel" name="phone" class="form-control" value="{{ old('phone')}}"
                                                 placeholder="Nhập phone...">
                                         </div>
                                     </div>
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
+                                            <label for="" class="form-label fw-semibold">address</label>
+                                            <input type="text" name="address" class="form-control" value="{{ old('address')}}"
+                                                placeholder="Nhập address...">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <div class="mb-3">
                                             <label for="" class="form-label fw-semibold">birth_date</label>
-                                            <input type="date" name="birth_date" class="form-control"
+                                            <input type="date" name="birth_date" class="form-control" value="{{ old('birth_date') }}"
                                                 placeholder="Nhập birth_date...">
                                         </div>
                                     </div>

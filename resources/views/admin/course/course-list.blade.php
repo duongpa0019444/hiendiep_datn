@@ -154,6 +154,11 @@
                                     <div class="col">
                                         <label class="form-label mb-1 d-block">Tác vụ</label>
                                         <div class="d-flex gap-1">
+<<<<<<< HEAD
+                                            <button type="submit" class="btn btn-success btn-sm w-100">Lọc</button>
+                                            <a href="{{ route('admin.course-list') }}"
+                                                class="btn btn-danger btn-sm w-100">Xóa</a>
+=======
                                             <button type="submit" class="btn btn-secondary btn-sm w-100">
                                                 <iconify-icon icon="ic:baseline-filter-alt" class="me-1"></iconify-icon>
                                                 Lọc
@@ -162,13 +167,18 @@
                                                 <iconify-icon icon="ic:round-clear" class="me-1"></iconify-icon> Xóa
                                             </a>
 
+>>>>>>> 1d455ee6a9340a08bec9b1889ad9de059620b5ab
                                         </div>
                                     </div>
 
                                     <!-- Nút Thêm khóa học -->
                                     <div class="col">
+<<<<<<< HEAD
+                                        <a href="{{ route('admin.course-add') }}" class="btn btn-warning btn-sm w-100">Thêm
+=======
                                         <a href="{{ route('admin.course-add') }}"
                                             class="btn btn-warning btn-sm w-100">Thêm
+>>>>>>> 1d455ee6a9340a08bec9b1889ad9de059620b5ab
                                             khóa học</a>
                                     </div>
                                 </form>
@@ -324,6 +334,41 @@
 
                     document.getElementById('delete-course-form-' + courseId).submit();
 
+<<<<<<< HEAD
+                // console.log(dom);
+            }
+        });
+    }
+
+    function toggleFeatured(courseId) {
+        fetch(`/admin/courses/${courseId}/toggle-featured`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Cập nhật thành công',
+                        text: data.status ? 'Khóa học đã được đánh dấu nổi bật' :
+                            'Khóa học đã được bỏ đánh dấu nổi bật',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                Swal.fire('Lỗi', 'Không thể cập nhật trạng thái nổi bật', 'error');
+            });
+    }
+</script>
+=======
                     // console.log(dom);
                 }
             });
@@ -358,3 +403,4 @@
         }
     </script>
 @endpush
+>>>>>>> 1d455ee6a9340a08bec9b1889ad9de059620b5ab

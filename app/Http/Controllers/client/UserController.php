@@ -43,8 +43,9 @@ class UserController extends Controller
                     ->value('class_id');
             }
 
+            $now = Carbon::now();
             // Lấy danh sách thông báo phù hợp
-            $notifications = notification::where(function ($q) use ($user, $classId) {
+            $notifications = Notification::where(function ($q) use ($user, $classId) {
                 $q->where('target_role', 'all')
                     ->orWhere('target_role', $user->role);
 
@@ -55,8 +56,13 @@ class UserController extends Controller
                     });
                 }
             })
+                ->where(function ($q) use ($now) {
+                    $q->whereNull('start_time')->orWhere('start_time', '<=', $now);
+                })
+                ->where(function ($q) use ($now) {
+                    $q->whereNull('end_time')->orWhere('end_time', '>=', $now);
+                })
                 ->orderByDesc('created_at')
-                // ->paginate(3);
                 ->limit(3)
                 ->get();
 
@@ -192,7 +198,9 @@ class UserController extends Controller
     public function score()
     {
         if (Auth::user()->role == "student") {
-            $data = score::with('class.course')->where('student_id', Auth::user()->id)->paginate(5);
+
+            $data = score::with('class.course')->where('student_id', Auth::user()->id)->paginate(6);
+
             return view('client.accounts.students.score', compact('data'));
         } elseif (Auth::user()->role == "teacher") {
 
@@ -211,21 +219,43 @@ class UserController extends Controller
     {
         $query = trim($request->query('queryScoreClient'));
 
-        if ($query) {
-            $data = Classes::with('course')
-                ->join('schedules', 'schedules.class_id', '=', 'classes.id')
-                ->join('courses', 'classes.courses_id', '=', 'courses.id')
-                ->where('schedules.teacher_id', Auth::id())
-                ->where(function ($q) use ($query) {
-                    $q->where('classes.name', 'like', "%$query%")
-                        ->orWhere('courses.name', 'like', "%$query%");
-                })
-                ->select('classes.*') // Lấy dữ liệu từ bảng classes
-                ->distinct()
-                ->paginate(18);
+        if (Auth::user()->role == "student") {
+            if ($query) {
+                $data = Score::with('class.course')
+                    ->where('student_id', Auth::user()->id)
+                    ->where(function ($queryBuilder) use ($query) {
+                        $queryBuilder->whereHas('class', function ($q) use ($query) {
+                            $q->where('name', 'like', "%$query%");
+                        })->orWhereHas('class.course', function ($q) use ($query) {
+                            $q->where('name', 'like', "%$query%");
+                        });
+                    })
+                    ->paginate(7);
 
-            return view('client.accounts.teachers.score', compact('data', 'query'));
+                return view('client.accounts.students.score', compact('data'));
+            } else {
+                $data = score::with('class.course')->where('student_id', Auth::user()->id)->paginate(6);
+                return view('client.accounts.students.score', compact('data'));
+            }
+        } elseif (Auth::user()->role == "teacher") {
+
+            if ($query) {
+                $data = Classes::with('course')
+                    ->join('schedules', 'schedules.class_id', '=', 'classes.id')
+                    ->join('courses', 'classes.courses_id', '=', 'courses.id')
+                    ->where('schedules.teacher_id', Auth::id())
+                    ->where(function ($q) use ($query) {
+                        $q->where('classes.name', 'like', "%$query%")
+                            ->orWhere('courses.name', 'like', "%$query%");
+                    })
+                    ->select('classes.*') // Lấy dữ liệu từ bảng classes
+                    ->distinct()
+                    ->paginate(18);
+
+                return view('client.accounts.teachers.score', compact('data', 'query'));
+            }
         }
+
 
 
         return redirect()->route('client.score');
@@ -607,12 +637,11 @@ class UserController extends Controller
         $user = ModelsUser::find(Auth::user()->id);
 
         $validated = $request->validate([
-            'name'       => 'required|string|max:255',
             'username'   => 'required|string|max:255|unique:users,name,' . $user->id,
-            'email'      => 'nullable|string||min:6',
-            'phone'      => 'nullable|digits_between:8,20',
+            'email'      => 'nullable|email|max:255',
             'gender'     => 'nullable|in:boy,girl',
             'birth_date' => 'nullable|date',
+            'address'   => 'nullable|string|max:1000',
             'avatar'     => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 

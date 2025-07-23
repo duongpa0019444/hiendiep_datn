@@ -84,7 +84,6 @@ class ScoreController extends Controller
         $data = ClassStudent::with('student')
             ->where('class_id', $class_id)
             ->get();
-
         $score = score::find($id);
 
         $class = classes::where('id',$class_id)->select('courses_id', 'name')?->first();

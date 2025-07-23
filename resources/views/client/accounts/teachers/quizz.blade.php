@@ -6,6 +6,7 @@
         <div class="quiz-container">
             <div class="row align-items-center">
                 <div class="col-md-7">
+
                     <h4 class="mb-2 text-white">Quản lý Quiz của bạn</h4>
                     <p class="mb-0 opacity-75 text-light">Thêm, chỉnh sửa quiz ôn tập cho học sinh!</p>
                 </div>
@@ -89,6 +90,7 @@
                         <div class="quiz-cards-wrapper" id="quizCardsWrapperAll">
                             <div class="quiz-cards-row px-1" id="quiz-card-all">
                                 @foreach ($quizzesAll as $quiz)
+
                                     <div class="quiz-card-item quiz-item-{{ $quiz->id }}">
                                         <div class="card quiz-card h-100">
                                             <div class="card-body">
@@ -122,6 +124,7 @@
                                                                 method="POST" class="w-100 btn-delete-quiz-form">
                                                                 @csrf
                                                                 @method('DELETE')
+
                                                                 <button type="submit" data-quiz-id="{{ $quiz->id }}"
                                                                     class="btn btn-outline-danger border w-100 quiz-action-btn btn-delete-quiz">
                                                                     <i class="icofont-ui-delete me-1"></i> Xóa
@@ -188,6 +191,7 @@
                         <button class="scroll-nav-btn right" id="scrollRightPublished">
                             <i class="icofont-rounded-right"></i>
                         </button>
+
                         <div class="quiz-cards-wrapper">
                             <div class="quiz-cards-row px-1" id="quizCardsWrapperPublished">
                                 @foreach ($quizzesPublished as $quiz)
@@ -219,6 +223,7 @@
                                                         <div class="col-12 dropdown-item">
                                                             <form
                                                                 action="{{ route('teacher.quizzes.delete', $quiz->id) }}"
+
                                                                 method="POST" class="w-100 btn-delete--quizform">
                                                                 @csrf
                                                                 @method('DELETE')
@@ -281,6 +286,7 @@
                         <button class="scroll-nav-btn right" id="scrollRightDraft">
                             <i class="icofont-rounded-right"></i>
                         </button>
+
                         <div class="quiz-cards-wrapper" >
                             <div class="quiz-cards-row px-1" id="quizCardsWrapperDraft">
                                 @foreach ($quizzesDraft as $quiz)
@@ -315,6 +321,7 @@
                                                                 method="POST" class="w-100 btn-delete-quiz-form">
                                                                 @csrf
                                                                 @method('DELETE')
+
                                                                 <button type="submit" data-quiz-id="{{ $quiz->id }}"
                                                                     class="btn btn-outline-danger border w-100 quiz-action-btn">
                                                                     <i class="icofont-ui-delete me-1"></i> Xóa
@@ -739,6 +746,7 @@
             e.preventDefault();
             const form = $(this).closest('form');
             const actionUrl = form.attr('action');
+
             const quizId = $(this).data('quiz-id');
             console.log(quizId);
             console.log($(`.quiz-item-${ quizId }`));
@@ -811,6 +819,7 @@
                             })
                             $(`.quiz-item-${ quizId }`).remove();
                             $('#quiz-card-all').prepend(renderQuizCardItem(response))
+
                             if(response.status === 'published') {
                                 $('#quizCardsWrapperPublished').prepend(renderQuizCardItem(response));
                             } else {
@@ -905,6 +914,7 @@
                                             method="POST" class="w-100 btn-delete-quiz-form">
                                             <input type="hidden" name="_token" value="${csrfToken}">
                                             <input type="hidden" name="_method" value="DELETE">
+
                                             <button type="button"  data-quiz-id="${quiz.id}"
                                                 class="btn btn-outline-danger w-100 quiz-action-btn delete-permanent"
                                                 data-id="${quiz.id}">
@@ -976,6 +986,7 @@
                                         <form action="/teacher/quizzes/${quiz.id}/delete" method="POST" class="w-100 btn-delete-quiz-form">
                                             <input type="hidden" name="_token" value="${csrfToken}">
                                             <input type="hidden" name="_method" value="DELETE">
+
                                             <button type="submit" class="btn btn-outline-danger border w-100 quiz-action-btn btn-delete-quiz" data-quiz-id="${quiz.id}">
                                                 <i class="icofont-ui-delete me-1"></i> Xóa
                                             </button>
@@ -1224,6 +1235,7 @@
 
                     });
                     $('#body-modal-result').html(html);
+
                     $("#resultModalLabel").html(
                         `<i class="icofont-chart-bar-graph text-primary"></i>  Kết quả: ${response.quiz.title} - ${response.student.name}`
                         )

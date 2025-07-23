@@ -160,6 +160,7 @@
                             <!-- Hiển thị khóa học -->
                             <div class="col-lg-6 col-xl-4 col-md-6 col-12">
                                 <div class="ed-course__card wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
+
                                     <a href="{{ route('client.course.detail', ['slug' => Str::slug($course->course_name), 'id' => $course->course_id]) }}"
                                         class="ed-course__img">
                                         <img src="{{ asset($course->image) }}" alt="course-img" style="height:150px" />

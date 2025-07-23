@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\classes;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -67,6 +68,89 @@ class AccountController extends Controller
         return view('admin.accounts.list', compact('users', 'role'));
     }
 
+    public function detail($role, $id)
+    {
+        $user = User::findOrFail($id);
+        if ($user->role == "student") {
+            // Lấy danh sách lớp học mà user này đang học
+            $classStudent = DB::table('class_student')
+                ->where('student_id', $id)
+                ->pluck('class_id');
+
+            $allClasses = DB::table('classes')
+                ->join('courses', 'classes.courses_id', '=', 'courses.id')
+                ->whereIn('classes.id', $classStudent)
+                ->select('classes.*', 'courses.name as course_name')
+                ->get();
+
+            // phân loại theo trạng thái lớp học
+            $currentClasses = $allClasses->where('status', 'in_progress');
+            $finishedClasses = $allClasses->where('status', 'completed');
+
+
+            // Lấy điểm của user trong các lớp này
+            $scores = DB::table('scores')
+                ->where('student_id', $id)
+                ->whereIn('class_id', $classStudent)
+                ->get()
+                ->groupBy('class_id');
+
+            return view('admin.accounts.account-detail', [
+                'user' => $user,
+                'currentClasses' => $currentClasses,
+                'finishedClasses' => $finishedClasses,
+                'scores' => $scores,
+            ]);
+        } elseif ($user->role == "teacher") {
+            // 1. Lấy lịch dạy (full)
+            $schedules = DB::table('schedules')
+                ->where('teacher_id', $id)
+                ->whereNotNull('class_id')
+                ->get();
+
+            // 2. Lấy danh sách class_id duy nhất
+            $classIdsSchedules = $schedules->pluck('class_id')->unique();
+
+            // 3. Lấy thông tin lớp
+            $classTeacher = DB::table('classes')
+                ->join('courses', 'classes.courses_id', '=', 'courses.id')
+                ->whereIn('classes.id', $classIdsSchedules)
+                ->select(
+                    'classes.id',
+                    'classes.name',
+                    'classes.status',                     
+                    'classes.number_of_sessions',
+                    'courses.name as course_name',
+                    'courses.total_sessions'
+                )
+                ->get();
+
+            // 4. Đếm số lượng học sinh từng lớp
+            $countStudent = DB::table('class_student')
+                ->select('class_id', DB::raw('count(student_id) as student_count'))
+                ->whereIn('class_id', $classIdsSchedules)
+                ->groupBy('class_id')
+                ->pluck('student_count', 'class_id');
+
+            // 5. Phân loại lớp: đang dạy / đã dạy dựa trạng thái
+            $teachingClasses = $classTeacher->where('status', 'in_progress');
+            $taughtClasses   = $classTeacher->where('status', 'completed');
+
+
+            return view('admin.accounts.account-detail', [
+                'user' => $user,
+                'schedules' => $schedules,
+                'countStudent' => $countStudent,
+                'teachingClasses' => $teachingClasses,
+                'taughtClasses' => $taughtClasses,
+            ]);
+        } else {
+            // Trường hợp khác (admin, v.v.)
+            $user = User::findOrFail($id);
+            return view('admin.accounts.account-detail', compact('user', 'role'));
+        }
+    }
+
 
     public function add()
     {
@@ -80,6 +164,7 @@ class AccountController extends Controller
             'name'       => 'required|string|max:255',
             'username'       => 'required|string|max:255|unique:users',
             'email'      => 'nullable|string|email|max:255',
+            'address'      => 'nullable|string|max:1000',
             'phone'     => 'nullable|digits_between:8,20',
             'password'   => 'nullable|string',
             'gender'     => 'nullable|in:boy,girl',
@@ -133,6 +218,7 @@ class AccountController extends Controller
             'name'       => 'required|string|max:255',
             'username'   => 'required|string|max:255|unique:users,name,' . $user->id,
             'email'      => 'nullable|string||min:6',
+            'address'      => 'nullable|string|max:1000',
             'phone'      => 'nullable|digits_between:8,20',
             'password'   => 'nullable|string',
             'gender'     => 'nullable|in:boy,girl',

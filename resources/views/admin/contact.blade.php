@@ -6,6 +6,7 @@
 @section('content')
     <div class="page-content">
         <div class="container-xxl">
+
             <div class="col-12">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb bg-light px-3 py-1 rounded shadow-sm">
@@ -77,6 +78,7 @@
                                             </option>
                                             <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Đã xử lý
                                             </option>
+
                                             {{-- <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Không
                                                 hỗ trợ
                                             </option> --}}
@@ -135,6 +137,7 @@
                                             <td>
 
                                                 {{-- Trạng thái --}}
+
                                                 @if ((int) $contact->status === 0)
                                                     <p class="badge bg-warning">Đợi xử lý</p>
                                                 @elseif ((int) $contact->status === 1)
@@ -212,4 +215,5 @@
                 });
             @endif
         });
+
     </script>

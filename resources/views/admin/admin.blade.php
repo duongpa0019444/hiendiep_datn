@@ -27,8 +27,8 @@
 
     <!-- App css (Require in all Page) -->
     <link href="{{ asset('admin/css/app.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('admin/css/loading.css') }}" rel="stylesheet" type="text/css" />
 
+    <link href="{{ asset('admin/css/loading.css') }}" rel="stylesheet" type="text/css" />
     <!-- Theme Config js (Require in all Page) -->
     <script src="{{ asset('admin/js/config.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -443,6 +443,7 @@
                 </a>
 
                 <a href="{{ route('admin.dashboard') }}" class="logo-light">
+
                     <img src="{{ asset('client/images/logo-icon-white.png') }}" class="logo-sm" alt="logo sm">
                     <img src="{{ asset('client/images/logo-white.png') }}" class="logo-lg" alt="logo light">
                 </a>
@@ -586,12 +587,24 @@
 
                         </li>
                         <li class="nav-item">
+
                             <a class="nav-link" href="{{ route('admin.teacher_salaries') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
+                                    <iconify-icon icon="line-md:beer-alt-twotone-loop"></iconify-icon>
                                 </span>
                                 <span class="nav-text"> Quản lí lương giáo viên</span>
                             </a>
+                            <div class="collapse" id="sidebarProducts">
+                                <ul class="nav sub-navbar-nav">
+                                    <li class="sub-nav-item">
+                                        <a class="sub-nav-link" href="{{ route('admin.teacher_salaries')}}">Quản lý bảng lương</a>
+                                    </li>
+                                    <li class="sub-nav-item">
+                                        <a class="sub-nav-link" href="{{ route('admin.teacher_salaries.detail')}}">Chi tiết bảng lương GV</a>
+                                    </li>
+
+                                </ul>
+                            </div>
 
                         </li>
 
@@ -610,10 +623,12 @@
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:document-report"></iconify-icon>
                                 </span>
+
                                 <span class="nav-text"> Quản lí liên hệ  </span>
                             </a>
 
 
+                       
                         </li>
 
 
@@ -707,6 +722,7 @@
                                     <iconify-icon icon="line-md:document-report"></iconify-icon>
                                 </span>
 
+
                                 <span class="nav-text"> Quản lý liên hệ</span>
                             </a>
 
@@ -736,6 +752,7 @@
 
     </div>
 
+
     <!-- Spinner container (ẩn mặc định) -->
     <div id="loading-spinner"
         style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999;">
@@ -758,33 +775,7 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-    @if (auth()->check() && auth()->user()->isStaff())
-        @if (auth()->check() && auth()->user()->isStaff())
-        @endif
-
-        <script>
-            AOS.init();
-            setTimeout(() => {
-                fetch('/clear-temp-folder', {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}', // nếu dùng trong Blade
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Có lỗi xảy ra');
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log(data.message);
-                    })
-                    .catch(error => {
-                        console.error('Lỗi:', error.message);
-                    });
-            }, 300000); // 5phút
-        </script>
-    @endif
+   
 
     <script>
         $(window).on('load', function() {

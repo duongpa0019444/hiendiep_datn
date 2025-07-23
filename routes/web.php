@@ -38,11 +38,13 @@ use Maatwebsite\Excel\Facades\Excel;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/course', [ClientCourseController::class, 'index'])->name('client.course');
 
+
 // phần liên hệ client
 
 Route::get('contact', [ClientCourseController::class, 'contact'])->name('client.contacts');
 Route::post('/contact-support', [SupportRequestController::class, 'store'])->name('support.store');
 Route::post('/contact-support/{id}/handle', [SupportRequestController::class, 'handle'])->middleware('auth')->name('support.handle');
+
 
 //
 Route::get('/course/{slug}_{id}', [ClientCourseController::class, 'detail'])->name('client.course.detail');
@@ -81,6 +83,8 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/account', [AccountController::class, 'account'])->name('admin.account');
     Route::get('/account-search', [AccountController::class, 'search'])->name('admin.account.search');
     Route::get('/account/{role}', [AccountController::class, 'list'])->name('admin.account.list');
+    Route::get('/account/{role}/{id}', [AccountController::class, 'detail'])->name('admin.account.detail');
+
     Route::get('/account-add/{role}', [AccountController::class, 'add'])->name('admin.account.add');
     Route::post('/account-store/{role}', [AccountController::class, 'store'])->name('admin.account.store');
     Route::get('/account-edit/{role}/{id}', [AccountController::class, 'edit'])->name('admin.account.edit');
@@ -171,10 +175,12 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
 
     //Chi tiết lương giáo viên
     Route::get('/admin/teacher-salary-rules/{id}/details', [TeacherRulesController::class, 'details'])->name('admin.teacher_salary_rules.details');
-    Route::get('/teacher-salary-rules/index', [TeacherRulesController::class, 'indexRules'])->name('admin.teacher-salary-rules.indexRules');
-    Route::post('/admin/teacher-salary-rules/store', [TeacherRulesController::class, 'store'])->name('admin.teacher-salary-rules.store');
-    Route::get('/teacher-salary-rules/by-teacher/{id}', [TeacherRulesController::class, 'getRulesByTeacher'])
-        ->name('admin.teacher-salary-rules.byTeacher');
+    Route::get('/teacher-salary-rules/index', [TeacherRulesController::class, 'indexRules'])->name('admin.teacher_salaries.detail');
+    Route::post('/admin/teacher-salary-rules/store', [TeacherRulesController::class, 'store'])->name('admin.teacher_salary.store');
+    Route::get('/admin/teacher-salary-rules/by-teacher/{id}', [TeacherRulesController::class, 'getRulesByTeacher'])->name('admin.teacher-salary-rules.byTeacher');
+    Route::get('/admin/teacher-salary-rules/search-teacher', [TeacherRulesController::class, 'searchTeacher'])
+    ->name('admin.teacher-salary-rules.searchTeacher');
+
 
     // Gửi thông báo
     Route::get('admin/notifications', [NotificationsController::class, 'index'])->name('admin.notifications');
@@ -292,6 +298,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::post('/courses/{id}/toggle-featured', [CourseController::class, 'toggleFeatured'])->name('admin.course.toggle-featured');
     // Route::post('/admin/courses/{id}/toggle-featured', [CourseController::class, 'toggleFeatured']);
 
+
     // quản lý hỗ trợ tin nhắn
     Route::get('/admin/contact', [contactController::class, 'contact'])->name('admin.contact');
     Route::get('/admin/contact/{id}/detail', [contactController::class, 'contactDetail'])->name('admin.contactDetail');
@@ -392,6 +399,7 @@ Route::middleware([CheckRoleClient::class . ':student'])->prefix('student')->gro
     Route::get('/check-access-code/{code}', [ClientQuizzesController::class, 'checkAccessCode']);
     Route::post('/submit-quiz/{quizId}/class/{classId}', [ClientQuizzesController::class, 'submitQuiz'])->name('student.quizzes.submit');
     Route::get('/quizz/resulte-student/{quizzAttempts}', [ClientQuizzesController::class, 'resultsQuizzComplete'])->name('student.quizzes.resultsQuizzComplete');
+
     Route::get('/dashboard/hoctaps/{class}', [UserController::class, 'getHoctaps']);
 
 });
@@ -399,6 +407,7 @@ Route::middleware([CheckRoleClient::class . ':student'])->prefix('student')->gro
 
 //Dành cho giáo viên
 Route::middleware([CheckRoleClient::class . ':teacher'])->prefix('teacher')->group(function () {
+
 
     Route::get('dashboard/overview/{month}/{year}', [UserController::class, 'OverviewTeacher']);
     //Quản lý quizz
@@ -431,6 +440,7 @@ Route::middleware([CheckRoleClient::class . ':teacher'])->prefix('teacher')->gro
     Route::get('quizzes/{id}/results', [ClientQuizzesController::class, 'results'])->name('teacher.quizzes.results');
     Route::get('quizzes/{id}/results/class/{class}', [ClientQuizzesController::class, 'resultsClass'])->name('teacher.quizzes.results.class');
     // Route::get('quizzes/results/filter/class', [quizzesController::class, 'filterResults'])->name('admin.quizzes.filter.reults.class');
+
 
     Route::get('quizzes/{id}/results/class/{class}/student/{student}', [ClientQuizzesController::class, 'resultsClassStudent'])->name('teacher.quizzes.results.class.student');
     Route::get('/quizz/{quiz}/show-result/{attempt}/student/{student}', [ClientQuizzesController::class, 'resultsQuizzStudent']); //hiển thị kết quả làm quiz của học sinh

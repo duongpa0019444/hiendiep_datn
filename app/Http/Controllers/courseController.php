@@ -99,6 +99,7 @@ class CourseController  extends Controller
 
         try {
             $course = courses::findOrFail($id);
+
             // Xóa file ảnh nếu tồn tại
             if ($course->image) {
                 $imagePath = public_path($course->image);
@@ -288,6 +289,7 @@ class CourseController  extends Controller
     //     return response()->json(['success' => true, 'status' => $course->is_featured]);
     // }
     public function toggleFeatured($id)
+
     {
         $course = courses::findOrFail($id);
         $course->is_featured = !$course->is_featured;
