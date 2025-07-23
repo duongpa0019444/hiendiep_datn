@@ -403,7 +403,7 @@
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:document-report"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Quản lí tin nhắn cần hỗ trợ </span>
+                                <span class="nav-text"> Quản lí liên hệ  </span>
                             </a>
 
                        
@@ -498,7 +498,7 @@
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:document-report"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Quản lý hỗ trợ tin nhắn  </span>
+                                <span class="nav-text"> Quản lý liên hệ</span>
                             </a>
 
                         </li>

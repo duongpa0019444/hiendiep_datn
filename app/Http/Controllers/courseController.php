@@ -39,13 +39,24 @@ class CourseController  extends Controller
             $query->orderBy('price', 'desc');
         }
 
-        // Lấy tất cả khóa học sau khi lọc (nếu bạn muốn phân trang, dùng ->paginate(10))
-        $courses = $query->paginate(10);
+        // Lấy tất cả khóa học sau khi lọc dùng ->paginate(10))
+        // dd($courses);
 
-        // Thống kê cơ bản
+         $limit = $request->input('limit2', 10); // lấy số lượng bản ghi mỗi trang từ request, mặc định 10
+        $courses = $query->paginate($limit);
         $totalCourses = $courses->count();
         $totalSessions = $courses->sum('total_sessions');
         $totalRevenue = $courses->sum('price');
+
+
+       
+        // $allCourses = $query->get(); // Lấy toàn bộ khóa học (không phân trang)
+
+        // $totalCourses = $allCourses->count();
+        // $totalSessions = $allCourses->sum('total_sessions');
+        // $totalRevenue = $allCourses->sum('price');
+        //         $courses = $query->paginate(10);
+
 
         // Số khóa học được tạo trong tháng hiện tại
         $coursesThisMonth = courses::whereBetween('created_at', [
@@ -88,13 +99,13 @@ class CourseController  extends Controller
 
         try {
             $course = courses::findOrFail($id);
-             // Xóa file ảnh nếu tồn tại
-        if ($course->image) {
-            $imagePath = public_path($course->image);
-            if (File::exists($imagePath)) {
-                File::delete($imagePath);
+            // Xóa file ảnh nếu tồn tại
+            if ($course->image) {
+                $imagePath = public_path($course->image);
+                if (File::exists($imagePath)) {
+                    File::delete($imagePath);
+                }
             }
-        }
             $course->delete();
             return redirect()->route('admin.course-list')->with('success', 'Xóa khóa học thành công');
         } catch (QueryException $e) {
@@ -242,7 +253,9 @@ class CourseController  extends Controller
         // dd($course_id, $id);
         $course_id = $course_id;
         $lession = Lessions::findOrFail($id);
-        return view('admin.course.lession-edit', ['id' => $id], compact('lession', 'course_id'));
+        $quizz = Quizzes::where('course_id', $course_id)->get(); // hoặc Quizzes::all() nếu không cần lọc
+
+        return view('admin.course.lession-edit', ['id' => $id], compact('lession', 'course_id', 'quizz', 'id'));
     }
     public function updateLession(Request $request, $course_id, $id)
     {
@@ -275,15 +288,14 @@ class CourseController  extends Controller
     //     return response()->json(['success' => true, 'status' => $course->is_featured]);
     // }
     public function toggleFeatured($id)
-{
-    $course = courses::findOrFail($id);
-    $course->is_featured = !$course->is_featured;
-    $course->save();
+    {
+        $course = courses::findOrFail($id);
+        $course->is_featured = !$course->is_featured;
+        $course->save();
 
-    return response()->json([
-        'success' => true,
-        'status' => $course->is_featured
-    ]);
-}
-
+        return response()->json([
+            'success' => true,
+            'status' => $course->is_featured
+        ]);
+    }
 }

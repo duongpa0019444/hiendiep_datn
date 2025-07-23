@@ -42,7 +42,7 @@
                                         <div class="mb-3">
                                             <label for="link_document" class="form-label">Tài liệu học</label>
                                             <input type="text" name="link_document" id="link_document"
-                                                class="form-control" placeholder="TTài liệu học">
+                                                class="form-control" placeholder="Tài liệu học">
                                         </div>
                                     </div>
 
