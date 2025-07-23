@@ -95,6 +95,18 @@
                                 </div>
                             </div>
 
+                            <!-- ✅ THÊM: Thời gian bắt đầu -->
+                                <div class="mt-2">
+                                    <label class="form-label">Thời gian bắt đầu hiệu lực</label>
+                                    <input type="datetime-local" name="start_time" class="form-control" value="{{ old('start_time') }}">
+                                </div>
+
+                                <!-- ✅ THÊM: Thời gian kết thúc -->
+                                <div class="mt-2 mb-2">
+                                    <label class="form-label">Thời gian kết thúc hiệu lực</label>
+                                    <input type="datetime-local" name="end_time" class="form-control" value="{{ old('end_time') }}">
+                                </div>
+
                             <button type="submit" class="btn btn-primary w-100">Gửi thông báo</button>
                         </form>
                     </div>
@@ -103,13 +115,13 @@
                         <div class="mb-3 d-flex gap-2  " id="roleButtons">
                             <button type="button" class="btn btn-outline-secondary  btn-role active" data-role="">Tất
                                 cả</button>
-                            <button type="button" class="btn btn-outline-success  btn-role" data-role="teacher">🎓 Giáo
+                            <button type="button" class="btn btn-outline-success  btn-role" data-role="teacher">Giáo
                                 viên</button>
-                            <button type="button" class="btn btn-outline-info  btn-role" data-role="student">👩‍🎓 Học
+                            <button type="button" class="btn btn-outline-info  btn-role" data-role="student">Học
                                 sinh</button>
-                            <button type="button" class="btn btn-outline-warning  btn-role" data-role="staff">🧑‍💼 Nhân
+                            <button type="button" class="btn btn-outline-warning  btn-role" data-role="staff">Nhân
                                 viên</button>
-                            <button type="button" class="btn btn-outline-primary  btn-role " data-role="class">🏫
+                            <button type="button" class="btn btn-outline-primary  btn-role " data-role="class">
                                 Lớp</button>
                         </div>
                         <div id="notificationsContainer">

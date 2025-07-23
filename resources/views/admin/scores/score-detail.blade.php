@@ -9,7 +9,7 @@
                 <ol class="breadcrumb py-0">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('admin.score') }}">Quản lí điểm số</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ $data->first()->class->name }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ $data->first()->class->name ?? '' }}</li>
                 </ol>
             </nav>
 
@@ -94,10 +94,10 @@
                                     @foreach ($data as $score)
                                         <tr>
                                             {{-- sử lí bảng score và thêm modol score vào --}}
-                                            <td>{{ $score->student->name }}</td>
-                                            <td>{{ $score->class->name }}</td>
-                                            <td>{{ $score->class->course->name }}</td>
-                                            <td>{{ $score->score_type }}</td> {{-- làm hàm trong model score --}}
+                                            <td>{{ $score->student->name ?? ''}}</td>
+                                            <td>{{ $score->class->name ?? ''}}</td>
+                                            <td>{{ $score->class->course->name ?? ''}}</td>
+                                            <td>{{ $score->score_type ?? ''}}</td> {{-- làm hàm trong model score --}}
                                             <td>{{ $score->score }}</td>
                                             <td>{{ \Carbon\Carbon::parse($score->exam_date)->format('d/m/Y') }}</td>
                                             <td>
@@ -109,7 +109,7 @@
                                                             class="align-middle fs-18"></iconify-icon></a>
                                                     <a href="{{ route('admin.score.delete', ['id' => $score->id]) }}"
                                                         class="btn btn-soft-danger btn-sm"
-                                                        onclick="return confirm('Bạn có muốn xóa {{ $score->scoreTypeVN() }} của học sinh {{ $score->student->name }} ?')">
+                                                        onclick="return confirm('Bạn có muốn xóa điểm của học sinh {{ $score->student->name }} ?')">
                                                         <iconify-icon icon="solar:trash-bin-minimalistic-2-broken"
                                                             class="align-middle fs-18"></iconify-icon></a>
                                                 </div>

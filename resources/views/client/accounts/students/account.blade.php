@@ -19,7 +19,8 @@
         @endif
 
 
-        <div class="d-flex flex-column pb-2 pb-md-4 flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+        <div
+            class="d-flex flex-column pb-2 pb-md-4 flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
             <h5 class="mb-0">Thông Tin Tài Khoản</h5>
             <form action="{{ route('client.account.edit') }}" method="GET">
                 <input type="hidden" name="id" value="{{ $user->id }}">
@@ -45,7 +46,7 @@
 
                                 <div class="d-flex justify-content-between text-muted align-items-center">
                                     <span class="d-flex align-items-center">
-                                        <i class="icofont-graduate me-2 display-6"></i>Tất cả khóa học đã đăng ký:</span>
+                                        <i class="icofont-graduate me-2 "></i>Tất cả khóa học đã đăng ký:</span>
                                     <span>{{ $courses }}</span>
                                 </div>
                             </div>
@@ -56,7 +57,7 @@
 
                                 <div class="d-flex justify-content-between text-muted align-items-center">
                                     <span class="d-flex align-items-center">
-                                       <i class="icofont-ui-play me-2 display-6"></i>Khóa Đang Học:</span>
+                                        <i class="icofont-ui-play me-2 "></i>Khóa Đang Học:</span>
                                     <span>{{ $inProgressCourseNames }}</span>
                                 </div>
                             </div>
@@ -67,7 +68,7 @@
 
                                 <div class="d-flex justify-content-between text-muted align-items-center">
                                     <span class="d-flex align-items-center">
-                                        <i class="icofont-check-alt me-2 display-6"></i>Khóa Đã Hoàn Thành:</span>
+                                        <i class="icofont-check-alt me-2 "></i>Khóa Đã Hoàn Thành:</span>
                                     <span>{{ $completedCourseNames }}</span>
                                 </div>
                             </div>
@@ -77,7 +78,7 @@
                             <div class="notification-content">
 
                                 <div class="d-flex justify-content-between text-muted align-items-center">
-                                    <span class="d-flex align-items-center"><i class="icofont-birthday-cake me-2 display-6">
+                                    <span class="d-flex align-items-center"><i class="icofont-birthday-cake me-2 ">
                                         </i>Ngày Sinh:</span>
                                     <span>{{ \Carbon\Carbon::parse($user->birth_date)->format('d/m/Y') }}</span>
 
@@ -90,8 +91,11 @@
 
                                 <div class="d-flex justify-content-between text-muted align-items-center">
                                     <span class="d-flex align-items-center">
-                                        <i class="icofont-boy me-2 display-6"></i>Giới tính:</span>
-                                    <span>{{ $user->gender }}</span>
+                                        <i class="icofont-boy me-2 "></i>Giới tính:</span>
+                                    <span>
+                                        {{ $user->gender === 'girl' ? 'Nữ' : ($user->gender === 'boy' ? 'Nam' : 'Khác') }}
+                                    </span>
+
                                 </div>
                             </div>
                         </li>
@@ -101,7 +105,7 @@
 
                                 <div class="d-flex justify-content-between text-muted align-items-center">
                                     <span class="d-flex align-items-center">
-                                        <i class="icofont-email me-2 display-6"></i>Email:</span>
+                                        <i class="icofont-email me-2 "></i>Email:</span>
                                     <span>{{ $user->email }}</span>
                                 </div>
                             </div>
@@ -112,8 +116,19 @@
 
                                 <div class="d-flex justify-content-between text-muted align-items-center">
                                     <span class="d-flex align-items-center">
-                                        <i class="icofont-phone-circle me-2 display-6"></i>Số điện thoại:</span>
+                                        <i class="icofont-phone-circle me-2 "></i>Số điện thoại:</span>
                                     <span>{{ $user->phone }}</span>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="list-group-item notification-item">
+                            <div class="notification-content">
+
+                                <div class="d-flex justify-content-between text-muted align-items-center">
+                                    <span class="d-flex align-items-center">
+                                        <i class="icofont-address-circle me-2 "></i>Địa chỉ:</span>
+                                    <span>{{ $user->address }}</span>
                                 </div>
                             </div>
                         </li>
@@ -123,7 +138,7 @@
             </div>
         </div>
 
-    
-       
+
+
     </div>
 @endsection

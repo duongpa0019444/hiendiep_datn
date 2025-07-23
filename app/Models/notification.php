@@ -13,6 +13,8 @@ class notification extends Model
         'target_role',
         'created_by',
         'class_id', // nếu bạn có dùng
+        'start_time',
+        'end_time'
     ];
 
         public function creator()

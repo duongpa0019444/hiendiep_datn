@@ -9,12 +9,14 @@ use App\Http\Controllers\Controller;
 use App\Models\classes;
 use App\Models\classStudent;
 use App\Models\coursePayment;
+use App\Models\Quizzes;
 use App\Models\notification;
 use App\Models\Schedule;
 use App\Models\score;
 use App\Models\User as ModelsUser;
 use Database\Seeders\user;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Str;
@@ -41,8 +43,9 @@ class UserController extends Controller
                     ->value('class_id');
             }
 
+            $now = Carbon::now();
             // Lấy danh sách thông báo phù hợp
-            $notifications = notification::where(function ($q) use ($user, $classId) {
+            $notifications = Notification::where(function ($q) use ($user, $classId) {
                 $q->where('target_role', 'all')
                     ->orWhere('target_role', $user->role);
 
@@ -53,13 +56,19 @@ class UserController extends Controller
                     });
                 }
             })
+                ->where(function ($q) use ($now) {
+                    $q->whereNull('start_time')->orWhere('start_time', '<=', $now);
+                })
+                ->where(function ($q) use ($now) {
+                    $q->whereNull('end_time')->orWhere('end_time', '>=', $now);
+                })
                 ->orderByDesc('created_at')
-                // ->paginate(3);
                 ->limit(3)
                 ->get();
 
             return view('client.accounts.students.dashboard', compact('unPaymentInfo', 'notifications'));
         } elseif (Auth::user()->role == "teacher") {
+
 
             $user = Auth::user();
             $userId = $user->id;
@@ -111,7 +120,7 @@ class UserController extends Controller
     {
         if (Auth::user()->role == "student") {
 
-            $data = score::with('class.course')->where('student_id', Auth::user()->id)->paginate(5);
+            $data = score::with('class.course')->where('student_id', Auth::user()->id)->paginate(6);
             return view('client.accounts.students.score', compact('data'));
         } elseif (Auth::user()->role == "teacher") {
 
@@ -130,23 +139,42 @@ class UserController extends Controller
     {
         $query = trim($request->query('queryScoreClient'));
 
-        if ($query) {
-            $data = Classes::with('course')
-                ->join('schedules', 'schedules.class_id', '=', 'classes.id')
-                ->join('courses', 'classes.courses_id', '=', 'courses.id')
-                ->where('schedules.teacher_id', Auth::id())
-                ->where(function ($q) use ($query) {
-                    $q->where('classes.name', 'like', "%$query%")
-                        ->orWhere('courses.name', 'like', "%$query%");
-                })
-                ->select('classes.*') // Lấy dữ liệu từ bảng classes
-                ->distinct()
-                ->paginate(18);
+        if (Auth::user()->role == "student") {
+            if ($query) {
+                $data = Score::with('class.course')
+                    ->where('student_id', Auth::user()->id)
+                    ->where(function ($queryBuilder) use ($query) {
+                        $queryBuilder->whereHas('class', function ($q) use ($query) {
+                            $q->where('name', 'like', "%$query%");
+                        })->orWhereHas('class.course', function ($q) use ($query) {
+                            $q->where('name', 'like', "%$query%");
+                        });
+                    })
+                    ->paginate(7);
 
-            return view('client.accounts.teachers.score', compact('data', 'query'));
+                return view('client.accounts.students.score', compact('data'));
+            } else {
+                $data = score::with('class.course')->where('student_id', Auth::user()->id)->paginate(6);
+                return view('client.accounts.students.score', compact('data'));
+            }
+        } elseif (Auth::user()->role == "teacher") {
+
+            if ($query) {
+                $data = Classes::with('course')
+                    ->join('schedules', 'schedules.class_id', '=', 'classes.id')
+                    ->join('courses', 'classes.courses_id', '=', 'courses.id')
+                    ->where('schedules.teacher_id', Auth::id())
+                    ->where(function ($q) use ($query) {
+                        $q->where('classes.name', 'like', "%$query%")
+                            ->orWhere('courses.name', 'like', "%$query%");
+                    })
+                    ->select('classes.*') // Lấy dữ liệu từ bảng classes
+                    ->distinct()
+                    ->paginate(18);
+
+                return view('client.accounts.teachers.score', compact('data', 'query'));
+            }
         }
-
-        return redirect()->route('client.score');
     }
 
 
@@ -263,10 +291,13 @@ class UserController extends Controller
         ])->with('success', 'Đã cập nhật điểm thành công!');
     }
 
-    public function Scoredelete($id){
+
+    public function Scoredelete($id)
+    {
         score::find($id)->delete();
         return redirect()->back()->with('success', 'Xóa điểm thành công!');
     }
+
 
     public function Scoreimport(Request $request)
     {
@@ -393,7 +424,7 @@ class UserController extends Controller
                     'q.updated_at',
                     'c.name as class_name',
                     'u.name as creator_name',
-                    DB::raw('COUNT(DISTINCT ques.id) + COUNT(DISTINCT sq.id) as total_questions')
+                    DB::raw('COUNT(DISTINCT ques.id) + COUNT(DISTINCT sq.id) as `total_questions`')
                 )
                 ->orderBy('q.updated_at', 'desc')
                 ->get();
@@ -401,7 +432,62 @@ class UserController extends Controller
             return view('client.accounts.students.quizz', compact('quizzesDone', 'assignedQuizzes'));
         } elseif (Auth::user()->role == "teacher") {
 
-            return view('client.accounts.teachers.quizz');
+            $queryBase = DB::table('quizzes as q')
+                ->leftJoin('classes as c', 'q.class_id', '=', 'c.id')
+                ->leftJoin('users as u', 'q.created_by', '=', 'u.id')
+                ->leftJoin('questions as ques', 'q.id', '=', 'ques.quiz_id')
+                ->leftJoin('sentence_questions as sq', 'q.id', '=', 'sq.quiz_id')
+                ->select(
+                    'q.id',
+                    'q.title',
+                    'q.status',
+                    'q.class_id',
+                    'q.duration_minutes',
+                    'q.created_by',
+                    'q.updated_at',
+                    'q.deleted_at',
+                    'c.name as class_name',
+                    'u.name as creator_name',
+                    DB::raw('COUNT(DISTINCT ques.id) + COUNT(DISTINCT sq.id) as total_questions')
+                )
+                ->where('q.created_by', Auth::user()->id)
+                ->groupBy(
+                    'q.id',
+                    'q.title',
+                    'q.status',
+                    'q.class_id',
+                    'q.duration_minutes',
+                    'q.created_by',
+                    'q.updated_at',
+                    'q.deleted_at',
+                    'c.name',
+                    'u.name'
+                );
+
+            // Lấy tất cả quiz
+            $quizzesAll = (clone $queryBase)->whereNull('q.deleted_at')->orderBy('q.updated_at', 'desc')->get();
+
+            // Lấy quiz đã xuất bản
+            $quizzesPublished = (clone $queryBase)
+                ->where('q.status', 'published')
+                ->whereNull('q.deleted_at')
+                ->orderBy('q.updated_at', 'desc')
+                ->get();
+
+            // Lấy quiz lưu nháp
+            $quizzesDraft = (clone $queryBase)
+                ->where('q.status', 'draft')
+                ->whereNull('q.deleted_at')
+                ->orderBy('q.updated_at', 'desc')
+                ->get();
+
+            // Lấy quiz đã xóa
+            $quizzesTrashed = (clone $queryBase)
+                ->whereNotNull('q.deleted_at')
+                ->orderBy('q.updated_at', 'asc')
+                ->get();
+
+            return view('client.accounts.teachers.quizz', compact('quizzesAll', 'quizzesPublished', 'quizzesDraft', 'quizzesTrashed'));
         }
     }
 
@@ -468,12 +554,11 @@ class UserController extends Controller
         $user = ModelsUser::find(Auth::user()->id);
 
         $validated = $request->validate([
-            'name'       => 'required|string|max:255',
             'username'   => 'required|string|max:255|unique:users,name,' . $user->id,
-            'email'      => 'nullable|string||min:6',
-            'phone'      => 'nullable|digits_between:8,20',
+            'email'      => 'nullable|email|max:255',
             'gender'     => 'nullable|in:boy,girl',
             'birth_date' => 'nullable|date',
+            'address'   => 'nullable|string|max:1000',
             'avatar'     => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -490,6 +575,7 @@ class UserController extends Controller
             $file->move($destinationPath, $filename);
             $validated['avatar'] = 'uploads/avatar/' . $filename;
         }
+
 
         $user->update($validated);
 

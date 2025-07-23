@@ -3,8 +3,7 @@
 @section('content-information')
     <div id="account" class="content-section">
         <h5>Cập nhật Tài Khoản</h5>
-        
-        
+
         <form method="POST" action="{{ route('client.account.update') }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
@@ -39,8 +38,9 @@
                                 <i class="icofont-user"></i>
                                 <label for="roles-name" class="form-label fw-semibold mb-0">Tên người dùng</label>
                             </span>
-                            <input type="text" value="{{ $info->name ?? '' }}" id="roles-name" name="name"
-                                class="form-control" placeholder="Nhập tên ...">
+                            <p id="roles-name" class="p-3" >
+                                {{ $info->name ?? '' }}
+                            </p>
                         </div>
                     </div>
 
@@ -71,8 +71,7 @@
                                 <i class="icofont-phone"></i>
                                 <label class="form-label fw-semibold mb-0">Phone</label>
                             </span>
-                            <input type="tel" value="{{ $info->phone }}" name="phone" class="form-control"
-                                placeholder="Nhập phone...">
+                            <p class="p-3">{{ $info->phone }}</p>
                         </div>
                     </div>
 
@@ -84,6 +83,17 @@
                             </span>
                             <input type="date" value="{{ $info->birth_date }}" name="birth_date" class="form-control"
                                 placeholder="Nhập birth_date...">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <span class="d-flex align-items-center gap-2">
+                                <i class="icofont-calendar"></i>
+                                <label class="form-label fw-semibold mb-0">Địa chỉ</label>
+                            </span>
+                            <input type="text" value="{{ $info->address }}" name="address" class="form-control"
+                                placeholder="Nhập địa chỉ...">
                         </div>
                     </div>
 

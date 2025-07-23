@@ -105,7 +105,8 @@
             <div class="d-flex justify-content-between mb-1">
                 <h4 class="card-title mb-1">Danh sách thanh toán học phí</h4>
                 <div class="d-flex gap-2 align-items-center">
-                    <a id="" href="{{ route('admin.course_payments.trash') }}" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1">
+                    <a id="" href="{{ route('admin.course_payments.trash') }}"
+                        class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1">
                         <iconify-icon icon="mdi:trash-can-outline" class="fs-20 me-1"></iconify-icon> <span>Thùng rác</span>
                     </a>
 
@@ -196,7 +197,7 @@
 
                         <div class="card-body p-0">
                             <div class="table-responsive table-gridjs">
-                                <table class="table  rounded align-middle mb-0 table-hover table-centered" >
+                                <table class="table  rounded align-middle mb-0 table-hover table-centered">
                                     <thead class="table-dark">
                                         <tr>
                                             <th>Tên học sinh</th>
@@ -219,7 +220,7 @@
                                                 <td>
 
                                                     <div class="fw-bold">{{ $payment->class->name }}</div>
-                                                    {{-- <div class="fs-6">Khóa: {{ $payment->courses->name }}</div> --}}
+                                                    <div class="fs-6">Khóa: {{ $payment->course->name }}</div>
 
                                                 </td>
                                                 <td>
@@ -227,7 +228,8 @@
                                                 </td>
 
                                                 </td>
-                                                <td class="text-end">{{ number_format($payment->amount, 0, ',', '.') }}</td>
+                                                <td class="text-end">{{ number_format($payment->amount, 0, ',', '.') }}
+                                                </td>
                                                 <td>
                                                     <span
                                                         class="badge {{ $payment->status == 'paid' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' }} py-1 px-2">
@@ -568,11 +570,11 @@
                             <ul class="dropdown-menu">
 
                                 ${payment.status === 'paid' ? `
-                                        <li data-bs-target="#modal-printCoursePayment">
-                                            <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
-                                                <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
-                                            </button>
-                                        </li>` : ''}
+                                            <li data-bs-target="#modal-printCoursePayment">
+                                                <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
+                                                    <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
+                                                </button>
+                                            </li>` : ''}
 
                                 <li data-bs-target="#modal-course-payment">
                                     <button class="dropdown-item text-warning btn-edit-course-payment" data-coursePayment_id="${ payment.id }">
@@ -808,11 +810,11 @@
 
                                             ${payment.status === 'paid' ? `
 
-                                                    <li data-bs-target="#modal-printCoursePayment">
-                                                        <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
-                                                            <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
-                                                        </button>
-                                                    </li>` : ''}
+                                                        <li data-bs-target="#modal-printCoursePayment">
+                                                            <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
+                                                                <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
+                                                            </button>
+                                                        </li>` : ''}
 
 
                                             <li data-bs-target="#modal-course-payment">
@@ -934,6 +936,35 @@
             let exportUrl = '{{ route('admin.course_payments.export') }}?' + formData;
             // Chuyển hướng đến URL xuất file
             window.location.href = exportUrl;
+        });
+
+
+        // Khi click vào các link
+        $(document).on('click', 'a', function(e) {
+            const href = $(this).attr('href');
+
+            // Nếu là link hợp lệ (không phải anchor, không mở tab mới, không phải js link)
+            if (
+                href &&
+                !href.startsWith('#') &&
+                !$(this).attr('target') &&
+                !href.startsWith('javascript:')
+            ) {
+                $('#loading-spinner').fadeIn(200);
+            }
+        });
+
+        // Khi submit form không phải ajax
+        $(document).on('submit', 'form:not([data-ajax])', function() {
+            $('#loading-spinner').fadeIn(200);
+        });
+
+        // Khi dùng Ajax thì bật/tắt spinner riêng
+        $(document).ajaxStart(function() {
+            $('#loading-spinner').fadeIn(200);
+        });
+        $(document).ajaxStop(function() {
+            $('#loading-spinner').fadeOut(200);
         });
     </script>
 @endpush

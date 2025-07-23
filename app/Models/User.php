@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'username',
         'email',
+        'address',
         'phone',
         'password',
         'avatar',
@@ -80,6 +81,11 @@ class User extends Authenticatable
 
 
 
+    public function classStudents()
+    {
+        return $this->hasMany(classStudent::class, 'student_id', 'id');
+    }
+
 
     public function hasAnyRole(array $roles)
     {
@@ -103,4 +109,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(CoursePayment::class, 'student_id');
     }
+    // app/Models/User.php
+public function isStaff()
+{
+    return $this->role === 'staff';
+}
+
 }
