@@ -4,6 +4,8 @@
 @section('title', 'Trang admin')
 @section('description', '')
 @section('content')
+
+
     <div class="page-content">
 
         <!-- Start Container Fluid -->
@@ -95,7 +97,7 @@
                                             <div class="col-lg-4 col-md-6 col-sm-12">
                                                 <span class="text-success"> <i class="bx bxs-up-arrow fs-12"></i>
                                                     {{ $class->total_classes_in_progress }}</span>
-                                                <span class="text-muted fs-12">Đang học</span>
+                                                <span class="text-muted fs-12">Đang hoạt động</span>
                                             </div>
 
                                             <div class="col-lg-4 col-md-6 col-sm-12">
@@ -201,7 +203,7 @@
             </div> <!-- end row -->
 
             <div class="card">
-                <div class="d-flex align-items-center justify-content-center gap-2 col-xxl-12" data-aos="fade-up"
+                <div class="d-flex align-items-center justify-content-center gap-2 col-xxl-12 mt-2" data-aos="fade-up"
                     data-aos-delay="300">
                     <!-- Nút chuyển năm -->
                     <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center"
@@ -249,7 +251,7 @@
 
 
             <div class="card mt-2 p-2" data-aos="fade-up" data-aos-delay="300">
-                <div class="table-container">
+                <div class="table-container table-responsive">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="card-title mb-0 title-date-schedules">Lịch học ({{ $formattedDate }})</h4>
                         <div class="d-flex align-items-center">
@@ -259,7 +261,7 @@
                                 data-today="{{ $formattedDate }}">Today</button>
                         </div>
                     </div>
-                    <table class="table table-centered table-hover" id="scheduleTable">
+                    <table class="table table-centered table-hover " id="scheduleTable">
                         <thead class="table-dark">
                             <tr>
                                 <th scope="col">STT</th>
@@ -323,61 +325,7 @@
                     </table>
                 </div>
 
-                <!-- Modal chi tiết -->
-                <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="detailsModalLabel">Chi tiết lớp học</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="mb-1">
-                                    <div class="row">
-                                        <div class="col-md-4 mb-2">
-                                            <p><strong>Lớp học:</strong> <span id="modalClass"></span></p>
-                                        </div>
-                                        <div class="col-md-4 mb-2">
-                                            <p><strong>Môn học:</strong> <span id="modalSubject"></span></p>
-                                        </div>
-                                        <div class="col-md-4 mb-2">
-                                            <p><strong>Giáo viên:</strong> <span id="modalTeacher"></span></p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <p><strong>Thời gian:</strong> <span id="modalTime"></span></p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <p class="d-flex align-items-center"><strong>Trạng thái buổi học:</strong>
-                                                <span id="modalStatus" class="ms-2"></span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <hr>
-                                <h4>Danh sách điểm danh</h4>
-                                <table class="table table-bordered attendance-table">
-                                    <thead>
-                                        <tr>
-                                            <th>STT</th>
-                                            <th>Tên học viên</th>
-                                            <th>Trạng thái</th>
-                                            <th>Ghi chú</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="attendanceBody"></tbody>
-                                </table>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary"
-                                    data-bs-dismiss="modal">Đóng</button>
-                                <a href=""><button type="button" class="btn btn-primary">Chi tiết</button></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
 
@@ -700,7 +648,7 @@
             schedules.forEach(function(schedule, index) {
                 var statusLabel = '';
                 if (schedule.status_label === 'Chưa học') {
-                    statusLabel = '<span class="badge bg-warning text-dark p-1">' + schedule.status_label +
+                    statusLabel = '<span class="badge bg-warning text-white p-1">' + schedule.status_label +
                         '</span>';
                 } else if (schedule.status_label === 'Đang học') {
                     statusLabel = '<span class="badge bg-success text-white p-1">' + schedule.status_label +
@@ -990,6 +938,14 @@
                         fontSize: '14px',
                         offsetX: 0,
                         offsetY: 7
+                    },
+                    tooltip: {
+                        y: {
+                            formatter: function (val) {
+                                return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+                                // Ví dụ: 1500000 → 1.500.000 ₫
+                            }
+                        }
                     },
                     labels: courseName,
                     colors: colors,

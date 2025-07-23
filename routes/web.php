@@ -29,19 +29,22 @@ use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckRoleClient;
 use App\Models\news;
 use App\Models\topics;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
+
+
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/course', [ClientCourseController::class, 'index'])->name('client.course');
 
-// phần liên hệ client 
+// phần liên hệ client
 
 Route::get('contact', [ClientCourseController::class, 'contact'])->name('client.contacts');
 Route::post('/contact-support', [SupportRequestController::class, 'store'])->name('support.store');
 Route::post('/contact-support/{id}/handle', [SupportRequestController::class, 'handle'])->middleware('auth')->name('support.handle');
 
-// 
+//
 Route::get('/course/{slug}_{id}', [ClientCourseController::class, 'detail'])->name('client.course.detail');
 Route::get('/course-search', [ClientCourseController::class, 'search'])->name('client.course.search');
 
@@ -289,7 +292,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::post('/courses/{id}/toggle-featured', [CourseController::class, 'toggleFeatured'])->name('admin.course.toggle-featured');
     // Route::post('/admin/courses/{id}/toggle-featured', [CourseController::class, 'toggleFeatured']);
 
-    // quản lý hỗ trợ tin nhắn 
+    // quản lý hỗ trợ tin nhắn
     Route::get('/admin/contact', [contactController::class, 'contact'])->name('admin.contact');
     Route::get('/admin/contact/{id}/detail', [contactController::class, 'contactDetail'])->name('admin.contactDetail');
 
@@ -389,12 +392,15 @@ Route::middleware([CheckRoleClient::class . ':student'])->prefix('student')->gro
     Route::get('/check-access-code/{code}', [ClientQuizzesController::class, 'checkAccessCode']);
     Route::post('/submit-quiz/{quizId}/class/{classId}', [ClientQuizzesController::class, 'submitQuiz'])->name('student.quizzes.submit');
     Route::get('/quizz/resulte-student/{quizzAttempts}', [ClientQuizzesController::class, 'resultsQuizzComplete'])->name('student.quizzes.resultsQuizzComplete');
+    Route::get('/dashboard/hoctaps/{class}', [UserController::class, 'getHoctaps']);
+
 });
 
 
 //Dành cho giáo viên
 Route::middleware([CheckRoleClient::class . ':teacher'])->prefix('teacher')->group(function () {
 
+    Route::get('dashboard/overview/{month}/{year}', [UserController::class, 'OverviewTeacher']);
     //Quản lý quizz
     Route::get('quizzes/{id}/detail', [quizzesController::class, 'detail'])->name('teacher.quizzes.detail');
     Route::get('quizzes/filter', [quizzesController::class, 'filter'])->name('teacher.quizzes.filter');
@@ -426,7 +432,7 @@ Route::middleware([CheckRoleClient::class . ':teacher'])->prefix('teacher')->gro
     Route::get('quizzes/{id}/results/class/{class}', [ClientQuizzesController::class, 'resultsClass'])->name('teacher.quizzes.results.class');
     // Route::get('quizzes/results/filter/class', [quizzesController::class, 'filterResults'])->name('admin.quizzes.filter.reults.class');
 
-    Route::get('quizzes/{id}/results/class/{class}/student/{student}', [ClientQuizzesController::class, 'resultsClassStudent'])->name('admin.quizzes.results.class.student');
+    Route::get('quizzes/{id}/results/class/{class}/student/{student}', [ClientQuizzesController::class, 'resultsClassStudent'])->name('teacher.quizzes.results.class.student');
     Route::get('/quizz/{quiz}/show-result/{attempt}/student/{student}', [ClientQuizzesController::class, 'resultsQuizzStudent']); //hiển thị kết quả làm quiz của học sinh
 
 

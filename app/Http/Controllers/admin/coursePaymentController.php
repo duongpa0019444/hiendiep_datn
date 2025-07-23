@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\admin;
 
+use App\Events\PaymentNotificationCreated;
 use App\Http\Controllers\Controller;
 
 use App\Models\coursePayment;
@@ -11,6 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Exports\CoursePaymentsExport;
+use App\Models\notificationCoursePayments;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -71,7 +73,7 @@ class coursePaymentController extends Controller
             'pagination' => $payments->links('pagination::bootstrap-5')->toHtml()
         ]);
     }
-     private function getFilteredPayments(Request $request)
+    private function getFilteredPayments(Request $request)
     {
         $query = coursePayment::query();
 
@@ -103,7 +105,8 @@ class coursePaymentController extends Controller
     }
 
 
-    public function filterTrash(Request $request){
+    public function filterTrash(Request $request)
+    {
         $deletedPayments = $this->getFilteredPaymentsTrash($request);
         $deletedPayments->appends($request->all());
         return response()->json([
@@ -163,7 +166,17 @@ class coursePaymentController extends Controller
 
             $payment->save();
 
-            // Trả về JSON với dữ liệu bản ghi
+            $noti = notificationCoursePayments::create([
+                'course_payment_id' => $id,
+                'user_id' => $payment->student_id,
+                'status' => 'unseen'
+
+            ]);
+
+            $noti = $noti->fresh();
+            event(new PaymentNotificationCreated($noti));
+
+
             return response()->json([
                 'message' => 'Cập nhật thanh toán thành công',
                 'payment' => $payment->load(['user', 'class', 'course'])
