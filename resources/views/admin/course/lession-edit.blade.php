@@ -4,6 +4,8 @@
 @section('description', '')
 @section('content')
 
+
+
 <div class="page-content">
     <form action="{{ route('admin.lession-update',['course_id'=>$course_id,'id' => $id]) }}" method="POST">
         @csrf
@@ -49,10 +51,13 @@
                                 <div class="col-lg-6">
                                     <div class="mb-3">
                                         <select name="quizz_id" id="quizz_id" class="form-select">
-                                            <option value=" {{ $quizz->name }}"></option>
+                                            {{-- <option value=" {{ $quizz->name }}"></option> --}}
+                                            <option value="">-- Chọn bài Quiz --</option>
                                             @foreach ($quizz as $quiz)
-                                                <option value="{{ $quiz->id }}">{{ $quiz->name }}</option>
+                                                {{-- <option value="{{ $quiz->id }}">{{ $quiz->name }}</option> --}}
+                                                <option value="{{ $quiz->id }}">{{ $quiz->title }}</option>
                                             @endforeach
+                                            
                                         </select>
                                     </div>
                                 
@@ -68,7 +73,12 @@
 
 
                     <!-- Buttons -->
-                    <div class="p-3 bg-light mb-3 rounded">
+                   
+                    
+                    
+
+                </div>
+                 <div class="p-3 bg-light mb-3 rounded">
                         <div class="row justify-content-end g-2">
                             
                             <div class="col-lg-2">
@@ -80,9 +90,17 @@
                             </div>
                         </div>
                     </div>
+                     <div class="mt-3">
+                                  <button class="btn btn-soft-primary">
+                                      <a href="{{ route('admin.course-detail') }}"
+                                          class="link-primary text-decoration-underline link-offset-2"
+                                          style="color: black">Trở về trang chi tiết khóa học <i
+                                              class="bx bx-arrow-to-right align-middle fs-16"></i></a>
+                                  </button>
+                              </div>
 
-                </div>
             </div>
+            
         </div>
     </form>
 </div>

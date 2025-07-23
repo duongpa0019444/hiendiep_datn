@@ -5,18 +5,18 @@
 @section('content')
 
     @if (session('success'))
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    Toastify({
-                        text: "{{ session('success') }}",
-                        gravity: "top",
-                        position: "center",
-                        className: "success",
-                        duration: 4000
-                    }).showToast();
-                });
-            </script>
-        @endif
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Toastify({
+                    text: "{{ session('success') }}",
+                    gravity: "top",
+                    position: "center",
+                    className: "success",
+                    duration: 4000
+                }).showToast();
+            });
+        </script>
+    @endif
 
     <main>
         <div class="section-bg hero-bg background-image"
@@ -45,13 +45,13 @@
                             <!-- Hero Content -->
                             <div class="ed-hero__content">
                                 <h1 class="ed-hero__content-title ed-split-text left">Nền tảng <span>học tiếng Anh</span>
-                                    tốt nhất tại Hiền Diệp</h1>
+                                    vững chắc cho học sinh trung học</h1>
                                 <p class="ed-hero__content-text">
                                     Cải thiện kỹ năng tiếng Anh với các khóa học đa dạng, giáo viên tận tâm và phương pháp
                                     giảng dạy hiện đại.
                                 </p>
                                 <div class="ed-hero__btn">
-                                    <a href="courses.html" class="ed-btn">Khám phá khóa học<i
+                                    <a href="{{ route('client.course') }}" class="ed-btn">Khám phá khóa học<i
                                             class="fi fi-rr-arrow-small-right"></i></a>
                                 </div>
                             </div>
@@ -160,11 +160,13 @@
                             <!-- Hiển thị khóa học -->
                             <div class="col-lg-6 col-xl-4 col-md-6 col-12">
                                 <div class="ed-course__card wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
-                                    <a href="{{ route('admin.course-detail', $course->id) }}" class="ed-course__img">
+
+                                    <a href="{{ route('client.course.detail', ['slug' => Str::slug($course->course_name), 'id' => $course->course_id]) }}"
+                                        class="ed-course__img">
                                         <img src="{{ asset($course->image) }}" alt="course-img" style="height:150px" />
                                     </a>
 
-                                    <a href="#" class="ed-course__tag">Tiếng Anh</a>
+                                    <p class="ed-course__tag">{{ $course->total_lessons }} Bài giảng</p>
 
                                     <div class="ed-course__body">
                                         <div class="ed-course__lesson">
@@ -178,16 +180,16 @@
                                             </div>
                                         </div>
 
-                                        <a href="{{ route('admin.course-detail', $course->id) }}"
+                                        <a href="{{ route('admin.course-detail', $course->course_id) }}"
                                             class="ed-course__title">
-                                            <h5>{{ $course->name }}</h5>
+                                            <h5>{{ $course->course_name }}</h5>
                                         </a>
 
                                         <div class="ed-course__bottom">
                                             <span class="ed-course__price">{{ number_format($course->price) }} VNĐ</span>
                                             <div class="ed-course__students">
                                                 <i class="fi fi-rr-graduation-cap"></i>
-                                                <p>{{ $course->students_count ?? 0 }} Học viên</p>
+                                                <p>{{ $course->total_students ?? 0 }} Học viên</p>
                                             </div>
                                         </div>
                                     </div>
@@ -261,7 +263,7 @@
         <!-- End Features Area -->
 
         <!-- Start Course Area -->
-        <section class="ed-course section-gap section-bg-1 position-relative">
+        {{-- <section class="ed-course section-gap section-bg-1 position-relative">
             <div class="ed-course__shapes">
                 <img class="ed-course__shape-1 rotate-ani" src="{{ asset('client/images/course/course-1/shape-1.svg') }}"
                     alt="shape-1" />
@@ -441,7 +443,7 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </section> --}}
         <!-- End Course Area -->
 
         <!-- Start Why Choose Area -->
@@ -627,109 +629,7 @@
         </section>
         <!-- End Partner Area -->
 
-        <!-- Start Testimonial Area -->
-        <section class="ed-testimonial section-bg-color-1 section-gap">
-            <div class="container ed-container">
-                <div class="row align-items-center">
-                    <div class="col-lg-6 col-12">
-                        <!-- Testimonial Content  -->
-                        <div class="ed-testimonial__content">
-                            <div class="ed-section-head">
-                                <span class="ed-section-head__sm-title">CẢM NHẬN HỌC VIÊN</span>
-                                <h3 class="ed-section-head__title ed-split-text left">
-                                    Học viên nói gì về Hiền Diệp
-                                </h3>
-                            </div>
 
-                            <div class="owl-carousel ed-testimonial__slider">
-                                <!-- Single Testimonial  -->
-                                <div class="ed-testimonial__slider-item">
-                                    <ul class="ed-testimonial__rattings">
-                                        <li><i class="icofont-star"></i></li>
-                                        <li><i class="icofont-star"></i></li>
-                                        <li><i class="icofont-star"></i></li>
-                                        <li><i class="icofont-star"></i></li>
-                                        <li><i class="icofont-star"></i></li>
-                                    </ul>
-                                    <p class="ed-testimonial__text">
-                                        “Học tại Hiền Diệp là quyết định đúng đắn nhất của tôi. Giáo viên nhiệt tình, phương
-                                        pháp dạy dễ hiểu, giúp tôi tự tin giao tiếp chỉ sau 3 tháng.”
-                                    </p>
-                                    <div class="ed-testimonial__author">
-                                        <div class="ed-testimonial__author-img">
-                                            <img src="{{ asset('client/images/testimonial/testimonial-1/author-1.png') }}"
-                                                alt="author-img" />
-                                        </div>
-                                        <div class="ed-testimonial__author-info">
-                                            <h5>Nguyễn Thị Mai</h5>
-                                            <p>Học viên giao tiếp</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Single Testimonial  -->
-                                <div class="ed-testimonial__slider-item">
-                                    <ul class="ed-testimonial__rattings">
-                                        <li><i class="icofont-star"></i></li>
-                                        <li><i class="icofont-star"></i></li>
-                                        <li><i class="icofont-star"></i></li>
-                                        <li><i class="icofont-star"></i></li>
-                                        <li><i class="icofont-star"></i></li>
-                                    </ul>
-                                    <p class="ed-testimonial__text">
-                                        “Khóa học IELTS tại Hiền Diệp giúp tôi đạt band 7.0. Giáo viên tận tâm, tài liệu cập
-                                        nhật và môi trường học rất thân thiện.”
-                                    </p>
-                                    <div class="ed-testimonial__author">
-                                        <div class="ed-testimonial__author-img">
-                                            <img src="{{ asset('client/images/testimonial/testimonial-1/author-1.png') }}"
-                                                alt="author-img" />
-                                        </div>
-                                        <div class="ed-testimonial__author-info">
-                                            <h5>Trần Văn Hùng</h5>
-                                            <p>Học viên IELTS</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-12">
-                        <!-- Testimonial Images -->
-                        <div class="ed-testimonial__images position-relative">
-                            <div class="ed-testimonial__main-img">
-                                <img src="{{ asset('client/images/testimonial/testimonial-1/testimonial-img.png') }}"
-                                    alt="testimonial-img" />
-                            </div>
-
-                            <!-- Counter Card -->
-                            <div class="counter-card updown-ani">
-                                <div class="counter-card__icon">
-                                    <i class="fi fi-rr-graduation-cap"></i>
-                                </div>
-                                <div class="counter-card__info">
-                                    <h4><span class="counter">10</span>K+</h4>
-                                    <p>Học viên hài lòng</p>
-                                </div>
-                            </div>
-
-                            <!-- Testimonial Shapes -->
-                            <div class="ed-testimonial__shapes">
-                                <img class="ed-testimonial__shape-1"
-                                    src="{{ asset('client/images/testimonial/testimonial-1/shape-1.svg') }}"
-                                    alt="shape-1" />
-                                <img class="ed-testimonial__shape-2"
-                                    src="{{ asset('client/images/testimonial/testimonial-1/shape-2.svg') }}"
-                                    alt="shape-2" />
-                                <img class="ed-testimonial__shape-3 rotate-ani"
-                                    src="{{ asset('client/images/testimonial/testimonial-1/shape-3.svg') }}"
-                                    alt="shape-3" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
         <!-- End Testimonial Area -->
         <div class="section-bg background-image"
             style="background-image: url('{{ asset('client/images/section-bg-english.png') }}');">
@@ -739,9 +639,9 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-6 col-md-8 col-12">
                             <div class="ed-section-head text-center">
-                                <span class="ed-section-head__sm-title">TIN TỨC & MẸO HỌC</span>
+                                <span class="ed-section-head__sm-title">TIN TỨC</span>
                                 <h3 class="ed-section-head__title ed-split-text left">
-                                    Bài Viết Mới Về Học Tiếng Anh
+                                    Bài Viết Về Học Tiếng Anh
                                 </h3>
                             </div>
                         </div>
@@ -749,81 +649,214 @@
 
                     <div class="row">
                         <!-- Single Blog -->
-                        <div class="col-lg-4 col-md-6 col-12">
-                            <div class="ed-blog__card wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
-                                <div class="ed-blog__head">
-                                    <div class="ed-blog__img">
-                                        <img src="{{ asset('client/images/blog/blog-1/1.png') }}"
-                                            alt="english-blog-img" />
+                        @foreach ($news as $new)
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="ed-blog__card wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
+                                    <div class="ed-blog__head">
+                                        <div class="ed-blog__img">
+                                            <img src="{{ asset($new->image) }}" alt="english-blog-img" />
+                                        </div>
+                                        <a href="blog.html" class="ed-blog__category"> {{ $new->topic->name }}</a>
                                     </div>
-                                    <a href="blog.html" class="ed-blog__category">Kỹ Năng Nói</a>
+                                    <div class="ed-blog__content">
+                                        <ul class="ed-blog__meta">
+                                            <li><i class="fi fi-rr-calendar"></i>{{ $new->updated_at }}</li>
+                                            {{-- <li><i class="fi fi-rr-comment-alt-dots"></i>25 Bình Luận</li> --}}
+                                        </ul>
+                                        <a href="blog-details.html" class="ed-blog__title">
+                                            <h4>
+                                                {{ $new->title }}
+                                            </h4>
+                                            <p>
+                                                {{ $new->short_intro }}
+
+                                            </p>
+                                        </a>
+                                    </div>
                                 </div>
-                                <div class="ed-blog__content">
-                                    <ul class="ed-blog__meta">
-                                        <li><i class="fi fi-rr-calendar"></i>15 Tháng 4, 2025</li>
-                                        <li><i class="fi fi-rr-comment-alt-dots"></i>25 Bình Luận</li>
-                                    </ul>
-                                    <a href="blog-details.html" class="ed-blog__title">
-                                        <h4>
-                                            5 Mẹo Hàng Đầu Để Cải Thiện Kỹ Năng Nói Tiếng Anh
-                                        </h4>
-                                    </a>
+                            </div>
+                        @endforeach
+                        @if (count($events) == 0)
+                            <div class="col-12">
+                                <div class="alert alert-info text-center d-flex align-items-center justify-content-center"
+                                    role="alert" style="border-radius: 12px;">
+                                    <i class="icofont-info-circle me-2 fs-5 text-primary"></i>
+                                    <span class="fw-semibold">Hiện tại không có sự kiện nào.</span>
+                                </div>
+                            </div>
+                        @endif
+
+                    </div>
+                </div>
+            </section>
+            <!-- End Blog Area -->
+
+
+
+
+            <!-- Start Testimonial Area -->
+            <section class="ed-testimonial section-bg-color-1 section-gap">
+                <div class="container ed-container">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 col-12">
+                            <!-- Testimonial Content  -->
+                            <div class="ed-testimonial__content">
+                                <div class="ed-section-head">
+                                    <span class="ed-section-head__sm-title">CẢM NHẬN HỌC VIÊN</span>
+                                    <h3 class="ed-section-head__title ed-split-text left">
+                                        Học viên nói gì về Hiền Diệp
+                                    </h3>
+                                </div>
+
+                                <div class="owl-carousel ed-testimonial__slider">
+                                    <!-- Single Testimonial  -->
+                                    <div class="ed-testimonial__slider-item">
+                                        <ul class="ed-testimonial__rattings">
+                                            <li><i class="icofont-star"></i></li>
+                                            <li><i class="icofont-star"></i></li>
+                                            <li><i class="icofont-star"></i></li>
+                                            <li><i class="icofont-star"></i></li>
+                                            <li><i class="icofont-star"></i></li>
+                                        </ul>
+                                        <p class="ed-testimonial__text">
+                                            “Học tại Hiền Diệp là quyết định đúng đắn nhất của tôi. Giáo viên nhiệt tình,
+                                            phương
+                                            pháp dạy dễ hiểu, giúp tôi tự tin giao tiếp chỉ sau 3 tháng.”
+                                        </p>
+                                        <div class="ed-testimonial__author">
+                                            <div class="ed-testimonial__author-img">
+                                                <img src="{{ asset('client/images/testimonial/testimonial-1/author-1.png') }}"
+                                                    alt="author-img" />
+                                            </div>
+                                            <div class="ed-testimonial__author-info">
+                                                <h5>Nguyễn Thị Mai</h5>
+                                                <p>Học viên giao tiếp</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Single Testimonial  -->
+                                    <div class="ed-testimonial__slider-item">
+                                        <ul class="ed-testimonial__rattings">
+                                            <li><i class="icofont-star"></i></li>
+                                            <li><i class="icofont-star"></i></li>
+                                            <li><i class="icofont-star"></i></li>
+                                            <li><i class="icofont-star"></i></li>
+                                            <li><i class="icofont-star"></i></li>
+                                        </ul>
+                                        <p class="ed-testimonial__text">
+                                            “Khóa học IELTS tại Hiền Diệp giúp tôi đạt band 7.0. Giáo viên tận tâm, tài liệu
+                                            cập
+                                            nhật và môi trường học rất thân thiện.”
+                                        </p>
+                                        <div class="ed-testimonial__author">
+                                            <div class="ed-testimonial__author-img">
+                                                <img src="{{ asset('client/images/testimonial/testimonial-1/author-1.png') }}"
+                                                    alt="author-img" />
+                                            </div>
+                                            <div class="ed-testimonial__author-info">
+                                                <h5>Trần Văn Hùng</h5>
+                                                <p>Học viên IELTS</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-6 col-12">
+                            <!-- Testimonial Images -->
+                            <div class="ed-testimonial__images position-relative">
+                                <div class="ed-testimonial__main-img">
+                                    <img src="{{ asset('client/images/testimonial/testimonial-1/testimonial-img.png') }}"
+                                        alt="testimonial-img" />
+                                </div>
 
-                        <!-- Single Blog -->
-                        <div class="col-lg-4 col-md-6 col-12">
-                            <div class="ed-blog__card wow fadeInUp" data-wow-delay=".5s" data-wow-duration="1s">
-                                <div class="ed-blog__head">
-                                    <div class="ed-blog__img">
-                                        <img src="{{ asset('client/images/blog/blog-1/1.png') }}"
-                                            alt="english-blog-img" />
+                                <!-- Counter Card -->
+                                <div class="counter-card updown-ani">
+                                    <div class="counter-card__icon">
+                                        <i class="fi fi-rr-graduation-cap"></i>
                                     </div>
-                                    <a href="blog.html" class="ed-blog__category">Từ Vựng</a>
+                                    <div class="counter-card__info">
+                                        <h4><span class="counter">10</span>K+</h4>
+                                        <p>Học viên hài lòng</p>
+                                    </div>
                                 </div>
-                                <div class="ed-blog__content">
-                                    <ul class="ed-blog__meta">
-                                        <li><i class="fi fi-rr-calendar"></i>20 Tháng 1, 2025</li>
-                                        <li><i class="fi fi-rr-comment-alt-dots"></i>18 Bình Luận</li>
-                                    </ul>
-                                    <a href="blog-details.html" class="ed-blog__title">
-                                        <h4>
-                                            Cách Học 100 Từ Vựng Tiếng Anh Hiệu Quả Trong 1 Tuần
-                                        </h4>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Single Blog -->
-                        <div class="col-lg-4 col-md-6 col-12">
-                            <div class="ed-blog__card wow fadeInUp" data-wow-delay=".7s" data-wow-duration="1s">
-                                <div class="ed-blog__head">
-                                    <div class="ed-blog__img">
-                                        <img src="{{ asset('client/images/blog/blog-1/1.png') }}"
-                                            alt="english-blog-img" />
-                                    </div>
-                                    <a href="blog.html" class="ed-blog__category">Luyện Thi</a>
-                                </div>
-                                <div class="ed-blog__content">
-                                    <ul class="ed-blog__meta">
-                                        <li><i class="fi fi-rr-calendar"></i>10 Tháng 6, 2025</li>
-                                        <li><i class="fi fi-rr-comment-alt-dots"></i>12 Bình Luận</li>
-                                    </ul>
-                                    <a href="blog-details.html" class="ed-blog__title">
-                                        <h4>
-                                            Bí Quyết Đạt Điểm Cao Trong Kỳ Thi IELTS Writing
-                                        </h4>
-                                    </a>
+                                <!-- Testimonial Shapes -->
+                                <div class="ed-testimonial__shapes">
+                                    <img class="ed-testimonial__shape-1"
+                                        src="{{ asset('client/images/testimonial/testimonial-1/shape-1.svg') }}"
+                                        alt="shape-1" />
+                                    <img class="ed-testimonial__shape-2"
+                                        src="{{ asset('client/images/testimonial/testimonial-1/shape-2.svg') }}"
+                                        alt="shape-2" />
+                                    <img class="ed-testimonial__shape-3 rotate-ani"
+                                        src="{{ asset('client/images/testimonial/testimonial-1/shape-3.svg') }}"
+                                        alt="shape-3" />
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
-            <!-- End Blog Area -->
         </div>
+
+        <!-- Start Blog Area -->
+        <section class="ed-blog section-gap">
+            <div class="container ed-container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6 col-md-8 col-12">
+                        <div class="ed-section-head text-center">
+                            <span class="ed-section-head__sm-title">SỰ KIỆN</span>
+                            <h3 class="ed-section-head__title ed-split-text left">
+                                SỰ KIỆN MỚI NHẤT
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Single Blog -->
+                    @foreach ($events as $new)
+                        <div class="col-lg-4 col-md-6 col-12">
+                            <div class="ed-blog__card wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
+                                <div class="ed-blog__head">
+                                    <div class="ed-blog__img">
+                                        <img src="{{ asset($new->image) }}" alt="english-blog-img" />
+                                    </div>
+                                    <a href="blog.html" class="ed-blog__category"> {{ $new->topic->name }}</a>
+                                </div>
+                                <div class="ed-blog__content">
+                                    <ul class="ed-blog__meta">
+                                        <li><i class="fi fi-rr-calendar"></i>{{ $new->updated_at }}</li>
+                                        {{-- <li><i class="fi fi-rr-comment-alt-dots"></i>25 Bình Luận</li> --}}
+                                    </ul>
+                                    <a href="blog-details.html" class="ed-blog__title">
+                                        <h4>
+                                            {{ $new->title }}
+                                        </h4>
+                                        <p>
+                                            {{ $new->short_intro }}
+
+                                        </p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                    @if (count($events) == 0)
+                        <div class="col-12">
+                            <div class="alert alert-info text-center d-flex align-items-center justify-content-center"
+                                role="alert" style="border-radius: 12px;">
+                                <i class="icofont-info-circle me-2 fs-5 text-primary"></i>
+                                <span class="fw-semibold">Hiện tại không có sự kiện nào.</span>
+                            </div>
+                        </div>
+                    @endif
+
+                </div>
+            </div>
+        </section>
     </main>
 
 

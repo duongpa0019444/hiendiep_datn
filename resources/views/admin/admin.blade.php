@@ -28,6 +28,7 @@
     <!-- App css (Require in all Page) -->
     <link href="{{ asset('admin/css/app.min.css') }}" rel="stylesheet" type="text/css" />
 
+    <link href="{{ asset('admin/css/loading.css') }}" rel="stylesheet" type="text/css" />
     <!-- Theme Config js (Require in all Page) -->
     <script src="{{ asset('admin/js/config.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -42,11 +43,84 @@
 
     <script src="{{ asset('ckeditor4/ckeditor/ckeditor.js') }}"></script>
     @stack('styles')
+    @vite('resources/js/app.js')
+
+
 
 </head>
 
 <body>
 
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="spinner-wrapper">
+            <div class="spinner-ring"></div>
+            <img src="{{ asset('client/images/logo-icon.png') }}" alt="Logo" class="spinner-logo">
+        </div>
+        <p class="text-muted mt-3">Đang tải...</p>
+
+        <!-- Progress bar -->
+        <div class="progress-container mt-3">
+            <div class="progress-bar-loading"></div>
+        </div>
+    </div>
+
+
+
+
+    <!-- Modal chi tiết -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Chi tiết lớp học</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-1">
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <p><strong>Lớp học:</strong> <span id="modalClass"></span></p>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <p><strong>Môn học:</strong> <span id="modalSubject"></span></p>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <p><strong>Giáo viên:</strong> <span id="modalTeacher"></span></p>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <p><strong>Thời gian:</strong> <span id="modalTime"></span></p>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <p class="d-flex align-items-center"><strong>Trạng thái buổi học:</strong>
+                                    <span id="modalStatus" class="ms-2"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h4>Danh sách điểm danh</h4>
+                    <table class="table table-bordered attendance-table">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên học viên</th>
+                                <th>Trạng thái</th>
+                                <th>Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceBody"></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <a href="{{ route('admin.attendance.index') }}"><button type="button" class="btn btn-primary">Chi
+                            tiết</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- START Wrapper -->
     <div class="wrapper">
         <!-- ========== Topbar Start ========== -->
@@ -78,24 +152,157 @@
                             </button>
                         </div>
 
+                        <div class="dropdown topbar-item"  data-bs-auto-close="outside">
+                            @php
 
-
-                        <!-- Theme Setting -->
-                        <div class="topbar-item d-none d-md-flex">
-                            <button type="button" class="topbar-button" id="theme-settings-btn"
-                                data-bs-toggle="offcanvas" data-bs-target="#theme-settings-offcanvas"
-                                aria-controls="theme-settings-offcanvas">
-                                <iconify-icon icon="solar:settings-bold-duotone"
+                                $notifications = \App\Models\notificationCoursePayments::where('status', '!=', 'seen')
+                                    ->orderBy('created_at', 'desc')
+                                    ->get();
+                            @endphp
+                            <button type="button" class="topbar-button position-relative"
+                                id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
+                                <iconify-icon icon="solar:bell-bing-bold-duotone"
                                     class="fs-24 align-middle"></iconify-icon>
+                                <span
+                                    class="position-absolute topbar-badge fs-10 translate-middle badge bg-danger rounded-pill">{{ count($notifications) }}<span
+                                        class="visually-hidden">unread messages</span></span>
                             </button>
+                            <div class="dropdown-menu py-0 dropdown-xl dropdown-menu-end"
+                                aria-labelledby="page-header-notifications-dropdown">
+                                <div class="p-3 border-top-0 border-start-0 border-end-0 border-dashed border">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <h6 class="m-0 fs-16 fw-semibold">Thông báo thu học phí</h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div data-simplebar style="max-height: 300px;">
+                                    <!-- Item 1 -->
+
+                                    @foreach ($notifications as $notification)
+                                        <div class="dropdown-item py-3 border-bottom text-wrap position-relative">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0">
+                                                    <div class="avatar-sm me-2">
+                                                        <span
+                                                            class="avatar-title {{ $notification->coursePayment->method == 'Cash' ? 'bg-soft-info text-info' : 'bg-soft-success text-success' }} fs-20 rounded-circle">
+                                                            <i class="fas fa-money-bill-wave"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1 pe-4">
+                                                    <p class="mb-1 fw-semibold">
+                                                        {{ $notification->coursePayment->user->name }} đã
+                                                        {{ $notification->coursePayment->method == 'Cash' ? 'nộp tiền mặt' : 'chuyển khoản' }}
+                                                        học phí
+                                                    </p>
+                                                    <p class="mb-0 text-muted text-wrap">
+
+                                                        Thời gian:
+                                                        {{ \Carbon\Carbon::parse($notification->coursePayment->payment_date)->format('H:i - d/m/Y') }}<br>
+                                                    </p>
+                                                </div>
+
+                                                <!-- Dấu ba chấm và dropdown -->
+                                                <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
+                                                    <button class="btn btn-sm border-0" type="button"
+                                                        data-bs-toggle="dropdown" aria-expanded="false"  onclick="event.stopPropagation();">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                        <li>
+                                                            <a class="dropdown-item mark-as-read"
+                                                                href="javascript:void(0);"
+                                                                data-id="{{ $notification->id }}">
+                                                                <i class="fas fa-check me-1 text-success"></i> Đánh dấu
+                                                                là đã đọc
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+
+
+                                </div>
+
+                                <div class="text-center py-3">
+                                    <a href="/admin/notifications/tuition" class="btn btn-primary btn-sm">
+                                        Xem tất cả thông báo <i class="bx bx-right-arrow-alt ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+
+
+                            <!-- Theme Setting -->
+                            <div class="topbar-item d-none d-md-flex">
+                                <button type="button" class="topbar-button" id="theme-settings-btn"
+                                    data-bs-toggle="offcanvas" data-bs-target="#theme-settings-offcanvas"
+                                    aria-controls="theme-settings-offcanvas">
+                                    <iconify-icon icon="solar:settings-bold-duotone"
+                                        class="fs-24 align-middle"></iconify-icon>
+                                </button>
+                            </div>
+
+
+                            <!-- User -->
+                            <div class="dropdown topbar-item">
+                                <a type="button" class="topbar-button d-flex align-items-center gap-2"
+                                    id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                                    aria-expanded="false">
+
+                                    <div class="d-flex flex-column justify-content-center text-end">
+                                        <p class="mb-0 fw-semibold">{{ Auth::user()->name }}</p>
+                                    </div>
+
+                                    <span class="d-flex align-items-center  border rounded-circle overflow-hidden">
+                                        <img class="rounded-circle" width="32" height="32"
+                                            src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('icons/user-solid.svg') }}"
+                                            alt="avatar">
+                                    </span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <!-- item-->
+                                    <h6 class="dropdown-header">Welcome {{ Auth::user()->name }}!</h6>
+                                    <a class="dropdown-item" href="pages-profile.html">
+                                        <i class="bx bx-user-circle text-muted fs-18 align-middle me-1"></i><span
+                                            class="align-middle">Profile</span>
+                                    </a>
+                                    <a class="dropdown-item" href="apps-chat.html">
+                                        <i class="bx bx-message-dots text-muted fs-18 align-middle me-1"></i><span
+                                            class="align-middle">Messages</span>
+                                    </a>
+
+                                    <a class="dropdown-item" href="pages-pricing.html">
+                                        <i class="bx bx-wallet text-muted fs-18 align-middle me-1"></i><span
+                                            class="align-middle">Pricing</span>
+                                    </a>
+                                    <a class="dropdown-item" href="pages-faqs.html">
+                                        <i class="bx bx-help-circle text-muted fs-18 align-middle me-1"></i><span
+                                            class="align-middle">Help</span>
+                                    </a>
+                                    <a class="dropdown-item" href="auth-lock-screen.html">
+                                        <i class="bx bx-lock text-muted fs-18 align-middle me-1"></i><span
+                                            class="align-middle">Lock screen</span>
+                                    </a>
+
+                                    <div class="dropdown-divider my-1"></div>
+
+                                    <a class="dropdown-item text-danger" href="{{ route('auth.logout') }}">
+                                        <i class="bx bx-log-out fs-18 align-middle me-1"></i><span
+                                            class="align-middle">Đăng xuất</span>
+                                    </a>
+                                </div>
+                            </div>
+
                         </div>
-
-
-                        <!-- App Search-->
-
                     </div>
                 </div>
-            </div>
         </header>
 
 
@@ -236,7 +443,8 @@
                 </a>
 
                 <a href="{{ route('admin.dashboard') }}" class="logo-light">
-                    <img src="{{ asset('client/images/logo-icon.png') }}" class="logo-sm" alt="logo sm">
+
+                    <img src="{{ asset('client/images/logo-icon-white.png') }}" class="logo-sm" alt="logo sm">
                     <img src="{{ asset('client/images/logo-white.png') }}" class="logo-lg" alt="logo light">
                 </a>
             </div>
@@ -262,7 +470,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.account')}}">
+                            <a class="nav-link" href="{{ route('admin.account') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:beer-alt-twotone-loop"></iconify-icon>
                                 </span>
@@ -328,7 +536,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{route('admin.score')}}">
+                            <a class="nav-link" href="{{ route('admin.score') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:document-report"></iconify-icon>
                                 </span>
@@ -341,7 +549,7 @@
 
 
                         <li class="nav-item">
-                              <a class="nav-link" href="{{route('admin.attendance.index')}}">
+                            <a class="nav-link" href="{{ route('admin.attendance.index') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:document-report"></iconify-icon>
                                 </span>
@@ -379,7 +587,8 @@
 
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link menu-arrow" href="#sidebarProducts" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarProducts">
+
+                            <a class="nav-link" href="{{ route('admin.teacher_salaries') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:beer-alt-twotone-loop"></iconify-icon>
                                 </span>
@@ -396,6 +605,7 @@
 
                                 </ul>
                             </div>
+
                         </li>
 
                         <li class="nav-item">
@@ -406,15 +616,17 @@
                                 <span class="nav-text"> Quản lí thông báo </span>
                             </a>
 
-                       
+
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.contact') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:document-report"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Quản lí tin nhắn cần hỗ trợ </span>
+
+                                <span class="nav-text"> Quản lí liên hệ  </span>
                             </a>
+
 
                        
                         </li>
@@ -422,33 +634,34 @@
 
 
                         <li class="nav-item">
-                              <a class="nav-link menu-arrow" href="#news" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="news">
-                                   <span class="nav-icon">
-                                        <iconify-icon icon="line-md:clipboard-list-twotone"></iconify-icon>
-                                   </span>
-                                   <span class="nav-text"> Quản lý bài viết </span>
-                              </a>
-                              <div class="collapse" id="news">
-                                   <ul class="nav sub-navbar-nav">
-                                        <li class="sub-nav-item">
-                                             <a class="sub-nav-link" href="{{ route('admin.news.index') }}">Danh sách bài viết</a>
-                                        </li>
-                                        <li class="sub-nav-item">
-                                             <a class="sub-nav-link" href="{{ route('admin.topics.index') }}">Chủ đề</a>
-                                        </li>
-                                   </ul>
-                              </div>
-                         </li>
+                            <a class="nav-link menu-arrow" href="#news" data-bs-toggle="collapse" role="button"
+                                aria-expanded="false" aria-controls="news">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="line-md:clipboard-list-twotone"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý bài viết </span>
+                            </a>
+                            <div class="collapse" id="news">
+                                <ul class="nav sub-navbar-nav">
+                                    <li class="sub-nav-item">
+                                        <a class="sub-nav-link" href="{{ route('admin.news.index') }}">Danh sách bài
+                                            viết</a>
+                                    </li>
+                                    <li class="sub-nav-item">
+                                        <a class="sub-nav-link" href="{{ route('admin.topics.index') }}">Chủ đề</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
                         <li class="nav-item mt-3">
-                            <a class="nav-link" href="{{ route('auth.logout') }}">
+                            <a class="nav-link" href="{{ route('home') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:log-out"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Đăng xuất </span>
+                                <span class="nav-text"> Thoát </span>
                             </a>
 
                         </li>
-
                     @elseif (auth()->user()->isUser())
                         <li class="menu-title">Quản lý</li>
 
@@ -508,7 +721,9 @@
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:document-report"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Quản lý hỗ trợ tin nhắn  </span>
+
+
+                                <span class="nav-text"> Quản lý liên hệ</span>
                             </a>
 
                         </li>
@@ -516,11 +731,11 @@
 
 
                         <li class="nav-item mt-3">
-                            <a class="nav-link" href="{{ route('auth.logout') }}">
+                            <a class="nav-link" href="{{ route('home') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="line-md:log-out"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Đăng xuất </span>
+                                <span class="nav-text"> Thoát </span>
                             </a>
 
                         </li>
@@ -537,7 +752,8 @@
 
     </div>
 
- <!-- Spinner container (ẩn mặc định) -->
+
+    <!-- Spinner container (ẩn mặc định) -->
     <div id="loading-spinner"
         style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999;">
         <div class="spinner-border text-info" role="status">
@@ -559,43 +775,18 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-    @if (auth()->check() && auth()->user()->isStaff())
-    @if (auth()->check() && auth()->user()->isStaff())
-
-@endif
+   
 
     <script>
-        AOS.init();
-        setTimeout(() => {
-            fetch('/clear-temp-folder', {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}', // nếu dùng trong Blade
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error('Có lỗi xảy ra');
-                    return response.json();
-                })
-                .then(data => {
-                    console.log(data.message);
-                })
-                .catch(error => {
-                    console.error('Lỗi:', error.message);
-                });
-        }, 300000); // 5phút
-
-        
-
-
-
-</script>
-@endif
-
-
+        $(window).on('load', function() {
+            console.log('Page loaded');
+            $('#preloader').fadeOut('slow');
+        });
+    </script>
 
     @stack('scripts')
+
+
 
 </body>
 

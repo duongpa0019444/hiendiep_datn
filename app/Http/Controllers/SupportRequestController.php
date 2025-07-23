@@ -7,46 +7,30 @@ use Illuminate\Http\Request;
 
 class SupportRequestController extends Controller
 {
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-    'pl_content' => 'required',
-    'name' => 'required',
-    'phone' => 'required',
-    'message' => 'required',
-]);
 
-// Gán status mặc định
-$data['status'] = 'đợi xử lý';
+   public function store(Request $request)
+{
+    $data = $request->validate([
+        'pl_content' => 'required|in:khiếu nại,góp ý,hỗ trợ,đăng ký',
+        'name'       => 'required|string|max:100',
+        'phone'      => 'required|digits_between:9,15',
+        'message'    => 'required|string|max:1000',
+    ], [
+        'pl_content.required' => 'Vui lòng chọn phân loại.',
+        'pl_content.in'       => 'Phân loại không hợp lệ.',
+        'name.required'       => 'Vui lòng nhập tên.',
+        'phone.required'      => 'Vui lòng nhập số điện thoại.',
+        'phone.digits_between'=> 'Số điện thoại phải từ 9 đến 15 chữ số.',
+        'message.required'    => 'Vui lòng nhập nội dung tin nhắn.',
+    ]);
 
-$support = Contact::create($data);
+    $data['status'] = 'đợi xử lý';
 
-return back()->with('success', 'Tin nhắn đã gửi. Chúng tôi sẽ hỗ trợ bạn sớm!');
+    Contact::create($data);
 
-        
+    return redirect()->back()->with('success', 'Tin nhắn đã gửi thành công !');
+}
 
-        $support = contact::create($data);
-
-        // broadcast(new SupportRequestCreated($support))->toOthers();
-
-        return back()->with('success', 'Tin nhắn đã gửi. Chúng tôi sẽ hỗ trợ bạn sớm!');
-    }
-
-    // public function handle(Request $request, $id)
-    // {
-        
-    //     $support = contact::findOrFail($id);
-
-    //     if ($support->assigned_to) {
-    //         return response()->json(['message' => 'Yêu cầu đã có người nhận xử lý!'], 409);
-    //     }
-
-    //     $support->assigned_to = auth()->id();
-    //     $support->status = 'đã xử lý';
-    //     $support->save();
-
-        
-    //     return response()->json(['message' => 'Bạn đã nhận xử lý yêu cầu này!']);
-    // }
+   
 }
 ?>

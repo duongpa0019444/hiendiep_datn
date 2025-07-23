@@ -36,7 +36,8 @@ html[data-menu-color=light] {
     --bs-main-nav-bg: rgb(241, 243, 248);
     --bs-main-nav-item-color: #202020;
     --bs-main-nav-item-hover-bg: transparent;
-    --bs-main-nav-item-hover-color: #4858FB;
+
+    --bs-main-nav-item-hover-color: #EB1327;
     --bs-main-nav-border-color: #eaedf1;
 }
 
@@ -85,7 +86,8 @@ html[data-bs-theme=dark][data-topbar-color=light] {
     --bs-gray-700: #424e5a;
     --bs-gray-800: #36404a;
     --bs-gray-900: #323a46;
-    --bs-primary: #4858FB;
+
+    --bs-primary: #EB1327;
     --bs-secondary: #5d7186;
     --bs-success: #22c55e;
     --bs-warning: #f9b931;
@@ -103,7 +105,8 @@ html[data-bs-theme=dark][data-topbar-color=light] {
     --bs-cyan: #4ecac2;
     --bs-light: #eef2f7;
     --bs-dark: #323a46;
-    --bs-primary-rgb: 84,62,232;
+
+    --bs-primary-rgb: 235,19,39;
     --bs-secondary-rgb: 93, 113, 134;
     --bs-success-rgb: 34, 197, 94;
     --bs-warning-rgb: 249, 185, 49;
@@ -4537,19 +4540,21 @@ fieldset:disabled .btn {
 
 .btn-primary {
     --bs-btn-color: #ffffff;
-    --bs-btn-bg: #543EE8;
-    --bs-btn-border-color: #543EE8;
+
+    --bs-btn-bg: #EB1327;
+    --bs-btn-border-color: #EB1327;
     --bs-btn-hover-color: #ffffff;
-    --bs-btn-hover-bg: rgb(23, 0, 176);
-    --bs-btn-hover-border-color: rgb(23, 0, 176);
+    --bs-btn-hover-bg: #A52323;
+    --bs-btn-hover-border-color: #A52323;
     --bs-btn-focus-shadow-rgb: 255, 130, 78;
     --bs-btn-active-color: #ffffff;
     --bs-btn-active-bg: #cc5626;
     --bs-btn-active-border-color: #bf5123;
     --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
     --bs-btn-disabled-color: #ffffff;
-    --bs-btn-disabled-bg: #543EE8;
-    --bs-btn-disabled-border-color: #543EE8;
+
+    --bs-btn-disabled-bg: #EB1327;
+    --bs-btn-disabled-border-color: #EB1327;
 }
 
 .btn-secondary {
@@ -17857,11 +17862,11 @@ html[data-menu-size=hidden] .topbar {
 
 .logo-box .logo-sm {
     display: none;
-    height: var(--bs-logo-sm-height);
+    height: 40px;
 }
 
 .logo-box .logo-lg {
-    height: var(--bs-logo-lg-height);
+    height: 40px;
 }
 
 .logo-box .logo-light {
@@ -19839,6 +19844,10 @@ html[data-bs-theme=dark] .btn-dark {
 @media (min-width: 600px) {
     .dropdown-lg {
         width: 320px;
+    }
+
+    .dropdown-xl {
+        width: 500px;
     }
 }
 
@@ -25407,4 +25416,7 @@ p.no-span::after {
             justify-content: center;
         }
     }
+
+
+
 

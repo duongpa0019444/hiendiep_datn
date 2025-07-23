@@ -7,7 +7,7 @@
         <div class="quiz-container">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h4 class="mb-2">🎯 Quản lý Quiz của bạn</h4>
+                    <h4 class="mb-2 text-white"><i class="icofont-bullseye"></i> Quản lý Quiz của bạn</h4>
                     <p class="mb-0 opacity-75 text-light">Tham gia quiz, theo dõi tiến độ và xem kết quả học tập</p>
                 </div>
                 <div class="col-md-4 text-end">
@@ -47,15 +47,15 @@
         <!-- Tab Content -->
         <div class="tab-content">
             <!-- Tab 1: Quiz Code Input -->
-            <div class="tab-pane fade show active" id="quiz-code">
-                <div class="quiz-container text-center">
+            <div class="tab-pane fade show active" id="quiz-code" style="border: 1px dashed #ff0000;">
+                <div class="p-2 h-50 bg-gradient text-center mt-3">
                     <div class="row justify-content-center">
                         <div class="col-md-8">
                             <h4 class="mb-3">🔑 Tham gia Quiz bằng mã</h4>
-                            <p class="mb-4 opacity-75 text-light">Nhập mã quiz mà giáo viên đã cung cấp để tham gia</p>
+                            <p class="mb-4 opacity-75  text-dark">Nhập mã quiz mà giáo viên đã cung cấp để tham gia</p>
                             <div class="mb-3">
                                 <input type="text" class="form-control quiz-code-input"
-                                    placeholder="Nhập mã quiz (VD: ABC123)" style="text-transform: uppercase;">
+                                    placeholder="Nhập mã quiz (VD: 123123)" style="text-transform: uppercase; color: black;">
                             </div>
                             <button class="btn btn-join">
                                 <i class="fas fa-sign-in-alt me-2"></i>Tham gia Quiz

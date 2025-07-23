@@ -955,7 +955,7 @@
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
-                        success: function() {
+                        success: function(response) {
                             Swal.fire('Đã xóa!', 'Câu hỏi đã được xóa thành công.',
                                 'success');
                             form.closest('.question-item').remove();

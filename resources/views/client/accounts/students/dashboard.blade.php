@@ -3,10 +3,12 @@
 @section('content-information')
     <div id="dashboard" class="content-section active mb-4">
         <h2 class="fs-5">Chào mừng {{ Auth::user()->name }} quay trở lại!</h2>
-        <i class="icofont-exclamation-circle text-primary"></i> Ở đây bạn có thể xem thông tin lịch, điểm số, làm bài quiz và quản lý thông tin cá nhân.</p>
+
+        <i class="icofont-exclamation-circle text-primary"></i> Ở đây bạn có thể xem thông tin lịch, điểm số, làm bài quiz và
+        quản lý thông tin cá nhân.</p>
 
         <!-- Notifications Section -->
-        <div class="card mb-5">
+        <div class="card mb-2">
             <div class="card-header d-flex align-items-center">
                 <i class="icofont-notification fs-5 me-2 text-warning"></i> Thông Báo
             </div>
@@ -31,15 +33,13 @@
                     @endif
 
 
-                   @forelse ($notifications as $noti)
+
+                    @forelse ($notifications as $noti)
                         <li class="list-group-item notification-item">
                             <div class="notification-content">
                                 <strong class="text-primary">{{ $noti->title }}</strong>
                                 <div class="mb-2">{!! $noti->content !!}</div>
-                                <div class="d-flex justify-content-between text-muted small">
-                                    <span>Người gửi: {{ $noti->creator->name ?? 'Hệ thống' }}</span>
-                                    <span>{{ $noti->created_at->format('H:i d/m/Y') }}</span>
-                                </div>
+
                             </div>
                         </li>
                     @empty
@@ -58,35 +58,94 @@
         <div class="row mb-2">
             <div class="col-md-6 mb-2">
                 <div class="card current-class">
-                    <div class="card-header"><i class="icofont-calendar me-2"></i> Lớp Đang Học</div>
-                    <div class="card-body">
-                        <h5 class="card-title">Lớp {{ $className ?? 'A1-1' }}
-                            <span class="badge badge-pending ms-2">Đang học</span>
-                        </h5>
-                        <p class="card-text">Khóa học: <strong>{{ $courseName ?? 'Tiếng Anh Cơ Bản' }}</strong></p>
-                        <p class="card-text">Giảng viên: {{ $teacherName ?? 'Nguyễn Văn A' }}</p>
-                        <p class="card-text">Thời gian: {{ $schedule ?? 'Thứ 2, 4, 6 - 18:00-20:00' }}</p>
-                        <a href="#" class="btn-infomation-myaccount btn-sm mt-3">Xem chi tiết</a>
 
+                    <div class="card-header">
+                        <i class="icofont-calendar me-2"></i> Lớp Đang Học
                     </div>
+                    @foreach ($classes as $class)
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                {{ $class->class_name ?? '' }}
+                                <span class="badge badge-pending ms-2">Đang học</span>
+                            </h6>
+                            <p class="card-text">
+                                <i class="icofont-book-alt me-2"></i> Khóa học:
+                                <strong>{{ $class->course_name ?? '' }}</strong>
+                            </p>
+                            <p class="card-text">
+                                <i class="icofont-teacher me-2"></i> Giảng viên:
+                                {{ $class->teacher_name ?? '' }}
+                            </p>
+
+                        </div>
+                    @endforeach
+
                 </div>
+
             </div>
+
             <div class="col-md-6">
                 <div class="card completed-class">
-                    <div class="card-header"><i class="icofont-calendar me-2"></i> Lớp Đã Hoàn Thành</div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <li class="list-group-item">
-                                <strong>Lớp A0-1</strong> - Hoàn thành: {{ $completedDate1 ?? '15/10/2024' }}
-                                <span class="badge badge-completed float-end">Hoàn thành</span>
-                            </li>
-                            <li class="list-group-item">
-                                <strong>Lớp A0-2</strong> - Hoàn thành: {{ $completedDate2 ?? '20/12/2024' }}
-                                <span class="badge badge-completed float-end">Hoàn thành</span>
-                            </li>
 
-                        </ul>
-                        <a href="#" class="btn-infomation-myaccount btn-sm mt-3">Xem tất cả</a>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="icofont-chart-bar-graph me-2 text-white"></i>Học tập</span>
+                        <select name="class" id="dashboardHoctap" class="form-control text-black w-50 m-0">
+                            @foreach ($classes as $index => $class)
+                                <option {{ $index == 0 ? 'selected' : '' }} value="{{ $class->class_id }}">
+                                    {{ $class->class_name }}</option>
+                            @endforeach
+
+                        </select>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="card text-center h-100 border-0 shadow-sm border-top border-success">
+                                    <div class="card-body p-3">
+                                        <i class="icofont-check fs-5 text-success mb-2"></i>
+                                        <strong>Đã học</strong>
+                                        <div class="badge bg-success text-white fw-bold mt-1 p-1 w-100" id="dahoc">
+                                            {{ $hoctaps->student_sessions_present }} buổi</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="card text-center h-100 border-0 shadow-sm border-top border-danger">
+                                    <div class="card-body p-3">
+                                        <i class="icofont-close-line fs-5 text-danger mb-2"></i>
+                                        <strong>Nghỉ không phép</strong>
+                                        <div class="badge bg-danger text-white fw-bold mt-1 p-1 w-100" id="nghikhongphep">
+                                            {{ $hoctaps->student_sessions_absent }} buổi</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="card text-center h-100 border-0 shadow-sm border-top border-warning">
+                                    <div class="card-body p-3">
+                                        <i class="icofont-clock-time fs-5 text-warning mb-2"></i>
+                                        <strong>Đến muộn</strong>
+                                        <div class="badge bg-warning text-dark fw-bold mt-1 p-1 w-100" id="denmuon">
+                                            {{ $hoctaps->student_sessions_late }} buổi</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="card text-center h-100 border-0 shadow-sm border-top border-info">
+                                    <div class="card-body p-3">
+                                        <i class="icofont-exclamation-circle fs-5 text-info mb-2"></i>
+                                        <strong>Nghỉ có phép</strong>
+                                        <div class="badge bg-info text-white fw-bold mt-1 p-1 w-100" id="cophep">
+                                            {{ $hoctaps->student_sessions_excused }} buổi</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -99,7 +158,7 @@
         //Hàm render dữ liệu thông tin thanh toán trong modal thông báo
         function renderPaymentInfo() {
             $.ajax({
-                url: 'course-payments/infomation',
+                url: '/student/course-payments/infomation',
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
@@ -196,7 +255,7 @@
             console.log('clicked');
             if (e.target.classList.contains('btn-showQr-payment')) {
                 $.ajax({
-                    url: 'course-payments/infomation',
+                    url: '/student/course-payments/infomation',
                     method: 'GET',
                     dataType: 'json',
                     success: function(response) {
@@ -310,5 +369,35 @@
                 console.error("Fetch error:", error);
             }
         }
+
+
+        $('#dashboardHoctap').on('change', function() {
+
+            var classId = $(this).val();
+            $.ajax({
+                url: `/student/dashboard/hoctaps/${classId}`,
+                method: 'GET',
+                success: function(response) {
+
+                    console.log('Dữ liệu nhận được:', response);
+                    $("#cophep").html(`${response.student_sessions_excused} buổi`)
+                    $("#denmuon").html(`${response.student_sessions_late} buổi`)
+                    $("#nghikhongphep").html(`${response.student_sessions_absent} buổi`)
+                    $("#dahoc").html(`${response.student_sessions_present} buổi`)
+                    Toastify({
+                        text: `<i class="icofont-check-circled me-2 text-white"></i> Đã lấy được thông tin!`,
+                        gravity: "top",
+                        position: "right",
+                        className: "success",
+                        duration: 2000,
+                        escapeMarkup: false
+                    }).showToast();
+
+                },
+                error: function(xhr) {
+                    console.log('Lỗi:', xhr.responseText);
+                }
+            });
+        });
     </script>
 @endpush

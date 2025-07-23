@@ -8,7 +8,7 @@
         <div class="section-bg hero-bg background-image"
             style="background-image: url('{{ asset('client/images/hero/home-1/hero-bg.png') }}');">
             <div class="my-account container">
-                <div class="sidebar-myAccount">
+                <div class="sidebar-myAccount ">
                     <h2>My Account</h2>
                     <ul>
                         @if (Auth::user()->role == 'student')
