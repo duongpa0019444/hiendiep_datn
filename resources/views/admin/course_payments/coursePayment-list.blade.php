@@ -411,12 +411,10 @@
         $(document).on('click', '.btn-invoice-coursePayment', function() {
             const coursePaymentId = $(this).data('coursepayment_id');
 
-            console.log('Course Payment ID:', coursePaymentId);
             $.ajax({
                 url: `/admin/course-payments/${coursePaymentId}/show`,
                 type: 'GET',
                 success: function(response) {
-                    console.log('Response:', response);
                     const payment = response;
                     $('.invoice-container').html(`
                 <div class="invoice-header text-center">
@@ -516,15 +514,21 @@
         // Xử lý bộ lọc
         $('#searchForm').on('submit', function(e) {
             e.preventDefault();
+            $('.table').css({
+                'opacity': '0.5',
+                'pointer-events': 'none' // nếu muốn không bấm được
+            });
             $.ajax({
                 url: $(this).attr('action'),
                 type: 'GET',
                 data: $(this).serialize(),
                 success: function(response) {
-                    console.log(response);
                     $('#body-coursePapyment').html(renderCoursePayment(response.payments.data));
                     $('#pagination-wrapper').html(response.pagination);
-
+                    $('.table').css({
+                        'opacity': '1',
+                        'pointer-events': 'none' // nếu muốn không bấm được
+                    });
                 },
                 error: function(xhr) {
                     console.error('Lỗi khi tìm kiếm:', xhr.responseText);
@@ -570,11 +574,11 @@
                             <ul class="dropdown-menu">
 
                                 ${payment.status === 'paid' ? `
-                                            <li data-bs-target="#modal-printCoursePayment">
-                                                <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
-                                                    <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
-                                                </button>
-                                            </li>` : ''}
+                                                <li data-bs-target="#modal-printCoursePayment">
+                                                    <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
+                                                        <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
+                                                    </button>
+                                                </li>` : ''}
 
                                 <li data-bs-target="#modal-course-payment">
                                     <button class="dropdown-item text-warning btn-edit-course-payment" data-coursePayment_id="${ payment.id }">
@@ -631,13 +635,11 @@
         //Hàm xử lý render dữ liệu lên modal khi ấn nút sửa
         $(document).on('click', '.btn-edit-course-payment', function() {
             const coursePaymentId = $(this).data('coursepayment_id');
-            console.log(coursePaymentId);
             // Gọi AJAX để lấy dữ liệu
             $.ajax({
                 url: `course-payments/${coursePaymentId}/detail`,
                 type: 'GET',
                 success: function(response) {
-                    console.log(response.payment);
                     $('#modal-body-courser-payment').html(
                         `
                     <div class="mb-1  p-2 col-lg-12 col-md-12 col-sm-12">
@@ -770,12 +772,14 @@
             e.preventDefault();
             const url = $(this).attr('action');
             var formData = $(this).serialize();
+            console.log('Form data:', formData);
+            console.log('URL:', url);
             $.ajax({
                 url: url,
                 type: 'POST',
                 data: formData,
                 success: function(response) {
-
+                    console.log(response);
                     // Cập nhật chỉ hàng vừa chỉnh sửa
                     if (response.payment) {
                         const payment = response.payment;
@@ -810,11 +814,11 @@
 
                                             ${payment.status === 'paid' ? `
 
-                                                        <li data-bs-target="#modal-printCoursePayment">
-                                                            <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
-                                                                <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
-                                                            </button>
-                                                        </li>` : ''}
+                                                            <li data-bs-target="#modal-printCoursePayment">
+                                                                <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
+                                                                    <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
+                                                                </button>
+                                                            </li>` : ''}
 
 
                                             <li data-bs-target="#modal-course-payment">
@@ -906,7 +910,6 @@
                 url: '/admin/course-payments/statistics',
                 type: 'GET',
                 success: function(response) {
-                    console.log('thống kê:' + response);
 
                     total_unpaid.text(formatCurrency(response.total_unpaid) + 'VNĐ');
                     total_paid.text(formatCurrency(response.total_paid) + 'VNĐ');
@@ -931,7 +934,6 @@
             e.preventDefault();
             // Lấy dữ liệu từ form lọc
             let formData = $('#searchForm').serialize();
-            console.log(formData);
             // Tạo URL với các tham số lọc
             let exportUrl = '{{ route('admin.course_payments.export') }}?' + formData;
             // Chuyển hướng đến URL xuất file
@@ -939,32 +941,6 @@
         });
 
 
-        // Khi click vào các link
-        $(document).on('click', 'a', function(e) {
-            const href = $(this).attr('href');
 
-            // Nếu là link hợp lệ (không phải anchor, không mở tab mới, không phải js link)
-            if (
-                href &&
-                !href.startsWith('#') &&
-                !$(this).attr('target') &&
-                !href.startsWith('javascript:')
-            ) {
-                $('#loading-spinner').fadeIn(200);
-            }
-        });
-
-        // Khi submit form không phải ajax
-        $(document).on('submit', 'form:not([data-ajax])', function() {
-            $('#loading-spinner').fadeIn(200);
-        });
-
-        // Khi dùng Ajax thì bật/tắt spinner riêng
-        $(document).ajaxStart(function() {
-            $('#loading-spinner').fadeIn(200);
-        });
-        $(document).ajaxStop(function() {
-            $('#loading-spinner').fadeOut(200);
-        });
     </script>
 @endpush
