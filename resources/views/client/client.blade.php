@@ -230,38 +230,47 @@
                                                 </div>
 
                                                 <ul
-                                                    class="dropdown-menu dropdown-menu-end shadow-sm mt-2 p-3 rounded-3 avatar-menu">
-                                                    <li>
-                                                        <a href="{{ route('client.information') }}"
-                                                            class="dropdown-item p-2" data-section="dashboard">
-                                                            <i class="icofont-chart-bar-graph me-2"></i> Dashboard
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ route('client.schedule') }}"
-                                                            class="dropdown-item p-2" data-section="schedule">
-                                                            <i class="icofont-calendar me-2"></i>
-                                                            {{ Auth::user()->role == 'teacher' ? 'Lịch dạy' : 'Lịch học' }}
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ route('client.score') }}" class="dropdown-item p-2"
-                                                            data-section="grades">
-                                                            <i class="icofont-book-alt me-2"></i> Điểm số
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ route('client.quizz') }}" class="dropdown-item p-2"
-                                                            data-section="quizzes">
-                                                            <i class="icofont-pencil-alt-2 me-2"></i> Bài Quiz
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ route('client.account') }}" class="dropdown-item p-2"
-                                                            data-section="account">
-                                                            <i class="icofont-user me-2"></i> Thông tin tài khoản
-                                                        </a>
-                                                    </li>
+                                                    class="dropdown-menu dropdown-menu-myaccount dropdown-menu-end shadow-sm mt-2 p-3 rounded-3 avatar-menu">
+                                                    @if (Auth::user()->role == 'admin')
+                                                        <li>
+                                                            <a href="{{ route('admin.dashboard') }}"
+                                                                class="dropdown-item p-2" data-section="dashboard">
+                                                                <i class="icofont-dashboard-web me-2"></i> Vào trang quản trị
+                                                            </a>
+                                                        </li>
+                                                    @else
+                                                        <li>
+                                                            <a href="{{ route('client.information') }}"
+                                                                class="dropdown-item p-2" data-section="dashboard">
+                                                                <i class="icofont-chart-bar-graph me-2"></i> Dashboard
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="{{ route('client.schedule') }}"
+                                                                class="dropdown-item p-2" data-section="schedule">
+                                                                <i class="icofont-calendar me-2"></i>
+                                                                {{ Auth::user()->role == 'teacher' ? 'Lịch dạy' : 'Lịch học' }}
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="{{ route('client.score') }}"
+                                                                class="dropdown-item p-2" data-section="grades">
+                                                                <i class="icofont-book-alt me-2"></i> Điểm số
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="{{ route('client.quizz') }}"
+                                                                class="dropdown-item p-2" data-section="quizzes">
+                                                                <i class="icofont-pencil-alt-2 me-2"></i> Bài Quiz
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="{{ route('client.account') }}"
+                                                                class="dropdown-item p-2" data-section="account">
+                                                                <i class="icofont-user me-2"></i> Thông tin tài khoản
+                                                            </a>
+                                                        </li>
+                                                    @endif
                                                     <li>
                                                         <hr class="dropdown-divider">
                                                     </li>
@@ -324,7 +333,7 @@
                     <img src="{{ asset('client/images/footer/footer-2/footer-bg.png') }}" alt="footer-bg-img" />
                 </div>
 
-                <!-- Start Call Action Area -->
+                {{-- <!-- Start Call Action Area -->
                 <section class="ed-call-action position-relative">
                     <div class="container ed-container">
                         <div class="ed-call-action__inner position-relative">
@@ -368,7 +377,7 @@
                             </div>
                         </div>
                     </div>
-                </section>
+                </section> --}}
                 <!-- End Call Action Area -->
 
                 <!-- Start Footer Area -->
@@ -532,9 +541,9 @@
                 <!-- Auth Head  -->
                 <div class="ed-auth__modal-head">
                     <a href="index.html" class="ed-auth__modal-logo">
-                        <img src="{{ asset('client/images/logo.svg') }}" alt="logo" />
+                        <img src="{{ asset('client/images/logo.png') }}" alt="logo" />
                     </a>
-                    <h3 class="ed-auth__modal-title">Sign In Now</h3>
+                    <h3 class="ed-auth__modal-title">Đăng Nhập</h3>
 
                 </div>
 

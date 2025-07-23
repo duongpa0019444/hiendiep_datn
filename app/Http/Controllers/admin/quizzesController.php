@@ -14,6 +14,7 @@ use App\Models\sentenceAnswers;
 use App\Models\sentenceQuestions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Support\Facades\Validator;
 
@@ -46,7 +47,7 @@ class quizzesController extends Controller
 
     public function trash(Request $request)
     {
-        $quizzes = quizzes::onlyTrashed()->orderByDesc('created_at')->with(['creator', 'course', 'class'])->paginate(1);
+        $quizzes = quizzes::onlyTrashed()->orderByDesc('created_at')->with(['creator', 'course', 'class'])->paginate(10);
         // Kiểm tra nếu là AJAX request
         if ($request->ajax()) {
             return response()->json([
@@ -163,29 +164,46 @@ class quizzesController extends Controller
 
     public function forceDelete($id)
     {
-        DB::transaction(function () use ($id) {
-            $quiz = Quizzes::onlyTrashed()->findOrFail($id);
 
-            // Lấy các câu hỏi thường (multiple choice)
-            $questionIds = DB::table('questions')->where('quiz_id', $id)->pluck('id');
-            if ($questionIds->isNotEmpty()) {
-                DB::table('answers')->whereIn('question_id', $questionIds)->delete();
-                DB::table('questions')->whereIn('id', $questionIds)->delete();
-            }
 
-            // Lấy các câu hỏi dạng điền câu (sentence)
-            $sentenceQuestionIds = DB::table('sentence_questions')->where('quiz_id', $id)->pluck('id');
-            if ($sentenceQuestionIds->isNotEmpty()) {
-                DB::table('sentence_answers')->whereIn('sentence_question_id', $sentenceQuestionIds)->delete();
-                DB::table('sentence_questions')->whereIn('id', $sentenceQuestionIds)->delete();
-            }
+        try {
+            DB::transaction(function () use ($id) {
+                $quiz = quizzes::onlyTrashed()->findOrFail($id);
 
-            // Xóa bài làm của học sinh
-            DB::table('quiz_attempts')->where('quiz_id', $id)->delete();
 
-            // Xóa vĩnh viễn quiz
-            $quiz->forceDelete();
-        });
+
+                // Lấy các câu hỏi thường (multiple choice)
+                $questionIds = DB::table('questions')->where('quiz_id', $id)->pluck('id');
+                if ($questionIds->isNotEmpty()) {
+                    $answerIds = DB::table('answers')->whereIn('question_id', $questionIds)->pluck('id');
+
+                    // Xóa student_answers trước
+                    if ($answerIds->isNotEmpty()) {
+                        DB::table('student_answers')->whereIn('answer_id', $answerIds)->delete();
+                        DB::table('answers')->whereIn('id', $answerIds)->delete();
+                    }
+
+                    DB::table('questions')->whereIn('id', $questionIds)->delete();
+                }
+
+                // Lấy các câu hỏi dạng điền câu (sentence)
+                $sentenceQuestionIds = DB::table('sentence_questions')->where('quiz_id', $id)->pluck('id');
+                if ($sentenceQuestionIds->isNotEmpty()) {
+                    DB::table('sentence_answers')->whereIn('question_id', $sentenceQuestionIds)->delete();
+                    DB::table('sentence_questions')->whereIn('id', $sentenceQuestionIds)->delete();
+                }
+
+                // Xóa bài làm của học sinh
+                DB::table('quiz_attempts')->where('quiz_id', $id)->delete();
+
+                // Xóa vĩnh viễn quiz
+                $quiz->forceDelete();
+            });
+        } catch (\Throwable $e) {
+            Log::error('Lỗi xảy ra khi xóa quiz: ' . $e->getMessage());
+            // hoặc log thêm chi tiết:
+            Log::error($e);
+        }
 
         return redirect()->back()->with('success', 'Đã xóa vĩnh viễn quiz và toàn bộ dữ liệu liên quan.');
     }
@@ -688,7 +706,7 @@ class quizzesController extends Controller
 
         $statistics = DB::select(
             "
-                    SELECT
+            SELECT
                 u.id AS student_id,
                 u.name AS student_name,
                 COUNT(qa.id) AS total_attempts,
@@ -868,7 +886,8 @@ class quizzesController extends Controller
     }
 
 
-    public function getCourse($id){
+    public function getCourse($id)
+    {
         $course = courses::join('classes', 'classes.courses_id', '=', 'courses.id')
             ->select('courses.*')
             ->where('classes.id', $id)

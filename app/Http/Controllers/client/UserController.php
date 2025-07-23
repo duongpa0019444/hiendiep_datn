@@ -16,6 +16,7 @@ use App\Models\score;
 use App\Models\User as ModelsUser;
 use Database\Seeders\user;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Str;
@@ -59,7 +60,57 @@ class UserController extends Controller
                 ->limit(3)
                 ->get();
 
-            return view('client.accounts.students.dashboard', compact('unPaymentInfo', 'notifications'));
+
+            //Lớp đang học
+
+            $classes = DB::table('class_student as cs')
+                ->join('classes as c', 'cs.class_id', '=', 'c.id')
+                ->join('courses as co', 'c.courses_id', '=', 'co.id')
+                ->join('schedules as s', 'c.id', '=', 's.class_id')
+                ->join('users as u', 'cs.student_id', '=', 'u.id')
+                ->join('users as t', 's.teacher_id', '=', 't.id')
+                ->where('cs.student_id', $userId)
+                ->where('cs.deleted_at', null)
+                ->where('c.status', '!=', 'completed')
+                ->select([
+                    'c.id as class_id',
+                    'u.name as student_name',
+                    'c.name as class_name',
+                    'c.status as class_status',
+                    'co.name as course_name',
+                    't.name as teacher_name',
+                ])
+                ->groupBy('u.name', 'c.name', 'c.status', 'co.name', 't.name', 'c.id')
+                ->orderBy('c.created_at', 'asc')
+                ->get();
+
+
+            $attendance = DB::select("
+                SELECT
+                    u.name AS student_name,
+                    c.name AS class_name,
+                    SUM(CASE WHEN a.status = 'present' THEN 1 ELSE 0 END) AS student_sessions_present,
+                    SUM(CASE WHEN a.status = 'late' THEN 1 ELSE 0 END) AS student_sessions_late,
+                    SUM(CASE WHEN a.status = 'absent' THEN 1 ELSE 0 END) AS student_sessions_absent,
+                    SUM(CASE WHEN a.status = 'excused' THEN 1 ELSE 0 END) AS student_sessions_excused
+                FROM
+                    class_student cs
+                    INNER JOIN classes c ON cs.class_id = c.id
+                    INNER JOIN users u ON cs.student_id = u.id
+                    LEFT JOIN schedules s ON c.id = s.class_id
+                    LEFT JOIN attendances a ON s.id = a.schedule_id AND a.user_id = ?
+                WHERE
+                    c.id = ?
+                    AND cs.student_id = ?
+                    AND c.deleted_at IS NULL
+                    AND cs.deleted_at IS NULL
+                GROUP BY
+                    u.id, u.name, c.id, c.name
+
+            ", [$userId, $classes[0]->class_id, $userId]);
+
+            $hoctaps = $attendance[0];
+            return view('client.accounts.students.dashboard', compact('unPaymentInfo', 'notifications', 'classes', 'hoctaps'));
         } elseif (Auth::user()->role == "teacher") {
 
 
@@ -92,11 +143,40 @@ class UserController extends Controller
                 ->limit(3)
                 ->get();
 
-            return view('client.accounts.teachers.dashboard', compact('unPaymentInfo', 'notifications'));
+
+            $todaySchedules = DB::table('schedules as s')
+                ->join('classes as c', 's.class_id', '=', 'c.id')
+                ->whereDate('s.date', Carbon::today())
+                ->where('s.teacher_id', $userId)
+                ->select(
+                    'c.name as class_name',
+                    's.start_time',
+                    's.end_time',
+                    DB::raw("DATE_FORMAT(s.date, '%d/%m/%Y') as formatted_date")
+                )
+                ->get();
+
+
+            $upcomingSchedules = DB::table('schedules as s')
+                ->join('classes as c', 's.class_id', '=', 'c.id')
+                ->whereDate('s.date', '>', Carbon::today()) // chỉ lấy lịch sau hôm nay
+                ->where('s.teacher_id', $userId)
+                ->orderBy('s.date', 'asc')
+                ->select(
+                    'c.name as class_name',
+                    's.start_time',
+                    's.end_time',
+                    DB::raw("DATE_FORMAT(s.date, '%d/%m/%Y') as formatted_date")
+                )->limit(3)
+                ->get();
+
+
+            $overview = $this->OverviewTeacher(Carbon::now()->month, Carbon::now()->year, new Request());
+
+
+            return view('client.accounts.teachers.dashboard', compact('unPaymentInfo', 'notifications', 'todaySchedules', 'upcomingSchedules', 'overview'));
         }
     }
-
-
 
 
 
@@ -329,7 +409,7 @@ class UserController extends Controller
         score::find($id)->delete();
         return redirect()->back()->with('success', 'Xóa điểm thành công!');
     }
-   
+
 
     public function Scoreimport(Request $request)
     {
@@ -637,5 +717,64 @@ class UserController extends Controller
         $user->save();
 
         return redirect()->route('client.account')->with('success', 'Đổi mật khẩu thành công!');
+    }
+
+
+
+    public function getHoctaps($class_id)
+    {
+        $userId = Auth::user()->id;
+        $hoctaps = DB::select("
+                SELECT
+                    u.name AS student_name,
+                    c.name AS class_name,
+                    SUM(CASE WHEN a.status = 'present' THEN 1 ELSE 0 END) AS student_sessions_present,
+                    SUM(CASE WHEN a.status = 'late' THEN 1 ELSE 0 END) AS student_sessions_late,
+                    SUM(CASE WHEN a.status = 'absent' THEN 1 ELSE 0 END) AS student_sessions_absent,
+                    SUM(CASE WHEN a.status = 'excused' THEN 1 ELSE 0 END) AS student_sessions_excused
+                FROM
+                    class_student cs
+                    INNER JOIN classes c ON cs.class_id = c.id
+                    INNER JOIN users u ON cs.student_id = u.id
+                    LEFT JOIN schedules s ON c.id = s.class_id
+                    LEFT JOIN attendances a ON s.id = a.schedule_id AND a.user_id = ?
+                WHERE
+                    c.id = ?
+                    AND cs.student_id = ?
+                    AND c.deleted_at IS NULL
+                    AND cs.deleted_at IS NULL
+                GROUP BY
+                    u.id, u.name, c.id, c.name;
+
+            ", [$userId, $class_id, $userId]);
+
+
+        return response()->json($hoctaps[0]);
+    }
+
+    public function OverviewTeacher($month, $year, Request $request)
+    {
+        $userId = Auth::user()->id;
+        $result = DB::table('schedules as s')
+            ->join('classes as c', 's.class_id', '=', 'c.id')
+            ->join('class_student as cs', 'c.id', '=', 'cs.class_id')
+            ->where('s.teacher_id', $userId)
+            ->whereMonth('s.date', $month)
+            ->whereYear('s.date', $year)
+            ->whereNull('c.deleted_at')
+            ->whereNull('cs.deleted_at')
+            ->selectRaw('
+                COUNT(DISTINCT c.id) AS total_classes,
+                COUNT(DISTINCT CASE WHEN s.status = 1 THEN s.id END) AS total_sessions,
+                COUNT(DISTINCT cs.student_id) AS total_students
+            ')->first();
+        if($request->ajax()) {
+            return response()->json([
+                'total_classes' => $result->total_classes,
+                'total_sessions' => $result->total_sessions,
+                'total_students' => $result->total_students
+            ]);
+        }
+        return $result;
     }
 }

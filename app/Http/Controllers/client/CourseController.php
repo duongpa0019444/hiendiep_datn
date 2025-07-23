@@ -37,7 +37,7 @@ class CourseController extends Controller
         return view('client.course', compact('data', 'searchTerm'));
     }
      public function contact(){
-        
+
         return view('client.contact');
     }
 }

@@ -6,7 +6,7 @@
         <div class="quiz-container">
             <div class="row align-items-center">
                 <div class="col-md-7">
-                    <h4 class="mb-2">Quản lý Quiz của bạn</h4>
+                    <h4 class="mb-2 text-white">Quản lý Quiz của bạn</h4>
                     <p class="mb-0 opacity-75 text-light">Thêm, chỉnh sửa quiz ôn tập cho học sinh!</p>
                 </div>
                 <div class="col-md-5 text-end">
@@ -89,7 +89,7 @@
                         <div class="quiz-cards-wrapper" id="quizCardsWrapperAll">
                             <div class="quiz-cards-row px-1" id="quiz-card-all">
                                 @foreach ($quizzesAll as $quiz)
-                                    <div class="quiz-card-item">
+                                    <div class="quiz-card-item quiz-item-{{ $quiz->id }}">
                                         <div class="card quiz-card h-100">
                                             <div class="card-body">
                                                 <span
@@ -122,7 +122,7 @@
                                                                 method="POST" class="w-100 btn-delete-quiz-form">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit"
+                                                                <button type="submit" data-quiz-id="{{ $quiz->id }}"
                                                                     class="btn btn-outline-danger border w-100 quiz-action-btn btn-delete-quiz">
                                                                     <i class="icofont-ui-delete me-1"></i> Xóa
                                                                 </button>
@@ -188,10 +188,10 @@
                         <button class="scroll-nav-btn right" id="scrollRightPublished">
                             <i class="icofont-rounded-right"></i>
                         </button>
-                        <div class="quiz-cards-wrapper" id="quizCardsWrapperPublished">
-                            <div class="quiz-cards-row px-1">
+                        <div class="quiz-cards-wrapper">
+                            <div class="quiz-cards-row px-1" id="quizCardsWrapperPublished">
                                 @foreach ($quizzesPublished as $quiz)
-                                    <div class="quiz-card-item">
+                                    <div class="quiz-card-item quiz-item-{{ $quiz->id }}">
                                         <div class="card quiz-card h-100">
                                             <div class="card-body">
                                                 <span class="status-badge bg-success text-white">Đã xuất bản</span>
@@ -219,11 +219,11 @@
                                                         <div class="col-12 dropdown-item">
                                                             <form
                                                                 action="{{ route('teacher.quizzes.delete', $quiz->id) }}"
-                                                                method="POST" class="w-100 btn-delete-quiz-form">
+                                                                method="POST" class="w-100 btn-delete--quizform">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit"
-                                                                    class="btn btn-outline-danger border w-100 quiz-action-btn">
+                                                                <button type="submit" data-quiz-id="{{ $quiz->id }}"
+                                                                    class="btn btn-outline-danger border w-100 quiz-action-btn btn-delete-quiz">
                                                                     <i class="icofont-ui-delete me-1"></i> Xóa
                                                                 </button>
                                                             </form>
@@ -281,10 +281,10 @@
                         <button class="scroll-nav-btn right" id="scrollRightDraft">
                             <i class="icofont-rounded-right"></i>
                         </button>
-                        <div class="quiz-cards-wrapper" id="quizCardsWrapperDraft">
-                            <div class="quiz-cards-row px-1">
+                        <div class="quiz-cards-wrapper" >
+                            <div class="quiz-cards-row px-1" id="quizCardsWrapperDraft">
                                 @foreach ($quizzesDraft as $quiz)
-                                    <div class="quiz-card-item">
+                                    <div class="quiz-card-item quiz-item-{{ $quiz->id }}">
                                         <div class="card quiz-card h-100">
                                             <div class="card-body">
                                                 <span class="status-badge bg-warning text-white">Nháp</span>
@@ -315,7 +315,7 @@
                                                                 method="POST" class="w-100 btn-delete-quiz-form">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit"
+                                                                <button type="submit" data-quiz-id="{{ $quiz->id }}"
                                                                     class="btn btn-outline-danger border w-100 quiz-action-btn">
                                                                     <i class="icofont-ui-delete me-1"></i> Xóa
                                                                 </button>
@@ -739,6 +739,10 @@
             e.preventDefault();
             const form = $(this).closest('form');
             const actionUrl = form.attr('action');
+            const quizId = $(this).data('quiz-id');
+            console.log(quizId);
+            console.log($(`.quiz-item-${ quizId }`));
+
             Swal.fire({
                 title: 'Bạn có chắc chắn?',
                 text: "Bài quiz sẽ được đưa vào thùng rác!",
@@ -765,6 +769,8 @@
                             Swal.fire('Đã xóa!', 'Quiz đã được xóa thành công.',
                                 'success');
                             form.closest('.quiz-card-item').remove();
+                            $(`.quiz-item-${ quizId }`).remove();
+
                             console.log(response);
                             $('#quiz-card-trashed').prepend(renderDeletedQuizItem(response))
 
@@ -805,7 +811,11 @@
                             })
                             $(`.quiz-item-${ quizId }`).remove();
                             $('#quiz-card-all').prepend(renderQuizCardItem(response))
-
+                            if(response.status === 'published') {
+                                $('#quizCardsWrapperPublished').prepend(renderQuizCardItem(response));
+                            } else {
+                                $('#quizCardsWrapperDraft').prepend(renderQuizCardItem(response));
+                            }
                         },
                         error: function() {
                             Swal.fire({
@@ -895,7 +905,7 @@
                                             method="POST" class="w-100 btn-delete-quiz-form">
                                             <input type="hidden" name="_token" value="${csrfToken}">
                                             <input type="hidden" name="_method" value="DELETE">
-                                            <button type="button"
+                                            <button type="button"  data-quiz-id="${quiz.id}"
                                                 class="btn btn-outline-danger w-100 quiz-action-btn delete-permanent"
                                                 data-id="${quiz.id}">
                                                 <i class="icofont-trash me-1"></i> Xóa vĩnh viễn
@@ -966,7 +976,7 @@
                                         <form action="/teacher/quizzes/${quiz.id}/delete" method="POST" class="w-100 btn-delete-quiz-form">
                                             <input type="hidden" name="_token" value="${csrfToken}">
                                             <input type="hidden" name="_method" value="DELETE">
-                                            <button type="submit" class="btn btn-outline-danger border w-100 quiz-action-btn btn-delete-quiz">
+                                            <button type="submit" class="btn btn-outline-danger border w-100 quiz-action-btn btn-delete-quiz" data-quiz-id="${quiz.id}">
                                                 <i class="icofont-ui-delete me-1"></i> Xóa
                                             </button>
                                         </form>
@@ -1214,7 +1224,9 @@
 
                     });
                     $('#body-modal-result').html(html);
-                    $("#resultModalLabel").html(`<i class="icofont-chart-bar-graph text-primary"></i>  Kết quả: ${response.quiz.title} - ${response.student.name}`)
+                    $("#resultModalLabel").html(
+                        `<i class="icofont-chart-bar-graph text-primary"></i>  Kết quả: ${response.quiz.title} - ${response.student.name}`
+                        )
                     $('.quiz-action-btn-result').hide();
                     $('#ed-preloader').fadeOut();
 
@@ -1231,7 +1243,7 @@
         //Hàm hiển thị chi tiết kết quả
         $(document).on('click', '#modal-detail-result', function(e) {
             e.preventDefault();
-               $('#ed-preloader').css('display', 'flex');
+            $('#ed-preloader').css('display', 'flex');
             const url = $(this).attr('href');
             $.ajax({
                 url: url,
