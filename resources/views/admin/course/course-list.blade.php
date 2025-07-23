@@ -154,15 +154,21 @@
                                     <div class="col">
                                         <label class="form-label mb-1 d-block">Tác vụ</label>
                                         <div class="d-flex gap-1">
-                                            <button type="submit" class="btn btn-success btn-sm w-100">Lọc</button>
-                                            <a href="{{ route('admin.course-list') }}"
-                                                class="btn btn-danger btn-sm w-100">Xóa</a>
+                                            <button type="submit" class="btn btn-secondary btn-sm w-100">
+                                                <iconify-icon icon="ic:baseline-filter-alt" class="me-1"></iconify-icon>
+                                                Lọc
+                                            </button>
+                                            <a href="{{ route('admin.course-list') }}" class="btn btn-danger btn-sm w-100">
+                                                <iconify-icon icon="ic:round-clear" class="me-1"></iconify-icon> Xóa
+                                            </a>
+
                                         </div>
                                     </div>
 
                                     <!-- Nút Thêm khóa học -->
                                     <div class="col">
-                                        <a href="{{ route('admin.course-add') }}" class="btn btn-warning btn-sm w-100">Thêm
+                                        <a href="{{ route('admin.course-add') }}"
+                                            class="btn btn-warning btn-sm w-100">Thêm
                                             khóa học</a>
                                     </div>
                                 </form>
@@ -178,13 +184,12 @@
 
                                     <tr>
 
-                                        <th>ID</th>
+                                        <th>STT</th>
                                         <th>Hình ảnh </th>
                                         <th>Tên Khóa Học</th>
                                         <th>Giá Khóa Học </th>
                                         <th>Tổng Số Buổi Học </th>
                                         <th>Ngày Tạo Khóa Học </th>
-                                        <th>Mô Tả Khóa Học </th>
                                         <th>Nổi Bật </th>
                                         <th>Hành Động </th>
 
@@ -199,7 +204,9 @@
                                                     <label class="form-check-label" for="customCheck2"></label>
                                                 </div>
                                             </td> --}}
-                                            <td> {{ $course->id }}</td>
+                                            {{-- <td> {{ $course->id }}</td> --}}
+                                            <td> {{ ($courses->currentPage() - 1) * $courses->perPage() + $loop->iteration }}
+                                            </td>
                                             <td>
                                                 <div class="d-flex align-items-center gap-2">
                                                     <div
@@ -217,11 +224,11 @@
                                             <td>
                                                 <p class="text-dark fw-medium fs-15 mb-0">{{ $course->name }}</p>
                                             </td>
-                                            <td>{{ $course->price }}</td>
+                                            <td>{{ number_format($course->price) }} VNĐ</td>
                                             <td>{{ $course->total_sessions }}</td>
 
                                             <td>{{ $course->created_at }}</td>
-                                            <td>{{ $course->description }}</td>
+                                            {{-- <td>{{ $course->description }}</td> --}}
                                             <td style="width: 100px;">
                                                 <div class="form-check">
                                                     <input type="checkbox" class="form-check-input"
@@ -264,6 +271,8 @@
                                                                         class="align-middle fs-18 me-1"></iconify-icon>
                                                                     Xóa
                                                                 </button>
+
+
                                                             </form>
                                                         </li>
                                                     </ul>
@@ -285,17 +294,6 @@
                         <div id="pagination-wrapper" class="flex-grow-1">
                             {{ $courses->links('pagination::bootstrap-5') }}
                         </div>
-
-                        <div class="d-flex align-items-center" style="min-width: 160px;">
-                            <label for="limit2" class="form-label mb-0 me-2 small">Hiển thị</label>
-                            <select name="limit2" id="limit2" class="form-select form-select-sm"
-                                style="width: 100px;">
-                                <option value="10" selected>10</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -307,54 +305,56 @@
 @endsection
 
 
-<script>
-    function confirmDelete(courseId) {
+@push('scripts')
+    <script>
+        function confirmDelete(courseId) {
 
-        Swal.fire({
-            title: 'Bạn có chắc chắn?',
-            text: "Thao tác này sẽ xóa bài giảng!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Xóa',
-            cancelButtonText: 'Hủy'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // console.log(result);
+            Swal.fire({
+                title: 'Bạn có chắc chắn?',
+                text: "Thao tác này sẽ xóa bài giảng!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // console.log(result);
 
-                document.getElementById('delete-course-form-' + courseId).submit();
+                    document.getElementById('delete-course-form-' + courseId).submit();
 
-                // console.log(dom);
-            }
-        });
-    }
-
-    function toggleFeatured(courseId) {
-        fetch(`/admin/courses/${courseId}/toggle-featured`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    // console.log(dom);
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Cập nhật thành công',
-                        text: data.status ? 'Khóa học đã được đánh dấu nổi bật' :
-                            'Khóa học đã được bỏ đánh dấu nổi bật',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Lỗi:', error);
-                Swal.fire('Lỗi', 'Không thể cập nhật trạng thái nổi bật', 'error');
             });
-    }
-</script>
+        }
+
+        function toggleFeatured(courseId) {
+            fetch(`/admin/courses/${courseId}/toggle-featured`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cập nhật thành công',
+                            text: data.status ? 'Khóa học đã được đánh dấu nổi bật' :
+                                'Khóa học đã được bỏ đánh dấu nổi bật',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi:', error);
+                    Swal.fire('Lỗi', 'Không thể cập nhật trạng thái nổi bật', 'error');
+                });
+        }
+    </script>
+@endpush

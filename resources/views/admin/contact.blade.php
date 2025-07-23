@@ -6,6 +6,14 @@
 @section('content')
     <div class="page-content">
         <div class="container-xxl">
+            <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-light px-3 py-1 rounded shadow-sm">
+                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Quản lí liên hệ</li>
+                        </ol>
+                    </nav>
+                </div>
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h3 class="mb-1">Tin nhắn hỗ trợ đã nhận</h3>
@@ -69,9 +77,9 @@
                                             </option>
                                             <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Đã xử lý
                                             </option>
-                                            <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Không
+                                            {{-- <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Không
                                                 hỗ trợ
-                                            </option>
+                                            </option> --}}
                                         </select>
                                     </div>
 
@@ -127,13 +135,14 @@
                                             <td>
 
                                                 {{-- Trạng thái --}}
-                                                @if ($contact->status == 0)
+                                                @if ((int) $contact->status === 0)
                                                     <p class="badge bg-warning">Đợi xử lý</p>
-                                                @elseif ($contact->status == 1)
+                                                @elseif ((int) $contact->status === 1)
                                                     <span class="badge bg-success">Đã xử lý</span>
-                                                @elseif ($contact->status == 2)
-                                                    <span class="badge bg-secondary">Không hỗ trợ</span>
+                                                @else
+                                                    <span class="badge bg-secondary">Không xác định</span>
                                                 @endif
+
 
 
                                             </td>
