@@ -5,7 +5,7 @@
 
     <div class="page-content">
         <div class="container-fluid">
-             <nav aria-label="breadcrumb p-0">
+            <nav aria-label="breadcrumb p-0">
                 <ol class="breadcrumb py-0">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('admin.score') }}">Quản lí điểm số</a></li>
@@ -15,18 +15,45 @@
 
 
             @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Toastify({
+                            text: "{{ session('success') }}",
+                            gravity: "top",
+                            position: "center",
+                            className: "success",
+                            duration: 4000
+                        }).showToast();
+                    });
+                </script>
             @endif
+
+            @if (session('import_errors'))
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const allErrors = `{!! addslashes(implode("\n", session('import_errors'))) !!}`;
+                        Toastify({
+                            text: allErrors,
+                            gravity: "top",
+                            position: "center",
+                            duration: 6000,
+                            style: {
+                                background: "linear-gradient(to right, #ff0000, #cc0000)",
+                                color: "#fff",
+                                whiteSpace: "pre-line" // cho xuống dòng
+                            }
+                        }).showToast();
+                    });
+                </script>
+            @endif
+
             <div class="row">
 
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="card-title">Bảng điểm </h4>
                         <div class="d-flex gap-4">
-                             <form action="{{ route('admin.scores.import') }}" method="POST" enctype="multipart/form-data"
+                            <form action="{{ route('admin.scores.import') }}" method="POST" enctype="multipart/form-data"
                                 class="d-inline-block">
                                 @csrf
                                 <div class="d-flex align-items-center gap-2">
@@ -39,7 +66,7 @@
                             <a href="{{ route('admin.score.add', [request('class_id')]) }}" class="btn btn-sm btn-primary">
                                 Nhập điểm mới
                             </a>
-                           
+
 
 
                             <a href="{{ route('admin.scores.export', [request('class_id'), request('course_id')]) }}"

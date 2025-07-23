@@ -16,6 +16,12 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 class ScoresImport implements ToCollection
 {
 
+      protected array $errors;
+
+    public function __construct(array &$errors)
+    {
+        $this->errors = &$errors;
+    }
 
     public function collection(Collection $rows)
     {
@@ -24,7 +30,7 @@ class ScoresImport implements ToCollection
 
             $studentName     = trim($row[0]);
             $studentBirthday = ScoreController::parseExcelDate($row[1]);
-            $className       = $row[2];
+            $className       = trim($row[2]);
             $scoreType       = strtolower(trim($row[3]));
             $scoreValue      = floatval($row[4]);
             $examDate        = ScoreController::parseExcelDate($row[5]);
@@ -37,6 +43,7 @@ class ScoresImport implements ToCollection
                 ->first();
             // dd($student);
             if (!$student) {
+                 $this->errors[] = "Không tìm thấy tên sinh viên.";
                 Log::warning("Không tìm thấy sinh viên: {$studentName} ({$studentBirthday})");
                 continue;
             }
@@ -44,6 +51,7 @@ class ScoresImport implements ToCollection
             $class = Classes::where('name', $className)->first();
 
             if (!$class) {
+                 $this->errors[] = "Không tìm thấy tên lớp";
                 Log::warning("Không tìm thấy lớp: {$className}");
                 continue;
             }
@@ -56,6 +64,7 @@ class ScoresImport implements ToCollection
                 ->exists();
 
             if (!$inClass) {
+                 $this->errors[] = "Không tìm thấy học sinh viên trong lớp này";
                 Log::warning("Học sinh '{$studentName}' không thuộc lớp '{$className}'");
                 continue;
             }

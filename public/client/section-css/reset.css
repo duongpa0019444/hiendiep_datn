@@ -23,7 +23,7 @@
   --ed-title-color: #011c1a;
   --ed-paragraph-color: #5f5d5d;
   --ed-border-color: #f0f2f2;
-  --ed-font-family: "Poppins", sans-serif;
+  --ed-font-family: Arial;
   --ed-font-family-2: Aeonik Pro TRIAL, sans-serif;
 }
 
@@ -1141,7 +1141,7 @@ p {
 .progress-wrap {
   position: fixed;
   right: 50px;
-  bottom: 50px;
+  bottom: 100px;
   height: 46px;
   width: 46px;
   cursor: pointer;
@@ -1154,6 +1154,15 @@ p {
   transform: translateY(15px);
   -webkit-transition: all 200ms linear;
   transition: all 200ms linear;
+}
+
+#chatbase-bubble-button{
+position: fixed;
+  right: 50px !important;
+  bottom: 40px !important;
+  height: 46px !important;
+  width: 46px !important;
+
 }
 .progress-wrap.active-progress {
   opacity: 1;

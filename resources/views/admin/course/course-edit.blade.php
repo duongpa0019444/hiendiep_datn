@@ -12,7 +12,7 @@
             @method('PUT')
 
             <!-- Start Container Fluid -->
-           
+
             <div class="container-xxl">
                 <div class="row">
                      @if ($errors->any())

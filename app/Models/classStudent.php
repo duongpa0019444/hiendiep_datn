@@ -16,4 +16,8 @@ class classStudent extends Model
     {
         return $this->belongsTo(User::class, 'student_id');
     }
+
+    public function classes(){
+        return $this->belongsTo(classes::class, 'class_id');
+    }
 }

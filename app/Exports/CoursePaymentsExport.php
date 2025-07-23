@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Exports;
 
 use App\Models\CoursePayment;
@@ -44,9 +45,9 @@ class CoursePaymentsExport implements FromCollection, WithHeadings
 
         return $query->get()->map(function ($payment) {
             return [
-                $payment->user->name,
-                $payment->class->name,
-                $payment->course->name ?? '',
+                optional($payment->user)->name,
+                optional($payment->class)->name,
+                optional($payment->course)->name ?? '',
                 optional($payment->payment_date)->format('d/m/Y H:i'),
                 number_format($payment->amount, 0, ',', '.'),
                 $payment->status === 'paid' ? 'Đã thanh toán' : ($payment->status === 'unpaid' ? 'Chưa thanh toán' : ''),

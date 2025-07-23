@@ -29,7 +29,7 @@ class User extends Authenticatable
         'gender',
         'birth_date',
         'role',
-
+        
     ];
 
     /**
@@ -57,9 +57,33 @@ class User extends Authenticatable
 
     public function class_student()
     {
-        return $this->hasMany(classStudent::class, 'id', 'student_id');
+        return $this->hasMany(classStudent::class, 'student_id', 'id');
     }
 
+    public function course()
+    {
+        return $this->belongsTo(courses::class, 'courses_id');
+    }
+
+
+
+    // // quan hệ với nhiều classes
+    public function classes()
+    {
+        return $this->belongsToMany(
+            classes::class,   // Model lớp
+            'class_student',              // Bảng trung gian
+            'student_id',                 // FK ở bảng trung gian trỏ về users
+            'class_id'                    // FK ở bảng trung gian trỏ về classes
+        );
+    }
+
+
+
+    public function classStudents()
+    {
+        return $this->hasMany(classStudent::class, 'student_id', 'id');
+    }
 
 
     public function hasAnyRole(array $roles)
@@ -84,4 +108,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(CoursePayment::class, 'student_id');
     }
+    // app/Models/User.php
+public function isStaff()
+{
+    return $this->role === 'staff';
+}
+
 }

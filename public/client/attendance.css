@@ -1,0 +1,328 @@
+/* Phần điểm danh */
+.class-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.class-header h6,
+.class-header p,
+.class-header span,
+.class-header i {
+    color: white !important; /* Ghi đè text-muted */
+}
+
+.student-status {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.student-status.present {
+    background-color: #28a745;
+    color: white;
+}
+
+.student-status.absent {
+    background-color: #dc3545;
+    color: white;
+}
+
+.student-status.late {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.student-status.excused {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.student-status.undone {
+    background-color: #6c757d;
+    color: white;
+}
+
+
+ .attendance-summary {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        border: 1px solid #e9ecef;
+    }
+
+.summary-item {
+    text-align: center;
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+}
+
+ .summary-item:hover {
+        transform: translateY(-2px);
+    }
+
+    .summary-number {
+        display: block;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #495057;
+    }
+
+    .summary-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+/* .summary-number.present {
+    color: #28a745;
+}
+
+.summary-number.absent {
+    color: #dc3545;
+}
+
+.summary-number.late {
+    color: #ffc107;
+}
+
+.summary-number.unmarked {
+    color: #6c757d;
+}
+
+.summary-label {
+    color: #495057;
+    font-weight: 500;
+} */
+
+.quick-actions {
+    margin: 1.5rem 0;
+    display: flex;
+    gap: 10px;
+        margin-bottom: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.quick-action-btn {
+    padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        background: #6c757d;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+    .search-box {
+        border-radius: 25px;
+        border: 2px solid #e9ecef;
+        padding: 12px 20px 12px 45px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+
+    .search-box:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+.student-list {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+    .student-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        background: white;
+        transition: all 0.3s;
+    }
+
+    .student-item:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transform: translateY(-1px);
+    }
+
+
+.student-item:last-child {
+    border-bottom: none;
+}
+
+    .student-avatar {
+        position: relative;
+        margin-right: 15px;
+    }
+
+    .student-avatar img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .student-status {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: white;
+    }
+
+.student-info {
+        flex: 1;
+        margin-right: 15px;
+    }
+
+    .student-name {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: #495057;
+    }
+
+.student-gender {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+
+    .attendance-controls {
+        /* display: flex; */
+        /* gap: 8px; */
+        /* flex-wrap: wrap; */
+    }
+
+    .status-btn {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Present */
+.status-btn.present {
+    border-color: #28a745;
+    color: #28a745;
+}
+.status-btn.present.active {
+    background: #28a745;
+    color: white;
+}
+
+/* Absent */
+.status-btn.absent {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+.status-btn.absent.active {
+    background: #dc3545;
+    color: white;
+}
+
+/* Late */
+.status-btn.late {
+    border-color: #ffc107;
+    color: #ffc107;
+}
+.status-btn.late.active {
+    background: #ffc107;
+    color: #212529;
+}
+
+/* Excused */
+.status-btn.excused {
+    border-color: #17a2b8;
+    color: #17a2b8;
+}
+.status-btn.excused.active {
+    background: #17a2b8;
+    color: white;
+}
+
+
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 20px;
+        border-top: 1px solid #e9ecef;
+        background: #f8f9fa;
+        border-radius: 0 0 10px 10px;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 20px;
+        color: #6c757d;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+    }
+
+    @media (max-width: 768px) {
+        .student-item {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .student-avatar {
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+
+        .student-info {
+            margin-right: 0;
+            margin-bottom: 15px;
+        }
+
+        .attendance-controls {
+            justify-content: center;
+        }
+
+        .quick-actions {
+            justify-content: center;
+        }
+    }
+

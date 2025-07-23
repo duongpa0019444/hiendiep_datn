@@ -23,11 +23,14 @@
                             {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}</td>
                         <td>{{ $schedule->course_name }}</td>
                         <td>
-                            <button class="btn btn-success btn-sm attendance-btn shadow-sm" 
+                            <a href="{{ route('admin.attendance.class', ['id' => $schedule->schedule_id]) }}">
+                                <button class="btn btn-success btn-sm attendance-btn shadow-sm" 
                                         data-schedule-id="{{ $schedule->schedule_id }}"
                                         onclick="markAttendance({{ $schedule->schedule_id }})">
                                     <i class="icofont-check-circled" style="margin-right: 0.25rem;"></i>Điểm danh
                                 </button>
+                            </a>
+                            
                         </td>
                     </tr>
                 @endforeach

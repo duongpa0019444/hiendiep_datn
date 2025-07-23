@@ -53,13 +53,20 @@ class AccountController extends Controller
 
 
 
-    public function list($role)
+    public function list($role, Request $request)
     {
-        $role = User::where('role', $role)->orderBy('id', 'desc')->paginate(10);
+        $query = User::where('role', $role);
 
+        if ($request->has('queryAccountRole') && $request->queryAccountRole !== null) {
+            $keyword = $request->queryAccountRole;
+            $query->where('name', 'like', '%' . $keyword . '%');
+        }
 
-        return view('admin.accounts.list', compact('role'));
+        $users = $query->orderBy('id', 'desc')->paginate(10);
+
+        return view('admin.accounts.list', compact('users', 'role'));
     }
+
 
     public function add()
     {

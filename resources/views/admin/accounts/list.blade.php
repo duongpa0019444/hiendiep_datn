@@ -8,7 +8,7 @@
 @endphp
 
 @extends('admin.admin')
-@section('title', 'Quản lí ' . ($roles[request('role')] ?? request('role') ?? 'người dùng'))
+@section('title', 'Quản lí ' . ($roles[request('role')] ?? (request('role') ?? 'người dùng')))
 @section('description', '')
 @section('content')
 
@@ -25,7 +25,7 @@
 
             @if (session('success'))
                 <script>
-                    document.addEventListener('DOMContentLoaded', function() {  
+                    document.addEventListener('DOMContentLoaded', function() {
                         const toastElement = document.createElement('div');
                         toastElement.setAttribute('data-toast', '');
                         toastElement.setAttribute('data-toast-text', "{{ session('success') }}");
@@ -55,10 +55,23 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="card-title">Danh sách </h4>
                         @if (request('role'))
-                            <a href="{{ route('admin.account.add', ['role' => request('role')]) }}"
-                                class="btn btn-sm btn-primary">
-                                Thêm {{ $roles[request('role')] ?? request('role') }}
-                            </a>
+                            <div class="d-flex justify-content-between gap-3 align-items-center">
+                                <form method="GET" action="{{ route('admin.account.list', request('role')) }}">
+                                    <div class="position-relative">
+                                        <input type="search" name="queryAccountRole" class="form-control"
+                                            placeholder="Tìm học sinh..." autocomplete="off"
+                                            value="{{ request()->query('queryAccountRole') ?? '' }}">
+                                        <iconify-icon icon="solar:magnifer-linear" class="search-widget-icon"
+                                            style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999;"></iconify-icon>
+                                    </div>
+                                </form>
+
+
+                                <a href="{{ route('admin.account.add', ['role' => request('role')]) }}"
+                                    class="btn  btn-primary">
+                                    Thêm {{ $roles[request('role')] ?? request('role') }}
+                                </a>
+                            </div>
                         @endif
 
                     </div> <!-- end card-header-->
@@ -77,7 +90,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($role as $data)
+                                    @forelse ($users as $data)
                                         <tr>
                                             <td><img class="rounded" src="{{ asset($data->avatar) }}" width="50"
                                                     alt="{{ $data->name }}">
@@ -101,7 +114,13 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                    @endforeach
+                                    @empty
+                                        <div class="col-12">
+                                            <div class="alert mt-3 alert-warning text-center" role="alert">
+                                                Không tìm thấy {{ $roles[request('role')] ?? request('role') }} nào
+                                            </div>
+                                        </div>
+                                    @endforelse
 
                                 </tbody>
                             </table>
@@ -109,7 +128,7 @@
                     </div> <!-- end card body -->
                     <div class="card-footer border-top">
                         <nav aria-label="Page navigation">
-                            {!! $role->links('pagination::bootstrap-5') !!}
+                            {!! $users->links('pagination::bootstrap-5') !!}
                         </nav>
                     </div>
                 </div>
@@ -154,11 +173,12 @@
                         msg += `Và Thanh toán: ${data.payments.length} khoản\n`;
                     if (data.quizzes.length)
                         msg += `Và Bài quiz: ${data.quizzes.length} lần\n`;
-                     if (data.schedules.length)
+                    if (data.schedules.length)
                         msg += `Lịch dạy: ${data.schedules.length} buổi \n`;
                     // nếu trùng 1 lớp 3 buổi thì sao
 
-                    if (data.classes.length || data.payments.length || data.quizzes.length || data.schedules.length) {
+                    if (data.classes.length || data.payments.length || data.quizzes.length || data.schedules
+                        .length) {
                         Swal.fire({
                             title: `Bạn có chắc muốn xóa ${role}?`,
                             text: msg,
@@ -171,7 +191,8 @@
                             buttonsStyling: false,
                         }).then(function(result) {
                             if (result.isConfirmed) {
-                                window.location.href = "{{ url('/admin/account/delete') }}/" + role + "/" + userId;
+                                window.location.href = "{{ url('/admin/account/delete') }}/" + role +
+                                    "/" + userId;
 
                             } else {
                                 Swal.fire({
@@ -196,7 +217,8 @@
                             buttonsStyling: false,
                         }).then(function(result) {
                             if (result.isConfirmed) {
-                               window.location.href = "{{ url('/admin/account/delete') }}/" + role + "/" + userId;
+                                window.location.href = "{{ url('/admin/account/delete') }}/" + role +
+                                    "/" + userId;
 
                             } else {
                                 Swal.fire({

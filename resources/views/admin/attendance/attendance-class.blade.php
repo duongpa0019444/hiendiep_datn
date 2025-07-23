@@ -33,6 +33,11 @@
                                     <i class="fas fa-clock ms-3 me-2"></i>
                                     <span
                                         id="eventTime">{{ $scheduleData->start_time && $scheduleData->end_time ? \Carbon\Carbon::parse($scheduleData->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($scheduleData->end_time)->format('H:i') : 'Không có thời gian' }}</span>
+                                    <br>
+                                    <i class="fas fa-chalkboard-teacher me-2"></i>
+                                    <span
+                                        id="teacherName">{{ $scheduleData->teacher_name ?? 'Chưa phân công giáo viên' }}</span>
+
                                 </p>
                             </div>
                             <div class="col-md-4 text-end">
@@ -617,7 +622,7 @@
                                     icon: 'success',
                                     confirmButtonText: 'OK'
                                 }).then(() => {
-                                showLoading(false); // Tắt loading trước
+                                    showLoading(false); // Tắt loading trước
 
                                     // attendanceData = [];
                                     updateSummary();

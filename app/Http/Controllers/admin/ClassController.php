@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\classes;
 use App\Models\classStudent;
+use App\Models\coursePayment;
 // use App\Models\coursePayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -172,6 +173,9 @@ class ClassController extends Controller
         $class = classes::findOrFail($id);
         $class->delete();
 
+        // Xóa mềm các bản ghi học phí liên quan
+        coursePayment::where('class_id', $id)->get()->each->delete();
+
         // return redirect()->route('admin.classes.index')->with('success', 'Lớp học đã được xóa thành công');
         return response()->json([
             'success' => true,
@@ -184,11 +188,22 @@ class ClassController extends Controller
         $class = classes::withTrashed()->findOrFail($id);
         $class->restore();
 
+        //Khôi phụ các bản ghi học phí liên quan
+        coursePayment::withTrashed()
+            ->where('class_id', $id)
+            ->restore();
+
+
         return redirect()->route('admin.classes.index')->with('success', 'Lớp học đã được khôi phục thành công');
     }
 
     public function forceDelete($id)
     {
+        // Xóa cứng các khoản thanh toán liên quan trước
+        coursePayment::withTrashed()
+            ->where('class_id', $id)
+            ->forceDelete();
+
         $class = classes::withTrashed()->findOrFail($id);
         $class->forceDelete();
 
@@ -326,6 +341,22 @@ class ClassController extends Controller
             'created_at' => now(),
         ]);
 
+
+
+        //Thêm vào bảng course_payments
+        $classes = classes::where('classes.id', $classId)
+            ->with(['course'])
+            ->first();
+        DB::table('course_payments')->insert([
+            'class_id' => $classId,
+            'student_id' => $studentId,
+            'course_id' => $classes->course->id,
+            'amount' => $classes->course->price,
+            'status' => 'unpaid',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         return redirect()->back()->with('success', 'Học sinh đã được thêm vào lớp thành công.');
     }
 
@@ -336,6 +367,18 @@ class ClassController extends Controller
             ->where('student_id', $studentId)
             ->first()
             ->delete();
+
+        //Xóa mềm học sinh khỏi bảng course_payments
+        $classes = classes::where('classes.id', $classId)
+            ->with(['course'])
+            ->first();
+        $course_payment = coursePayment::where('class_id', $classId)
+            ->where('student_id', $studentId)
+            ->where('course_id', $classes->course->id)
+            ->first();
+        $course_payment->delete();
+
+
 
         return redirect()->back()->with('success', 'Học sinh đã được xóa khỏi lớp thành công.');
     }
@@ -385,6 +428,19 @@ class ClassController extends Controller
         // Khôi phục bản ghi đã xóa mềm
         $classStudent->restore();
 
+        //Khôi phục bản ghi course_payment
+        $course_payment = coursePayment::withTrashed()
+            ->where('class_id', $classId)
+            ->where('student_id', $studentId)
+            ->first();
+
+        // Kiểm tra xem bản ghi có tồn tại và đã bị xóa mềm hay không
+        if (!$course_payment || !$course_payment->trashed()) {
+            return redirect()->back()->with('error', 'Không tìm thấy thông tin thanh toán đã bị xóa.');
+        }
+
+        $course_payment->restore();
+
         return redirect()->back()->with('success', 'Đã khôi phục học viên vào lớp.');
     }
 
@@ -406,6 +462,21 @@ class ClassController extends Controller
 
         // Xóa vĩnh viễn bản ghi
         $classStudent->forceDelete();
+
+        // Xóa cứng học sinh khỏi bảng course_payments
+        $classes = classes::where('classes.id', $classId)
+            ->with(['course'])
+            ->first();
+
+        $course_payment = coursePayment::where('class_id', $classId)
+            ->where('student_id', $studentId)
+            ->where('course_id', $classes->course->id)
+            ->first();
+
+        if ($course_payment) {
+            $course_payment->forceDelete();
+        }
+
 
         return redirect()->back()->with('success', 'Đã xóa vĩnh viễn học viên khỏi lớp.');
     }

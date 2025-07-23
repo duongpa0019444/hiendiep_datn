@@ -12,132 +12,143 @@ use Illuminate\Support\Facades\Log;
 
 class TeacherSalaryController extends Controller
 {
-    public function index()
-    {
-        $month = Carbon::now()->month;
-        $year = Carbon::now()->year;
+   public function index()
+{
+    $month = Carbon::now()->month;
+    $year = Carbon::now()->year;
 
-        $salaries = $data = DB::table('teacher_salaries as ts')
-            ->join('users as u', 'u.id', '=', 'ts.teacher_id')
-            ->leftJoin('teacher_salary_rules as tsr', function ($join) {
-                $join->on('ts.teacher_id', '=', 'tsr.teacher_id')
-                    ->where('tsr.effective_date', '<=', Carbon::now());
-            })
-            ->select(
-                'ts.*',
-                'u.name as teacher_name',
-                'u.phone as teacher_phone',
-                'tsr.pay_rate',
-            )
-            ->where('ts.month', $month)
-            ->where('ts.year', $year)
-            ->get();
+    $startOfMonth = Carbon::create($year, $month, 1)->startOfMonth()->toDateString(); // YYYY-MM-01
+    $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth()->toDateString();     // YYYY-MM-31
 
-        $payRates = DB::table('teacher_salary_rules')
-            ->select('teacher_id', 'unit', 'pay_rate')
-            ->whereIn('teacher_id', $salaries->pluck('teacher_id')->unique())
-            ->get();
+    $salaries = DB::table('teacher_salaries as ts')
+        ->join('users as u', 'u.id', '=', 'ts.teacher_id')
+        ->leftJoin('teacher_salary_rules as tsr', function ($join) use ($startOfMonth, $endOfMonth) {
+            $join->on('ts.teacher_id', '=', 'tsr.teacher_id')
+                ->where('tsr.effective_date', '<=', $endOfMonth)
+                ->where(function ($q) use ($startOfMonth) {
+                    $q->whereNull('tsr.end_pay_rate')
+                      ->orWhere('tsr.end_pay_rate', '>=', $startOfMonth);
+                });
+        })
+        ->select(
+            'ts.*',
+            'u.name as teacher_name',
+            'u.phone as teacher_phone',
+            'tsr.pay_rate'
+        )
+        ->where('ts.month', $month)
+        ->where('ts.year', $year)
+        ->get();
+    
+    // Các phần còn lại giữ nguyên
+    $payRates = DB::table('teacher_salary_rules')
+        ->select('teacher_id', 'unit', 'pay_rate')
+        ->whereIn('teacher_id', $salaries->pluck('teacher_id')->unique())
+        ->get();
 
-        $shechedules = DB::table('schedules')
-            ->select('id', 'date', 'start_time', 'end_time', 'teacher_id', 'support_teacher', 'day_of_week')
-            ->whereIn('teacher_id', $salaries->pluck('class_id')->unique())
-            ->get();
+    $shechedules = DB::table('schedules')
+        ->select('id', 'date', 'start_time', 'end_time', 'teacher_id', 'support_teacher', 'day_of_week')
+        ->whereIn('teacher_id', $salaries->pluck('class_id')->unique())
+        ->get();
 
-        return view('admin.teacher_salaries.index', compact('salaries', 'payRates', 'shechedules'));
-    }
+    return view('admin.teacher_salaries.index', compact('salaries', 'payRates', 'shechedules'));
+}
 
-    public function getData(Request $request)
-    {
-        $inputMonth = $request->input('month'); // Ví dụ: '2025-06'
+public function getData(Request $request)
+{
+    $input = $request->input('month', now()->format('Y-m'));
+    [$year, $month] = explode('-', $input);
+    $year = (int)$year;
+    $month = (int)$month;
 
-        if ($inputMonth) {
-            [$year, $month] = explode('-', $inputMonth);
-        } else {
-            $year = Carbon::now()->year;
-            $month = Carbon::now()->month;
-        }
+    $mainTeacher = DB::table('schedules as s')
+        ->where('s.status', 1)
+        ->whereMonth('s.date', $month)
+        ->whereYear('s.date', $year)
+        ->whereNotNull('s.teacher_id')
+        ->join('teacher_salary_rules as tsr', function ($j) {
+            $j->on('s.teacher_id', '=', 'tsr.teacher_id')
+              ->whereRaw('s.date >= tsr.effective_date')
+              ->where(function ($q) {
+                  $q->whereNull('tsr.end_pay_rate')
+                    ->orWhereRaw('s.date <= tsr.end_pay_rate');
+              });
+        })
+        ->leftJoin('users as u', 'u.id', '=', 's.teacher_id')
+        ->leftJoin('teacher_salaries as ts', function ($j) use ($month, $year) {
+            $j->on('ts.teacher_id', '=', 's.teacher_id')
+              ->where('ts.month', $month)
+              ->where('ts.year', $year);
+        })
+        ->select(
+            's.teacher_id as teacher_id',
+            'u.name as teacher_name',
+            'u.phone as teacher_phone',
+            DB::raw('ROUND(TIMESTAMPDIFF(MINUTE, s.start_time, s.end_time)/60) as hours'),
+            DB::raw('tsr.pay_rate'),
+            DB::raw('tsr.unit'),
+            'ts.bonus',
+            'ts.penalty'
+        );
 
-        // Main teacher
-        $mainTeachers = DB::table('schedules as s')
-            ->join('teacher_salary_rules as tsr', function ($join) {
-                $join->on('s.teacher_id', '=', 'tsr.teacher_id')
-                    ->whereRaw('s.date >= tsr.effective_date')
-                    ->where(function ($query) {
-                        $query->whereNull('tsr.end_pay_rate')
-                            ->orWhereRaw('s.date <= tsr.end_pay_rate');
-                    });
-            })
-            ->whereNotNull('s.teacher_id')
-            ->whereMonth('s.date', $month)
-            ->whereYear('s.date', $year)
-            ->select(
-                's.teacher_id',
-                DB::raw('ROUND(TIMESTAMPDIFF(MINUTE, s.start_time, s.end_time)/60) as teaching_hours'),
-                'tsr.pay_rate',
-                'tsr.unit',
-                's.date'
-            );
+    $supportTeacher = DB::table('schedules as s')
+        ->where('s.status', 1)
+        ->whereMonth('s.date', $month)
+        ->whereYear('s.date', $year)
+        ->whereNotNull('s.support_teacher')
+        ->join('teacher_salary_rules as tsr', function ($j) {
+            $j->on('s.support_teacher', '=', 'tsr.teacher_id')
+              ->whereRaw('s.date >= tsr.effective_date')
+              ->where(function ($q) {
+                  $q->whereNull('tsr.end_pay_rate')
+                    ->orWhereRaw('s.date <= tsr.end_pay_rate');
+              });
+        })
+        ->leftJoin('users as u', 'u.id', '=', 's.support_teacher')
+        ->leftJoin('teacher_salaries as ts', function ($j) use ($month, $year) {
+            $j->on('ts.teacher_id', '=', 's.support_teacher')
+              ->where('ts.month', $month)
+              ->where('ts.year', $year);
+        })
+        ->select(
+            's.support_teacher as teacher_id',
+            'u.name as teacher_name',
+            'u.phone as teacher_phone',
+            DB::raw('ROUND(TIMESTAMPDIFF(MINUTE, s.start_time, s.end_time)/60) as hours'),
+            DB::raw('tsr.pay_rate'),
+            DB::raw('tsr.unit'),
+            'ts.bonus',
+            'ts.penalty'
+        );
 
-        // Support teacher
-        $supportTeachers = DB::table('schedules as s')
-            ->join('teacher_salary_rules as tsr', function ($join) {
-                $join->on('s.support_teacher', '=', 'tsr.teacher_id')
-                    ->whereRaw('s.date >= tsr.effective_date')
-                    ->where(function ($query) {
-                        $query->whereNull('tsr.end_pay_rate')
-                            ->orWhereRaw('s.date <= tsr.end_pay_rate');
-                    });
-            })
-            ->whereNotNull('s.support_teacher')
-            ->whereMonth('s.date', $month)
-            ->whereYear('s.date', $year)
-            ->select(
-                DB::raw('s.support_teacher as teacher_id'),
-                DB::raw('ROUND(TIMESTAMPDIFF(MINUTE, s.start_time, s.end_time)/60) as teaching_hours'),
-                'tsr.pay_rate',
-                'tsr.unit',
-                's.date'
-            );
+    // Gộp query
+    $combinedQuery = $mainTeacher->unionAll($supportTeacher);
 
-        // Gộp lại
-        $teaching = DB::table(DB::raw("({$mainTeachers->toSql()} UNION ALL {$supportTeachers->toSql()}) as teaching"))
-            ->mergeBindings($mainTeachers)
-            ->mergeBindings($supportTeachers);
+    // Truy vấn từ subquery và group lại theo teacher
+    $records = DB::table(DB::raw("({$combinedQuery->toSql()}) as sub"))
+        ->mergeBindings($combinedQuery)
+        ->select(
+            'teacher_id',
+            'teacher_name',
+            'teacher_phone',
+            DB::raw('SUM(hours) as total_hours'),
+            DB::raw('MAX(pay_rate) as pay_rate'), // do chỉ có 1 mức lương
+            DB::raw('MAX(unit) as unit'),
+            DB::raw('MAX(bonus) as bonus'),
+            DB::raw('MAX(penalty) as penalty'),
+            DB::raw('SUM(hours * pay_rate) as total_salary')
+        )
+        ->groupBy('teacher_id', 'teacher_name', 'teacher_phone')
+        ->get();
 
-        // Tính tổng lương cho mỗi giáo viên
-        $teachingDatas = DB::table(DB::raw("({$teaching->toSql()}) as teaching_data"))
-            ->mergeBindings($teaching)
-            ->join('users as u', 'u.id', '=', 'teaching_data.teacher_id')
-            ->leftJoin('teacher_salaries as ts', function ($join) use ($month, $year) {
-                $join->on('ts.teacher_id', '=', 'teaching_data.teacher_id')
-                    ->where('ts.month', '=', $month)
-                    ->where('ts.year', '=', $year);
-            })
-            ->select(
-                'teaching_data.teacher_id',
-                'u.name as teacher_name',
-                'u.phone as teacher_phone',
-                DB::raw('SUM(teaching_data.teaching_hours) as total_hours'),
-                DB::raw('SUM(teaching_data.teaching_hours * teaching_data.pay_rate) as total_salary'),
-                DB::raw('MAX(teaching_data.pay_rate) as pay_rate'),
-                DB::raw('MAX(teaching_data.unit) as unit'),
-                'ts.bonus',
-                'ts.penalty'
-            )
-            ->groupBy(
-                'teaching_data.teacher_id',
-                'u.name',
-                'u.phone',
-                'ts.bonus',
-                'ts.penalty'
-            )
-            ->get();
+    return response()->json([
+        'success' => true,
+        'data' => $records,
+    ]);
+}
 
-        return response()->json([
-            'success' => true,
-            'data' => $teachingDatas,
-        ]);
-    }
+
+
 
 
     public function save(Request $request)
@@ -203,37 +214,79 @@ class TeacherSalaryController extends Controller
     }
 
 
-    public function filter(Request $request)
-    {
-        $query = DB::table('teacher_salaries as ts')
-            ->join('users as u', 'u.id', '=', 'ts.teacher_id')
-            ->leftJoin('teacher_salary_rules as tsr', function ($join) {
-                $join->on('ts.teacher_id', '=', 'tsr.teacher_id');
-            })
-            ->select(
-                'ts.*',
-                'u.name as teacher_name',
-                'u.phone as teacher_phone',
-                'tsr.pay_rate'
-            );
+public function filter(Request $request)
+{
+    $query = DB::table('teacher_salaries as ts')
+        ->join('users as u', 'u.id', '=', 'ts.teacher_id');
 
-        if ($request->filled('name')) {
-            $query->where('u.name', 'like', '%' . $request->name . '%');
-        }
+    // Nếu có tháng, lấy khoảng ngày tháng
+    if ($request->filled('month')) {
+        $date = Carbon::parse($request->month);
+        $month = $date->month;
+        $year = $date->year;
 
-        if ($request->filled('month')) {
-            $date = Carbon::parse($request->month);
-            $query->where('ts.month', $date->month)
-                ->where('ts.year', $date->year);
-        }
+        $startOfMonth = Carbon::create($year, $month, 1)->startOfMonth()->toDateString();
+        $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth()->toDateString();
 
-        if ($request->has('status') && $request->status !== '') {
-            $query->where('ts.paid', $request->status);
-        }
+        // Lọc theo tháng + năm
+        $query->where('ts.month', $month)
+              ->where('ts.year', $year);
 
+        // Chỉ lấy pay_rate có hiệu lực trong khoảng tháng đó
+        $query->leftJoin(DB::raw("
+            (
+                SELECT t1.*
+                FROM teacher_salary_rules t1
+                INNER JOIN (
+                    SELECT teacher_id, MAX(effective_date) as effective_date
+                    FROM teacher_salary_rules
+                    WHERE effective_date <= '{$endOfMonth}'
+                      AND (end_pay_rate IS NULL OR end_pay_rate >= '{$startOfMonth}')
+                    GROUP BY teacher_id
+                ) t2 ON t1.teacher_id = t2.teacher_id AND t1.effective_date = t2.effective_date
+            ) as tsr
+        "), 'ts.teacher_id', '=', 'tsr.teacher_id');
+    } else {
+        // Nếu không chọn tháng, chỉ lấy pay_rate đang có hiệu lực hôm nay
+        $today = Carbon::now()->toDateString();
 
-        $salaries = $query->get();
-
-        return response()->json(['success' => true, 'data' => $salaries]);
+        $query->leftJoin(DB::raw("
+            (
+                SELECT t1.*
+                FROM teacher_salary_rules t1
+                INNER JOIN (
+                    SELECT teacher_id, MAX(effective_date) as effective_date
+                    FROM teacher_salary_rules
+                    WHERE effective_date <= '{$today}'
+                      AND (end_pay_rate IS NULL OR end_pay_rate >= '{$today}')
+                    GROUP BY teacher_id
+                ) t2 ON t1.teacher_id = t2.teacher_id AND t1.effective_date = t2.effective_date
+            ) as tsr
+        "), 'ts.teacher_id', '=', 'tsr.teacher_id');
     }
+
+    // Lọc theo tên
+    if ($request->filled('name')) {
+        $query->where('u.name', 'like', '%' . $request->name . '%');
+    }
+
+    // Lọc trạng thái trả lương
+   if ($request->filled('status') && $request->status !== 'all') {
+    $query->where('ts.paid', (int)$request->status);
+    } else {
+        // Nếu không chọn, lọc cả trạng thái 0 và 1 (tránh null)
+        $query->whereIn('ts.paid', [0, 1]);
+    }
+
+    // Select cuối
+    $salaries = $query->select(
+        'ts.*',
+        'u.name as teacher_name',
+        'u.phone as teacher_phone',
+        'tsr.pay_rate'
+    )->get();
+
+    return response()->json(['success' => true, 'data' => $salaries]);
+}
+
 }

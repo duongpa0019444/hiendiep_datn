@@ -17,7 +17,7 @@
 
 
     <!-- App favicon -->
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
+    <link rel="shortcut icon" href="{{ asset('client/images/logo-icon.png') }}">
 
     <!-- Vendor css (Require in all Page) -->
     <link href="{{ asset('admin/css/vendor.min.css') }}" rel="stylesheet" type="text/css" />
@@ -27,18 +27,13 @@
 
     <!-- App css (Require in all Page) -->
     <link href="{{ asset('admin/css/app.min.css') }}" rel="stylesheet" type="text/css" />
-    <!-- Gọi CKEditor từ thư mục nội bộ -->
-
 
     <!-- Theme Config js (Require in all Page) -->
     <script src="{{ asset('admin/js/config.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     {{-- <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script> --}}
 
-
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-      {{-- LINK Jquery --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <!-- Font Awesome 6 CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -235,14 +230,14 @@
         <div class="main-nav">
             <!-- Sidebar Logo -->
             <div class="logo-box">
-                <a href="" class="logo-dark">
-                    <img src="" class="logo-sm" alt="logo sm">
-                    <img src="" class="logo-lg" alt="logo dark">
+                <a href="{{ route('admin.dashboard') }}" class="logo-dark">
+                    <img src="{{ asset('client/images/logo-icon.png') }}" class="logo-sm" alt="logo sm">
+                    <img src="{{ asset('client/images/logo.png') }}" class="logo-lg" alt="logo dark">
                 </a>
 
-                <a href="" class="logo-light">
-                    <img src="" class="logo-sm" alt="logo sm">
-                    <img src="" class="logo-lg" alt="logo light">
+                <a href="{{ route('admin.dashboard') }}" class="logo-light">
+                    <img src="{{ asset('client/images/logo-icon.png') }}" class="logo-sm" alt="logo sm">
+                    <img src="{{ asset('client/images/logo-white.png') }}" class="logo-lg" alt="logo light">
                 </a>
             </div>
 
@@ -391,16 +386,6 @@
                                 <span class="nav-text"> Quản lí lương giáo viên</span>
                             </a>
 
-                            {{-- <div class="collapse" id="user">
-                            <ul class="nav sub-navbar-nav">
-                                <li class="sub-nav-item">
-                                    <a class="sub-nav-link" href="/admin/user/list">Tạo khoản thu</a>
-                                </li>
-
-
-                            </ul>
-                        </div> --}}
-
                         </li>
 
                         <li class="nav-item">
@@ -411,16 +396,17 @@
                                 <span class="nav-text"> Quản lí thông báo </span>
                             </a>
 
-                            {{-- <div class="collapse" id="user">
-                                <ul class="nav sub-navbar-nav">
-                                    <li class="sub-nav-item">
-                                        <a class="sub-nav-link" href="/admin/user/list">Tạo thông báo</a>
-                                    </li>
+                       
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.contact') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lí tin nhắn cần hỗ trợ </span>
+                            </a>
 
-
-                                </ul>
-                            </div> --}}
-
+                       
                         </li>
 
 
@@ -507,6 +493,17 @@
 
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.contact') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý hỗ trợ tin nhắn  </span>
+                            </a>
+
+                        </li>
+
+
 
                         <li class="nav-item mt-3">
                             <a class="nav-link" href="{{ route('auth.logout') }}">
@@ -530,6 +527,13 @@
 
     </div>
 
+ <!-- Spinner container (ẩn mặc định) -->
+    <div id="loading-spinner"
+        style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999;">
+        <div class="spinner-border text-info" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 
     <!-- ========== Footer End ========== -->
     <!-- Vendor Javascript (Require in all Page) -->
@@ -545,6 +549,11 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    @if (auth()->check() && auth()->user()->isStaff())
+    @if (auth()->check() && auth()->user()->isStaff())
+
+@endif
+
     <script>
         AOS.init();
         setTimeout(() => {
@@ -566,7 +575,14 @@
                     console.error('Lỗi:', error.message);
                 });
         }, 300000); // 5phút
-    </script>
+
+        
+
+
+
+</script>
+@endif
+
 
 
     @stack('scripts')
