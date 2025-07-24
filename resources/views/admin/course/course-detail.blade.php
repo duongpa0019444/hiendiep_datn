@@ -48,7 +48,7 @@
                                           @foreach ($lessions as $lession)
                                               <tr>
                                                   <td>{{ $lession->name }}</td>
-                                                  <td><a href="{{ $lession->link_document }}"><iconify-icon
+                                                  <td><a target="_blank"  rel="noopener noreferrer" href="{{ $lession->link_document }}"><iconify-icon
                                                               icon="mdi:file-pdf-box" class="text-danger"
                                                               style="font-size: 40px;"></iconify-icon>
                                                       </a></td>
