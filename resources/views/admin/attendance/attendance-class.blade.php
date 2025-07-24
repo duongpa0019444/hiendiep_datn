@@ -600,6 +600,12 @@
                 if (result.isConfirmed) {
                     showLoading(true);
 
+                    // In ra dữ liệu trước khi gửi
+                    console.log('➡️ Dữ liệu chuẩn bị gửi:', {
+                        schedule_id: scheduleId,
+                        attendance_data: attendanceData
+                    });
+
                     fetch('{{ route('attendance.save') }}', {
                             method: 'POST',
                             headers: {
