@@ -383,7 +383,7 @@ Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function
     // Mới thêm
     Route::get('schedule/{id}/attendance', [ClientAttendanceController::class, 'attendanceClass'])->name('admin.attendance.class');
     Route::post('schedule/attendance/summary', [ClientAttendanceController::class, 'updateSummary'])->name('attendance.summary.update');
-    Route::post('schedule/attendance/save', [ClientAttendanceController::class, 'saveAttendance'])->name('attendance.save');
+    Route::post('schedule/attendance/save', [ClientAttendanceController::class, 'saveAttendance'])->name('client.attendance.save');
     Route::get('schedule/attendance/export', [ClientAttendanceController::class, 'exportAttendance'])->name('attendance.export');
 
 
