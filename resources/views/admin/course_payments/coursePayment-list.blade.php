@@ -574,11 +574,19 @@
                             <ul class="dropdown-menu">
 
                                 ${payment.status === 'paid' ? `
+<<<<<<< HEAD
+                                            <li data-bs-target="#modal-printCoursePayment">
+                                                <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
+                                                    <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
+                                                </button>
+                                            </li>` : ''}
+=======
                                                 <li data-bs-target="#modal-printCoursePayment">
                                                     <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
                                                         <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
                                                     </button>
                                                 </li>` : ''}
+>>>>>>> 1d455ee6a9340a08bec9b1889ad9de059620b5ab
 
                                 <li data-bs-target="#modal-course-payment">
                                     <button class="dropdown-item text-warning btn-edit-course-payment" data-coursePayment_id="${ payment.id }">
@@ -814,11 +822,19 @@
 
                                             ${payment.status === 'paid' ? `
 
+<<<<<<< HEAD
+                                                        <li data-bs-target="#modal-printCoursePayment">
+                                                            <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
+                                                                <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
+                                                            </button>
+                                                        </li>` : ''}
+=======
                                                             <li data-bs-target="#modal-printCoursePayment">
                                                                 <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
                                                                     <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
                                                                 </button>
                                                             </li>` : ''}
+>>>>>>> 1d455ee6a9340a08bec9b1889ad9de059620b5ab
 
 
                                             <li data-bs-target="#modal-course-payment">
@@ -941,6 +957,36 @@
         });
 
 
+<<<<<<< HEAD
+        // Khi click vào các link
+        $(document).on('click', 'a', function(e) {
+            const href = $(this).attr('href');
 
+            // Nếu là link hợp lệ (không phải anchor, không mở tab mới, không phải js link)
+            if (
+                href &&
+                !href.startsWith('#') &&
+                !$(this).attr('target') &&
+                !href.startsWith('javascript:')
+            ) {
+                $('#loading-spinner').fadeIn(200);
+            }
+        });
+
+        // Khi submit form không phải ajax
+        $(document).on('submit', 'form:not([data-ajax])', function() {
+            $('#loading-spinner').fadeIn(200);
+        });
+
+        // Khi dùng Ajax thì bật/tắt spinner riêng
+        $(document).ajaxStart(function() {
+            $('#loading-spinner').fadeIn(200);
+        });
+        $(document).ajaxStop(function() {
+            $('#loading-spinner').fadeOut(200);
+        });
+=======
+
+>>>>>>> 1d455ee6a9340a08bec9b1889ad9de059620b5ab
     </script>
 @endpush

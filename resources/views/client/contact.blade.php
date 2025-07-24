@@ -1,5 +1,6 @@
 @extends('client.client')
 
+
 @section('title', 'Liên hệ')
 @section('description', '')
 
@@ -55,6 +56,7 @@
                 </div>
             </div>
         </section>
+
     </div>
      
     <!-- Contact Cards -->

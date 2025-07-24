@@ -203,6 +203,7 @@
             </div> <!-- end row -->
 
             <div class="card">
+
                 <div class="d-flex align-items-center justify-content-center gap-2 col-xxl-12 mt-2" data-aos="fade-up"
                     data-aos-delay="300">
                     <!-- Nút chuyển năm -->
@@ -244,6 +245,7 @@
                                 </div>
                             </div>
                             <!-- end card body-->
+
                         </div>
                     </div>
                 </div>
@@ -324,6 +326,7 @@
                         </tbody>
                     </table>
                 </div>
+
 
 
             </div>
@@ -648,6 +651,7 @@
             schedules.forEach(function(schedule, index) {
                 var statusLabel = '';
                 if (schedule.status_label === 'Chưa học') {
+
                     statusLabel = '<span class="badge bg-warning text-white p-1">' + schedule.status_label +
                         '</span>';
                 } else if (schedule.status_label === 'Đang học') {
@@ -939,6 +943,7 @@
                         offsetX: 0,
                         offsetY: 7
                     },
+
                     tooltip: {
                         y: {
                             formatter: function (val) {

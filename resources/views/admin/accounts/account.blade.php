@@ -392,10 +392,10 @@
             <div class="row">
                 <div class="card">
                     <div class="card-header row d-flex justify-content-between align-items-center">
-                        <h4 class="card-title col-4">Danh sách tất cả người dùng</h4>
-                        <div class="col-8 gap-2">
+                        <h4 class="card-title col-3">Danh sách tất cả người dùng</h4>
+                        <div class="col-9 gap-2">
                             <form id="filterAccountForm" method="GET" action="{{ route('admin.account.search') }}"
-                                class="form-inline d-flex gap-2 align-items-center">
+                                class="form-inline d-flex justify-content-end gap-2 align-items-center">
                                 <a href="{{ route('admin.account.trash') }}" class="btn btn-sm btn-primary">
                                     Thùng rác tài khoản
                                 </a>

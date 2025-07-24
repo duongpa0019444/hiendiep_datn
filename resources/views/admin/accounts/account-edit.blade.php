@@ -107,6 +107,14 @@
                                                 class="form-control" placeholder="Nhập phone...">
                                         </div>
                                     </div>
+                                    
+                                    <div class="col-lg-6">
+                                        <div class="mb-3">
+                                            <label for="" class="form-label fw-semibold">address</label>
+                                            <input type="tel" value="{{ $info->address }}" name="address"
+                                                class="form-control" placeholder="Nhập address...">
+                                        </div>
+                                    </div>
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">

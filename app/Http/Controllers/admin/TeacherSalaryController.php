@@ -38,18 +38,18 @@ class TeacherSalaryController extends Controller
         )
         ->where('ts.month', $month)
         ->where('ts.year', $year)
-        ->get();
-    
+        ->paginate(3);
+
     // Các phần còn lại giữ nguyên
     $payRates = DB::table('teacher_salary_rules')
         ->select('teacher_id', 'unit', 'pay_rate')
         ->whereIn('teacher_id', $salaries->pluck('teacher_id')->unique())
-        ->get();
+        ->get(  );
 
     $shechedules = DB::table('schedules')
         ->select('id', 'date', 'start_time', 'end_time', 'teacher_id', 'support_teacher', 'day_of_week')
         ->whereIn('teacher_id', $salaries->pluck('class_id')->unique())
-        ->get();
+        ->get(  );
 
     return view('admin.teacher_salaries.index', compact('salaries', 'payRates', 'shechedules'));
 }
@@ -279,14 +279,14 @@ public function filter(Request $request)
     }
 
     // Select cuối
-    $salaries = $query->select(
-        'ts.*',
-        'u.name as teacher_name',
-        'u.phone as teacher_phone',
-        'tsr.pay_rate'
-    )->get();
+        $salaries = $query->select(
+            'ts.*',
+            'u.name as teacher_name',
+            'u.phone as teacher_phone',
+            'tsr.pay_rate'
+        )->get();
 
-    return response()->json(['success' => true, 'data' => $salaries]);
+        return response()->json(['success' => true, 'data' => $salaries]);
 }
 
 }

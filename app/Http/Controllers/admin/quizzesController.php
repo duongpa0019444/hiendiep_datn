@@ -47,6 +47,7 @@ class quizzesController extends Controller
 
     public function trash(Request $request)
     {
+
         $quizzes = quizzes::onlyTrashed()->orderByDesc('created_at')->with(['creator', 'course', 'class'])->paginate(10);
         // Kiểm tra nếu là AJAX request
         if ($request->ajax()) {
@@ -164,6 +165,7 @@ class quizzesController extends Controller
 
     public function forceDelete($id)
     {
+
 
 
         try {
@@ -706,6 +708,7 @@ class quizzesController extends Controller
 
         $statistics = DB::select(
             "
+
             SELECT
                 u.id AS student_id,
                 u.name AS student_name,
@@ -884,6 +887,7 @@ class quizzesController extends Controller
             'studentSentenceAnswers'
         ));
     }
+
 
 
     public function getCourse($id)

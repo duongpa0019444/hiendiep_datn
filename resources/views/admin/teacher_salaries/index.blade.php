@@ -131,15 +131,15 @@
                 <div class="d-flex justify-content-between">
                     <div class="">
                         <h4 class="card-title m-1 d-inline-block">Danh sách thanh toán lương</h4>
-                        <button type="button" class="btn btn-outline-success m-1" id="loadRulesBtn"> Cá nhân </button>
                     </div>
                     <div>
                         <button type="button" class="btn btn-outline-primary m-1" id="loadSalaryBtn">
                             Tạo bảng lương
                         </button>
-                        <a id="export-btn" href="" class="btn btn-outline-primary btn-sm m-1">
-                            <iconify-icon icon="material-symbols:download" class="fs-20"></iconify-icon> Xuất file
-                        </a>
+                        <button type="button" class="btn btn-outline-primary m-1" onclick="printSalaryTable()">
+                            <iconify-icon icon="mdi:printer" class="fs-20 align-middle me-1"></iconify-icon>
+                            In bảng lương
+                        </button>
                     </div>
 
                 </div>
@@ -157,75 +157,30 @@
                                 <h5 class="modal-title" id="salaryModalLabel">Bảng lương giáo viên</h5>
 
 
-                                <button type="button" class="btn btn-outline-primary btn-sm m-1" id="SaveSalaryBtn"> Lưu
-                                    bảng lương</button>
+                                
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                             </div>
                             <div class="modal-body">
                                 <div id="salaryTableContainer">
 
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- End Modal -->
-
-                <!-- Modal Tạo Teacher Rules -->
-                <div class="modal fade" id="rulesModal" tabindex="-1" aria-labelledby="rulesModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-xl"> <!-- modal-xl để đủ hiển thị bảng -->
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="rulesModalLabel">Bảng lương giáo viên</h5>
-                                <button type="button" class="btn btn-outline-primary btn-sm m-1" id="SaveRulesBtn"> Lưu
-                                    bảng lương</button>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Đóng"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div id="rulesTableContainer">
-                                    <label for="teacherSelect">Chọn giáo viên</label>
-                                    <select id="teacherSelect" class="form-control" style="width: 100%">
-                                        <option value="">-- Chọn giáo viên --</option>
-                                    </select>
-
-                                    <div id="salaryDetails" style="margin-top: 1rem; display: none;">
-                                        <label>Mức lương</label>
-                                        <input type="number" id="payRate" class="form-control">
-
-                                        <label>Ngày bắt đầu</label>
-                                        <input type="date" id="effectiveDate" class="form-control">
-                                    </div>
-                                    <div id="teacherRulesHistory" style="margin-top: 1rem; display: none;">
-                                        <h6>Lịch sử bảng lương</h6>
-                                        <table class="table table-bordered table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>Mức lương</th>
-                                                    <th>Ngày bắt đầu</th>
-                                                    <th>Ngày kết thúc</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="rulesHistoryBody">
-                                                <!-- sẽ được đổ dữ liệu -->
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                 <div class="text-end">
+                                    <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary btn-sm m-1">Đóng</button>
+                                    <button type="button" class="btn btn-outline-primary btn-sm m-1" id="SaveSalaryBtn"> Lưu
+                                        bảng lương</button>
                                 </div>
                             </div>
+                           
                         </div>
                     </div>
                 </div>
                 <!-- End Modal -->
-
 
 
                 <div class="card-body p-0">
                     <div class="row mb-3">
                         <div class="col-md-3">
-                            <input type="text" id="filterName" class="form-control"
-                                placeholder="Lọc theo tên giáo viên">
+                            <input type="text" id="filterName" class="form-control" placeholder="Lọc theo tên giáo viên">
                         </div>
                         <div class="col-md-2">
                             <input type="month" id="filterMonth" class="form-control">
@@ -328,10 +283,10 @@
 
                 <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 m-3">
                     <div id="pagination-wrapper" class="flex-grow-1">
-                        {{-- {{ $payments->links('pagination::bootstrap-5') }} --}}
+                        {{ $salaries->links('pagination::bootstrap-5') }}
                     </div>
 
-                    <div class="d-flex align-items-center" style="min-width: 160px;">
+                    {{-- <div class="d-flex align-items-center" style="min-width: 160px;">
                         <label for="limit2" class="form-label mb-0 me-2 small">Hiển thị</label>
                         <select name="limit2" id="limit2" class="form-select form-select-sm" style="width: 100px;">
                             <option value="10" selected>10</option>
@@ -339,7 +294,7 @@
                             <option value="50">50</option>
                             <option value="100">100</option>
                         </select>
-                    </div>
+                    </div> --}}
                 </div>
 
                 {{-- Modal thêm ghi chú --}}
@@ -708,183 +663,7 @@
             });
         });
 
-        // JS mở bảng rules salary
 
-
-        $(document).ready(function() {
-            let teacherRules = {}; // 👈 Khai báo biến chứa dữ liệu lương
-
-            $('#loadRulesBtn').on('click', function() {
-                $.ajax({
-                    url: "{{ route('admin.teacher-salary-rules.indexRules') }}",
-                    type: "GET",
-                    dataType: "json",
-                    success: function(res) {
-                        if (!res.success || !res.data || res.data.length === 0) {
-                            $('#rulesTableContainer').html(
-                                '<p>Không có dữ liệu lương tháng này.</p>');
-                        } else {
-                            let options = '<option value="">-- Chọn giáo viên --</option>';
-
-                            res.data.forEach(rule => {
-                                teacherRules[rule.id] = {
-                                    name: rule.name,
-                                    pay_rate: rule.pay_rate,
-                                    effective_date: rule.effective_date
-                                };
-
-                                options +=
-                                    `<option value="${rule.id}">${rule.name}</option>`;
-                            });
-
-                            $('#teacherSelect').html(options);
-                        }
-
-                        // Đặt ngoài if để luôn gán sự kiện
-                        $('#teacherSelect').on('change', function() {
-                            const id = $(this).val();
-
-                            if (id && teacherRules[id]) {
-                                const info = teacherRules[id];
-                                $('#payRate').val(info.pay_rate);
-                                $('#effectiveDate').val(info.effective_date);
-                                $('#salaryDetails').show();
-
-                                // Gọi API để lấy bảng TSR đầy đủ
-                                $.ajax({
-                                    url: `/admin/teacher-salary-rules/by-teacher/${id}`, // hoặc dùng route() nếu Blade xử lý được
-                                    type: 'GET',
-                                    success: function(res) {
-                                        if (res.success && res.data.length >
-                                            0) {
-                                            let rows = '';
-                                            res.data.forEach((item,
-                                                index) => {
-                                                rows += `
-                                            <tr>
-                                                <td>${index + 1}</td>
-                                                <td>${item.pay_rate}</td>
-                                                <td>${item.effective_date}</td>
-                                                <td>${item.end_pay_rate || '-'}</td>
-                                            </tr>`;
-                                            });
-
-                                            $('#rulesHistoryBody').html(
-                                                rows);
-                                            $('#teacherRulesHistory')
-                                                .show();
-                                        } else {
-                                            $('#rulesHistoryBody').html(
-                                                '<tr><td colspan="4">Không có dữ liệu</td></tr>'
-                                            );
-                                            $('#teacherRulesHistory')
-                                                .show();
-                                        }
-                                    },
-                                    error: function() {
-                                        $('#rulesHistoryBody').html(
-                                            '<tr><td colspan="4">Lỗi khi tải dữ liệu</td></tr>'
-                                        );
-                                        $('#teacherRulesHistory').show();
-                                    }
-                                });
-                            } else {
-                                $('#payRate').val('');
-                                $('#effectiveDate').val('');
-                                $('#salaryDetails').hide();
-                                $('#teacherRulesHistory').hide();
-                            }
-                        });
-
-
-                        // Hiển thị modal
-                        const rulesModal = new bootstrap.Modal(document.getElementById(
-                            'rulesModal'));
-                        rulesModal.show();
-                    },
-                    error: function(xhr, status, error) {
-                        console.log(error);
-                        $('#rulesTableContainer').html('<p>Lỗi khi tải dữ liệu.</p>');
-                    }
-                });
-            });
-
-            $('#SaveRulesBtn').on('click', function() {
-                const teacherId = $('#teacherSelect').val();
-                const payRate = $('#payRate').val();
-                const effectiveDate = $('#effectiveDate').val();
-
-                if (!teacherId) {
-                    Swal.fire({
-                        title: 'Lưu ý!',
-                        text: 'Vui lòng chọn giáo viên',
-                        icon: 'error',
-                        confirmButtonClass: 'btn btn-primary w-xs mt-2',
-                        buttonsStyling: false
-                    });
-                    return;
-                }
-
-                if (!payRate || !effectiveDate) {
-                    // alert('Vui lòng nhập đầy đủ mức lương và ngày bắt đầu.');
-                    Swal.fire({
-                        title: 'Lưu ý!',
-                        text: 'Vui lòng nhập đầy đủ mức lương và ngày bắt đầu',
-                        icon: 'error',
-                        confirmButtonClass: 'btn btn-primary w-xs mt-2',
-                        buttonsStyling: false
-                    }).then(() => {
-                        window.location.href = "{{ route('admin.teacher_salaries') }}";
-                    })
-                    return;
-                }
-
-                $.ajax({
-                    url: "{{ route('admin.teacher-salary-rules.store') }}", // thay route đúng nếu khác
-                    type: "POST",
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        teacher_id: teacherId,
-                        pay_rate: payRate,
-                        effective_date: effectiveDate
-                    },
-                    success: function(res) {
-                        if (res.success) {
-                            console.log(res.data);
-                            alert('Lưu bảng lương thành công!');
-
-                            Swal.fire({
-                                title: 'Thành công!',
-                                text: 'Lưu bảng lương thành công',
-                                icon: 'success',
-                                confirmButtonClass: 'btn btn-primary w-xs mt-2',
-                                buttonsStyling: false
-                            }).then(() => {
-                                window.location.href =
-                                    "{{ route('admin.teacher_salaries') }}";
-                            })
-
-                        } else {
-                            // alert();
-                            Swal.fire({
-                                title: 'Không thành công!',
-                                text: res.message,
-                                icon: 'error',
-                                confirmButtonClass: 'btn btn-primary w-xs mt-2',
-                                buttonsStyling: false
-                            });
-                            return;
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error(xhr.mes);
-                        alert('Đã xảy ra lỗi khi lưu dữ liệu.');
-                    }
-                });
-            });
-        });
-
-        // end bảng
 
 
 
@@ -918,47 +697,67 @@
                 "Bạn có chắc muốn đánh dấu là Đã thanh toán?" :
                 "Bạn có chắc muốn chuyển lại thành Chưa thanh toán?";
 
-            if (!confirm(confirmText)) {
-                // Quay lại trạng thái cũ nếu người dùng không xác nhận
-                select.val(select.data('original'));
-                return;
-            }
-            // Gửi AJAX để cập nhật trạng thái
-            $.ajax({
-                url: " {{ route('admin.teacher_salaries.upload') }}", // hoặc dùng route()
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    salary_id: salaryId,
-                    paid: paid
-                },
-                success: function(res) {
-                    if (res.success) {
-                        Swal.fire({
-                            title: 'Sửa thành công!',
-                            text: 'Sửa trạng thái thành công',
-                            icon: 'success',
-                            confirmButtonClass: 'btn btn-primary w-xs mt-2',
-                            buttonsStyling: false
-                        }).then(() => {
-                            window.location.href = "{{ route('admin.teacher_salaries') }}";
-                        })
+            Swal.fire({
+                title: confirmText,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Vâng, tiếp tục',
+                cancelButtonText: 'Không, hủy',
+                confirmButtonClass: 'btn btn-danger w-xs me-2 mt-2',
+                cancelButtonClass: 'btn btn-secondary w-xs mt-2',
+                buttonsStyling: false,
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    select.val(select.data('original'));
+                     window.location.href =
+                                    "{{ route('admin.teacher_salaries') }}";
+                    return;
+                   
+                }
 
-                    } else {
+                $.ajax({
+                    url: "{{ route('admin.teacher_salaries.upload') }}",
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        salary_id: salaryId,
+                        paid: paid
+                    },
+                    success: function(res) {
+                        if (res.success) {
+                            Swal.fire({
+                                title: 'Sửa thành công!',
+                                text: 'Sửa trạng thái thành công',
+                                icon: 'success',
+                                confirmButtonClass: 'btn btn-primary w-xs mt-2',
+                                buttonsStyling: false
+                            }).then(() => {
+                                window.location.href =
+                                    "{{ route('admin.teacher_salaries') }}";
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Không thành công!',
+                                text: res.message,
+                                icon: 'error',
+                                confirmButtonClass: 'btn btn-primary w-xs mt-2',
+                                buttonsStyling: false
+                            });
+                           
+                        }
+                    },
+                    error: function() {
                         Swal.fire({
-                            title: 'Không thành công!',
-                            text: res.message,
+                            title: 'Lỗi!',
+                            text: 'Lỗi kết nối khi cập nhật trạng thái.',
                             icon: 'error',
                             confirmButtonClass: 'btn btn-primary w-xs mt-2',
                             buttonsStyling: false
                         });
-                        return;
                     }
-                },
-                error: function() {
-                    alert("Lỗi kết nối khi cập nhật trạng thái.");
-                }
+                });
             });
+
 
 
         });
@@ -1099,6 +898,35 @@
                 $('#salaryDetails').hide();
             }
         });
+
+
+        // hàm in bảng lương
+        function printSalaryTable() {
+            const contents = document.getElementById('printableSalaryTable').innerHTML;
+            const newWin = window.open('', '', 'width=900,height=700');
+
+            newWin.document.write(`
+            <html>
+                <head>
+                    <style>
+                        body { font-family: DejaVu Sans, sans-serif; padding: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #333; padding: 8px; text-align: center; }
+                        th { background-color: #f0f0f0; }
+                    </style>
+                </head>
+                <body>
+                    <h3 style="text-align:center;">BẢNG LƯƠNG GIÁO VIÊN</h3>
+                    ${contents}
+                </body>
+            </html>
+        `);
+
+            newWin.document.close();
+            newWin.focus();
+            newWin.print();
+            newWin.close();
+        }
     </script>
 
 @endsection

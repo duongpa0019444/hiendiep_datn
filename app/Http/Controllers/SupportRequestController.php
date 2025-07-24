@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 class SupportRequestController extends Controller
 {
+
    public function store(Request $request)
 {
     $data = $request->validate([
