@@ -650,13 +650,13 @@
             // console.log(props.scheduleId || 'Ngu');
 
             // Hiển thị nút điểm danh nếu sự kiện thuộc ngày hôm nay và nếu chưa điểm danh
-            if (today.getTime() === eventDate.getTime() && props.students && props.students > 0 && props.status === 0) {
+            // if (today.getTime() === eventDate.getTime() && props.students && props.students > 0 && props.status === 0) {
                 $('#attendanceBtn').show().off('click').on('click', function() {
                     window.location.href = `/admin/attendance/schedules/${props.scheduleId || ''}`;
                 });
-            } else {
-                $('#attendanceBtn').hide();
-            }
+            // } else {
+                // $('#attendanceBtn').hide();
+            // }
 
             $('#eventDetailModal').modal('show');
         }

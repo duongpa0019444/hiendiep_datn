@@ -1,19 +1,17 @@
-@extends('admin.admin')
+@extends('client.accounts.information')
 
 @section('title', 'Điểm danh lớp học')
-@section('description', 'Trang điểm danh lớp học')
+@section('description', 'Quản lý điểm danh lớp học của bạn!')
+@push('styles')
+    {{-- <link rel="stylesheet" href="{{ asset('client/plugins/css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('client/plugins/css/icofont.css') }}" />
+    <link rel="stylesheet" href="{{ asset('client/plugins/css/custom.css') }}" /> --}}
+    <link rel="stylesheet" href="{{ asset('client/attendance.css') }}" />
+@endpush
 
-@section('content')
-    <div class="page-content">
-        <div class="container-xxl">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb py-0">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.attendance.index') }}">Quản lý điểm danh</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Điểm danh lớp học</li>
-                </ol>
-            </nav>
-
-            <div class="card">
+@section('content-information')
+    <div id="schedule" class="content-section">
+        <div class="card">
                 <div class="card-body">
                     <!-- Class Info Header -->
                     <div class="class-header">
@@ -33,11 +31,6 @@
                                     <i class="fas fa-clock ms-3 me-2"></i>
                                     <span
                                         id="eventTime">{{ $scheduleData->start_time && $scheduleData->end_time ? \Carbon\Carbon::parse($scheduleData->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($scheduleData->end_time)->format('H:i') : 'Không có thời gian' }}</span>
-                                    <br>
-                                    <i class="fas fa-chalkboard-teacher me-2"></i>
-                                    <span
-                                        id="teacherName">{{ $scheduleData->teacher_name ?? 'Chưa phân công giáo viên' }}</span>
-
                                 </p>
                             </div>
                             <div class="col-md-4 text-end">
@@ -211,7 +204,6 @@
                     </button>
                 </div>
             </div>
-        </div>
     </div>
 
     <!-- Loading Modal -->
@@ -249,7 +241,8 @@
 
 @endsection
 
-@push('scripts')
+
+@push('script')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer>
@@ -276,6 +269,7 @@
                     keyboard: false
                 });
             }
+            
             // Đồng bộ giao diện với attendanceData
             attendanceData.forEach(item => {
                 updateStudentStatus(item.student_id, item.status);
@@ -599,12 +593,6 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     showLoading(true);
-
-                    // In ra dữ liệu trước khi gửi
-                    console.log('➡️ Dữ liệu chuẩn bị gửi:', {
-                        schedule_id: scheduleId,
-                        attendance_data: attendanceData
-                    });
 
                     fetch('{{ route('attendance.save') }}', {
                             method: 'POST',

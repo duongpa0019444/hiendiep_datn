@@ -30,12 +30,17 @@
     <!-- Main CSS -->
     <link rel="stylesheet" href="{{ asset('client/style.css') }}" />
 
+    <!-- Font Awesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <script src="{{ asset('client/plugins/js/jquery.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    @stack('styles')
+
 </head>
 
 
@@ -1085,7 +1090,7 @@
             });
         });
     </script>
-
+    
 
 </body>
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
@@ -34,7 +34,7 @@ class AttendanceController extends Controller
         // Lớp cần điểm danh
         $classesNeedAttendance = $todaySchedules->where('status', 0)->count();
 
-        return view('admin.attendance.index', compact('todayClassCount', 'attendanceRate', 'classesNeedAttendance'));
+        return view('client.accounts.teachers.attendance', compact('todayClassCount', 'attendanceRate', 'classesNeedAttendance'));
     }
 
     // Điểm danh
@@ -161,7 +161,7 @@ class AttendanceController extends Controller
             });
 
         // Truyền dữ liệu vào view
-        return view('admin.attendance.attendance-class', compact('scheduleData', 'students', 'attendance'));
+        return view('client.accounts.teachers.attendance', compact('scheduleData', 'students', 'attendance'));
     }
     public function updateSummary(Request $request)
     {
