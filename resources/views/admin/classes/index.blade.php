@@ -155,8 +155,9 @@
                     </div>
                     <h5 class="text-muted">Chưa có lớp học nào</h5>
                     <p class="text-muted">Hãy tạo lớp học đầu tiên của bạn</p>
-                    <a href="{{ route('admin.classes.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Tạo lớp mới
+                    <a href="" class="btn btn-primary mb-3" data-bs-toggle="modal"
+                        data-bs-target="#addClassModal">
+                        <i class="fas fa-plus"></i> Thêm lớp mới
                     </a>
                 </div>
             @else
