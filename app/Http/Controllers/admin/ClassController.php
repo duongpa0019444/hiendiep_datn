@@ -93,6 +93,7 @@ class ClassController extends Controller
         return redirect()->back()->with('success', 'Trạng thái đã được cập nhật');
     }
 
+
     public function store(Request $request)
     {
         $request->validate([

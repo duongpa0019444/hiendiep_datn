@@ -459,7 +459,7 @@
                 <ul class="navbar-nav" id="navbar-nav">
 
                     @if (auth()->user()->isAdmin())
-                        <li class="menu-title">Tổng quan</li>
+                        <li class="menu-title ">Tổng quan</li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.dashboard') }}">
@@ -470,7 +470,7 @@
                             </a>
                         </li>
 
-                        <li class="menu-title">Quản lý học tập</li>
+                        <li class="menu-title mt-2">Quản lý học tập</li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.account') }}">
@@ -539,7 +539,7 @@
 
 
 
-                        <li class="menu-title">Tài chính</li>
+                        <li class="menu-title mt-2">Tài chính</li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.course_payments') }}">
@@ -571,7 +571,7 @@
                             </div>
                         </li>
 
-                        <li class="menu-title">Truyền thông & Liên hệ</li>
+                        <li class="menu-title mt-2">Truyền thông & Liên hệ</li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.notifications') }}">
@@ -621,7 +621,7 @@
                             </a>
                         </li>
                     @elseif (auth()->user()->isUser())
-                        <li class="menu-title">Tổng quan</li>
+                        <li class="menu-title ">Tổng quan</li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.dashboard') }}">
@@ -632,7 +632,7 @@
                             </a>
                         </li>
 
-                        <li class="menu-title">Quản lý học tập</li>
+                        <li class="menu-title mt-2">Quản lý học tập</li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.account') }}">
@@ -701,7 +701,7 @@
 
 
 
-                        <li class="menu-title">Tài chính</li>
+                        <li class="menu-title mt-2">Tài chính</li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.course_payments') }}">
@@ -733,7 +733,7 @@
                             </div>
                         </li>
 
-                        <li class="menu-title">Truyền thông & Liên hệ</li>
+                        <li class="menu-title mt-2">Truyền thông & Liên hệ</li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.notifications') }}">
