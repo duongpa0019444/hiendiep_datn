@@ -90,7 +90,7 @@
             top: 50%;
             left: 5px;
             transform: translateY(-50%);
-            pointer-events: none;
+           pointer-events: none;
             font-size: 1em;
             transition: .5s;
         }

@@ -152,7 +152,7 @@
                             </button>
                         </div>
 
-                        <div class="dropdown topbar-item"  data-bs-auto-close="outside">
+                        <div class="dropdown topbar-item" data-bs-auto-close="outside">
                             @php
 
                                 $notifications = \App\Models\notificationCoursePayments::where('status', '!=', 'seen')
@@ -160,8 +160,8 @@
                                     ->get();
                             @endphp
                             <button type="button" class="topbar-button position-relative"
-                                id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false">
+                                id="page-header-notifications-dropdown" data-bs-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
                                 <iconify-icon icon="solar:bell-bing-bold-duotone"
                                     class="fs-24 align-middle"></iconify-icon>
                                 <span
@@ -208,7 +208,8 @@
                                                 <!-- Dấu ba chấm và dropdown -->
                                                 <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
                                                     <button class="btn btn-sm border-0" type="button"
-                                                        data-bs-toggle="dropdown" aria-expanded="false"  onclick="event.stopPropagation();">
+                                                        data-bs-toggle="dropdown" aria-expanded="false"
+                                                        onclick="event.stopPropagation();">
                                                         <i class="fas fa-ellipsis-v"></i>
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-end">
@@ -269,7 +270,7 @@
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <!-- item-->
                                     <h6 class="dropdown-header">Welcome {{ Auth::user()->name }}!</h6>
-                                    <a class="dropdown-item" href="pages-profile.html">
+                                    {{-- <a class="dropdown-item" href="pages-profile.html">
                                         <i class="bx bx-user-circle text-muted fs-18 align-middle me-1"></i><span
                                             class="align-middle">Profile</span>
                                     </a>
@@ -289,7 +290,7 @@
                                     <a class="dropdown-item" href="auth-lock-screen.html">
                                         <i class="bx bx-lock text-muted fs-18 align-middle me-1"></i><span
                                             class="align-middle">Lock screen</span>
-                                    </a>
+                                    </a> --}}
 
                                     <div class="dropdown-divider my-1"></div>
 
@@ -458,7 +459,7 @@
                 <ul class="navbar-nav" id="navbar-nav">
 
                     @if (auth()->user()->isAdmin())
-                        <li class="menu-title">Quản lý</li>
+                        <li class="menu-title">Tổng quan</li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.dashboard') }}">
@@ -469,175 +470,132 @@
                             </a>
                         </li>
 
+                        <li class="menu-title">Quản lý học tập</li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.account') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:beer-alt-twotone-loop"></iconify-icon>
+                                    <iconify-icon icon="mdi:account-group-outline"></iconify-icon>
                                 </span>
-                                <span class="nav-text">Quản lí người dùng</span>
+                                <span class="nav-text"> Quản lý người dùng </span>
                             </a>
-
                         </li>
 
                         <li class="nav-item">
-
                             <a class="nav-link" href="{{ route('admin.classes.index') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:calendar"></iconify-icon>
+                                    <iconify-icon icon="mdi:google-classroom"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Quản lý lớp học </span>
+                                <span class="nav-text"> Quản lý lớp học </span>
                             </a>
-
                         </li>
 
                         <li class="nav-item">
-
                             <a class="nav-link" href="{{ route('admin.schedules.index') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:beer-alt-twotone-loop"></iconify-icon>
+                                    <iconify-icon icon="mdi:calendar-clock-outline"></iconify-icon>
                                 </span>
-                                <span class="nav-text">Quản lý lịch học</span>
+                                <span class="nav-text"> Quản lý lịch học </span>
                             </a>
-
                         </li>
 
                         <li class="nav-item">
-
-                            <a class="nav-link" href=" {{ route('admin.course-list') }}">
+                            <a class="nav-link" href="{{ route('admin.course-list') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:clipboard-list"></iconify-icon>
+                                    <iconify-icon icon="mdi:book-education-outline"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Quản lí khóa học </span>
+                                <span class="nav-text"> Quản lý khóa học </span>
                             </a>
-
                         </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="#user" data-bs-toggle="collapse" role="button"
-                                aria-expanded="false" aria-controls="user">
-                                <span class="nav-icon">
-                                    <iconify-icon icon="line-md:account-small"></iconify-icon>
-                                </span>
-                                <span class="nav-text"> Quản lí thời khóa biểu </span>
-                            </a>
-
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.quizz') }}">
-                                <span class="nav-icon">
-                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
-                                </span>
-                                <span class="nav-text"> Quản lí kiểm tra </span>
-                            </a>
-
-
-
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.score') }}">
-                                <span class="nav-icon">
-                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
-                                </span>
-                                <span class="nav-text"> Quản lí điểm số </span>
-                            </a>
-
-
-
-                        </li>
-
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.attendance.index') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
+                                    <iconify-icon icon="mdi:clipboard-check-outline"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Quản lí điểm danh</span>
+                                <span class="nav-text"> Quản lý điểm danh </span>
                             </a>
-
-                            {{-- <div class="collapse" id="user">
-                            <ul class="nav sub-navbar-nav">
-                                <li class="sub-nav-item">
-                                    <a class="sub-nav-link" href="/admin/user/list">Tạo khoản thu</a>
-                                </li>
-
-
-                            </ul>
-                        </div> --}}
-
                         </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.quizz') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="ph:exam-bold"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý quiz </span>
+                            </a>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.score') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:chart-bar"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý điểm số </span>
+                            </a>
+                        </li>
+
+
+
+                        <li class="menu-title">Tài chính</li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.course_payments') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="mdi:cash"></iconify-icon>
+                                    <iconify-icon icon="mdi:cash-multiple"></iconify-icon>
                                 </span>
-                                <span class="nav-text">Học phí & Thanh toán </span>
+                                <span class="nav-text"> Học phí & Thanh toán </span>
                             </a>
-
-                            {{-- <div class="collapse" id="user">
-                            <ul class="nav sub-navbar-nav">
-                                <li class="sub-nav-item">
-                                    <a class="sub-nav-link" href="/admin/user/list">Tạo khoản thu</a>
-                                </li>
-
-
-                            </ul>
-                        </div> --}}
-
                         </li>
-                        <li class="nav-item">
 
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.teacher_salaries') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:beer-alt-twotone-loop"></iconify-icon>
+                                    <iconify-icon icon="mdi:cash-register"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Quản lí lương giáo viên</span>
+                                <span class="nav-text"> Quản lý lương giáo viên </span>
                             </a>
-                            <div class="collapse" id="sidebarProducts">
+                            <div class="collapse" id="sidebarTeacherSalaries">
                                 <ul class="nav sub-navbar-nav">
                                     <li class="sub-nav-item">
-                                        <a class="sub-nav-link" href="{{ route('admin.teacher_salaries')}}">Quản lý bảng lương</a>
+                                        <a class="sub-nav-link" href="{{ route('admin.teacher_salaries') }}">Bảng
+                                            lương</a>
                                     </li>
                                     <li class="sub-nav-item">
-                                        <a class="sub-nav-link" href="{{ route('admin.teacher_salaries.detail')}}">Chi tiết bảng lương GV</a>
+                                        <a class="sub-nav-link"
+                                            href="{{ route('admin.teacher_salaries.detail') }}">Chi tiết lương GV</a>
                                     </li>
-
                                 </ul>
                             </div>
-
                         </li>
+
+                        <li class="menu-title">Truyền thông & Liên hệ</li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.notifications') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
+                                    <iconify-icon icon="mdi:bell-outline"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Quản lí thông báo </span>
+                                <span class="nav-text"> Quản lý thông báo </span>
                             </a>
-
-
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.contact') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
+                                    <iconify-icon icon="mdi:email-outline"></iconify-icon>
                                 </span>
-
-                                <span class="nav-text"> Quản lí liên hệ  </span>
+                                <span class="nav-text"> Quản lý liên hệ </span>
                             </a>
-
-
-                       
                         </li>
-
-
 
                         <li class="nav-item">
                             <a class="nav-link menu-arrow" href="#news" data-bs-toggle="collapse" role="button"
                                 aria-expanded="false" aria-controls="news">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:clipboard-list-twotone"></iconify-icon>
+                                    <iconify-icon icon="mdi:post-outline"></iconify-icon>
                                 </span>
                                 <span class="nav-text"> Quản lý bài viết </span>
                             </a>
@@ -653,91 +611,176 @@
                                 </ul>
                             </div>
                         </li>
+
                         <li class="nav-item mt-3">
                             <a class="nav-link" href="{{ route('home') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:log-out"></iconify-icon>
+                                    <iconify-icon icon="mdi:logout"></iconify-icon>
                                 </span>
                                 <span class="nav-text"> Thoát </span>
                             </a>
-
                         </li>
                     @elseif (auth()->user()->isUser())
-                        <li class="menu-title">Quản lý</li>
+                        <li class="menu-title">Tổng quan</li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.dashboard') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="solar:widget-5-bold-duotone"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Thông báo và tin tức </span>
+                                <span class="nav-text"> Dashboard </span>
+                            </a>
+                        </li>
+
+                        <li class="menu-title">Quản lý học tập</li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.account') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:account-group-outline"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý người dùng </span>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin">
+                            <a class="nav-link" href="{{ route('admin.classes.index') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:beer-alt-twotone-loop"></iconify-icon>
+                                    <iconify-icon icon="mdi:google-classroom"></iconify-icon>
                                 </span>
-                                <span class="nav-text">Thông tin cá nhân</span>
+                                <span class="nav-text"> Quản lý lớp học </span>
                             </a>
-
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#order">
+                            <a class="nav-link" href="{{ route('admin.schedules.index') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:clipboard-list"></iconify-icon>
+                                    <iconify-icon icon="mdi:calendar-clock-outline"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Điểm danh </span>
+                                <span class="nav-text"> Quản lý lịch học </span>
                             </a>
-
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#user" data-bs-toggle="collapse" role="button"
-                                aria-expanded="false" aria-controls="user">
+                            <a class="nav-link" href="{{ route('admin.course-list') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:account-small"></iconify-icon>
+                                    <iconify-icon icon="mdi:book-education-outline"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Thời khóa biểu </span>
+                                <span class="nav-text"> Quản lý khóa học </span>
                             </a>
+                        </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.attendance.index') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:clipboard-check-outline"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý điểm danh </span>
+                            </a>
                         </li>
 
 
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/statistical">
+                            <a class="nav-link" href="{{ route('admin.quizz') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
+                                    <iconify-icon icon="ph:exam-bold"></iconify-icon>
                                 </span>
-                                <span class="nav-text"> Học phí </span>
+                                <span class="nav-text"> Quản lý quiz </span>
                             </a>
+                        </li>
 
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.score') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:chart-bar"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý điểm số </span>
+                            </a>
+                        </li>
+
+
+
+                        <li class="menu-title">Tài chính</li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.course_payments') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:cash-multiple"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Học phí & Thanh toán </span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.teacher_salaries') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:cash-register"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý lương giáo viên </span>
+                            </a>
+                            <div class="collapse" id="sidebarTeacherSalaries">
+                                <ul class="nav sub-navbar-nav">
+                                    <li class="sub-nav-item">
+                                        <a class="sub-nav-link" href="{{ route('admin.teacher_salaries') }}">Bảng
+                                            lương</a>
+                                    </li>
+                                    <li class="sub-nav-item">
+                                        <a class="sub-nav-link"
+                                            href="{{ route('admin.teacher_salaries.detail') }}">Chi tiết lương GV</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
+                        <li class="menu-title">Truyền thông & Liên hệ</li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.notifications') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:bell-outline"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý thông báo </span>
+                            </a>
                         </li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.contact') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:document-report"></iconify-icon>
+                                    <iconify-icon icon="mdi:email-outline"></iconify-icon>
                                 </span>
-
-
-                                <span class="nav-text"> Quản lý liên hệ</span>
+                                <span class="nav-text"> Quản lý liên hệ </span>
                             </a>
-
                         </li>
 
-
+                        <li class="nav-item">
+                            <a class="nav-link menu-arrow" href="#news" data-bs-toggle="collapse" role="button"
+                                aria-expanded="false" aria-controls="news">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:post-outline"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý bài viết </span>
+                            </a>
+                            <div class="collapse" id="news">
+                                <ul class="nav sub-navbar-nav">
+                                    <li class="sub-nav-item">
+                                        <a class="sub-nav-link" href="{{ route('admin.news.index') }}">Danh sách bài
+                                            viết</a>
+                                    </li>
+                                    <li class="sub-nav-item">
+                                        <a class="sub-nav-link" href="{{ route('admin.topics.index') }}">Chủ đề</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
 
                         <li class="nav-item mt-3">
                             <a class="nav-link" href="{{ route('home') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="line-md:log-out"></iconify-icon>
+                                    <iconify-icon icon="mdi:logout"></iconify-icon>
                                 </span>
                                 <span class="nav-text"> Thoát </span>
                             </a>
-
                         </li>
                     @endif
                 </ul>
@@ -775,7 +818,7 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-   
+
 
     <script>
         $(window).on('load', function() {

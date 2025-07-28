@@ -90,7 +90,6 @@
                         <div class="quiz-cards-wrapper" id="quizCardsWrapperAll">
                             <div class="quiz-cards-row px-1" id="quiz-card-all">
                                 @foreach ($quizzesAll as $quiz)
-
                                     <div class="quiz-card-item quiz-item-{{ $quiz->id }}">
                                         <div class="card quiz-card h-100">
                                             <div class="card-body">
@@ -223,7 +222,6 @@
                                                         <div class="col-12 dropdown-item">
                                                             <form
                                                                 action="{{ route('teacher.quizzes.delete', $quiz->id) }}"
-
                                                                 method="POST" class="w-100 btn-delete--quizform">
                                                                 @csrf
                                                                 @method('DELETE')
@@ -287,7 +285,7 @@
                             <i class="icofont-rounded-right"></i>
                         </button>
 
-                        <div class="quiz-cards-wrapper" >
+                        <div class="quiz-cards-wrapper">
                             <div class="quiz-cards-row px-1" id="quizCardsWrapperDraft">
                                 @foreach ($quizzesDraft as $quiz)
                                     <div class="quiz-card-item quiz-item-{{ $quiz->id }}">
@@ -820,10 +818,12 @@
                             $(`.quiz-item-${ quizId }`).remove();
                             $('#quiz-card-all').prepend(renderQuizCardItem(response))
 
-                            if(response.status === 'published') {
-                                $('#quizCardsWrapperPublished').prepend(renderQuizCardItem(response));
+                            if (response.status === 'published') {
+                                $('#quizCardsWrapperPublished').prepend(renderQuizCardItem(
+                                    response));
                             } else {
-                                $('#quizCardsWrapperDraft').prepend(renderQuizCardItem(response));
+                                $('#quizCardsWrapperDraft').prepend(renderQuizCardItem(
+                                    response));
                             }
                         },
                         error: function() {
@@ -1067,8 +1067,12 @@
                                 `;
                         });
                     } else {
-                        classListHtml =
-                            '<div class="alert alert-info">Không có lớp nào làm quiz!</div>';
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Thông báo',
+                            text: 'Hiện tại chưa có kết quả làm bài.',
+                            confirmButtonText: 'Đồng ý'
+                        });
                     }
                     $("#statistics").html(`
                         <div class="small question-count"><i class="icofont-users-alt-3 text-info"></i> Tổng lớp: ${response.statistics}</div>
@@ -1238,7 +1242,7 @@
 
                     $("#resultModalLabel").html(
                         `<i class="icofont-chart-bar-graph text-primary"></i>  Kết quả: ${response.quiz.title} - ${response.student.name}`
-                        )
+                    )
                     $('.quiz-action-btn-result').hide();
                     $('#ed-preloader').fadeOut();
 

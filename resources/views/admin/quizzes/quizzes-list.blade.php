@@ -183,67 +183,6 @@
                                     <tbody id="body-quizzes">
                                         @if (isset($quizzes) && $quizzes->isEmpty())
                                             <tr>
-<<<<<<< HEAD
-                                                <td>
-                                                    <div class="fw-bold">{{ $quiz->title }} <p class="text-danger">
-                                                            {{ $quiz->status == 'published' ? '' : ' (Bản nháp)' }}</p>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    @if ($quiz->is_public)
-                                                        <div class="fw-bold">Tất cả</div>
-                                                    @else
-                                                        <div class="fw-bold">{{ $quiz->class->name ?? 'Tất cả' }}</div>
-                                                        <div class="fs-6">Khóa: {{ $quiz->course->name ?? 'Tất cả' }}
-                                                        </div>
-                                                    @endif
-                                                </td>
-                                                <td>{{ $quiz->creator->name ?? 'Không rõ' }}</td>
-                                                <td>{{ $quiz->duration_minutes }}</td>
-                                                <td>
-                                                    <span
-                                                        class="badge {{ $quiz->is_public ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' }} py-1 px-2">
-                                                        {{ $quiz->is_public ? 'Công khai' : 'Riêng tư' }}
-                                                    </span>
-                                                </td>
-                                                <td>{{ $quiz->access_code ?? '-' }}</td>
-                                                <td>
-                                                    <div class="btn-group dropstart">
-                                                        <button class="btn btn-light btn-sm dropdown-toggle"
-                                                            type="button" data-bs-toggle="dropdown">
-                                                            Thao tác
-                                                        </button>
-                                                        <ul class="dropdown-menu">
-                                                            <li><a href="{{ route('admin.quizzes.detail', $quiz->id) }}"
-                                                                    class="dropdown-item text-info"
-                                                                    data-quiz-id="{{ $quiz->id }}"><iconify-icon
-                                                                        icon="solar:eye-broken"
-                                                                        class="me-1"></iconify-icon> Chi tiết</a></li>
-                                                            <li><button class="dropdown-item text-warning btn-edit-quiz"
-                                                                    data-bs-target="#modal-add-quiz"
-                                                                    data-quiz-id="{{ $quiz->id }}"><iconify-icon
-                                                                        icon="solar:pen-2-broken"
-                                                                        class="me-1"></iconify-icon> Sửa</button></li>
-                                                            <li>
-                                                                <form
-                                                                    action="{{ route('admin.quizzes.delete', $quiz->id) }}"
-                                                                    method="POST" style="display:inline;">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="button"
-                                                                        class="dropdown-item text-danger bg-transparent border-0 w-100 text-start btn-delete-quiz">
-                                                                        <iconify-icon
-                                                                            icon="solar:trash-bin-minimalistic-2-broken"
-                                                                            class="me-1"></iconify-icon> Xóa
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                            <li><a class="dropdown-item"
-                                                                    href="{{ route('admin.quizzes.results', $quiz->id) }}"><iconify-icon
-                                                                        icon="solar:chart-broken"
-                                                                        class="me-1"></iconify-icon> Xem kết quả</a></li>
-                                                        </ul>
-=======
                                                 <td colspan="7" class="text-center text-muted py-5">
                                                     <div class="d-flex flex-column align-items-center justify-content-center"
                                                         style="min-height: 10px;">
@@ -251,7 +190,7 @@
                                                             style="font-size: 40px;" class="mb-2 text-secondary">
                                                         </iconify-icon>
                                                         <span>Không có bài quiz nào phù hợp với tiêu chí tìm kiếm.</span>
->>>>>>> 1d455ee6a9340a08bec9b1889ad9de059620b5ab
+
                                                     </div>
                                                 </td>
                                             </tr>
@@ -665,7 +604,7 @@
             e.preventDefault();
             $('.table').css({
                 'opacity': '0.5',
-                'pointer-events': 'none' // nếu muốn không bấm được
+
             });
             $.ajax({
                 url: this.action,
@@ -676,7 +615,7 @@
                     $('#pagination-wrapper').html(response.pagination);
                     $('.table').css({
                         'opacity': '1',
-                        'pointer-events': 'none' // nếu muốn không bấm được
+
                     });
                 },
                 error: function(xhr) {
@@ -756,19 +695,13 @@
                             </td>
                             <td>
                                 ${quiz.is_public ? `
-<<<<<<< HEAD
-                                                            <div class="fw-bold">Tất cả</div>
-                                                        ` : `
-                                                            <div class="fw-bold">${quiz.class?.name || 'Tất cả'}</div>
-                                                            <div class="fs-6">Khóa: ${quiz.course?.name || 'Tất cả'}</div>
-                                                        `}
-=======
+
                                     <div class="fw-bold">Tất cả</div>
                                 ` : `
                                     <div class="fw-bold">${quiz.class?.name || 'Tất cả'}</div>
                                     <div class="fs-6">Khóa: ${quiz.course?.name || 'Tất cả'}</div>
                                 `}
->>>>>>> 1d455ee6a9340a08bec9b1889ad9de059620b5ab
+
                             </td>
                             <td>${quiz.creator?.name || 'Không rõ'}</td>
                             <td>${quiz.duration_minutes}</td>
