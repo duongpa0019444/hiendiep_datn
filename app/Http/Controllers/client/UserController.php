@@ -234,7 +234,7 @@ class UserController extends Controller
                         WHEN "Fri" THEN "Thứ 6"
                         WHEN "Sat" THEN "Thứ 7"
                         WHEN "Sun" THEN "Chủ nhật"
-                    END as day_of_week'),   
+                    END as day_of_week'),
                     'schedules.id as schedule_id',
                     'schedules.date',
                     'schedules.start_time',

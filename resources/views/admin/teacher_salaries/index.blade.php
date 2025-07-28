@@ -157,20 +157,22 @@
                                 <h5 class="modal-title" id="salaryModalLabel">Bảng lương giáo viên</h5>
 
 
-                                
+
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                             </div>
                             <div class="modal-body">
                                 <div id="salaryTableContainer">
 
                                 </div>
-                                 <div class="text-end">
-                                    <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary btn-sm m-1">Đóng</button>
-                                    <button type="button" class="btn btn-outline-primary btn-sm m-1" id="SaveSalaryBtn"> Lưu
+                                <div class="text-end">
+                                    <button type="button" data-bs-dismiss="modal"
+                                        class="btn btn-outline-secondary btn-sm m-1">Đóng</button>
+                                    <button type="button" class="btn btn-outline-primary btn-sm m-1" id="SaveSalaryBtn">
+                                        Lưu
                                         bảng lương</button>
                                 </div>
                             </div>
-                           
+
                         </div>
                     </div>
                 </div>
@@ -200,83 +202,85 @@
                             <button id="delelyFilter" class="btn btn-success w-100">Bỏ lọc</button>
                         </div>
                     </div>
+                    <div id="printableSalaryTable">
 
-                    <div class="table-responsive table-gridjs">
-                        <table class="table table-bordered table-hover table-centered align-middle">
-                            <thead class="table-light">
-                                <tr class="text-center">
-                                    <th>Tên giáo viên</th>
-                                    <th>Thời gian</th>
-                                    <th>Số giờ</th>
-                                    <th>Mức lương</th>
+                        <div class="table-responsive table-gridjs">
+                            <table class="table table-bordered table-hover table-centered align-middle">
+                                <thead class="table-light">
+                                    <tr class="text-center">
+                                        <th>Tên giáo viên</th>
+                                        <th>Thời gian</th>
+                                        <th>Số giờ</th>
+                                        <th>Mức lương</th>
 
-                                    <th>Thưởng</th>
-                                    <th>Phạt</th>
-                                    <th>Tổng (VNĐ)</th>
-                                    <th>Trạng thái</th>
-                                    <th>Ngày trả lương</th>
-                                    <th>Ghi chú</th>
-                                </tr>
-                            </thead>
-                            <tbody id="body-teacher_salaries">
-                                @foreach ($salaries as $salary)
-                                    <tr>
-                                        <td class="text-start detail_ruler">
-                                            <strong class="teacher-detail" style="cursor: pointer;"
-                                                data-bs-toggle="tooltip" title="Chi tiết bảng lương">
-                                                {{ $salary->teacher_name }}
-                                            </strong><br>
-                                            <iconify-icon icon="solar:phone-broken" class="fs-16 me-1"></iconify-icon>
-                                            <span class="text-muted">{{ $salary->teacher_phone }}</span>
-                                        </td>
-                                        <td class="text-center">
-                                            Tháng {{ $salary->month }} / {{ $salary->year }}
-                                        </td>
-                                        <td class="text-center">
-                                            {{ $salary->total_hours }} giờ
-                                        </td>
-                                        <td class="text-end">
-                                            {{ number_format($salary->pay_rate, 0, ',', '.') }} VNĐ/giờ
-                                        </td>
-
-                                        <td class="text-end text-success">
-                                            +{{ number_format($salary->bonus, 0, ',', '.') }} VNĐ
-                                        </td>
-                                        <td class="text-end text-danger">
-                                            -{{ number_format($salary->penalty, 0, ',', '.') }} VNĐ
-                                        </td>
-                                        <td class="text-end fw-bold text-success">
-                                            {{ number_format($salary->total_salary, 0, ',', '.') }} VNĐ
-                                        </td>
-                                        <td class="text-center">
-                                            <select class="form-select payment-status-select"
-                                                data-salary-id="{{ $salary->id }}">
-                                                <option value="0" {{ $salary->paid == 0 ? 'selected' : '' }}>
-                                                    Chưa thanh toán
-                                                </option>
-                                                <option value="1" {{ $salary->paid == 1 ? 'selected' : '' }}>
-                                                    Đã thanh toán
-                                                </option>
-                                            </select>
-                                        </td>
-
-                                        <td class="text-center">
-                                            @if ($salary->payment_date)
-                                                <span
-                                                    class="badge bg-success">{{ \Carbon\Carbon::parse($salary->payment_date)->format('d/m/Y') }}</span>
-                                            @else
-                                                <span class="badge bg-danger">Chưa thanh toán</span>
-                                            @endif
-                                        </td>
-                                        <td class="text-start note-cell" data-id="{{ $salary->id }}"
-                                            data-note="{{ $salary->note ?? '' }}" style="cursor: pointer;">
-                                            {{ $salary->note ?? 'Thêm' }}
-                                        </td>
+                                        <th>Thưởng</th>
+                                        <th>Phạt</th>
+                                        <th>Tổng (VNĐ)</th>
+                                        <th>Trạng thái</th>
+                                        <th>Ngày trả lương</th>
+                                        <th>Ghi chú</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody id="body-teacher_salaries">
+                                    @foreach ($salaries as $salary)
+                                        <tr>
+                                            <td class="text-start detail_ruler">
+                                                <strong class="teacher-detail" style="cursor: pointer;"
+                                                    data-bs-toggle="tooltip" title="Chi tiết bảng lương">
+                                                    {{ $salary->teacher_name }}
+                                                </strong><br>
+                                                <iconify-icon icon="solar:phone-broken" class="fs-16 me-1"></iconify-icon>
+                                                <span class="text-muted">{{ $salary->teacher_phone }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                Tháng {{ $salary->month }} / {{ $salary->year }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{ $salary->total_hours }} giờ
+                                            </td>
+                                            <td class="text-end">
+                                                {{ number_format($salary->pay_rate, 0, ',', '.') }} VNĐ/giờ
+                                            </td>
 
+                                            <td class="text-end text-success">
+                                                +{{ number_format($salary->bonus, 0, ',', '.') }} VNĐ
+                                            </td>
+                                            <td class="text-end text-danger">
+                                                -{{ number_format($salary->penalty, 0, ',', '.') }} VNĐ
+                                            </td>
+                                            <td class="text-end fw-bold text-success">
+                                                {{ number_format($salary->total_salary, 0, ',', '.') }} VNĐ
+                                            </td>
+                                            <td class="text-center">
+                                                <select class="form-select payment-status-select"
+                                                    data-salary-id="{{ $salary->id }}">
+                                                    <option value="0" {{ $salary->paid == 0 ? 'selected' : '' }}>
+                                                        Chưa thanh toán
+                                                    </option>
+                                                    <option value="1" {{ $salary->paid == 1 ? 'selected' : '' }}>
+                                                        Đã thanh toán
+                                                    </option>
+                                                </select>
+                                            </td>
+
+                                            <td class="text-center">
+                                                @if ($salary->payment_date)
+                                                    <span
+                                                        class="badge bg-success">{{ \Carbon\Carbon::parse($salary->payment_date)->format('d/m/Y') }}</span>
+                                                @else
+                                                    <span class="badge bg-danger">Chưa thanh toán</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-start note-cell" data-id="{{ $salary->id }}"
+                                                data-note="{{ $salary->note ?? '' }}" style="cursor: pointer;">
+                                                {{ $salary->note ?? 'Thêm' }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+
+                        </div>
                     </div>
                     <!-- end table-responsive -->
                 </div>
@@ -709,10 +713,10 @@
             }).then((result) => {
                 if (!result.isConfirmed) {
                     select.val(select.data('original'));
-                     window.location.href =
-                                    "{{ route('admin.teacher_salaries') }}";
+                    window.location.href =
+                        "{{ route('admin.teacher_salaries') }}";
                     return;
-                   
+
                 }
 
                 $.ajax({
@@ -743,7 +747,7 @@
                                 confirmButtonClass: 'btn btn-primary w-xs mt-2',
                                 buttonsStyling: false
                             });
-                           
+
                         }
                     },
                     error: function() {

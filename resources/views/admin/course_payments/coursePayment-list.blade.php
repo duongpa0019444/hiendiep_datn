@@ -516,7 +516,7 @@
             e.preventDefault();
             $('.table').css({
                 'opacity': '0.5',
-                'pointer-events': 'none' // nếu muốn không bấm được
+
             });
             $.ajax({
                 url: $(this).attr('action'),
@@ -527,7 +527,7 @@
                     $('#pagination-wrapper').html(response.pagination);
                     $('.table').css({
                         'opacity': '1',
-                        'pointer-events': 'none' // nếu muốn không bấm được
+
                     });
                 },
                 error: function(xhr) {
@@ -574,19 +574,12 @@
                             <ul class="dropdown-menu">
 
                                 ${payment.status === 'paid' ? `
-<<<<<<< HEAD
-                                            <li data-bs-target="#modal-printCoursePayment">
-                                                <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
-                                                    <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
-                                                </button>
-                                            </li>` : ''}
-=======
                                                 <li data-bs-target="#modal-printCoursePayment">
                                                     <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
                                                         <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
                                                     </button>
                                                 </li>` : ''}
->>>>>>> 1d455ee6a9340a08bec9b1889ad9de059620b5ab
+
 
                                 <li data-bs-target="#modal-course-payment">
                                     <button class="dropdown-item text-warning btn-edit-course-payment" data-coursePayment_id="${ payment.id }">
@@ -625,6 +618,10 @@
         // Xử lý phân trang
         $(document).on('click', '#pagination-wrapper a', function(e) {
             e.preventDefault();
+            $('.table').css({
+                'opacity': '0.5',
+
+            });
             const url = $(this).attr('href');
             $.ajax({
                 url: url,
@@ -632,6 +629,10 @@
                 success: function(response) {
                     $('#body-coursePapyment').html(renderCoursePayment(response.payments.data));
                     $('#pagination-wrapper').html(response.pagination);
+                    $('.table').css({
+                        'opacity': '1',
+
+                    });
                 },
                 error: function(xhr) {
                     console.error('Lỗi phân trang:', xhr.responseText);
@@ -822,20 +823,11 @@
 
                                             ${payment.status === 'paid' ? `
 
-<<<<<<< HEAD
-                                                        <li data-bs-target="#modal-printCoursePayment">
-                                                            <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
-                                                                <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
-                                                            </button>
-                                                        </li>` : ''}
-=======
                                                             <li data-bs-target="#modal-printCoursePayment">
                                                                 <button class="dropdown-item btn-invoice-coursePayment" data-coursePayment_id="${ payment.id }">
                                                                     <iconify-icon icon="solar:eye-broken"class="me-1"></iconify-icon> Xem hóa đơn
                                                                 </button>
                                                             </li>` : ''}
->>>>>>> 1d455ee6a9340a08bec9b1889ad9de059620b5ab
-
 
                                             <li data-bs-target="#modal-course-payment">
                                                 <button class="dropdown-item text-warning btn-edit-course-payment" data-coursePayment_id="${ payment.id }">
@@ -955,38 +947,5 @@
             // Chuyển hướng đến URL xuất file
             window.location.href = exportUrl;
         });
-
-
-<<<<<<< HEAD
-        // Khi click vào các link
-        $(document).on('click', 'a', function(e) {
-            const href = $(this).attr('href');
-
-            // Nếu là link hợp lệ (không phải anchor, không mở tab mới, không phải js link)
-            if (
-                href &&
-                !href.startsWith('#') &&
-                !$(this).attr('target') &&
-                !href.startsWith('javascript:')
-            ) {
-                $('#loading-spinner').fadeIn(200);
-            }
-        });
-
-        // Khi submit form không phải ajax
-        $(document).on('submit', 'form:not([data-ajax])', function() {
-            $('#loading-spinner').fadeIn(200);
-        });
-
-        // Khi dùng Ajax thì bật/tắt spinner riêng
-        $(document).ajaxStart(function() {
-            $('#loading-spinner').fadeIn(200);
-        });
-        $(document).ajaxStop(function() {
-            $('#loading-spinner').fadeOut(200);
-        });
-=======
-
->>>>>>> 1d455ee6a9340a08bec9b1889ad9de059620b5ab
     </script>
 @endpush
