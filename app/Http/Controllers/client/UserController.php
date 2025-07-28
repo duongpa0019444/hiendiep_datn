@@ -250,7 +250,6 @@ class UserController extends Controller
         } else {
             // Xử lý trường hợp vai trò không hợp lệ
             return redirect()->route('home')->with('error', 'Bạn không có quyền truy cập lịch học.');
-
         }
     }
 
@@ -637,7 +636,29 @@ class UserController extends Controller
     public function account()
     {
         if (Auth::user()->role == "student") {
-            return view('client.accounts.students.account');
+            $user = ModelsUser::with('classes.course')->find(Auth::user()->id);
+
+            // Tên tất cả các khóa học (không phân loại)
+            $courses = $user->classes->pluck('course.name')->implode(', ');
+
+            // Lấy khóa học đang học
+            $inProgressClasses = $user->classes->filter(function ($class) {
+                $course = $class->course;
+                return $course && $class->status == 'in_progress';
+            });
+            $inProgressCourseNames = $inProgressClasses->pluck('course.name')->implode(', ');
+
+            // Lấy các lớp có khóa học đã hoàn thành
+            $completedClasses = $user->classes->filter(function ($class) {
+                $course = $class->course;
+                return $course && $class->status == 'completed';
+            });
+
+            // Lấy tên khóa học đã hoàn thành
+            $completedCourseNames = $completedClasses->pluck('course.name')->implode(', ');
+
+            // dd($user->classes->pluck('name')->toArray());
+            return view('client.accounts.students.account', compact('user', 'courses', 'inProgressCourseNames', 'completedCourseNames'));
         } elseif (Auth::user()->role == "teacher") {
 
 
@@ -797,7 +818,7 @@ class UserController extends Controller
                 COUNT(DISTINCT CASE WHEN s.status = 1 THEN s.id END) AS total_sessions,
                 COUNT(DISTINCT cs.student_id) AS total_students
             ')->first();
-        if($request->ajax()) {
+        if ($request->ajax()) {
             return response()->json([
                 'total_classes' => $result->total_classes,
                 'total_sessions' => $result->total_sessions,
