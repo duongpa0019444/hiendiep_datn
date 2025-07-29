@@ -31,6 +31,6 @@ class SupportRequestController extends Controller
     return redirect()->back()->with('success', 'Tin nhắn đã gửi thành công !');
 }
 
-   
+
 }
 ?>

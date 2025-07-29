@@ -18,7 +18,7 @@
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
                                     <h4 class="card-title mb-2 d-flex align-items-center gap-2">Học sinh</h4>
-                                    <p class="text-muted fw-medium fs-22 mb-0">{{ $roleCounts['student'] }}</p>
+                                    <p class="text-muted fw-medium fs-22 mb-0">{{ $roleCounts['student'] ?? 0 }}</p>
                                 </div>
                                 <a href="{{ route('admin.account.list', 'student') }}">
                                     <div class="avatar-md bg-primary bg-opacity-10 rounded">
@@ -110,7 +110,7 @@
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
                                     <h4 class="card-title mb-2 d-flex align-items-center gap-2">Giáo viên</h4>
-                                    <p class="text-muted fw-medium fs-22 mb-0">{{ $roleCounts['teacher'] }}</p>
+                                    <p class="text-muted fw-medium fs-22 mb-0">{{ $roleCounts['teacher'] ?? 0 }}</p>
                                 </div>
                                 <a href="{{ route('admin.account.list', 'teacher') }}">
                                     <div class="avatar-md bg-primary bg-opacity-10 rounded">
@@ -343,7 +343,7 @@
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
                                     <h4 class="card-title mb-2 d-flex align-items-center gap-2">Admin</h4>
-                                    <p class="text-muted fw-medium fs-22 mb-0">{{ $roleCounts['admin'] }}</p>
+                                    <p class="text-muted fw-medium fs-22 mb-0">{{ $roleCounts['admin'] ?? 0 }}</p>
                                 </div>
                                 <a href="{{ route('admin.account.list', 'admin') }}">
                                     <div class="avatar-md bg-primary bg-opacity-10 rounded">
@@ -371,7 +371,7 @@
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
                                     <h4 class="card-title mb-2 d-flex align-items-center gap-2">Nhân viên</h4>
-                                    <p class="text-muted fw-medium fs-22 mb-0">{{ $roleCounts['staff'] }}</p>
+                                    <p class="text-muted fw-medium fs-22 mb-0">{{ $roleCounts['staff']?? 0}}</p>
                                 </div>
                                 <a href="{{ route('admin.account.list', 'staff') }}">
                                     <div class="avatar-md bg-primary bg-opacity-10 rounded">

@@ -4,16 +4,45 @@
 @section('description', '')
 @section('content')
 
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: '{{ session('success') }}',
+                confirmButtonText: 'OK'
 
+            });
+        </script>
+        {{-- Xoa session thong bao --}}
+        {{ session()->forget('success') }}
+    @endif
+    @if (session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: '{{ session('error') }}',
+                confirmButtonText: 'OK'
+            });
+        </script>
+        {{ session()->forget('error') }}
+    @endif
     <div class="page-content">
         <div class="container-xxl">
-            <nav aria-label="breadcrumb p-0">
-                <ol class="breadcrumb py-0">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.contact') }}">Quản lí liên hệ</a></li>
-                    <li class="breadcrumb-item active">Chi tiết liên hệ</li>
-                </ol>
-            </nav>
+            <div class="d-flex  align-items-center justify-content-between mb-1">
+                <nav aria-label="breadcrumb p-0">
+                    <ol class="breadcrumb py-0">
+                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.contact') }}">Quản lí liên hệ</a></li>
+                        <li class="breadcrumb-item active">Chi tiết liên hệ</li>
+                    </ol>
+                </nav>
+                <a href="{{ route('admin.contact') }}" class="btn btn-secondary">
+                    <iconify-icon icon="mdi:arrow-left" class="me-1"></iconify-icon>
+                    Quay lại danh sách
+                </a>
+            </div>
 
             <div class="card">
                 <div class="card-header">
@@ -40,14 +69,14 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-6">
+                            <div class="col-lg-4">
                                 <div class="mb-3">
                                     <label class="form-label">Loại tin nhắn</label>
                                     <input type="text" class="form-control" value="{{ $contact->pl_content }}" readonly>
                                 </div>
                             </div>
 
-                            <div class="col-lg-6">
+                            <div class="col-lg-4">
                                 <div class="mb-3">
                                     <label class="form-label">Nhân viên hỗ trợ</label>
                                     <input type="text" class="form-control"
@@ -55,7 +84,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-6">
+                            <div class="col-lg-4">
                                 <div class="mb-3">
                                     <label class="form-label">Ngày gửi tin nhắn</label>
                                     <input type="text" class="form-control" value="{{ $contact->created_at }}" readonly>
@@ -73,16 +102,19 @@
                         <div class="p-3 bg-light mb-3 rounded mt-4">
                             <div class="row justify-content-end g-2">
                                 <div class="col-lg-2">
-                                    <a href="{{ route('admin.contact') }}" class="btn btn-primary w-100">
-                                        Trở về danh sách liên hệ
+                                    <a href="{{ route('admin.contact') }}" class="btn btn-secondary w-100">
+                                        <iconify-icon icon="mdi:arrow-left" class="me-1"></iconify-icon>
+                                        Quay lại danh sách
                                     </a>
                                 </div>
+
                                 <div class="col-lg-2">
-                                    <button type="submit" id="btn-approve" data-status="{{ $contact->status }}"
-                                        class="btn btn-success w-100">
+                                    <button type="submit" id="btn-approve" class="btn btn-success w-100">
+                                        <iconify-icon icon="mdi:check-circle-outline" class="me-1"></iconify-icon>
                                         Đồng ý hỗ trợ
                                     </button>
                                 </div>
+
                             </div>
                         </div>
                     </form>
@@ -91,42 +123,6 @@
         </div>
     </div>
 
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const approveForm = document.getElementById('approveForm');
-            const approveBtn = document.getElementById('btn-approve');
-            const rejectBtn = document.getElementById('btn-reject');
 
-            // Kiểm tra trước khi gửi form (Đồng ý hỗ trợ)
-            approveForm.addEventListener('submit', function(e) {
-                const status = parseInt(approveBtn.getAttribute('data-status'));
-                if (status === 1) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Cảnh báo',
-                        text: 'Tin nhắn này đã được xử lý bởi người khác.',
-                        confirmButtonText: 'Đóng'
-                    });
-                }
-            });
-
-            // Kiểm tra trước khi chuyển trang (Không hỗ trợ)
-            rejectBtn.addEventListener('click', function(e) {
-                const status = parseInt(rejectBtn.getAttribute('data-status'));
-                if (status === 1) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Cảnh báo',
-                        text: 'Tin nhắn này đã được xử lý bởi người khác.',
-                        confirmButtonText: 'Đóng'
-                    });
-                }
-            });
-        });
-    </script>
 
 @endsection
