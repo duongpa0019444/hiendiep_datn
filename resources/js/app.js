@@ -4,7 +4,8 @@ window.addEventListener('load', function () {
 
         Echo.channel('admin-notifications')
             .listen('PaymentNotificationCreated', (e) => {
-                showToast('success', 'Có thông báo học phí mới!');
+                // showToast('success', 'Có thông báo học phí mới!');
+                console.log('có thông báo học phí mới!');
             });
 
 

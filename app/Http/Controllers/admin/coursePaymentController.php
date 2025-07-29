@@ -166,15 +166,15 @@ class coursePaymentController extends Controller
 
             $payment->save();
 
-            $noti = notificationCoursePayments::create([
-                'course_payment_id' => $id,
-                'user_id' => $payment->student_id,
-                'status' => 'unseen'
+            // $noti = notificationCoursePayments::create([
+            //     'course_payment_id' => $id,
+            //     'user_id' => $payment->student_id,
+            //     'status' => 'unseen'
 
-            ]);
+            // ]);
 
-            $noti = $noti->fresh();
-            event(new PaymentNotificationCreated($noti));
+            // $noti = $noti->fresh();
+            // event(new PaymentNotificationCreated($noti));
 
 
             return response()->json([

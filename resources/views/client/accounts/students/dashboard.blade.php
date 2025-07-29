@@ -111,7 +111,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-6">
+                            {{-- <div class="col-6">
                                 <div class="card text-center h-100 border-0 shadow-sm border-top border-danger">
                                     <div class="card-body p-3">
                                         <i class="icofont-close-line fs-5 text-danger mb-2"></i>
@@ -120,7 +120,7 @@
                                             {{ $hoctaps->student_sessions_absent }} buổi</div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
                             <div class="col-6">
                                 <div class="card text-center h-100 border-0 shadow-sm border-top border-warning">
@@ -133,7 +133,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-6">
+                            {{-- <div class="col-6">
                                 <div class="card text-center h-100 border-0 shadow-sm border-top border-info">
                                     <div class="card-body p-3">
                                         <i class="icofont-exclamation-circle fs-5 text-info mb-2"></i>
@@ -142,7 +142,7 @@
                                             {{ $hoctaps->student_sessions_excused }} buổi</div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
 
                         </div>
