@@ -81,7 +81,7 @@
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="user-name" class="form-label fw-semibold">Ngày</label>
-                                            <input type="date" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
+                                            <input type="date" 
                                                 name="exam_date" class="form-control">
 
                                         </div>

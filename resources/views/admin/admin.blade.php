@@ -43,8 +43,6 @@
 
     <script src="{{ asset('ckeditor4/ckeditor/ckeditor.js') }}"></script>
     @stack('styles')
-    @vite('resources/js/app.js')
-
 
 
 </head>
@@ -152,20 +150,23 @@
                             </button>
                         </div>
 
-                        <div class="dropdown topbar-item" data-bs-auto-close="outside">
+                        <div class="dropdown topbar-item">
                             @php
 
-                                $notifications = \App\Models\notificationCoursePayments::where('status', '!=', 'seen')
+                                $notifications = \App\Models\NotificationUser::with('notification')
+                                    ->where('user_id', auth()->id())
+                                    ->where('status', '!=', 'seen')
                                     ->orderBy('created_at', 'desc')
                                     ->get();
+
                             @endphp
-                            <button type="button" class="topbar-button position-relative"
+                            <button type="button" class="topbar-button position-relative"  data-bs-auto-close="outside"
                                 id="page-header-notifications-dropdown" data-bs-toggle="dropdown"
                                 aria-haspopup="true" aria-expanded="false">
                                 <iconify-icon icon="solar:bell-bing-bold-duotone"
                                     class="fs-24 align-middle"></iconify-icon>
                                 <span
-                                    class="position-absolute topbar-badge fs-10 translate-middle badge bg-danger rounded-pill">{{ count($notifications) }}<span
+                                    class="position-absolute topbar-badge fs-10 translate-middle badge bg-danger rounded-pill soluong-notification">{{ count($notifications) }}<span
                                         class="visually-hidden">unread messages</span></span>
                             </button>
                             <div class="dropdown-menu py-0 dropdown-xl dropdown-menu-end"
@@ -173,35 +174,33 @@
                                 <div class="p-3 border-top-0 border-start-0 border-end-0 border-dashed border">
                                     <div class="row align-items-center">
                                         <div class="col">
-                                            <h6 class="m-0 fs-16 fw-semibold">Thông báo thu học phí</h6>
+                                            <h6 class="m-0 fs-16 fw-semibold">Thông báo biến động học phí</h6>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div data-simplebar style="max-height: 300px;">
+                                <div data-simplebar style="max-height: 300px;" id="notifications-list">
                                     <!-- Item 1 -->
 
                                     @foreach ($notifications as $notification)
-                                        <div class="dropdown-item py-3 border-bottom text-wrap position-relative">
+                                        <div class="dropdown-item py-3 border-bottom text-wrap position-relative notification-{{ $notification->id }}">
                                             <div class="d-flex">
                                                 <div class="flex-shrink-0">
                                                     <div class="avatar-sm me-2">
                                                         <span
-                                                            class="avatar-title {{ $notification->coursePayment->method == 'Cash' ? 'bg-soft-info text-info' : 'bg-soft-success text-success' }} fs-20 rounded-circle">
-                                                            <i class="fas fa-money-bill-wave"></i>
+                                                            class="avatar-title {{ $notification->notification->background }} fs-16 rounded-circle">
+                                                            {!! $notification->notification->icon !!}
                                                         </span>
                                                     </div>
                                                 </div>
                                                 <div class="flex-grow-1 pe-4">
-                                                    <p class="mb-1 fw-semibold">
-                                                        {{ $notification->coursePayment->user->name }} đã
-                                                        {{ $notification->coursePayment->method == 'Cash' ? 'nộp tiền mặt' : 'chuyển khoản' }}
-                                                        học phí
-                                                    </p>
-                                                    <p class="mb-0 text-muted text-wrap">
+                                                    <a href="#" class="mb-1 fw-semibold fs-6">
+                                                        {{ $notification->notification->title }}
 
+                                                    </a>
+                                                    <p class="mb-0 text-muted text-wrap fs-6">
                                                         Thời gian:
-                                                        {{ \Carbon\Carbon::parse($notification->coursePayment->payment_date)->format('H:i - d/m/Y') }}<br>
+                                                        {{ \Carbon\Carbon::parse($notification->created_at)->format('H:i - d/m/Y') }}<br>
                                                     </p>
                                                 </div>
 
@@ -209,17 +208,16 @@
                                                 <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
                                                     <button class="btn btn-sm border-0" type="button"
                                                         data-bs-toggle="dropdown" aria-expanded="false"
-                                                        onclick="event.stopPropagation();">
+                                                        onclick="event.stopPropagation();" >
                                                         <i class="fas fa-ellipsis-v"></i>
                                                     </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end">
-                                                        <li>
-                                                            <a class="dropdown-item mark-as-read"
-                                                                href="javascript:void(0);"
+                                                    <ul class="dropdown-menu dropdown-menu-end" data-bs-auto-close="outside">
+                                                        <li >
+                                                            <button class="dropdown-item mark-as-read fs-6 btn-seen-noti"
                                                                 data-id="{{ $notification->id }}">
                                                                 <i class="fas fa-check me-1 text-success"></i> Đánh dấu
                                                                 là đã đọc
-                                                            </a>
+                                                            </button>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -232,7 +230,7 @@
                                 </div>
 
                                 <div class="text-center py-3">
-                                    <a href="/admin/notifications/tuition" class="btn btn-primary btn-sm">
+                                    <a href="{{ route('admin.noti.coursepayment') }}" class="btn btn-primary btn-sm">
                                         Xem tất cả thông báo <i class="bx bx-right-arrow-alt ms-1"></i>
                                     </a>
                                 </div>
@@ -822,7 +820,6 @@
 
     <script>
         $(window).on('load', function() {
-            console.log('Page loaded');
             $('#preloader').fadeOut('slow');
         });
     </script>
@@ -832,5 +829,13 @@
 
 
 </body>
+<script>
+    @auth
+        window.currentUserId = {{ Auth::id() }};
+    @else
+        window.currentUserId = null;
+    @endauth
+</script>
+@vite('resources/js/app.js')
 
 </html>

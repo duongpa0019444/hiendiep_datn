@@ -12,7 +12,10 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Exports\CoursePaymentsExport;
+use App\Models\notification;
 use App\Models\notificationCoursePayments;
+use App\Models\NotificationUser;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -159,6 +162,12 @@ class coursePaymentController extends Controller
         try {
 
             $payment = CoursePayment::findOrFail($id);
+
+            //Thông tin cũ
+            $oldStatus = $payment->status;
+            $oldMethod = $payment->method;
+            $oldDate   = $payment->payment_date;
+
             $payment->payment_date = $request->payment_date;
             $payment->method = $request->method;
             $payment->status = $request->status;
@@ -166,12 +175,93 @@ class coursePaymentController extends Controller
 
             $payment->save();
 
-            $noti = notificationCoursePayments::create([
-                'course_payment_id' => $id,
-                'user_id' => $payment->student_id,
-                'status' => 'unseen'
+            //thông tin mới
+            $newStatus = $request->status;
+            $newMethod = $request->method;
+            $newDate   = $request->payment_date;
 
+            $titleNotifycation = '';
+            $icon = '';
+            $background = '';
+
+            // 1. Nếu có thay đổi trạng thái
+            if ($oldStatus !== $newStatus) {
+                if ($oldStatus === 'unpaid' && $newStatus === 'paid') {
+                    // Xác nhận học phí đã thanh toán
+                    $action = $newMethod === 'Cash'
+                        ? 'đã xác nhận học phí nộp TIỀN MẶT'
+                        : 'đã xác nhận học phí CHUYỂN KHOẢN';
+
+                    $titleNotifycation = Auth::user()->name . ' ' . $action . ' cho học sinh ' . $payment->user->name;
+
+                    $icon = '<i class="fas fa-money-bill-wave text-success"></i>';
+                    $background = 'bg-soft-success';
+                } elseif ($oldStatus === 'paid' && $newStatus === 'unpaid') {
+                    // Hủy xác nhận thanh toán
+                    $titleNotifycation = Auth::user()->name . ' đã chuyển trạng thái học phí của '
+                        . $payment->user->name . ' về "Chưa thanh toán".';
+
+                    $icon = '<i class="fas fa-undo text-danger"></i>';
+                    $background = 'bg-soft-danger';
+                } else {
+                    // Trường hợp khác nếu sau này có thêm trạng thái
+                    $titleNotifycation = Auth::user()->name . ' đã cập nhật trạng thái thanh toán của '
+                        . $payment->user->name . ' thành "' . $newStatus . '".';
+
+                    $icon = '<i class="fas fa-edit text-primary"></i>';
+                    $background = 'bg-soft-primary';
+                }
+
+                // 2. Không đổi trạng thái, nhưng đổi phương thức
+            } elseif ($oldMethod !== $newMethod) {
+                $methodText = $newMethod === 'Cash' ? 'TIỀN MẶT' : 'CHUYỂN KHOẢN';
+
+                $titleNotifycation = Auth::user()->name . ' đã cập nhật phương thức thanh toán cho '
+                    . $payment->user->name . ' thành ' . $methodText . '.';
+
+                $icon = '<i class="fas fa-exchange-alt text-warning"></i>';
+                $background = 'bg-soft-warning';
+
+                // 3. Không đổi trạng thái, không đổi phương thức, nhưng đổi ngày thanh toán
+            } elseif ($oldDate !== $newDate) {
+                $formattedDate = \Carbon\Carbon::parse($newDate)->format('H:i d/m/Y');
+                $titleNotifycation = Auth::user()->name . ' đã cập nhật ngày thanh toán học phí của '
+                    . $payment->user->name . ' thành ' . $formattedDate . '.';
+
+                $icon = '<i class="fas fa-calendar-alt text-info"></i>';
+                $background = 'bg-soft-info';
+
+                // 4. Các thay đổi khác (ghi chú, note, v.v.)
+            } else {
+                $titleNotifycation = Auth::user()->name . ' đã cập nhật thông tin thanh toán của '
+                    . $payment->user->name . '.';
+
+                $icon = '<i class="fas fa-edit text-primary"></i>';
+                $background = 'bg-soft-primary';
+            }
+
+
+            $noti = notificationCoursePayments::create([
+                'title' => $titleNotifycation,
+                'course_payment_id' => $id,
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id,
+                'icon' => $icon,
+                'background' => $background,
             ]);
+
+            $notificationUser = [];
+
+            $users = User::whereIn('role', ['admin', 'staff'])->where('id', '!=', Auth::user()->id)->get();
+            foreach ($users as $user) {
+                $notificationUser[] = [
+                    'notification_id' => $noti->id,
+                    'user_id' => $user->id,
+                    'status' => 'unseen',
+                    'created_at' => now()
+                ];
+            }
+            NotificationUser::insert($notificationUser);
 
             $noti = $noti->fresh();
             event(new PaymentNotificationCreated($noti));
@@ -182,6 +272,7 @@ class coursePaymentController extends Controller
                 'payment' => $payment->load(['user', 'class', 'course'])
             ]);
         } catch (\Exception $e) {
+
             return redirect()->back()->withErrors(['error' => 'Cập nhật thất bại: ' . $e->getMessage()]);
         }
     }
@@ -272,24 +363,21 @@ class coursePaymentController extends Controller
 
     public function updatePayment(Request $request)
     {
-        // Kiểm tra người dùng đã đăng nhập
         if (!Auth::check()) {
             return response()->json([
                 'error' => 'Bạn cần đăng nhập để thực hiện hành động này'
             ], 401);
         }
 
-        // Kiểm tra dữ liệu đầu vào
         $request->validate([
             'paidContent' => 'required|string|max:255',
         ]);
 
-        $id = Auth::user()->id;
+        $id = Auth::id();
         $payments = CoursePayment::where('student_id', $id)
             ->where('status', 'unpaid')
             ->get();
 
-        // Kiểm tra nếu không có thanh toán
         if ($payments->isEmpty()) {
             return response()->json([
                 'error' => 'Không tìm thấy thanh toán chưa hoàn thành'
@@ -303,6 +391,37 @@ class coursePaymentController extends Controller
                 $payment->method = 'Bank Transfer';
                 $payment->payment_date = now();
                 $payment->save();
+
+                // Thông báo
+                $titleNotifycation = Auth::user()->name . ' đã chuyển khoản học phí.';
+                $icon = '<i class="fas fa-university text-info"></i>';
+                $background = 'bg-soft-info';
+
+                $noti = notificationCoursePayments::create([
+                    'title' => $titleNotifycation,
+                    'icon' => $icon,
+                    'background' => $background,
+                    'course_payment_id' => $payment->id,
+                    'created_by' => $id,
+                    'updated_by' => $id
+                ]);
+
+                $users = User::whereIn('role', ['admin', 'staff'])
+                    ->where('id', '!=', $id) // loại trừ người đang đăng nhập
+                    ->get();
+
+                $notificationUser = [];
+                foreach ($users as $user) {
+                    $notificationUser[] = [
+                        'notification_id' => $noti->id,
+                        'user_id' => $user->id,
+                        'status' => 'unseen',
+                        'created_at' => now()
+                    ];
+                }
+                NotificationUser::insert($notificationUser);
+
+                event(new PaymentNotificationCreated($noti));
             }
 
             return response()->json([
@@ -310,6 +429,10 @@ class coursePaymentController extends Controller
                 'payment_code' => $request->paidContent
             ]);
         } catch (\Exception $e) {
+            Log::error('Lỗi khi cập nhật thanh toán', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'error' => 'Lỗi khi cập nhật thanh toán: ' . $e->getMessage()
             ], 500);

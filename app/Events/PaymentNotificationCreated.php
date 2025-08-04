@@ -28,11 +28,15 @@ class PaymentNotificationCreated implements ShouldBroadcastNow
     public function broadcastWith()
     {
         return [
-            'id' => $this->notification->id,
-            'user_id' => $this->notification->user_id,
-            'status' => $this->notification->status,
-            'course_payment_id' => $this->notification->course_payment_id,
-            'created_at' => $this->notification->created_at->toDateTimeString()
+            'notification' => [
+                'id' => $this->notification->id,
+                'course_payment_id' => $this->notification->course_payment_id,
+                'title' => $this->notification->title,
+                'icon' => $this->notification->icon,
+                'background' => $this->notification->background,
+                'created_by' => $this->notification->created_by,
+                'created_at' => $this->notification->created_at->format('d/m/Y H:i:s'),
+            ]
         ];
     }
 }
