@@ -130,20 +130,23 @@
                     <h3 class="mb-1">Chi tiết lương giáo viên </h3>
                     <form method="GET" action="{{ route('admin.teacher_salaries.detail') }}" class="row mb-2 mt-1">
                         <div class="col-md-3">
-                            <label for="teacher_id" class="form-label">Chọn giáo viên</label>
-                            <select class="form-select" name="teacher_id" id="teacher_id" onchange="this.form.submit()">
-                                <option value="">-- Tất cả giáo viên --</option>
-                                @foreach ($allTeachers as $teacher)
-                                    <option value="{{ $teacher->id }}"
-                                        {{ request('teacher_id') == $teacher->id ? 'selected' : '' }}>
-                                        {{ $teacher->name }}
-                                    </option>
-                                @endforeach
+                            <label for="sort" class="form-label">Sắp xếp theo</label>
+                            <select class="form-select" id="sort" name="sort">
+                                <option value="created_at_desc" {{ request('sort') == 'created_at_desc' ? 'selected' : '' }}>Mới
+                                    nhất
+                                </option>
+                                <option value="created_at_asc" {{ request('sort') == 'created_at_asc' ? 'selected' : '' }}>
+                                    Cũ nhất</option>
+                                <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>
+                                    Tên A-Z
+                                </option>
+                                <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Tên Z-A
+                                </option>
                             </select>
                         </div>
 
                         <div class="col-md-3">
-                            <label for="keyword" class="form-label">Hoặc nhập tên giáo viên</label>
+                            <label for="keyword" class="form-label">Tìm tên giáo viên</label>
                             <input type="text" name="keyword" id="keyword" class="form-control"
                                 placeholder="Nhập tên giáo viên" value="{{ request('keyword') }}">
                         </div>
@@ -201,6 +204,12 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- Pagination -->
+                <div class="card-footer border-top">
+                    <nav aria-label="Page navigation">
+                        {!! $users->links('pagination::bootstrap-5') !!}
+                    </nav>
+                </div>
 
                 <!-- Modal: Xem & cập nhật lương giáo viên -->
                 <div class="modal fade" id="teacherSalaryModal" tabindex="-1" aria-labelledby="salaryModalLabel"
@@ -247,7 +256,8 @@
                                         <input type="hidden" name="effective_date" id="effectiveDate">
                                     </div>
                                     <div class="text-end">
-                                        <button type="submit" data-bs-dismiss="modal" class="btn btn-outline-secondary">Đóng</button>
+                                        <button type="submit" data-bs-dismiss="modal"
+                                            class="btn btn-outline-secondary">Đóng</button>
                                         <button type="submit" class="btn btn-outline-primary">Lưu lương mới</button>
                                     </div>
                                 </form>

@@ -712,7 +712,7 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.teacher_salaries') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="mdi:cash-register"></iconify-icon>
@@ -731,7 +731,7 @@
                                     </li>
                                 </ul>
                             </div>
-                        </li>
+                        </li> --}}
 
                         <li class="menu-title mt-2">Truyền thông & Liên hệ</li>
 

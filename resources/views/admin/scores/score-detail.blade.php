@@ -91,7 +91,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($data as $score)
+                                    @forelse ($data as $score)
                                         <tr>
                                             {{-- sử lí bảng score và thêm modol score vào --}}
                                             <td>{{ $score->student->name ?? ''}}</td>
@@ -115,7 +115,11 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                    @endforeach
+                                    @empty
+                                        <tr>
+                                            <td colspan="7" class="text-center">Không có điểm nào được tìm thấy.</td>
+                                        </tr>
+                                    @endforelse 
 
                                 </tbody>
                             </table>
