@@ -3,6 +3,37 @@
 @section('description', '')
 @section('content')
 
+    @if (session('success'))
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Toastify({
+                            text: "{{ session('success') }}",
+                            gravity: "top",
+                            position: "center",
+                            className: "success",
+                            duration: 4000
+                        }).showToast();
+                    });
+                </script>
+            @endif
+
+            @if (session('error'))
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Toastify({
+                            text: "{{ session('error') }}",
+                            gravity: "top",
+                            position: "center",
+                            className: "error",
+                            duration: 4000,
+                            style: {
+                                background: "red", // 👈 đổi màu nền
+                            }
+                        }).showToast();
+                    });
+                </script>
+            @endif
+
     <div class="page-content">
         <div class="container-fluid ">
             <nav aria-label="breadcrumb p-0">
@@ -337,56 +368,59 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h4 class="card-title mb-2 d-flex align-items-center gap-2">Admin</h4>
-                                    <p class="text-muted fw-medium fs-22 mb-0">{{ $roleCounts['admin'] ?? 0 }}</p>
-                                </div>
-                                <a href="{{ route('admin.account.list', 'admin') }}">
-                                    <div class="avatar-md bg-primary bg-opacity-10 rounded">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55"
-                                            viewBox="0 0 36 36">
-                                            <circle cx="14.67" cy="8.3" r="6" fill="#0d0d0d"
-                                                class="clr-i-solid clr-i-solid-path-1" />
-                                            <path fill="#0d0d0d"
-                                                d="M16.44 31.82a2.15 2.15 0 0 1-.38-2.55l.53-1l-1.09-.33a2.14 2.14 0 0 1-1.5-2.1v-2.05a2.16 2.16 0 0 1 1.53-2.07l1.09-.33l-.52-1a2.17 2.17 0 0 1 .35-2.52a19 19 0 0 0-2.32-.16A15.58 15.58 0 0 0 2 23.07v7.75a1 1 0 0 0 1 1z"
-                                                class="clr-i-solid clr-i-solid-path-2" />
-                                            <path fill="#0d0d0d"
-                                                d="m33.7 23.46l-2-.6a6.7 6.7 0 0 0-.58-1.42l1-1.86a.35.35 0 0 0-.07-.43l-1.45-1.46a.38.38 0 0 0-.43-.07l-1.85 1a7.7 7.7 0 0 0-1.43-.6l-.61-2a.38.38 0 0 0-.36-.25h-2.08a.38.38 0 0 0-.35.26l-.6 2a7 7 0 0 0-1.45.61l-1.81-1a.38.38 0 0 0-.44.06l-1.47 1.44a.37.37 0 0 0-.07.44l1 1.82a7.2 7.2 0 0 0-.65 1.43l-2 .61a.36.36 0 0 0-.26.35v2.05a.36.36 0 0 0 .26.35l2 .61a7.3 7.3 0 0 0 .6 1.41l-1 1.9a.37.37 0 0 0 .07.44L19.16 32a.38.38 0 0 0 .44.06l1.87-1a7 7 0 0 0 1.4.57l.6 2.05a.38.38 0 0 0 .36.26h2.05a.38.38 0 0 0 .35-.26l.6-2.05a6.7 6.7 0 0 0 1.38-.57l1.89 1a.38.38 0 0 0 .44-.06L32 30.55a.38.38 0 0 0 .06-.44l-1-1.88a7 7 0 0 0 .57-1.38l2-.61a.39.39 0 0 0 .27-.35v-2.07a.4.4 0 0 0-.2-.36m-8.83 4.72a3.34 3.34 0 1 1 3.33-3.34a3.34 3.34 0 0 1-3.33 3.34"
-                                                class="clr-i-solid clr-i-solid-path-3" />
-                                            <path fill="none" d="M0 0h36v36H0z" />
-                                        </svg>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h4 class="card-title mb-2 d-flex align-items-center gap-2">Nhân viên</h4>
-                                    <p class="text-muted fw-medium fs-22 mb-0">{{ $roleCounts['staff']?? 0}}</p>
-                                </div>
-                                <a href="{{ route('admin.account.list', 'staff') }}">
-                                    <div class="avatar-md bg-primary bg-opacity-10 rounded">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55"
-                                            viewBox="0 0 24 24">
-                                            <path fill="#0d0d0d"
-                                                d="M14 20v-1.25q0-.4.163-.763t.437-.637l4.925-4.925q.225-.225.5-.325t.55-.1q.3 0 .575.113t.5.337l.925.925q.2.225.313.5t.112.55t-.1.563t-.325.512l-4.925 4.925q-.275.275-.637.425t-.763.15H15q-.425 0-.712-.288T14 20M4 19v-1.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13q.925 0 1.825.113t1.8.362l-2.75 2.75q-.425.425-.65.975T12 18.35V20H5q-.425 0-.712-.288T4 19m16.575-3.6l.925-.975l-.925-.925l-.95.95zM12 12q-1.65 0-2.825-1.175T8 8t1.175-2.825T12 4t2.825 1.175T16 8t-1.175 2.825T12 12" />
-                                        </svg>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
+
+                @if (auth()->user()->isAdmin())
+                    <div class="col-lg-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h4 class="card-title mb-2 d-flex align-items-center gap-2">Admin</h4>
+                                        <p class="text-muted fw-medium fs-22 mb-0">{{ $roleCounts['admin'] ?? 0 }}</p>
+                                    </div>
+                                    <a href="{{ route('admin.account.list', 'admin') }}">
+                                        <div class="avatar-md bg-primary bg-opacity-10 rounded">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55"
+                                                viewBox="0 0 36 36">
+                                                <circle cx="14.67" cy="8.3" r="6" fill="#0d0d0d"
+                                                    class="clr-i-solid clr-i-solid-path-1" />
+                                                <path fill="#0d0d0d"
+                                                    d="M16.44 31.82a2.15 2.15 0 0 1-.38-2.55l.53-1l-1.09-.33a2.14 2.14 0 0 1-1.5-2.1v-2.05a2.16 2.16 0 0 1 1.53-2.07l1.09-.33l-.52-1a2.17 2.17 0 0 1 .35-2.52a19 19 0 0 0-2.32-.16A15.58 15.58 0 0 0 2 23.07v7.75a1 1 0 0 0 1 1z"
+                                                    class="clr-i-solid clr-i-solid-path-2" />
+                                                <path fill="#0d0d0d"
+                                                    d="m33.7 23.46l-2-.6a6.7 6.7 0 0 0-.58-1.42l1-1.86a.35.35 0 0 0-.07-.43l-1.45-1.46a.38.38 0 0 0-.43-.07l-1.85 1a7.7 7.7 0 0 0-1.43-.6l-.61-2a.38.38 0 0 0-.36-.25h-2.08a.38.38 0 0 0-.35.26l-.6 2a7 7 0 0 0-1.45.61l-1.81-1a.38.38 0 0 0-.44.06l-1.47 1.44a.37.37 0 0 0-.07.44l1 1.82a7.2 7.2 0 0 0-.65 1.43l-2 .61a.36.36 0 0 0-.26.35v2.05a.36.36 0 0 0 .26.35l2 .61a7.3 7.3 0 0 0 .6 1.41l-1 1.9a.37.37 0 0 0 .07.44L19.16 32a.38.38 0 0 0 .44.06l1.87-1a7 7 0 0 0 1.4.57l.6 2.05a.38.38 0 0 0 .36.26h2.05a.38.38 0 0 0 .35-.26l.6-2.05a6.7 6.7 0 0 0 1.38-.57l1.89 1a.38.38 0 0 0 .44-.06L32 30.55a.38.38 0 0 0 .06-.44l-1-1.88a7 7 0 0 0 .57-1.38l2-.61a.39.39 0 0 0 .27-.35v-2.07a.4.4 0 0 0-.2-.36m-8.83 4.72a3.34 3.34 0 1 1 3.33-3.34a3.34 3.34 0 0 1-3.33 3.34"
+                                                    class="clr-i-solid clr-i-solid-path-3" />
+                                                <path fill="none" d="M0 0h36v36H0z" />
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h4 class="card-title mb-2 d-flex align-items-center gap-2">Nhân viên</h4>
+                                        <p class="text-muted fw-medium fs-22 mb-0">{{ $roleCounts['staff'] ?? 0 }}</p>
+                                    </div>
+                                    <a href="{{ route('admin.account.list', 'staff') }}">
+                                        <div class="avatar-md bg-primary bg-opacity-10 rounded">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55"
+                                                viewBox="0 0 24 24">
+                                                <path fill="#0d0d0d"
+                                                    d="M14 20v-1.25q0-.4.163-.763t.437-.637l4.925-4.925q.225-.225.5-.325t.55-.1q.3 0 .575.113t.5.337l.925.925q.2.225.313.5t.112.55t-.1.563t-.325.512l-4.925 4.925q-.275.275-.637.425t-.763.15H15q-.425 0-.712-.288T14 20M4 19v-1.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13q.925 0 1.825.113t1.8.362l-2.75 2.75q-.425.425-.65.975T12 18.35V20H5q-.425 0-.712-.288T4 19m16.575-3.6l.925-.975l-.925-.925l-.95.95zM12 12q-1.65 0-2.825-1.175T8 8t1.175-2.825T12 4t2.825 1.175T16 8t-1.175 2.825T12 12" />
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <div class="row">
@@ -395,25 +429,40 @@
                         <h4 class="card-title col-3">Danh sách tất cả người dùng</h4>
                         <div class="col-9 gap-2">
                             <form id="filterAccountForm" method="GET" action="{{ route('admin.account.search') }}"
-                                class="form-inline d-flex justify-content-end gap-2 align-items-center">
-                                <a href="{{ route('admin.account.trash') }}" class="btn btn-sm btn-primary">
-                                    Thùng rác tài khoản
+                                class="form-inline d-flex j ustify-content-end gap-2 align-items-center">
+                                <a href="{{ route('admin.account.trash') }}" class="btn btn-primary">
+                                    Thùng rác
                                 </a>
 
-                                <select name="filter" class="form-select" style="width: 27%">
+                                <select name="filter" class="form-select" style="width: 15%">
                                     <option value="">-- Vai trò --</option>
-                                    <option value="admin" {{ request('filter') == 'admin' ? 'selected' : '' }}>Quản trị
-                                        viên
-                                    </option>
-                                    <option value="staff" {{ request('filter') == 'staff' ? 'selected' : '' }}>Nhân viên
-                                    </option>
-                                    <option value="student" {{ request('filter') == 'student' ? 'selected' : '' }}>Học
-                                        sinh
-                                    </option>
-                                    <option value="teacher" {{ request('filter') == 'teacher' ? 'selected' : '' }}>Giáo
-                                        viên
-                                    </option>
+                                    @if (auth()->user()->isAdmin())
+                                        <option value="admin" {{ request('filter') == 'admin' ? 'selected' : '' }}>Quản
+                                            trị
+                                            viên
+                                        </option>
+                                        <option value="staff" {{ request('filter') == 'staff' ? 'selected' : '' }}>Nhân
+                                            viên
+                                        </option>
+                                    @elseif (auth()->user()->isUser())
+                                        <option value="student" {{ request('filter') == 'student' ? 'selected' : '' }}>Học
+                                            sinh
+                                        </option>
+                                        <option value="teacher" {{ request('filter') == 'teacher' ? 'selected' : '' }}>
+                                            Giáo
+                                            viên
+                                        </option>
+                                    @endif
                                     <!-- Thêm các role khác nếu cần -->
+                                </select>
+
+                                <select name="gender" class="form-select" style="width: 15%">
+                                    <option value="">-- Giới tính --</option>
+                                    <option value="boy" {{ request('gender') == 'boy' ? 'selected' : '' }}>Nam
+                                    </option>
+                                    <option value="girl" {{ request('gender') == 'girl' ? 'selected' : '' }}>Nữ
+                                    </option>
+
                                 </select>
 
                                 <div class="position-relative">
@@ -426,8 +475,7 @@
 
                                 <button type="submit" class="btn btn-success">Lọc</button>
 
-                                <button id="clearFilterAccountBtn" type="button"
-                                        class="btn btn-danger">Xóa Lọc</button>
+                                <button id="clearFilterAccountBtn" type="button" class="btn btn-danger">Xóa Lọc</button>
                             </form>
 
 
@@ -447,7 +495,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($role as $data)
+                                    @forelse ($role as $data)
                                         <tr>
                                             <td>{{ $data->name }}</td>
                                             <td>{{ $data->gender }}</td>
@@ -455,7 +503,11 @@
                                             <td>{{ $data->email }}</td>
                                             <td>{{ $data->phone }}</td>
                                         </tr>
-                                    @endforeach
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center">Không có dữ liệu</td>
+                                        </tr>
+                                    @endforelse
 
                                 </tbody>
                             </table>
@@ -492,18 +544,17 @@
 
     </div>
 
-<script>
+    <script>
+        document.getElementById('clearFilterAccountBtn').addEventListener('click', function() {
+            const form = document.getElementById('filterAccountForm');
 
-    document.getElementById('clearFilterAccountBtn').addEventListener('click', function () {
-        const form = document.getElementById('filterAccountForm');
+            // Xóa tất cả input/select trong form
+            form.reset();
 
-        // Xóa tất cả input/select trong form
-        form.reset();
-
-        // Redirect về URL gốc không có query
-        const baseUrl = "{{ route('admin.account') }}";
-        window.location.href = baseUrl;
-    });
-</script>
+            // Redirect về URL gốc không có query
+            const baseUrl = "{{ route('admin.account') }}";
+            window.location.href = baseUrl;
+        });
+    </script>
 
 @endsection

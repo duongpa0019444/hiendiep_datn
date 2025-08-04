@@ -78,8 +78,6 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('dashboard/chart/revenue/{year}', [DashboardController::class, 'chartRevenue'])->name('admin.chartRevenue');
     Route::get('dashboard/chart/revenueCourse/{year}', [DashboardController::class, 'chartRevenueCourse'])->name('admin.revenueCourse');
 
-    // Quản lí điểm số
-    Route::get('/score', [ScoreController::class, 'score'])->name('admin.score');
 
     // Trang quản lý tài khoản
     Route::get('/account', [AccountController::class, 'account'])->name('admin.account');

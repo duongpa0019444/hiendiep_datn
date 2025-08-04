@@ -8,12 +8,20 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class TeacherRulesController extends Controller
 {
     public function details($id)
     {
+        // Kiểm tra quyền của người dùng hiện tại
+        if (Auth::user()->role == 'staff') {
+
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Bạn không có quyền quản trị này.');
+        }
+
         $items = DB::table('teacher_salary_rules as tsr')
             ->join('users as u', 'u.id', '=', 'tsr.teacher_id')
             ->where('tsr.teacher_id', $id)
@@ -29,12 +37,18 @@ class TeacherRulesController extends Controller
 
     public function indexRules(Request $request)
     {
-        if($request->has('month')) {
+        // Kiểm tra quyền của người dùng hiện tại
+        if (Auth::user()->role == 'staff') {
+
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Bạn không có quyền quản trị này.');
+        }
+        if ($request->has('month')) {
             $today = Carbon::parse($request->month);
         } else {
             $today = Carbon::now();
         }
-        
+
         $teacherId = $request->teacher_id;
         $keyword = $request->keyword;
 
@@ -58,15 +72,50 @@ class TeacherRulesController extends Controller
             $query->where('u.name', 'like', '%' . $keyword . '%');
         }
 
-        $users = $query->select('u.id', 'u.name', 'tsr.pay_rate', 'tsr.effective_date')->get();
+        // Lọc theo thứ tự
+        $sort = $request->query('sort');
+        if ($sort) {
+            switch ($sort) {
+                case 'created_at_desc':
+                    $query->orderBy('u.created_at', 'desc');
+                    break;
 
-        $allTeachers = DB::table('users')->where('role', 'teacher')->select('id', 'name')->get();
+                case 'created_at_asc':
+                    $query->orderBy('u.created_at', 'asc');
+                    break;
+
+                case 'name_asc':
+                    $query->orderBy('u.name', 'asc');
+                    break;
+
+                case 'name_desc':
+                    $query->orderBy('u.name', 'desc');
+                    break;
+
+                default:
+                    $query->orderBy('u.id', 'desc');
+                    break;
+            }
+        } else {
+            $query->orderBy('u.id', 'desc');
+        }
+
+
+        $users = $query->select('u.id', 'u.name', 'tsr.pay_rate', 'tsr.effective_date')->paginate(5);
+
+        $allTeachers = DB::table('users')->where('role', 'teacher')->select('id', 'name')->orderBy('name','desc')->get();
 
         return view('admin.teacher_salaries.teacher-rules', compact('users', 'allTeachers', 'teacherId', 'keyword'));
     }
 
     public function searchTeacher(Request $request)
     {
+        // Kiểm tra quyền của người dùng hiện tại
+        if (Auth::user()->role == 'staff') {
+
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Bạn không có quyền quản trị này.');
+        }
         $keyword = $request->q;
 
         $teachers = DB::table('users')
@@ -83,6 +132,12 @@ class TeacherRulesController extends Controller
 
     public function getRulesByTeacher($teacherId)
     {
+        // Kiểm tra quyền của người dùng hiện tại
+        if (Auth::user()->role == 'staff') {
+
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Bạn không có quyền quản trị này.');
+        }
         $rules = teacher_salary_rules::where('teacher_id', $teacherId)
             ->orderBy('effective_date', 'desc')
             ->get();
@@ -95,6 +150,12 @@ class TeacherRulesController extends Controller
 
     public function store(Request $request)
     {
+        // Kiểm tra quyền của người dùng hiện tại
+        if (Auth::user()->role == 'staff') {
+
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Bạn không có quyền quản trị này.');
+        }
         $request->validate([
             'teacher_id' => 'required|exists:users,id',
             'pay_rate' => 'required|numeric|min:0',

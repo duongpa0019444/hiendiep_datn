@@ -81,7 +81,9 @@
                                     <option value="all">Toàn hệ thống</option>
                                     <option value="student">Học sinh</option>
                                     <option value="teacher">Giáo viên</option>
-                                    <option value="staff">Nhân viên</option>
+                                    @if (auth()->user()->isAdmin())
+                                        <option value="staff">Nhân viên</option>
+                                    @endif
                                     <option value="class">Lớp</option>
                                 </select>
                                 <div class="mb-3 d-none mt-2" id="class-select-wrapper">
@@ -119,8 +121,10 @@
                                 viên</button>
                             <button type="button" class="btn btn-outline-info  btn-role" data-role="student">Học
                                 sinh</button>
-                            <button type="button" class="btn btn-outline-warning  btn-role" data-role="staff">Nhân
+                           @if (auth()->user()->isAdmin())
+                                 <button type="button" class="btn btn-outline-warning  btn-role" data-role="staff">Nhân
                                 viên</button>
+                            @endif
                             <button type="button" class="btn btn-outline-primary  btn-role " data-role="class">
                                 Lớp</button>
                         </div>

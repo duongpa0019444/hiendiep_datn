@@ -261,14 +261,14 @@ class UserController extends Controller
 
             return view('client.accounts.students.score', compact('data'));
         } elseif (Auth::user()->role == "teacher") {
-
             $data = Classes::with('course')
-                ->join('schedules', 'schedules.class_id', '=', 'classes.id')
-                ->where('schedules.teacher_id', Auth::id())
-                ->select('classes.*')
-                ->distinct()
+                ->whereIn('id', function ($query) {
+                    $query->select('class_id')
+                        ->from('schedules')
+                        ->where('teacher_id', Auth::id());
+                })
                 ->paginate(18);
-
+            // dd($data);
             return view('client.accounts.teachers.score', compact('data'));
         }
     }
@@ -661,45 +661,27 @@ class UserController extends Controller
             return view('client.accounts.students.account', compact('user', 'courses', 'inProgressCourseNames', 'completedCourseNames'));
         } elseif (Auth::user()->role == "teacher") {
 
-
             $user = ModelsUser::with('classes.course')->find(Auth::user()->id);
 
-            // Tên tất cả các khóa học (không phân loại)
-            $courses = $user->classes->pluck('course.name')->implode(', ');
-
-            // Lấy khóa học đang học
-            $inProgressClasses = $user->classes->filter(function ($class) {
-                $course = $class->course;
-                return $course && $class->status == 'in_progress';
-            });
-            $inProgressCourseNames = $inProgressClasses->pluck('course.name')->implode(', ');
-
-            // Lấy các lớp có khóa học đã hoàn thành
-            $completedClasses = $user->classes->filter(function ($class) {
-                $course = $class->course;
-                return $course && $class->status == 'completed';
-            });
-
-            // Lấy tên khóa học đã hoàn thành
-            $completedCourseNames = $completedClasses->pluck('course.name')->implode(', ');
-
-
-
-
-            // dd($user->classes->pluck('name')->toArray());
-            return view('client.accounts.students.account', compact('user', 'courses', 'inProgressCourseNames', 'completedCourseNames'));
-        } elseif (Auth::user()->role == "teacher") {
-
-            $user = ModelsUser::with('classes.course')->find(Auth::user()->id);
-            $classNames = Schedule::where('teacher_id', Auth::user()->id)
+            // Lấy tất cả lớp học theo Schedule
+            $allClasses = Schedule::where('teacher_id', Auth::id())
                 ->join('classes', 'schedules.class_id', '=', 'classes.id')
-
-                ->select('classes.name')
+                ->select('classes.name', 'classes.status')
                 ->distinct()
-                ->pluck('name');
+                ->get();
+
+            // Tất cả tên lớp (gộp)
+            $classNames = $allClasses->pluck('name');
+
+            // Lọc lớp đang dạy
+            $inProgressClasses = $allClasses->where('status', 'in_progress')->pluck('name');
+
+            // Lọc lớp đã hoàn thành
+            $completedClasses = $allClasses->where('status', 'completed')->pluck('name');
 
 
-            return view('client.accounts.teachers.account', compact('user', 'classNames'));
+
+            return view('client.accounts.teachers.account', compact('user', 'classNames', 'inProgressClasses', 'completedClasses'));
         }
     }
     public function editAccount()
