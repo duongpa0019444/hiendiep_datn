@@ -188,7 +188,7 @@
 
                             <div class="col-12 col-md-6 col-lg-4 col-xl-2 d-flex align-items-end gap-2">
                                 <button type="submit" class="btn btn-success btn-sm w-50">Lọc</button>
-                                <button type="reset" class="btn btn-danger btn-sm w-50">Xóa</button>
+                                <button type="reset" class="btn btn-danger btn-sm w-50 btn-reset">Xóa</button>
                             </div>
                         </form>
                     </div>
@@ -497,11 +497,9 @@
 
 
 
-        //reset search
-        $('#searchForm').on('reset', function(e) {
-            setTimeout(function() {
-                window.location.reload();
-            }, 10);
+        $(".btn-reset").on('click', function(e) {
+            $("#searchForm")[0].reset(); // Reset toàn bộ form
+            $("#searchForm").submit();
         });
 
         // Xử lý thay đổi số dòng hiển thị
@@ -781,14 +779,14 @@
             e.preventDefault();
             const url = $(this).attr('action');
             var formData = $(this).serialize();
-            console.log('Form data:', formData);
-            console.log('URL:', url);
+            // console.log('Form data:', formData);
+            // console.log('URL:', url);
             $.ajax({
                 url: url,
                 type: 'POST',
                 data: formData,
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                     // Cập nhật chỉ hàng vừa chỉnh sửa
                     if (response.payment) {
                         const payment = response.payment;

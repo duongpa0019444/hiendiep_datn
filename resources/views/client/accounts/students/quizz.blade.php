@@ -523,11 +523,10 @@
                 url: `/student/check-access-code/${code}`, // Route xử lý ở server
                 method: 'GET',
                 success: function(response) {
-                    console.log(response);
                     const quiz = response;
                     const createdAt = new Date(quiz.created_at);
                     const createdDate = createdAt.toLocaleDateString('vi-VN');
-                    if(!quiz){
+                    if (!quiz || (typeof quiz === 'object' && Object.keys(quiz).length === 0)) {
                         Swal.fire({
                             title: 'Lỗi!',
                             text: 'Mã Quiz không hợp lệ. Vui lòng nhập lại mã!',
