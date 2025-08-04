@@ -217,7 +217,9 @@
                                             <div class="dropdown">
                                                 <div class="d-flex justify-content-center align-items-center gap-2"
                                                     data-bs-toggle="dropdown" aria-expanded="false" role="button">
-                                                    <span class="fw-semibold">{{ Auth::user()->name }}</span>
+                                                    <span
+                                                        class="fw-semibold d-none d-md-inline">{{ Auth::user()->name }}</span>
+
                                                     <div
                                                         class="avatar-dropdown-toggle d-flex align-items-center position-relative">
                                                         <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('icons/user-solid.svg') }}"
@@ -230,13 +232,13 @@
                                                 </div>
 
                                                 <ul
-
                                                     class="dropdown-menu dropdown-menu-myaccount dropdown-menu-end shadow-sm mt-2 p-3 rounded-3 avatar-menu">
                                                     @if (Auth::user()->role == 'admin')
                                                         <li>
                                                             <a href="{{ route('admin.dashboard') }}"
                                                                 class="dropdown-item p-2" data-section="dashboard">
-                                                                <i class="icofont-dashboard-web me-2"></i> Vào trang quản trị
+                                                                <i class="icofont-dashboard-web me-2"></i> Vào trang quản
+                                                                trị
                                                             </a>
                                                         </li>
                                                     @else
@@ -1090,7 +1092,7 @@
             });
         });
     </script>
-    
+
 
 </body>
 
