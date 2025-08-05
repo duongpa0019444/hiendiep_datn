@@ -30,7 +30,6 @@ class CourseController extends Controller
 
         $data = courses::where('name', 'like', '%' . $searchTerm . '%')
             ->orWhere('description', 'like', '%' . $searchTerm . '%')
-            ->with('lessons', 'students')
             ->paginate(9) // số item/trang
             ->appends(['client_course_search' => $searchTerm]); // giữ query khi phân trang
 

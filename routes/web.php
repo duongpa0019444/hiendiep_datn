@@ -47,6 +47,8 @@ Route::get('contact', [ClientCourseController::class, 'contact'])->name('client.
 Route::post('/contact-support', [SupportRequestController::class, 'store'])->name('support.store');
 Route::post('/contact-support/{id}/handle', [SupportRequestController::class, 'handle'])->middleware('auth')->name('support.handle');
 
+// phần giới thiệu client
+Route::get('about', [HomeController::class, 'about'])->name('client.about');
 
 //
 Route::get('/course/{slug}_{id}', [ClientCourseController::class, 'detail'])->name('client.course.detail');
