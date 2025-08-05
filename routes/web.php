@@ -48,6 +48,8 @@ Route::get('contact', [ClientCourseController::class, 'contact'])->name('client.
 Route::post('/contact-support', [SupportRequestController::class, 'store'])->name('support.store');
 Route::post('/contact-support/{id}/handle', [SupportRequestController::class, 'handle'])->middleware('auth')->name('support.handle');
 
+// phần giới thiệu client
+Route::get('about', [HomeController::class, 'about'])->name('client.about');
 
 //
 Route::get('/course/{slug}_{id}', [ClientCourseController::class, 'detail'])->name('client.course.detail');
@@ -83,8 +85,6 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('dashboard/chart/revenue/{year}', [DashboardController::class, 'chartRevenue'])->name('admin.chartRevenue');
     Route::get('dashboard/chart/revenueCourse/{year}', [DashboardController::class, 'chartRevenueCourse'])->name('admin.revenueCourse');
 
-    // Quản lí điểm số
-    Route::get('/score', [ScoreController::class, 'score'])->name('admin.score');
 
     // Trang quản lý tài khoản
     Route::get('/account', [AccountController::class, 'account'])->name('admin.account');

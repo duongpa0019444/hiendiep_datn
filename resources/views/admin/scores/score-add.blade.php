@@ -3,13 +3,20 @@
 @section('description', '')
 @section('content')
 
+    <!-- Tom Select CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+
+    <!-- Tom Select JS -->
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <div class="page-content">
         <div class="container-fluid">
             <nav aria-label="breadcrumb p-0">
                 <ol class="breadcrumb py-0">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('admin.score') }}">Quản lí điểm số</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.score.detail', ['class_id' => request('class_id'), 'course_id' => $class->courses_id])}}">{{ $class->name }}</a></li>
+                    <li class="breadcrumb-item"><a
+                            href="{{ route('admin.score.detail', ['class_id' => request('class_id'), 'course_id' => $class->courses_id]) }}">{{ $class->name }}</a>
+                    </li>
                     <li class="breadcrumb-item active" aria-current="page">Nhập điểm </li>
                 </ol>
             </nav>
@@ -30,7 +37,7 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title fw-bold">Thông tin</h4>
-                            
+
                         </div>
                         <form method="POST" action="{{ route('admin.score.store', [request('class_id')]) }}">
                             @csrf
@@ -39,20 +46,26 @@
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="roles-name" class="form-label fw-semibold">Học sinh</label>
-                                            <select class="form-select" name="student_id" id="">
+                                            <label for="student_filter" class="form-label fw-semibold">Học sinh</label>
+                                            <select name="student_id" id="student_filter"
+                                                class="form-select">
                                                 <option value="">Chọn học sinh</option>
                                                 @foreach ($data as $stdClass)
-                                                    <option value="{{$stdClass->student_id}}"> {{ $stdClass->student->name }}</option>
+                                                    <option value="{{ $stdClass->student_id }}"
+                                                        {{ request('student_id') == $stdClass->student_id ? 'selected' : '' }}>
+                                                        {{ $stdClass->student->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
 
                                         </div>
                                     </div>
+
+
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="roles-name" class="form-label fw-semibold">Loại điểm</label>
-                                             <input type="text"  name="score_type" class="form-control"
+                                            <input type="text" name="score_type" class="form-control"
                                                 placeholder="Nhập loại điểm...">
                                         </div>
                                     </div>
@@ -60,16 +73,17 @@
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="user-name" class="form-label fw-semibold">Số điểm</label>
-                                            <input type="number" step="any" min="0" name="score" class="form-control"
-                                                placeholder="Nhập số điểm...">
+                                            <input type="number" step="any" min="0" name="score"
+                                                class="form-control" placeholder="Nhập số điểm...">
                                         </div>
                                     </div>
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="user-name" class="form-label fw-semibold">Ngày</label>
-                                            <input type="date" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" name="exam_date" class="form-control">
-                                               
+                                            <input type="date" 
+                                                name="exam_date" class="form-control">
+
                                         </div>
                                     </div>
                                 </div>
@@ -104,31 +118,21 @@
     </div>
 
     <script>
-        Dropzone.options.myDropzone = {
-            autoProcessQueue: false,
-            paramName: "avatar",
-            maxFiles: 1,
-            addRemoveLinks: true,
-            init: function() {
-                var myDropzone = this;
-
-                document.querySelector("form").addEventListener("submit", function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    if (myDropzone.getQueuedFiles().length > 0) {
-                        myDropzone.processQueue(); // submit file
-                    } else {
-                        this.submit(); // không có file thì submit luôn
-                    }
-
-                    myDropzone.on("success", function() {
-                        document.querySelector("form")
-                    .submit(); // submit form sau khi upload thành công
-                    });
-                });
-            }
-        };
+        document.addEventListener('DOMContentLoaded', function() {
+            new TomSelect("#student_filter", {
+                placeholder: "Chọn học sinh",
+                allowEmptyOption: true,
+                persist: false,
+                create: false,
+                maxOptions: 500,
+                closeAfterSelect: true,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                }
+            });
+        });
     </script>
+
 
 @endsection

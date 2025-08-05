@@ -20,7 +20,7 @@ class ScoreController extends Controller
 {
     public function index()
     {
-        $data = Classes::with('course')->get();
+        $data = Classes::with('course')->paginate(12);
         return view('admin.scores.score', compact('data'));
     }
 
@@ -33,7 +33,7 @@ class ScoreController extends Controller
                     $q->where('name', 'like', "%$query%");
                 })
                 ->with('course')
-                ->get();
+                ->paginate(12);
 
             return view('admin.scores.score', compact('data', 'query'));
         }

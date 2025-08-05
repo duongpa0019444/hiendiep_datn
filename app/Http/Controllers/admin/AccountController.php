@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 
@@ -27,6 +28,7 @@ class AccountController extends Controller
     }
     public function search(Request $request)
     {
+        
 
         $roleCounts = User::select('role', DB::raw('count(*) as total'))
             ->groupBy('role')
@@ -34,12 +36,24 @@ class AccountController extends Controller
             ->toArray();
 
         $filter = $request->query('filter');
+        // kiểm tra quyền lọc của nhân viên
+        if(Auth::user()->role == 'staff') {
+            if($filter == 'admin' || $filter == 'staff') {
+                return redirect()->route('admin.account')
+                    ->with('error', 'Bạn không có quyền lọc vai trò này');
+            }
+        }
+
+        $gender = $request->query('gender');
         $search = trim($request->query('queryAccount'));
 
         $query = User::query();
 
         if ($filter) {
             $query->where('role', $filter);
+        }
+        if ($gender) {
+            $query->where('gender', $gender);
         }
 
         if ($search) {
@@ -48,7 +62,7 @@ class AccountController extends Controller
 
         $role = $query->orderBy('id', 'desc')->paginate(10);
 
-        return view('admin.accounts.account', compact('role', 'filter', 'search', 'roleCounts'));
+        return view('admin.accounts.account', compact('role', 'filter', 'gender', 'search', 'roleCounts'));
     }
 
 
@@ -56,7 +70,42 @@ class AccountController extends Controller
 
     public function list($role, Request $request)
     {
+        // kiểm tra người dùng hiện tại có quyền truy cập role = admin, nhân viên không
+        if(Auth::user()->role == 'staff') {
+            if($role == 'admin' || $role == 'staff') {
+                return redirect()->route('admin.account')
+                    ->with('error', 'Bạn không có quyền truy cập vào danh sách này');
+            }
+        }
         $query = User::where('role', $role);
+
+        $sort = $request->query('sort');
+        // Lọc theo thứ tự sắp xếp
+        if ($sort) {
+            switch ($sort) {
+                case 'created_at_desc':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                case 'created_at_asc':
+                    $query->orderBy('created_at', 'asc');
+                    break;
+                case 'name_asc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'name_desc':
+                    $query->orderBy('name', 'desc');
+                    break;
+                default:
+                    $query->orderBy('id', 'desc'); // Mặc định sắp x
+                    break;
+            }
+        } else {
+            $query->orderBy('id', 'desc'); // Mặc định sắp xếp theo ID giảm dần
+        }
+        // Lọc theo giới tính
+        if ($request->has('gender') && $request->gender !== null) {
+            $query->where('gender', $request->gender);
+        }
 
         if ($request->has('queryAccountRole') && $request->queryAccountRole !== null) {
             $keyword = $request->queryAccountRole;
@@ -69,7 +118,8 @@ class AccountController extends Controller
     }
 
     public function detail($role, $id)
-    {
+    {   
+
         $user = User::findOrFail($id);
         if ($user->role == "student") {
             // Lấy danh sách lớp học mà user này đang học
@@ -118,7 +168,7 @@ class AccountController extends Controller
                 ->select(
                     'classes.id',
                     'classes.name',
-                    'classes.status',                     
+                    'classes.status',
                     'classes.number_of_sessions',
                     'courses.name as course_name',
                     'courses.total_sessions'
@@ -152,14 +202,29 @@ class AccountController extends Controller
     }
 
 
-    public function add()
+    public function add($role)
     {
+        // Kiểm tra quyền của người dùng hiện tại
+        if(Auth::user()->role == 'staff') {
+            if($role == 'admin' || $role == 'staff') {
+                return redirect()->route('admin.account')
+                    ->with('error', 'Bạn không có quyền thêm người dùng với vai trò này');
+            }
+        }
+    
+      
         return view('admin.accounts.account-add');
     }
 
     public function store(Request $request, $role)
     {
-
+        // Kiểm tra quyền của người dùng hiện tại
+        if(Auth::user()->role == 'staff') {
+            if($role == 'admin' || $role == 'staff') {
+                return redirect()->route('admin.account')
+                    ->with('error', 'Bạn không có quyền thêm người dùng với vai trò này');
+            }
+        }
         $validated = $request->validate([
             'name'       => 'required|string|max:255',
             'username'       => 'required|string|max:255|unique:users',
@@ -206,12 +271,28 @@ class AccountController extends Controller
 
     public function edit($role, $id)
     {
+         // Kiểm tra quyền của người dùng hiện tại
+        if(Auth::user()->role == 'staff') {
+            if($role == 'admin' || $role == 'staff') {
+                return redirect()->route('admin.account')
+                    ->with('error', 'Bạn không có quyền thêm người dùng với vai trò này');
+            }
+        }
+        
         $info = User::find($id);
         return view('admin.accounts.account-edit', compact('info'));
     }
 
     public function update(Request $request, $role, $id)
     {
+        // Kiểm tra quyền của người dùng hiện tại
+        if(Auth::user()->role == 'staff') {
+            if($role == 'admin' || $role == 'staff') {
+                return redirect()->route('admin.account')
+                    ->with('error', 'Bạn không có quyền thêm người dùng với vai trò này');
+            }
+        }
+
         $user = User::findOrFail($id);
 
         $validated = $request->validate([
@@ -251,45 +332,46 @@ class AccountController extends Controller
             ->with('success', 'Cập nhật người dùng thành công');
     }
 
-    //check người dùng có đang liên kết với các bảng khác không
-    public function check($id)
-    {
-
-        $classes = DB::table('class_student')
-            ->join('classes', 'class_student.class_id', '=', 'classes.id')
-            ->where('class_student.student_id', $id)
-            ->select('classes.id', 'classes.name')
-            ->get();
-        $schedules = DB::table('schedules as sd')
-            ->join('classes as c', 'sd.class_id', '=', 'c.id')
-            ->where('sd.teacher_id', $id)
-            ->select('sd.id', 'c.name as class_name')
-            ->get();
-
-        $payments = DB::table('course_payments')
-            ->where('student_id', $id)
-            ->select('id', 'amount', 'method', 'note', 'created_at')
-            ->get();
-
-        $quizzes = DB::table('quiz_attempts')
-            ->where('user_id', $id)
-            ->select('id', 'quiz_id', 'score', 'submitted_at')
-            ->get();
-
-        return response()->json([
-            'classes' => $classes,
-            'payments' => $payments,
-            'quizzes' => $quizzes,
-            'schedules' => $schedules,
-        ]);
-    }
 
 
     public function delete($role, $id)
     {
 
-        User::find($id)->delete();
-        return redirect()->route('admin.account.list', ['role' => $role])->with('success', 'Xóa người dùng thành công');
+        if (Auth::user()->id == $id) {
+            return redirect()->back()->with('error', 'Bạn không thể xóa chính mình');
+        }
+
+        if (Auth::user()->role == 'admin') {
+            $userId = User::findOrFail($id);
+            if ($userId->role == 'student') {
+                $classStudentCount = DB::table('class_student')->where('student_id', $id)->count();
+                if ($classStudentCount > 0) {
+                    return redirect()->route('admin.account.list', ['role' => $role])
+                        ->with('error', 'Không thể xóa người dùng vì có liên kết với lớp học');
+                }
+            } elseif ($userId->role == 'teacher') {
+                $scheduleCount = DB::table('schedules')->where('teacher_id', $id)->count();
+                if ($scheduleCount > 0) {
+                    return redirect()->route('admin.account.list', ['role' => $role])
+                        ->with('error', 'Không thể xóa người dùng vì có lịch dạy');
+                }
+            } elseif ($userId->role == 'admin') {
+                // Kiểm tra xem có phải là người dùng duy nhất không
+                $adminCount = User::where('role', 'admin')->count();
+                if ($adminCount <= 1) {
+                    return redirect()->route('admin.account.list', ['role' => $role])
+                        ->with('error', 'Không thể xóa người dùng vì đây là người dùng quản trị duy nhất');
+                }
+            }
+
+            User::find($id)->delete();
+            return redirect()->route('admin.account.list', ['role' => $role])->with('success', 'Xóa người dùng thành công');
+        }
+
+        if(Auth::user()->role == 'staff') {
+            return redirect()->route('admin.account.list', ['role' => $role])
+                ->with('error', 'Bạn không có quyền xóa người dùng');
+        }
     }
 
     public function trash(Request $request)

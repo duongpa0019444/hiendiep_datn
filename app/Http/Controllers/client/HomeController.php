@@ -61,4 +61,9 @@ class HomeController extends Controller
             ->get();
         return view('client.home', compact('featuredCourses', 'news', 'events'));
     }
+
+    public function about()
+    {
+        return view('client.about');
+    }
 }

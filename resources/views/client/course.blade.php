@@ -4,7 +4,7 @@
 @section('description', '')
 @section('content')
 
-    <main>
+    <main>  
         <!--<< Breadcrumb Section Start >>-->
         <div style="margin-top: 90px;">
             <!-- Start Bredcrumbs Area -->
@@ -111,6 +111,7 @@
 
                 </div>
 
+                {{-- Pagination --}}
                 <div class="row">
                     <div class="col-12">
                         <div class="ed-pagination">

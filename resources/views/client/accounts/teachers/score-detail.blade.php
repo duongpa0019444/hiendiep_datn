@@ -48,11 +48,11 @@
                 <h5 class="">Bảng Điểm </h5>
             </div>
             <div class="">
-                <a href="{{ route('client.score.add', [request('class_id')]) }}" class="btn  btn-primary">
+                <a href="{{ route('client.score.add', [request('class_id')]) }}" class="btn  btn-outline-primary">
                     Nhập điểm mới
                 </a>
                 <a href="{{ route('client.scores.export', [request('class_id'), request('course_id')]) }}"
-                    class="btn  btn-success">
+                    class="btn  btn-outline-success">
                     Xuất điểm Excel
                 </a>
 
@@ -69,9 +69,9 @@
                 @csrf
                 <div class="d-flex flex-column flex-sm-row gap-2 align-items-sm-center">
                     <input type="file" name="file" accept=".xlsx,.xls" class="" required>
-                    <button type="submit" class="btn  btn-warning">Nhập Excel</button>
+                    <button type="submit" class="btn btn-warning">Nhập Excel</button>
 
-                </div>
+                </div>  
             </form>
 
             {{-- Form Search --}}
@@ -128,11 +128,9 @@
                                 </td>
                             </tr>
                         @empty
-                            <div class="col-12">
-                                <div class="alert mt-3 alert-warning text-center" role="alert">
-                                    Không tìm thấy dữ liệu điểm của học sinh nào.
-                                </div>
-                            </div>
+                            <tr>
+                                <td colspan="7" class="text-center">Không có điểm nào được tìm thấy.</td>
+                            </tr>
                         @endforelse
 
                     </tbody>
