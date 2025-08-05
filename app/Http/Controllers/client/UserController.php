@@ -25,12 +25,14 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
+use function PHPUnit\Framework\isArray;
+
 class UserController extends Controller
 {
     public function information()
     {
         if (Auth::user()->role == "student") {
-
+            
             $user = Auth::user();
             $userId = $user->id;
             $unPaymentInfo = coursePayment::where('student_id', $userId)
@@ -42,7 +44,7 @@ class UserController extends Controller
                     ->where('student_id', $user->id)
                     ->value('class_id');
             }
-
+           
             $now = Carbon::now();
             // Lấy danh sách thông báo phù hợp
             $notifications = Notification::where(function ($q) use ($user, $classId) {
@@ -65,7 +67,6 @@ class UserController extends Controller
                 ->orderByDesc('created_at')
                 ->limit(3)
                 ->get();
-
 
             //Lớp đang học
 
@@ -113,9 +114,10 @@ class UserController extends Controller
                 GROUP BY
                     u.id, u.name, c.id, c.name
 
-            ", [$userId, $classes[0]->class_id, $userId]);
+            ", [$userId, $classes[0]->class_id ?? 0, $userId]);
 
-            $hoctaps = $attendance[0];
+            $hoctaps = $attendance[0] ?? [];
+           
             return view('client.accounts.students.dashboard', compact('unPaymentInfo', 'notifications', 'classes', 'hoctaps'));
         } elseif (Auth::user()->role == "teacher") {
 

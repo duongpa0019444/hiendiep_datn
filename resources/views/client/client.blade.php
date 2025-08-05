@@ -134,12 +134,12 @@
                             </li>
 
                             <li class="offcanvas__menu_li">
-                                <a class="offcanvas__menu_item active" href="about-1.html">Giới thiệu</a>
+                                <a class="offcanvas__menu_item active" href="{{ route('client.about') }}">Giới thiệu</a>
 
                             </li>
 
                             <li class="offcanvas__menu_li">
-                                <a class="offcanvas__menu_item" href="contact.html">Liên hệ</a>
+                                <a class="offcanvas__menu_item" href="{{ route('client.contacts') }}">Liên hệ</a>
                             </li>
 
                         </ul>
@@ -187,7 +187,7 @@
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="javascript:void(0)">Giới thiệu</a>
+                                        <a href="{{ route('client.about') }}">Giới thiệu</a>
 
                                     </li>
                                     <li>
