@@ -414,7 +414,7 @@ class quizzesController extends Controller
         if ($request->ajax()) {
             return response()->json($quiz);
         }
-        if (Auth::user()->role == 'admin') {
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'staff') {
             return view('admin.quizzes.quizzes-detail', compact('quiz', 'allQuestions', 'answers'));
         } elseif (Auth::user()->role == 'teacher') {
             return view('client.quizzes.quizzes-detail', compact('quiz', 'allQuestions', 'answers'));

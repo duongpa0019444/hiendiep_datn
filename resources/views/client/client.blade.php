@@ -9,7 +9,7 @@
     <meta name="description" content="@yield('description')">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="shortcut icon" href="{{ asset('client/images/logo-icon.png') }}">
-
+    <meta name="keywords" content="@yield('keywords', 'Học tiếng Anh, Bài viết tiếng Anh, Tin tức tiếng Anh')">
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="{{ asset('client/plugins/css/bootstrap.min.css') }}" />
@@ -99,7 +99,8 @@
                 <div class="modal-header offcanvas-header">
                     <!-- Mobile Menu Logo -->
                     <div class="offcanvas-logo">
-                        <a href="index.html"><img src="{{ asset('client/images/logo.png') }}" alt="#" /></a>
+                        <a href="{{ route('home') }}"><img src="{{ asset('client/images/logo.png') }}"
+                                alt="#" /></a>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                         <i class="fi fi-ss-cross"></i>
@@ -121,17 +122,19 @@
 
 
                             <li class="offcanvas__menu_li">
-                                <a class="offcanvas__menu_item" href="blog.html">Bài viết</a>
+                                <a class="offcanvas__menu_item" href="{{ route('client.news') }}">Bài viết</a>
                                 <ul class="offcanvas__sub_menu">
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="blog.html" class="offcanvas__sub_menu_item">Tin tức giáo dục</a>
-                                    </li>
-                                    <li class="offcanvas__sub_menu_li">
-                                        <a href="blog-details.html" class="offcanvas__sub_menu_item">Tin tức công
-                                            nghệ</a>
-                                    </li>
+                                    @foreach (\DB::table('topics')->get() as $topic)
+                                        <li class="offcanvas__sub_menu_li">
+                                            <a href="{{ route('client.news.category', ['id' => $topic->id, 'slug' => \Illuminate\Support\Str::slug($topic->name)]) }}"
+                                                class="offcanvas__sub_menu_item">
+                                                {{ $topic->name }}
+                                            </a>
+                                        </li>
+                                    @endforeach
                                 </ul>
                             </li>
+
 
                             <li class="offcanvas__menu_li">
                                 <a class="offcanvas__menu_item active" href="about-1.html">Giới thiệu</a>
@@ -179,11 +182,17 @@
                                     </li>
 
                                     <li>
-                                        <a href="javascript:void(0)">Bài viết<i
+                                        <a href="{{ route('client.news') }}">Bài viết<i
                                                 class="fi fi-ss-angle-small-down"></i></a>
                                         <ul class="sub-menu">
-                                            <li><a href="#">Tin giáo dục </a></li>
-                                            <li><a href="#">Tin công nghệ </a></li>
+                                            @foreach (\DB::table('topics')->get() as $topic)
+                                                <li class="offcanvas__sub_menu_li">
+                                                    <a href="{{ route('client.news.category', ['id' => $topic->id, 'slug' => \Illuminate\Support\Str::slug($topic->name)]) }}"
+                                                        class="offcanvas__sub_menu_item">
+                                                        {{ $topic->name }}
+                                                    </a>
+                                                </li>
+                                            @endforeach
                                         </ul>
                                     </li>
                                     <li>
@@ -397,104 +406,100 @@
                         </div>
                         <div class="container ed-container">
                             <div class="row g-0">
+                                <!-- Giới thiệu -->
                                 <div class="col-lg-4 col-md-6 col-12">
                                     <div class="ed-footer__widget ed-footer__about">
-                                        <a href="index.html" class="ed-footer__logo">
-                                            <img src="{{ asset('client/images/logo.svg') }}" alt="footer-logo" />
+                                        <a href="{{ url('/') }}" class="ed-footer__logo">
+                                            <img src="{{ asset('client/images/logo.png') }}" alt="footer-logo" />
                                         </a>
                                         <p class="ed-footer__about-text">
-                                            Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia
-                                            deserunt mollit.
+                                            Trung tâm Tiếng Anh Hiền Diệp cam kết mang đến môi trường học tập hiện đại,
+                                            phương pháp giảng dạy tiên tiến và đội ngũ giáo viên tận tâm.
                                         </p>
                                         <ul class="ed-footer__about-social">
-                                            <li>
-                                                <a href="https://www.facebook.com/" target="_blank"><img
+                                            <li><a href="https://www.facebook.com/" target="_blank"><img
                                                         src="{{ asset('client/images/icons/icon-dark-facebook.svg') }}"
-                                                        alt="icon-dark-facebook" /></a>
-                                            </li>
-                                            <li>
-                                                <a href="https://www.twitter.com/" target="_blank"><img
+                                                        alt="facebook" /></a></li>
+                                            <li><a href="https://www.youtube.com/" target="_blank"><img
                                                         src="{{ asset('client/images/icons/icon-dark-twitter.svg') }}"
-                                                        alt="icon-dark-twitter" /></a>
-                                            </li>
-                                            <li>
-                                                <a href="https://www.dribbble.com/" target="_blank"><img
-                                                        src="{{ asset('client/images/icons/icon-dark-dribbble.svg') }}"
-                                                        alt="icon-dark-dribbble" /></a>
-                                            </li>
-                                            <li>
-                                                <a href="https://www.instagram.com/" target="_blank"><img
+                                                        alt="youtube" /></a></li>
+                                            <li><a href="https://www.instagram.com/" target="_blank"><img
                                                         src="{{ asset('client/images/icons/icon-dark-instagram.svg') }}"
-                                                        alt="icon-dark-instagram" /></a>
-                                            </li>
+                                                        alt="instagram" /></a></li>
                                         </ul>
                                     </div>
                                 </div>
+
+                                <!-- Liên kết -->
                                 <div class="col-lg-2 col-md-6 col-12">
                                     <div class="ed-footer__widget">
-                                        <h4 class="ed-footer__widget-title">Links</h4>
+                                        <h4 class="ed-footer__widget-title">Liên kết</h4>
                                         <ul class="ed-footer__widget-links">
-                                            <li><a href="about-1.html">About Us</a></li>
-                                            <li><a href="course-1.html">Our Courses</a></li>
-                                            <li><a href="#">Pricing Plan</a></li>
-                                            <li><a href="contact.html">Contact Us</a></li>
-                                            <li><a href="blog.html">Our News</a></li>
-                                            <li><a href="faq.html">FAQ’s</a></li>
+                                            <li><a href="{{ url('/about') }}">Giới thiệu</a></li>
+                                            <li><a href="{{ url('/courses') }}">Các khóa học</a></li>
+                                            <li><a href="{{ url('/pricing') }}">Gói học phí</a></li>
+                                            <li><a href="{{ url('/contact') }}">Liên hệ</a></li>
+                                            <li><a href="{{ url('/news') }}">Tin tức</a></li>
+                                            <li><a href="{{ url('/faq') }}">Câu hỏi thường gặp</a></li>
                                         </ul>
                                     </div>
                                 </div>
+
+                                <!-- Thông tin liên hệ -->
                                 <div class="col-lg-3 col-md-6 col-12">
                                     <div class="ed-footer__widget contact-widget">
-                                        <h4 class="ed-footer__widget-title">Contact</h4>
-                                        <!-- Single Info  -->
+                                        <h4 class="ed-footer__widget-title">Thông tin liên hệ</h4>
+
                                         <div class="ed-footer__contact">
                                             <div class="ed-footer__contact-icon">
                                                 <img src="{{ asset('client/images/icons/icon-phone-blue.svg') }}"
-                                                    alt="icon-phone-blue" />
+                                                    alt="phone" />
                                             </div>
                                             <div class="ed-footer__contact-info">
-                                                <span>24/7 Support</span>
-                                                <a href="tel:+532 321 33 33">+532 321 33 33</a>
-                                            </div>
-                                        </div>
-                                        <!-- Single Info  -->
-                                        <div class="ed-footer__contact">
-                                            <div class="ed-footer__contact-icon">
-                                                <img src="{{ asset('client/images/icons/icon-envelope-blue.svg') }}"
-                                                    alt="icon-envelope-blue" />
-                                            </div>
-                                            <div class="ed-footer__contact-info">
-                                                <span>Send Message</span>
-                                                <a href="mailto:eduna@gmail.com">eduna@gmail.com</a>
+                                                <span>Hỗ trợ 24/7</span>
+                                                <a href="tel:09888661153">0988 866 1153</a>
                                             </div>
                                         </div>
 
-                                        <!-- Single Info  -->
+                                        <div class="ed-footer__contact">
+                                            <div class="ed-footer__contact-icon">
+                                                <img src="{{ asset('client/images/icons/icon-envelope-blue.svg') }}"
+                                                    alt="email" />
+                                            </div>
+                                            <div class="ed-footer__contact-info">
+                                                <span>Email</span>
+                                                <a
+                                                    href="mailto:hiendiepedu.edu@gmail.com">hiendiepedu.edu@gmail.com</a>
+                                            </div>
+                                        </div>
+
                                         <div class="ed-footer__contact">
                                             <div class="ed-footer__contact-icon">
                                                 <img src="{{ asset('client/images/icons/icon-location-blue.svg') }}"
-                                                    alt="icon-location-blue" />
+                                                    alt="location" />
                                             </div>
                                             <div class="ed-footer__contact-info">
-                                                <span>Our Locati0n</span>
-                                                <a href="#" target="_blank">32/Jenin, London</a>
+                                                <span>Địa chỉ</span>
+                                                <a href="#" target="_blank">984 Quang Trung 3, Đông Vệ, TP.
+                                                    Thanh Hóa</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
+                                <!-- Đăng ký nhận tin -->
                                 <div class="col-lg-3 col-md-6 col-12">
                                     <div class="ed-footer__widget newsletter-widget">
-                                        <h4 class="ed-footer__widget-title">Subscribe</h4>
-
+                                        <h4 class="ed-footer__widget-title">Đăng ký nhận tin</h4>
                                         <div class="ed-footer__newsletter">
                                             <p class="ed-footer__about-text">
-                                                Enter your email address to register to our newsletter subscription
+                                                Nhập email của bạn để nhận những thông tin và khuyến mãi mới nhất từ
+                                                trung tâm.
                                             </p>
                                             <form action="#" method="post" class="ed-footer__newsletter-form">
-                                                <input type="email" name="email" placeholder="Enter email"
+                                                <input type="email" name="email" placeholder="Nhập email của bạn"
                                                     required />
-                                                <button type="submit" class="ed-btn">Subscribe Now<i
+                                                <button type="submit" class="ed-btn">Đăng ký ngay <i
                                                         class="fi fi-rr-arrow-small-right"></i></button>
                                             </form>
                                         </div>
@@ -510,9 +515,8 @@
                             <div class="row">
                                 <div class="col-12">
                                     <p class="ed-footer__copyright-text">
-                                        Copyright 2024 Eduna | Developed By
-                                        <a href="https://themeforest.net/user/bizantheme"
-                                            target="_blank">BizanTheme</a>. All Rights Reserved
+                                        © 2024 Trung tâm Tiếng Anh Hiền Diệp. Thiết kế & phát triển bởi <a
+                                            href="#" target="_blank">Team tigerCode - FPL</a>.
                                     </p>
                                 </div>
                             </div>
@@ -543,7 +547,7 @@
 
                 <!-- Auth Head  -->
                 <div class="ed-auth__modal-head">
-                    <a href="index.html" class="ed-auth__modal-logo">
+                    <a href="{{ route('home') }}" class="ed-auth__modal-logo">
                         <img src="{{ asset('client/images/logo.png') }}" alt="logo" />
                     </a>
                     <h3 class="ed-auth__modal-title">Đăng Nhập</h3>
@@ -558,12 +562,12 @@
                     <form action="{{ route('loginAuth') }}" method="POST" class="ed-auth__modal-form">
                         @csrf
                         <div class="form-group">
-                            <input type="text" id="usernameLogin" name="username" placeholder="Enter password"
+                            <input type="text" id="usernameLogin" name="username" placeholder="Tên đang nhập"
                                 required />
                         </div>
 
                         <div class="form-group">
-                            <input type="password" id="passwordLogin" name="password" placeholder="Enter password"
+                            <input type="password" id="passwordLogin" name="password" placeholder="Mật khẩu"
                                 required />
                         </div>
 
@@ -586,121 +590,13 @@
     </div>
     <!-- End Login Modal -->
 
-    <!-- Start Register Modal -->
-    {{-- <div class="modal fade ed-auth__modal" id="registerModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="ed-auth__modal-content modal-content">
-                <button type="button" class="ed-auth__modal-close" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fi-rr-cross"></i>
-                </button>
-
-                <!-- Auth Head  -->
-                <div class="ed-auth__modal-head">
-                    <a href="index.html" class="ed-auth__modal-logo">
-                        <img src="{{ asset('client/images/logo.svg') }}" alt="logo" />
-                    </a>
-                    <h3 class="ed-auth__modal-title">Sign Up Now</h3>
-                    <p class="ed-auth__modal-text">
-                        already have an account?
-                        <button type="button" data-bs-toggle="modal" data-bs-target="#loginModal">
-                            Sign In
-                        </button>
-                    </p>
-                </div>
-
-                <!-- Auth Body  -->
-                <div class="ed-auth__modal-body">
-
-                    <form action="{{ route('registerAuth') }}" method="post" class="ed-auth__modal-form">
-                        @csrf
-                        <div class="form-group">
-                            <input type="text" name="name" placeholder="Enter name" required />
-                            @error('name')
-                                <span class="error" style="color: red; font-size: 0.9em;">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <input type="email" name="email" placeholder="Enter email" required />
-                            @error('email')
-                                <span class="error" style="color: red; font-size: 0.9em;">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <input type="tel" name="phone" inputmode="numeric" pattern="[0-9]{10,15}"
-                                value="{{ old('phone') }}" placeholder="Enter phone" required
-                                onkeypress="return (event.charCode !=8 && event.charCode == 0) ? true : (event.charCode >= 48 && event.charCode <= 57)" />
-                            @error('phone')
-                                <span class="error" style="color: red; font-size: 0.9em;">{{ $message }}</span>
-                            @enderror
-
-                        </div>
-
-                        <div class="form-group">
-                            <input type="password" name="password" placeholder="Enter password" required />
-
-                            @error('password')
-                                <span class="error" style="color: red; font-size: 0.9em;">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <input type="password" name="password_confirmation"
-                                placeholder="Enter password_confirmation" required />
-                            @error('password_confirmation')
-                                <span class="error" style="color: red; font-size: 0.9em;">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-
-                        <div class="ed-auth__form-btn">
-                            <button type="submit" class="ed-btn">Register Now<i
-                                    class="fi fi-rr-arrow-small-right"></i></button>
-                        </div>
-                    </form>
-                </div>
-
-
-
-                <!-- Auth Footer  -->
-                <div class="ed-auth__modal-footer">
-                    <div class="ed-auth__modal-third-party">
-                        <p>Or Sign Up with</p>
-                        <ul class="ed-auth__modal-third-party-list">
-                            <li>
-                                <a class="google-login" href="https://www.google.com/"><img
-                                        src="{{ asset('client/images/icons/icon-color-google.svg') }}"
-                                        alt="icon-color-google" /></a>
-                            </li>
-
-                            <li>
-                                <a class="facebook-login" href="https://facebook.com/"><img
-                                        src="{{ asset('client/images/icons/icon-color-facebook.svg') }}"
-                                        alt="icon-color-facebook" /></a>
-                            </li>
-                            <li>
-                                <a class="linkedin-login" href="https://www.linkedin.com/"><img
-                                        src="{{ asset('client/images/icons/icon-color-linkedin.svg') }}"
-                                        alt="icon-color-linkedin" /></a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> --}}
-    <!-- End Register Modal -->
-
-
 
     <!-- Start Sidebar  -->
     <div class="offcanvas offcanvas-end ed-sidebar" tabindex="-1" id="edSidebar"
         aria-labelledby="offcanvasRightLabel">
         <div class="ed-sidebar-header">
             <a href="index-1.html" class="ed-sidebar-logo">
-                <img src="{{ asset('client/images/logo.svg') }}" alt="logo" />
+                <img src="{{ asset('client/images/logo.png') }}" alt="logo" />
             </a>
             <button type="button" class="text-reset" data-bs-dismiss="offcanvas" aria-label="Close">
                 <i class="fi fi-rr-cross"></i>
@@ -709,7 +605,7 @@
         <div class="ed-sidebar-body m-0">
             <!-- Single Widget  -->
             <div class="ed-sidebar-widget">
-                <h3 class="ed-sidebar-widget-title">Contacts Us:</h3>
+                <h3 class="ed-sidebar-widget-title">Liên Hệ Với Chúng Tôi</h3>
                 <!-- Sigle Info  -->
                 <div class="ed-contact__info-item">
                     <div class="ed-contact__info-icon">
@@ -717,7 +613,7 @@
                     </div>
                     <div class="ed-contact__info-content">
                         <span>24/7 Support</span>
-                        <a href="tel:+532 321 33 33">+532 321 33 33</a>
+                        <a href="tel:09888661153">09888661153</a>
                     </div>
                 </div>
                 <!-- Sigle Info  -->
@@ -727,8 +623,8 @@
                             alt="icon-envelope-blue" />
                     </div>
                     <div class="ed-contact__info-content">
-                        <span>Send Message</span>
-                        <a href="mailto:eduna@gmail.com">eduna@gmail.com3</a>
+                        <span>Email</span>
+                        <a href="mailto:hiendiepedu.edu@gmail.com">hiendiepedu.edu@gmail.com</a>
                     </div>
                 </div>
 
@@ -739,8 +635,8 @@
                             alt="icon-location-blue" />
                     </div>
                     <div class="ed-contact__info-content">
-                        <span>Our Locati0n</span>
-                        <a href="#">32/Jenin, London</a>
+                        <span>Address</span>
+                        <a href="#">984 Quang trung 3 - Đông Vệ - Thành Phố Thanh Hóa</a>
                     </div>
                 </div>
             </div>

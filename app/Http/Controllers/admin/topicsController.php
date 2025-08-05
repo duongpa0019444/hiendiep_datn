@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\news;
 use App\Models\topics;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -170,6 +171,10 @@ class topicsController extends Controller
     }
 
     public function forceDelete($id){
+        $news = news::where('topic_id', $id)->get();
+        if ($news->count() > 0) {
+            return redirect()->back()->with('error', 'Không thể xóa chủ đề này vì nó đang chứa các bài viết.');
+        }
         $topic = topics::onlyTrashed()->findOrFail($id);
         $topic->forceDelete();
         return redirect()->back()->with('success', 'Xóa vĩnh viễn chủ đề thành công!');

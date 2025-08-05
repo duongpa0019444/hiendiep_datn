@@ -19,7 +19,7 @@ class questionsController extends Controller
             'quiz_id' => 'required|integer|exists:quizzes,id',
             'content' => 'required|string',
             'type' => 'required|in:single,multiple',
-            'points' => 'required|integer|min:1',
+            'points' => 'required|min:0.1',
 
             'answers' => 'required|array|min:2',
             'answers.*.content' => 'required|string',
@@ -36,8 +36,7 @@ class questionsController extends Controller
             'type.in' => 'Loại câu hỏi không hợp lệ. Chỉ chấp nhận: single hoặc multiple.',
 
             'points.required' => 'Vui lòng nhập điểm cho câu hỏi.',
-            'points.integer' => 'Điểm phải là số nguyên.',
-            'points.min' => 'Điểm tối thiểu phải là 1.',
+            'points.min' => 'Điểm tối thiểu phải là 0.1.',
 
             'answers.required' => 'Vui lòng nhập ít nhất 2 đáp án.',
             'answers.array' => 'Đáp án phải được gửi dưới dạng mảng.',
@@ -154,7 +153,7 @@ class questionsController extends Controller
             'quiz_id' => 'required|integer|exists:quizzes,id',
             'content' => 'required|string',
             'type' => 'required|in:single,multiple',
-            'points' => 'required|integer|min:1',
+            'points' => 'required|min:0.1',
 
             'answers' => 'required|array|min:2',
             'answers.*.content' => 'required|string',
@@ -171,8 +170,7 @@ class questionsController extends Controller
             'type.in' => 'Loại câu hỏi không hợp lệ. Chỉ chấp nhận: single hoặc multiple.',
 
             'points.required' => 'Vui lòng nhập điểm cho câu hỏi.',
-            'points.integer' => 'Điểm phải là số nguyên.',
-            'points.min' => 'Điểm tối thiểu phải là 1.',
+            'points.min' => 'Điểm tối thiểu phải là 0.1.',
 
             'answers.required' => 'Vui lòng nhập ít nhất 2 đáp án.',
             'answers.array' => 'Đáp án phải được gửi dưới dạng mảng.',
@@ -295,7 +293,7 @@ class questionsController extends Controller
             'type' => 'required|in:fill,reorder',
             'prompt' => 'required|string',
             'correct_answer' => 'required|string',
-            'points' => 'required|integer|min:1',
+            'points' => 'required|min:0.1',
             'explanation' => 'nullable|string',
         ], [
             'quiz_id.required' => 'Vui lòng chọn bài quiz.',
@@ -359,7 +357,7 @@ class questionsController extends Controller
             'type' => 'required|in:fill,reorder',
             'prompt' => 'required|string',
             'correct_answer' => 'required|string',
-            'points' => 'required|integer|min:1',
+            'points' => 'required|min:0.1',
             'explanation' => 'nullable|string',
         ], [
             'quiz_id.required' => 'Vui lòng chọn bài quiz.',

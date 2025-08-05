@@ -22,6 +22,7 @@ use App\Http\Controllers\admin\topicsController;
 use App\Http\Controllers\client\quizzesController as ClientQuizzesController;
 use App\Http\Controllers\client\CourseController as ClientCourseController;
 use App\Http\Controllers\client\AttendanceController as ClientAttendanceController;
+use App\Http\Controllers\client\newsController as ClientNewsController;
 use App\Http\Controllers\courseController;
 
 use App\Http\Controllers\SupportRequestController;
@@ -66,6 +67,10 @@ Route::post('/forgot-password', [loginController::class, 'sendResetLinkEmail'])-
 Route::get('/reset-password', [loginController::class, 'showResetPasswordForm'])->name('password.reset');
 Route::post('/reset-password', [loginController::class, 'resetPassword'])->name('password.update');
 
+//Bài viết
+Route::get('/news', [ClientNewsController::class, 'index'])->name('client.news');
+Route::get('/news/{id}/detail/{slug}', [ClientNewsController::class, 'newsDetail'])->name('client.news.detail');
+Route::get('/news/category/{id}/{slug}', [ClientNewsController::class, 'newsCategory'])->name('client.news.category');
 
 
 // Route dành cho admin và nhân viên --
