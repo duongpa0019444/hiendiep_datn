@@ -38,7 +38,7 @@
                             <div class="ed-section-head">
                                 <span class="ed-section-head__sm-title">CHÚNG TÔI LÀ AI</span>
                                 <h3 class="ed-section-head__title ed-split-text left">
-                                    Nâng Tầm Phương Pháp Tốt Nhất <br />
+                                    Nâng Tầm Phương Pháp Tốt Nhất
                                     với Khóa Học Của Chúng Tôi
                                 </h3>
                                 <p class="ed-section-head__text">
@@ -149,7 +149,7 @@
                                 <div class="ed-section-head">
                                     <span class="ed-section-head__sm-title text-white">KHÓA HỌC</span>
                                     <h3 class="ed-section-head__title ed-split-text right">
-                                        Tìm Lộ Trình Học Tập Phù Hợp <br />
+                                        Tìm Lộ Trình Học Tập Phù Hợp
                                         Cho Tương Lai Của Bạn
                                     </h3>
                                     <p class="ed-section-head__text">
