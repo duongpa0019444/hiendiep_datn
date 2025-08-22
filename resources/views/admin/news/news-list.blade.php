@@ -539,7 +539,7 @@
                         <!-- Tiêu đề + Chủ đề -->
                         <td>
                             <div class="d-flex align-items-start gap-2">
-                                <img src="${article.image ?? '/images/no-image.png'}"
+                                <img src="/${article.image ?? '/images/no-image.png'}"
                                     alt="Ảnh bài viết"
                                     class="rounded"
                                     style="width: 70px; height: 50px; object-fit: cover;">

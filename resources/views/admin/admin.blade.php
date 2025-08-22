@@ -171,6 +171,7 @@
                                             class="visually-hidden">unread messages</span></span>
                                 </button>
                             @endif
+
                             <div class="dropdown-menu py-0 dropdown-xl dropdown-menu-end"
                                 aria-labelledby="page-header-notifications-dropdown">
                                 <div class="p-3 border-top-0 border-start-0 border-end-0 border-dashed border">
@@ -276,13 +277,9 @@
                                     {{-- <a class="dropdown-item" href="pages-profile.html">
                                         <i class="bx bx-user-circle text-muted fs-18 align-middle me-1"></i><span
                                             class="align-middle">Profile</span>
-                                    </a>
-                                    <a class="dropdown-item" href="apps-chat.html">
-                                        <i class="bx bx-message-dots text-muted fs-18 align-middle me-1"></i><span
-                                            class="align-middle">Messages</span>
-                                    </a>
+                                    </a> --}}
 
-                                    <a class="dropdown-item" href="pages-pricing.html">
+                                    {{-- <a class="dropdown-item" href="pages-pricing.html">
                                         <i class="bx bx-wallet text-muted fs-18 align-middle me-1"></i><span
                                             class="align-middle">Pricing</span>
                                     </a>
@@ -294,6 +291,11 @@
                                         <i class="bx bx-lock text-muted fs-18 align-middle me-1"></i><span
                                             class="align-middle">Lock screen</span>
                                     </a> --}}
+                                    <a class="dropdown-item" href="{{ route('admin.actions.log') }}">
+                                        <i class="bx bx-user-pin text-muted fs-18 align-middle me-1"></i>
+                                        <span class="align-middle">Lịch sử thao tác</span>
+
+                                    </a>
 
                                     <div class="dropdown-divider my-1"></div>
 

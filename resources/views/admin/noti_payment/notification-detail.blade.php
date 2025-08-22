@@ -6,14 +6,15 @@
 @section('content')
     <div class="page-content">
         <div class="container-xxl">
-              <nav aria-label="breadcrumb p-0">
+            <nav aria-label="breadcrumb p-0">
                 <ol class="breadcrumb py-0">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('admin.noti.coursepayment') }}">Thông báo học phí & thanh toán</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><a
+                            href="{{ route('admin.noti.coursepayment') }}">Thông báo học phí & thanh toán</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Chi tiết</li>
                 </ol>
             </nav>
-              <h5>Chi tiết thông báo biến động học phí & thanh toán</h5>
+            <h5>Chi tiết thông báo biến động học phí & thanh toán</h5>
             <div class="card p-4">
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -46,7 +47,14 @@
                                 <strong>Học sinh:</strong>
                                 {{ $payment->user->name ?? '---' }}
                                 - (
-                                {{ $payment->user->birth_date ? \Carbon\Carbon::parse($payment->user->birth_date)->format('d/m/Y') : '---' }}
+                                @if (isset($payment) && $payment->user)
+                                    {{ \Carbon\Carbon::parse($payment->user->birth_date)->format('d/m/Y') }}
+                                @else
+                                    ---
+                                @endif
+
+
+
                                 )
 
                             </p>

@@ -72,6 +72,12 @@ class ContactController extends Controller
             $contact->assigned_to = Auth::id(); // Gán nhân viên hiện tại
             $contact->status = 1; // Đã xử lý
             $contact->save();
+            $this->logAction(
+                'update',
+                Contact::class,
+                $contact->id,
+                Auth::user()->name . ' đã cập nhật tin nhắn hỗ trợ: ' . $contact->id
+            );
             return redirect()->route('admin.contactDetail', $id)->with('success', 'Đã hỗ trợ thông tin này.');
         }else{
             return redirect()->route('admin.contactDetail', $id)->with('error', 'Đã có người hỗ trợ thông tin này.');
@@ -86,14 +92,24 @@ class ContactController extends Controller
 
         $contact->status = 2; // Ví dụ: 2 = không hỗ trợ
         $contact->save();
-
+        $this->logAction(
+            'update',
+            Contact::class,
+            $contact->id,
+            Auth::user()->name . ' đã cập nhật tin nhắn hỗ trợ: ' . $contact->id
+        );
         return redirect()->route('admin.contactDetail', $id)->with('success', 'Đã từ chối hỗ trợ.');
     }
     public function delete($id)
     {
         $contact = Contact::findOrFail($id);
         $contact->delete();
-
+        $this->logAction(
+            'delete',
+            Contact::class,
+            $contact->id,
+            Auth::user()->name . ' đã xóa tin nhắn hỗ trợ: ' . $contact->id
+        );
         return redirect()->route('admin.contact')->with('success', 'Xóa tin nhắn thành công.');
     }
 }

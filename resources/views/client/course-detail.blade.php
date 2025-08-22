@@ -8,8 +8,7 @@
         <!--<< Breadcrumb Section Start >>-->
         <div style="margin-top: 90px;">
             <!-- Start Bredcrumbs Area -->
-            <section class="ed-breadcrumbs"
-                style="background-image: url('{{ asset('client/images/breadcrumbs-bg.png') }}');">
+            <section class="ed-breadcrumbs" style="background-image: url('{{ asset('client/images/breadcrumbs-bg.png') }}');">
 
                 <div class="container">
                     <div class="row justify-content-center">
@@ -128,8 +127,8 @@
                                 </ul>
                             </div>
 
-                            <div class="ed-course__sidebar-widget">
-                                <h4 class="ed-course__sidebar-title">Liên hệ với chúng tôi</h4>
+                            <div class="ed-blog__sidebar-widget">
+                                <h4 class="ed-blog__sidebar-title">Liên Hệ Với Chúng Tôi</h4>
                                 <!-- Sigle Info  -->
                                 <div class="ed-contact__info-item">
                                     <div class="ed-contact__info-icon">
@@ -137,8 +136,8 @@
                                             alt="icon-phone-blue" />
                                     </div>
                                     <div class="ed-contact__info-content">
-                                        <span>Hỗ trợ 24/7</span>
-                                        <a href="tel:+0922311234">+0922311234</a>
+                                        <span>24/7 Support</span>
+                                        <a href="tel:+532 321 33 33">+532 321 33 33</a>
                                     </div>
                                 </div>
                                 <!-- Sigle Info  -->
@@ -147,9 +146,9 @@
                                         <img src="{{ asset('client/images/icons/icon-envelope-blue.svg') }}"
                                             alt="icon-envelope-blue" />
                                     </div>
-                                    <div class="ed-contact__info-content text-break">
-                                        <span>Gửi tin nhắn</span>
-                                        <a href="mailto:trungtamhiendiep@gmail.com">hiendiep@gmail.com</a>
+                                    <div class="ed-contact__info-content">
+                                        <span>Email</span>
+                                        <a href="mailto:hiendiepedu.edu@gmail.com">hiendiepedu.edu@gmail.com</a>
                                     </div>
                                 </div>
 
@@ -160,8 +159,9 @@
                                             alt="icon-location-blue" />
                                     </div>
                                     <div class="ed-contact__info-content">
-                                        <span>Vị trí của chúng tôi</span>
-                                        <a href="https://www.google.com/maps/place/Tr%C6%B0%E1%BB%9Dng+THPT+Tri%E1%BB%87u+S%C6%A1n+3/@19.8181875,105.5346406,13z/data=!4m15!1m8!3m7!1s0x3136e59040000001:0x654e145bb3a5b678!2zVHLGsOG7nW5nIFRIUFQgVHJp4buHdSBTxqFuIDM!8m2!3d19.8181875!4d105.5346406!10e5!16s%2Fg%2F1tdh5y53!3m5!1s0x3136e59040000001:0x654e145bb3a5b678!8m2!3d19.8181875!4d105.5346406!16s%2Fg%2F1tdh5y53?entry=ttu&g_ep=EgoyMDI1MDYzMC4wIKXMDSoASAFQAw%3D%3D">Văn Sơn, Triệu Sơn, Thanh Hóa</a>
+                                        <span>Adress</span>
+                                        <a href="#" target="_blank">984 Quang Trung 3, Đông Vệ, TP.
+                                            Thanh Hóa</a>
                                     </div>
                                 </div>
                             </div>

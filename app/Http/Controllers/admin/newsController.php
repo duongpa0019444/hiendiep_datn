@@ -184,6 +184,12 @@ class newsController extends Controller
         $news->is_featured = $request->is_featured;
         $news->save();
 
+        $this->logAction(
+            'create',
+            news::class,
+            $news->id,
+            Auth::user()->name . ' đã tạo bài viết: ' . $news->title
+        );
         return redirect()->route('admin.news.index')->with('success', 'Thêm bài viết thành công!');
     }
 
@@ -280,6 +286,12 @@ class newsController extends Controller
         $news->is_featured = $request->is_featured;
         $news->save();
 
+        $this->logAction(
+            'update',
+            news::class,
+            $news->id,
+            Auth::user()->name . ' đã cập nhật bài viết: ' . $news->title
+        );
         return redirect()->route('admin.news.index')->with('success', 'Sửa bài viết thành công!');
     }
 
@@ -287,7 +299,12 @@ class newsController extends Controller
     {
         $news = news::findOrFail($id);
         $news->delete();
-
+        $this->logAction(
+            'delete',
+            news::class,
+            $news->id,
+            Auth::user()->name . ' đã xóa bài viết: ' . $news->title
+        );
         return response()->json(['success' => true]);
     }
 
@@ -317,7 +334,12 @@ class newsController extends Controller
         $news = News::onlyTrashed()->findOrFail($id);
 
         $news->restore();
-
+        $this->logAction(
+            'update',
+            news::class,
+            $news->id,
+            Auth::user()->name . ' đã khôi phục bài viết: ' . $news->title
+        );
         return redirect()->back()->with('success', 'Khôi phục bài viết thành công!');
     }
 
@@ -330,7 +352,12 @@ class newsController extends Controller
         if (!empty($news->image) && File::exists(public_path($news->image))) {
             File::delete(public_path($news->image));
         }
-
+        $this->logAction(
+            'delete',
+            news::class,
+            $news->id,
+            Auth::user()->name . ' đã xóa vĩnh viễn bài viết: ' . $news->title
+        );
         $news->forceDelete(); // Xóa vĩnh viễn khỏi DB
 
         return redirect()->back()->with('success', 'Xóa vĩnh viễn bài viết thành công!');

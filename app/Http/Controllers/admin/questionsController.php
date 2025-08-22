@@ -5,9 +5,11 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\answers;
 use App\Models\questions;
+use App\Models\Quizzes;
 use App\Models\sentenceAnswers;
 use App\Models\sentenceQuestions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class questionsController extends Controller
@@ -19,7 +21,7 @@ class questionsController extends Controller
             'quiz_id' => 'required|integer|exists:quizzes,id',
             'content' => 'required|string',
             'type' => 'required|in:single,multiple',
-            'points' => 'required|integer|min:1',
+            'points' => 'required|min:0.1',
 
             'answers' => 'required|array|min:2',
             'answers.*.content' => 'required|string',
@@ -36,8 +38,7 @@ class questionsController extends Controller
             'type.in' => 'Loại câu hỏi không hợp lệ. Chỉ chấp nhận: single hoặc multiple.',
 
             'points.required' => 'Vui lòng nhập điểm cho câu hỏi.',
-            'points.integer' => 'Điểm phải là số nguyên.',
-            'points.min' => 'Điểm tối thiểu phải là 1.',
+            'points.min' => 'Điểm tối thiểu phải là 0.1.',
 
             'answers.required' => 'Vui lòng nhập ít nhất 2 đáp án.',
             'answers.array' => 'Đáp án phải được gửi dưới dạng mảng.',
@@ -120,7 +121,12 @@ class questionsController extends Controller
         }
 
         answers::insert($answersToInsert);
-
+        $this->logAction(
+            'update',
+            Quizzes::class,
+            $question->id,
+            Auth::user()->name . ' đã tạo câu hỏi trắc nghiệm: ' . $question->content
+        );
         return response()->json([
             'message' => 'Câu hỏi và đáp án đã được lưu thành công.',
             'question' => $question,
@@ -154,7 +160,7 @@ class questionsController extends Controller
             'quiz_id' => 'required|integer|exists:quizzes,id',
             'content' => 'required|string',
             'type' => 'required|in:single,multiple',
-            'points' => 'required|integer|min:1',
+            'points' => 'required|min:0.1',
 
             'answers' => 'required|array|min:2',
             'answers.*.content' => 'required|string',
@@ -171,8 +177,7 @@ class questionsController extends Controller
             'type.in' => 'Loại câu hỏi không hợp lệ. Chỉ chấp nhận: single hoặc multiple.',
 
             'points.required' => 'Vui lòng nhập điểm cho câu hỏi.',
-            'points.integer' => 'Điểm phải là số nguyên.',
-            'points.min' => 'Điểm tối thiểu phải là 1.',
+            'points.min' => 'Điểm tối thiểu phải là 0.1.',
 
             'answers.required' => 'Vui lòng nhập ít nhất 2 đáp án.',
             'answers.array' => 'Đáp án phải được gửi dưới dạng mảng.',
@@ -252,6 +257,14 @@ class questionsController extends Controller
             ];
         }
         answers::insert($answersToInsert);
+
+        $this->logAction(
+            'update',
+            Quizzes::class,
+            $question->id,
+            Auth::user()->name . ' đã cập nhật câu hỏi trắc nghiệm: ' . $question->content
+        );
+
         return response()->json([
             'message' => 'Câu hỏi và đáp án đã được cập nhật thành công.',
             'question' => $question,
@@ -270,7 +283,12 @@ class questionsController extends Controller
 
         // Xóa tất cả các đáp án liên quan đến câu hỏi này
         answers::where('question_id', $id)->delete();
-
+        $this->logAction(
+            'delete',
+            Quizzes::class,
+            $question->id,
+            Auth::user()->name . ' đã xóa câu hỏi trắc nghiệm: ' . $question->content
+        );
         // Xóa câu hỏi
         $question->delete();
 
@@ -295,7 +313,7 @@ class questionsController extends Controller
             'type' => 'required|in:fill,reorder',
             'prompt' => 'required|string',
             'correct_answer' => 'required|string',
-            'points' => 'required|integer|min:1',
+            'points' => 'required|min:0.1',
             'explanation' => 'nullable|string',
         ], [
             'quiz_id.required' => 'Vui lòng chọn bài quiz.',
@@ -328,6 +346,17 @@ class questionsController extends Controller
             'updated_at' => now()
         ]);
 
+        $this->logAction(
+            'update',
+            Quizzes::class,
+            $question->id,
+            Auth::user()->name . ' đã tạo câu hỏi ' .
+            ($question->type == 'fill'
+                ? 'điền từ: '
+                : 'sắp xếp câu: ')
+            . $question->prompt
+        );
+
         return response()->json([
             'message' => 'Thêm câu hỏi thành công.',
             'question' => $question,
@@ -359,7 +388,7 @@ class questionsController extends Controller
             'type' => 'required|in:fill,reorder',
             'prompt' => 'required|string',
             'correct_answer' => 'required|string',
-            'points' => 'required|integer|min:1',
+            'points' => 'required|min:0.1',
             'explanation' => 'nullable|string',
         ], [
             'quiz_id.required' => 'Vui lòng chọn bài quiz.',
@@ -391,6 +420,16 @@ class questionsController extends Controller
         $questionSentence->explanation = $request->explanation ?? null;
         $questionSentence->updated_at = now();
         $questionSentence->save();
+        $this->logAction(
+            'update',
+            Quizzes::class,
+            $questionSentence->id,
+            Auth::user()->name . ' đã cập nhật câu hỏi ' .
+            ($questionSentence->type == 'fill'
+                ? 'điền từ: '
+                : 'sắp xếp câu: ')
+            . $questionSentence->prompt
+        );
 
         return response()->json([
             'message' => 'Câu hỏi đã được cập nhật thành công.',
@@ -411,7 +450,12 @@ class questionsController extends Controller
 
         // Xóa tất cả các đáp án liên quan đến câu hỏi này
         sentenceAnswers::where('question_id', $id)->delete();
-
+        $this->logAction(
+            'update',
+            Quizzes::class,
+            $questionSentence->id,
+            Auth::user()->name . ' đã xóa câu hỏi: ' . $questionSentence->prompt
+        );
         // Xóa câu hỏi
         $questionSentence->delete();
 
