@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\AccountController;
+use App\Http\Controllers\admin\ActionLogController;
 use App\Http\Controllers\admin\AttendanceController;
 use App\Http\Controllers\admin\ClassController;
 use App\Http\Controllers\client\HomeController;
@@ -388,7 +389,11 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::post('/notification/course/payment/updateSeenMultiple', [notiCoursePaymentController::class, 'updateSeenMultiple']);
     Route::post('/notification/course/payment/deleteMultiple', [notiCoursePaymentController::class, 'deleteMultiple']);
 
-
+    Route::get('/actions/log', [ActionLogController::class, 'index'])->name('admin.actions.log');
+    Route::get('/actions/log/filter', [ActionLogController::class, 'filter'])->name('admin.actions.log.filter');
+    Route::post('/actions/log/delete', [ActionLogController::class, 'delete'])->name('admin.actions.log.delete');
+    Route::post('/actions/log/delete/{id}', [ActionLogController::class, 'delete'])->name('admin.actions.log.delete');
+    Route::get('/actions/log/view/{id}', [ActionLogController::class, 'viewLog'])->name('admin.actions.log.view');
 });
 
 

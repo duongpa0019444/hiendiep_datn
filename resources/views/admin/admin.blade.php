@@ -160,7 +160,7 @@
                                     ->get();
 
                             @endphp
-                            <button type="button" class="topbar-button position-relative"  data-bs-auto-close="outside"
+                            <button type="button" class="topbar-button position-relative" data-bs-auto-close="outside"
                                 id="page-header-notifications-dropdown" data-bs-toggle="dropdown"
                                 aria-haspopup="true" aria-expanded="false">
                                 <iconify-icon icon="solar:bell-bing-bold-duotone"
@@ -183,7 +183,8 @@
                                     <!-- Item 1 -->
 
                                     @foreach ($notifications as $notification)
-                                        <div class="dropdown-item py-3 border-bottom text-wrap position-relative notification-{{ $notification->id }}">
+                                        <div
+                                            class="dropdown-item py-3 border-bottom text-wrap position-relative notification-{{ $notification->id }}">
                                             <div class="d-flex">
                                                 <div class="flex-shrink-0">
                                                     <div class="avatar-sm me-2">
@@ -208,12 +209,14 @@
                                                 <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
                                                     <button class="btn btn-sm border-0" type="button"
                                                         data-bs-toggle="dropdown" aria-expanded="false"
-                                                        onclick="event.stopPropagation();" >
+                                                        onclick="event.stopPropagation();">
                                                         <i class="fas fa-ellipsis-v"></i>
                                                     </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end" data-bs-auto-close="outside">
-                                                        <li >
-                                                            <button class="dropdown-item mark-as-read fs-6 btn-seen-noti"
+                                                    <ul class="dropdown-menu dropdown-menu-end"
+                                                        data-bs-auto-close="outside">
+                                                        <li>
+                                                            <button
+                                                                class="dropdown-item mark-as-read fs-6 btn-seen-noti"
                                                                 data-id="{{ $notification->id }}">
                                                                 <i class="fas fa-check me-1 text-success"></i> Đánh dấu
                                                                 là đã đọc
@@ -271,13 +274,9 @@
                                     {{-- <a class="dropdown-item" href="pages-profile.html">
                                         <i class="bx bx-user-circle text-muted fs-18 align-middle me-1"></i><span
                                             class="align-middle">Profile</span>
-                                    </a>
-                                    <a class="dropdown-item" href="apps-chat.html">
-                                        <i class="bx bx-message-dots text-muted fs-18 align-middle me-1"></i><span
-                                            class="align-middle">Messages</span>
-                                    </a>
+                                    </a> --}}
 
-                                    <a class="dropdown-item" href="pages-pricing.html">
+                                    {{-- <a class="dropdown-item" href="pages-pricing.html">
                                         <i class="bx bx-wallet text-muted fs-18 align-middle me-1"></i><span
                                             class="align-middle">Pricing</span>
                                     </a>
@@ -289,6 +288,11 @@
                                         <i class="bx bx-lock text-muted fs-18 align-middle me-1"></i><span
                                             class="align-middle">Lock screen</span>
                                     </a> --}}
+                                    <a class="dropdown-item" href="{{ route('admin.actions.log') }}">
+                                        <i class="bx bx-user-pin text-muted fs-18 align-middle me-1"></i>
+                                        <span class="align-middle">Lịch sử thao tác</span>
+
+                                    </a>
 
                                     <div class="dropdown-divider my-1"></div>
 
@@ -831,7 +835,7 @@
 </body>
 <script>
     @auth
-        window.currentUserId = {{ Auth::id() }};
+    window.currentUserId = {{ Auth::id() }};
     @else
         window.currentUserId = null;
     @endauth

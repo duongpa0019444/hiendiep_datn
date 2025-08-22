@@ -70,13 +70,19 @@ class topicsController extends Controller
         ]);
 
 
-        topics::create([
+        $topic = topics::create([
             'name' => $request->name,
             'description' => $request->description,
             'created_by' => Auth::user()->id,
             'updated_by' => Auth::user()->id,
         ]);
 
+        $this->logAction(
+            'create',
+            topics::class,
+            $topic->id,
+            Auth::user()->name . ' đã tạo chủ đề: ' . $topic->name
+        );
         return redirect()->route('admin.topics.index')->with('success', 'Chủ đề đã được tạo thành công!');
     }
 
@@ -113,12 +119,25 @@ class topicsController extends Controller
             'updated_at' => now()
         ]);
 
+        $this->logAction(
+            'update',
+            topics::class,
+            $topic->id,
+            Auth::user()->name . ' đã cập nhật chủ đề: ' . $topic->name
+        );
+
         return redirect()->route('admin.topics.index')->with('success', 'Chủ đề đã được cập nhật thành công!');
     }
 
     public function delete($id)
     {
         $topic = topics::findOrFail($id);
+        $this->logAction(
+            'delete',
+            topics::class,
+            $topic->id,
+            Auth::user()->name . ' đã xóa chủ đề: ' . $topic->name
+        );
         $topic->delete();
         return redirect()->back()->with('success', 'Chủ đề đã được xóa thành công!');
     }
@@ -166,6 +185,12 @@ class topicsController extends Controller
     public function restore($id){
         $topic = topics::onlyTrashed()->findOrFail($id);
         $topic->restore();
+        $this->logAction(
+            'update',
+            topics::class,
+            $topic->id,
+            Auth::user()->name . ' đã khôi phục chủ đề: ' . $topic->name
+        );
         return redirect()->back()->with('success', 'Khôi phục chủ đề thành công!');
 
     }
@@ -176,6 +201,12 @@ class topicsController extends Controller
             return redirect()->back()->with('error', 'Không thể xóa chủ đề này vì nó đang chứa các bài viết.');
         }
         $topic = topics::onlyTrashed()->findOrFail($id);
+        $this->logAction(
+            'delete',
+            topics::class,
+            $topic->id,
+            Auth::user()->name . ' đã xóa vĩnh viễn chủ đề: ' . $topic->name
+        );
         $topic->forceDelete();
         return redirect()->back()->with('success', 'Xóa vĩnh viễn chủ đề thành công!');
     }
