@@ -55,7 +55,7 @@
                             <div class="ed-course__card wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
                                 <a href="{{ route('client.course.detail', ['slug' => Str::slug($course->name), 'id' => $course->id]) }}" class="ed-course__img">
                                     {{-- <input type="hidden" name="course_id" value="{{ $course->id }}"> --}}
-                                    <img src="{{ asset('uploads/course/' . $course->image) }}" alt="{{ $course->name }}" />
+                                    <img src="{{ asset($course->image) }}" alt="{{ $course->name }}" />
                                 </a>
 
                                 <a href="{{ route('client.course.detail', ['slug' => Str::slug($course->name), 'id' => $course->id]) }}" class="ed-course__tag">

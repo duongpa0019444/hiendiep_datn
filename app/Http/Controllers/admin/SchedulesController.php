@@ -21,7 +21,7 @@ class SchedulesController extends Controller
             'classes.created_at as start_date',
             'courses.name as course_name',
             'courses.description as course_description',
-            DB::raw("(SELECT COUNT(*) FROM class_student 
+            DB::raw("(SELECT COUNT(*) FROM class_student
             WHERE class_student.class_id = classes.id) AS so_hoc_sinh"),
         )
             ->leftJoin('courses', 'classes.courses_id', '=', 'courses.id');
@@ -274,6 +274,6 @@ class SchedulesController extends Controller
         }
     }
 
-    
+
 
 }

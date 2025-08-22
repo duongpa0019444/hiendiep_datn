@@ -28,7 +28,7 @@ class AccountController extends Controller
     }
     public function search(Request $request)
     {
-        
+
 
         $roleCounts = User::select('role', DB::raw('count(*) as total'))
             ->groupBy('role')
@@ -118,7 +118,7 @@ class AccountController extends Controller
     }
 
     public function detail($role, $id)
-    {   
+    {
 
         $user = User::findOrFail($id);
         if ($user->role == "student") {
@@ -211,8 +211,8 @@ class AccountController extends Controller
                     ->with('error', 'Bạn không có quyền thêm người dùng với vai trò này');
             }
         }
-    
-      
+
+
         return view('admin.accounts.account-add');
     }
 
@@ -278,7 +278,7 @@ class AccountController extends Controller
                     ->with('error', 'Bạn không có quyền thêm người dùng với vai trò này');
             }
         }
-        
+
         $info = User::find($id);
         return view('admin.accounts.account-edit', compact('info'));
     }

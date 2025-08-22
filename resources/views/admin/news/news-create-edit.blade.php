@@ -138,14 +138,12 @@
                                             <label for="image" class="form-label fw-bold">Hình ảnh</label>
                                             <input type="file" class="form-control form-control-sm @error('image') is-invalid @enderror" id="image" name="image" onchange="previewImage(event)">
                                             <div class="mt-2">
-                                                <img id="imagePreview" src="{{ $isEdit && $news->image ? asset('upload/news/' . $news->image) : '' }}"
+                                                <img id="imagePreview" src="{{ $isEdit && $news->image ? asset($news->image) : '' }}"
                                                     alt="Ảnh xem trước"
                                                     style="max-height: 150px; object-fit: cover;"
                                                     class="{{ $isEdit && $news->image ? '' : 'd-none' }}">
                                             </div>
-                                            @if($isEdit && $news->image)
-                                                <small class="text-muted">Hình ảnh hiện tại: {{ $news->image }}</small>
-                                            @endif
+
                                             @error('image')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror

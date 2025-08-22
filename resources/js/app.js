@@ -155,6 +155,7 @@ $(document).on('click', '.btn-seen-noti', function (e) {
     e.preventDefault();
     e.stopPropagation();
     let id = $(this).data('id');
+    console.log('Đánh dấu đã đọc thông báo ID:', id);
     $.ajax({
         url: '/admin/notification/course/payment/updateSeen/' + id,
         type: 'GET',
