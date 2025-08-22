@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\teacher_salary_rules;
+use App\Models\staff_salary_rules;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class TeacherRulesController extends Controller
+class StaffRulesController extends Controller
 {
     public function details($id)
     {
@@ -22,10 +22,10 @@ class TeacherRulesController extends Controller
                 ->with('error', 'Bạn không có quyền quản trị này.');
         }
 
-        $items = DB::table('teacher_salary_rules as tsr')
-            ->join('users as u', 'u.id', '=', 'tsr.teacher_id')
-            ->where('tsr.teacher_id', $id)
-            ->select('u.id', 'u.phone', 'tsr.pay_rate', 'tsr.effective_date')
+        $items = DB::table('staff_salary_rules as tsr')
+            ->join('users as u', 'u.id', '=', 'tsr.staff_id')
+            ->where('tsr.staff_id', $id)
+            ->select('u.id', 'u.phone', 'tsr.base_salary', 'tsr.salary_coefficient','tsr.insurance', 'tsr.start_pay_rate')
             ->get();
 
         if ($items->isEmpty()) {
@@ -49,25 +49,25 @@ class TeacherRulesController extends Controller
             $today = Carbon::now();
         }
 
-        $teacherId = $request->teacher_id;
+        $staffId = $request->staff_id;
         $keyword = $request->keyword;
 
         // Subquery: Lấy mức lương mới nhất theo effective_date <= hôm nay
-        $latestSalarySub = DB::table('teacher_salary_rules as tsr1')
-            ->select('tsr1.teacher_id', 'tsr1.pay_rate', 'tsr1.effective_date')
-            ->whereRaw('tsr1.effective_date = (
-            SELECT MAX(tsr2.effective_date)
-            FROM teacher_salary_rules tsr2
-            WHERE tsr2.teacher_id = tsr1.teacher_id
-              AND tsr2.effective_date <= ?
+        $latestSalarySub = DB::table('staff_salary_rules as tsr1')
+            ->select('tsr1.staff_id', 'tsr1.base_salary', 'tsr1.salary_coefficient', 'tsr1.insurance', 'tsr1.start_pay_rate')
+            ->whereRaw('tsr1.start_pay_rate = (
+            SELECT MAX(tsr2.start_pay_rate)
+            FROM staff_salary_rules tsr2
+            WHERE tsr2.staff_id = tsr1.staff_id
+              AND tsr2.start_pay_rate <= ?
         )', [$today]);
 
         $query = DB::table('users as u')
-            ->leftJoinSub($latestSalarySub, 'tsr', 'tsr.teacher_id', '=', 'u.id')
-            ->where('u.role', 'teacher');
+            ->leftJoinSub($latestSalarySub, 'tsr', 'tsr.staff_id', '=', 'u.id')
+            ->where('u.role', 'staff');
 
-        if ($teacherId) {
-            $query->where('u.id', $teacherId);
+        if ($staffId) {
+            $query->where('u.id', $staffId);
         } elseif ($keyword) {
             $query->where('u.name', 'like', '%' . $keyword . '%');
         }
@@ -101,14 +101,14 @@ class TeacherRulesController extends Controller
         }
 
 
-        $users = $query->select('u.id', 'u.name', 'tsr.pay_rate', 'tsr.effective_date')->paginate(5);
+        $users = $query->select('u.id', 'u.name', 'tsr.base_salary', 'tsr.salary_coefficient','tsr.insurance', 'tsr.start_pay_rate')->paginate(5);
 
-        $allTeachers = DB::table('users')->where('role', 'teacher')->select('id', 'name')->orderBy('name','desc')->get();
+        $allstaffs = DB::table('users')->where('role', 'staff')->select('id', 'name')->orderBy('name','desc')->get();
 
-        return view('admin.teacher_salaries.teacher-rules', compact('users', 'allTeachers', 'teacherId', 'keyword'));
+        return view('admin.staff_salaries.staff-rules', compact('users', 'allstaffs', 'staffId', 'keyword'));
     }
 
-    public function searchTeacher(Request $request)
+    public function searchstaff(Request $request)
     {
         // Kiểm tra quyền của người dùng hiện tại
         if (Auth::user()->role == 'staff') {
@@ -118,19 +118,19 @@ class TeacherRulesController extends Controller
         }
         $keyword = $request->q;
 
-        $teachers = DB::table('users')
-            ->where('role', 'teacher')
+        $staffs = DB::table('users')
+            ->where('role', 'staff')
             ->where('name', 'like', '%' . $keyword . '%')
             ->select('id', 'name')
             ->limit(10)
             ->get();
 
-        return response()->json($teachers);
+        return response()->json($staffs);
     }
 
 
 
-    public function getRulesByTeacher($teacherId)
+    public function getRulesBystaff($staffId)
     {
         // Kiểm tra quyền của người dùng hiện tại
         if (Auth::user()->role == 'staff') {
@@ -138,8 +138,8 @@ class TeacherRulesController extends Controller
             return redirect()->route('admin.dashboard')
                 ->with('error', 'Bạn không có quyền quản trị này.');
         }
-        $rules = teacher_salary_rules::where('teacher_id', $teacherId)
-            ->orderBy('effective_date', 'desc')
+        $rules = staff_salary_rules::where('staff_id', $staffId)
+            ->orderBy('start_pay_rate', 'desc')
             ->get();
 
         return response()->json([
@@ -156,44 +156,51 @@ class TeacherRulesController extends Controller
             return redirect()->route('admin.dashboard')
                 ->with('error', 'Bạn không có quyền quản trị này.');
         }
-
-         $data = $request->all();
+       $data = $request->all();
 
         // loại bỏ dấu phẩy
-        $data['pay_rate'] = str_replace('.', '', $data['pay_rate']);
+        $data['base_salary'] = str_replace('.', '', $data['base_salary']);
       
-
         $request->replace($data);
 
         $request->validate([
-            'teacher_id' => 'required|exists:users,id',
-            'pay_rate' => 'required|numeric|min:0',
-            'effective_date' => 'required|date',
+            'staff_id' => 'required|exists:users,id',
+            'base_salary' => 'required|numeric|min:0',
+            'salary_coefficient' => 'required|numeric|min:0',
+            'insurance' => 'required|numeric|min:0|max:30',
+            'start_pay_rate' => 'required|date',
         ]);
+
 
         try {
             DB::beginTransaction();
 
-            $teacherId = $request->teacher_id;
-            $newRate = $request->pay_rate;
-            $newEffective = $request->effective_date;
+            $staffId = $request->staff_id;
+            $NewBase = $request->base_salary;
+            $NewCoefficient = $request->salary_coefficient;
+            $NewInsurance = $request->insurance;
+            $newEffective = $request->start_pay_rate;
 
             // Lấy bảng lương mới nhất (chưa có end_pay_rate)
-            $latest = DB::table('teacher_salary_rules')
-                ->where('teacher_id', $teacherId)
+            $latest = DB::table('staff_salary_rules')
+                ->where('staff_id', $staffId)
                 ->whereNull('end_pay_rate')
-                ->orderByDesc('effective_date')
+                ->orderByDesc('start_pay_rate')
                 ->first();
 
             if ($latest) {
-                if ($latest->pay_rate == $newRate) {
+            
+
+                if($latest->salary_coefficient == $NewCoefficient) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Mức lương mới phải khác mức lương hiện tại.'
+                        'message' => 'Hệ số lương mới phải khác hệ số lương hiện tại.'
                     ]);
                 }
 
-                if ($newEffective <= $latest->effective_date) {
+            
+
+                if ($newEffective <= $latest->start_pay_rate) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Ngày hiệu lực phải lớn hơn mức lương hiện tại.'
@@ -201,7 +208,7 @@ class TeacherRulesController extends Controller
                 }
 
                 // ✅ Cập nhật ngày kết thúc cho bản ghi cũ
-                DB::table('teacher_salary_rules')
+                DB::table('staff_salary_rules')
                     ->where('id', $latest->id)
                     ->update([
                         'end_pay_rate' => Carbon::parse($newEffective)->subDay()->toDateString()
@@ -209,10 +216,12 @@ class TeacherRulesController extends Controller
             }
 
             // ✅ Insert bản ghi mới
-            DB::table('teacher_salary_rules')->insert([
-                'teacher_id' => $teacherId,
-                'pay_rate' => $newRate,
-                'effective_date' => $newEffective,
+            DB::table('staff_salary_rules')->insert([
+                'staff_id' => $staffId,
+                'base_salary' => $NewBase,
+                'salary_coefficient' => $NewCoefficient,
+                'insurance' => $NewInsurance,
+                'start_pay_rate' => $newEffective,
             ]);
 
             DB::commit();

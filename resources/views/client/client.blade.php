@@ -242,7 +242,7 @@
 
                                                 <ul
                                                     class="dropdown-menu dropdown-menu-myaccount dropdown-menu-end shadow-sm mt-2 p-3 rounded-3 avatar-menu">
-                                                    @if (Auth::user()->role == 'admin')
+                                                    @if (Auth::user()->role == 'admin' || Auth::user()->role == 'staff')
                                                         <li>
                                                             <a href="{{ route('admin.dashboard') }}"
                                                                 class="dropdown-item p-2" data-section="dashboard">

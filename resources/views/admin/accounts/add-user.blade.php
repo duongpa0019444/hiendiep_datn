@@ -1,27 +1,14 @@
-@php
-    $roles = [
-        'student' => 'Học sinh',
-        'teacher' => 'Giáo viên',
-        'admin' => 'Quản trị viên',
-        'staff' => 'Nhân viên',
-    ];
-@endphp
 @extends('admin.admin')
-@section('title', 'Thêm ' . $roles[request('role')] ?? request('role'))
+@section('title', 'Thêm người dùng')
 @section('description', '')
 @section('content')
-
     <div class="page-content">
         <div class="container-fluid">
             <nav aria-label="breadcrumb p-0">
                 <ol class="breadcrumb py-0">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('admin.account') }}">Quản lí người dùng</a></li>
-                    <li class="breadcrumb-item"><a
-                            href="{{ route('admin.account.list', request('role')) }}">{{ $roles[request('role')] ?? request('role') }}</a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Thêm
-                        {{ $roles[request('role')] ?? request('role') }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">Thêm người dùng</li>
                 </ol>
             </nav>
             <div class="row">
@@ -38,14 +25,37 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-header d-flex justify-content-between">
-                            <h4 class="card-title fw-bold">Thêm {{ $roles[request('role')] ?? request('role') }}</h4>
+                            <h4 class="card-title fw-bold">Thêm người dùng</h4>
                             <span class="text-danger">lưu ý: (*) là trường bắt buộc nhập</span>
                         </div>
-                        <form method="POST" action="{{ route('admin.account.store', ['role' => request('role')]) }}"
-                            enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('admin.account-store') }}" enctype="multipart/form-data">
                             @csrf
                             <div class="card-body">
                                 <div class="row">
+
+                                    <div class="col-lg-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Vai trò</label>
+                                            <select name="role" id="role" class="form-select">
+                                                <option value="">Chọn vai trò</option>
+                                                <option value="admin">Admin</option>
+                                                <option value="staff">Nhân viên</option>
+                                                <option value="student">Học sinh</option>
+                                                <option value="teacher">Giáo viên</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6" id="mission-wrapper" style="display:none;">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Nhiệm vụ nhân viên</label>
+                                            <select name="mission" id="mission" class="form-select">
+                                                <option value="">Chọn nhiệm vụ</option>
+                                                <option value="train">Quản lí đào tạo</option>
+                                                <option value="accountant">Kế toán</option>
+                                            </select>
+                                        </div>
+                                    </div>
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
@@ -96,7 +106,7 @@
                                         </div>
                                     </div>
 
-                                    
+
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
@@ -126,24 +136,13 @@
                                         </div>
                                     </div>
 
-                                    @if (request('role') === 'staff')
-                                        <div class="col-lg-6">
-                                            <div class="mb-3">
-                                                <label for="" class="form-label fw-semibold">Nhiệm vụ</label>
-                                                <select name="mission" id="" class="form-select">
-                                                    <option value="">Chọn nhiệm vụ</option>
-                                                    <option value="train">Quản lí đào tạo</option>
-                                                    <option value="accountant">Kế toán</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    @endif
+
 
                                 </div>
 
                             </div>
                             <div class="card-footer border-top text-end pe-3">
-                                <a href="{{ route('admin.account.list', request('role')) }}"
+                                <a href="{{ route('admin.account') }}"
                                     class="btn btn-secondary me-2">Quay Lại</a>
                                 <button type="submit" class="btn btn-primary">Lưu</button>
                             </div>
@@ -171,6 +170,17 @@
         </footer>
 
     </div>
-
+    <script>
+        document.getElementById('role').addEventListener('change', function() {
+            const missionDiv = document.getElementById('mission-wrapper');
+            const missionSelect = document.getElementById('mission');
+            if (this.value === 'staff') {
+                missionDiv.style.display = 'block';
+            } else {
+                missionDiv.style.display = 'none';
+                missionSelect.value = '';
+            }
+        });
+    </script>
 
 @endsection

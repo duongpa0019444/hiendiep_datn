@@ -1,15 +1,14 @@
 @extends('admin.admin')
-@section('title', 'Chi tiết lương giáo viên')
+@section('title', 'Chi tiết lương nhân viên')
 @section('description', '')
 @section('content')
     <div class="page-content">
         <div class="container-fluid">
-
             <div class="container-xxl">
                 <nav aria-label="breadcrumb p-0">
                     <ol class="breadcrumb py-0">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Quản lí lương giáo viên</li>
+                        <li class="breadcrumb-item active" aria-current="page">Quản lí lương nhân viên</li>
                     </ol>
                 </nav>
 
@@ -24,7 +23,7 @@
                                         </h4>
                                         <p class="text-muted fw-medium fs-22 mb-0" id="total_paid">
                                             {{ number_format(
-                                                \DB::table('teacher_salaries')->where('paid', '1')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('total_salary'),
+                                                \DB::table('staff_salaries')->where('paid', '1')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('total_salary'),
                                                 0,
                                                 ',',
                                                 '.',
@@ -53,7 +52,7 @@
                                         </h4>
                                         <p class="text-muted fw-medium fs-22 mb-0" id="total_unpaid">
                                             {{ number_format(
-                                                \DB::table('teacher_salaries')->where('paid', '0')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('total_salary'),
+                                                \DB::table('staff_salaries')->where('paid', '0')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('total_salary'),
                                                 0,
                                                 ',',
                                                 '.',
@@ -80,7 +79,7 @@
                                         <h4 class="card-title mb-2 d-flex align-items-center gap-2 fs-5">Tiền thưởng </h4>
                                         <p class="text-muted fw-medium fs-22 mb-0" id="total_bank_transfer">
                                             {{ number_format(
-                                                \DB::table('teacher_salaries')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('bonus'),
+                                                \DB::table('staff_salaries')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('bonus'),
                                                 0,
                                                 ',',
                                                 '.',
@@ -107,7 +106,7 @@
                                         </h4>
                                         <p class="text-muted fw-medium fs-22 mb-0" id="total_cash">
                                             {{ number_format(
-                                                \DB::table('teacher_salaries')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('penalty'),
+                                                \DB::table('staff_salaries')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('penalty'),
                                                 0,
                                                 ',',
                                                 '.',
@@ -125,8 +124,8 @@
                             </div>
                         </div>
                     </div>
-                    <h3 class="mb-1">Chi tiết lương giáo viên </h3>
-                    <form method="GET" action="{{ route('admin.teacher_salaries.detail') }}" class="row mb-2 mt-1">
+                    <h3 class="mb-1">Chi tiết lương nhân viên</h3>
+                    <form method="GET" action="{{ route('admin.staff_salaries.detail') }}" class="row mb-2 mt-1">
                         <div class="col-md-3">
                             <label for="sort" class="form-label">Sắp xếp theo</label>
                             <select class="form-select" id="sort" name="sort">
@@ -144,7 +143,7 @@
                         </div>
 
                         <div class="col-md-3">
-                            <label for="keyword" class="form-label">Tìm tên giáo viên</label>
+                            <label for="keyword" class="form-label">Tìm tên nhân viên</label>
                             <input type="text" name="keyword" id="keyword" class="form-control"
                                 placeholder="Nhập tên giáo viên" value="{{ request('keyword') }}">
                         </div>
@@ -160,7 +159,7 @@
                                 <button type="submit" class="btn btn-primary w-100">Lọc</button>
                             </div>
                             <div class="flex-fill">
-                                <a href="{{ route('admin.teacher_salaries.detail') }}" class="btn btn-success w-100">Bỏ
+                                <a href="{{ route('admin.staff_salaries.detail') }}" class="btn btn-success w-100">Bỏ
                                     lọc</a>
                             </div>
                         </div>
@@ -172,8 +171,10 @@
                         <thead class="table-light">
                             <tr>
                                 <th>#</th>
-                                <th>Tên giáo viên</th>
-                                <th>Mức lương</th>
+                                <th>Tên nhân viên</th>
+                                <th>Lương cơ bản</th>
+                                <th>Hệ số lương</th>
+                                <th>Bảo hiểm</th>
                                 <th>Ngày áp dụng</th>
                                 <th>Thao tác</th>
                             </tr>
@@ -183,8 +184,10 @@
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $user->name }}</td>
-                                    <td>{{ number_format($user->pay_rate ?? 0, 0, ',', '.') }} VND</td>
-                                    <td>{{ $user->effective_date ? \Carbon\Carbon::parse($user->effective_date)->format('d/m/Y') : '-' }}
+                                    <td>{{ number_format($user->base_salary ?? 0, 0, ',', '.') }} VND</td>
+                                    <td>{{$user->salary_coefficient}}</td>
+                                    <td>{{ $user->insurance }}%</td>
+                                    <td>{{ $user->start_pay_rate ? \Carbon\Carbon::parse($user->start_pay_rate)->format('d/m/Y') : '-' }}
                                     </td>
                                     <td>
                                         <button class="btn btn-primary btn-sm"
@@ -210,12 +213,12 @@
                 </div>
 
                 <!-- Modal: Xem & cập nhật lương giáo viên -->
-                <div class="modal fade" id="teacherSalaryModal" tabindex="-1" aria-labelledby="salaryModalLabel"
+                <div class="modal fade" id="staffSalaryModal" tabindex="-1" aria-labelledby="salaryModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title">Lịch sử bảng lương - <span id="modalTeacherName"></span></h5>
+                                <h5 class="modal-title">Lịch sử bảng lương - <span id="modalstaffName"></span></h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Đóng"></button>
                             </div>
@@ -227,7 +230,9 @@
                                         <thead>
                                             <tr>
                                                 <th>#</th>
-                                                <th>Mức lương</th>
+                                                <th>Lương cơ bản</th>
+                                                <th>Hệ số lương</th>
+                                                <th>Bảo hiểm</th>
                                                 <th>Ngày áp dụng</th>
                                                 <th>Ngày kết thúc</th>
                                             </tr>
@@ -242,16 +247,23 @@
                                 <hr>
                                 <h6>Thêm mức lương mới</h6>
                                 <form id="uploadSalaryForm">
-                                    <input type="hidden" name="teacher_id" id="modalTeacherId">
+                                    <input type="hidden" name="staff_id" id="modalstaffId">
+                                   <div class="mb-3">
+                                        <label>Lương cơ bản</label>
+                                        <input type="text" class="form-control format-currency" name="base_salary" required>
+                                    </div>
                                     <div class="mb-3">
-                                        <label>Mức lương</label>
-                                        <input type="text" class="form-control format-currency" name="pay_rate" required
-                                            min="0">
+                                        <label>Hệ số lương</label>
+                                        <input type="number" class="form-control " name="salary_coefficient" required min="0" step="0.01">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Bảo hiểm (%)</label>
+                                        <input type="number" class="form-control " name="insurance" required min="0" max="30" step="0.01">
                                     </div>
                                     <div class="mb-3">
                                         <label>Tháng áp dụng</label>
                                         <input type="month" class="form-control" id="monthPicker" required>
-                                        <input type="hidden" name="effective_date" id="effectiveDate">
+                                        <input type="hidden" name="start_pay_rate" id="effectiveDate">
                                     </div>
                                     <div class="text-end">
                                         <button type="submit" data-bs-dismiss="modal"
@@ -291,14 +303,14 @@
             return `${day}/${month}/${year}`;
         }
 
-        function openSalaryModal(teacherId, teacherName) {
-            document.getElementById('modalTeacherName').textContent = teacherName;
-            document.getElementById('modalTeacherId').value = teacherId;
+        function openSalaryModal(staffId, staffName) {
+            document.getElementById('modalstaffName').textContent = staffName;
+            document.getElementById('modalstaffId').value = staffId;
             document.querySelector('#uploadSalaryForm').reset();
 
-            loadSalaryHistory(teacherId); // Gọi load bảng lịch sử
+            loadSalaryHistory(staffId); // Gọi load bảng lịch sử
 
-            const modalEl = document.getElementById('teacherSalaryModal');
+            const modalEl = document.getElementById('staffSalaryModal');
             const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
             modalInstance.show();
         }
@@ -310,7 +322,7 @@
 
             const form = this;
             const formData = new FormData(form);
-            const url = `{{ route('admin.teacher_salary.store') }}`;
+            const url = `{{ route('admin.staff_salary.store') }}`;
 
             fetch(url, {
                     method: 'POST',
@@ -329,8 +341,8 @@
                             confirmButtonClass: 'btn btn-primary w-xs mt-2',
                             buttonsStyling: false
                         }).then(() => {
-                            const teacherId = form.teacher_id.value;
-                            loadSalaryHistory(teacherId);
+                            const staffId = form.staff_id.value;
+                            loadSalaryHistory(staffId);
                         })
 
                     } else {
@@ -343,11 +355,11 @@
                         })
                     }
                 })
-                .catch(() => alert('Lỗi khi gửi yêu cầu'));
+                .catch(() =>  alert('Lỗi khi gửi yêu cầu'));
         });
 
-        function loadSalaryHistory(teacherId) {
-            const url = `{{ route('admin.teacher-salary-rules.byTeacher', ':id') }}`.replace(':id', teacherId);
+        function loadSalaryHistory(staffId) {
+            const url = `{{ route('admin.staff-salary-rules.bystaff', ':id') }}`.replace(':id', staffId);
             const salaryBody = document.getElementById('salaryHistoryBody');
             salaryBody.innerHTML = '<tr><td colspan="4">Đang tải...</td></tr>';
 
@@ -364,8 +376,10 @@
                                 salaryBody.innerHTML += `
                          <tr>
                             <td>${index + 1}</td>
-                            <td>${Number(rule.pay_rate).toLocaleString()} VND</td>
-                            <td>${formatDate(rule.effective_date)}</td>
+                            <td>${Number(rule.base_salary).toLocaleString()} VND</td>
+                            <td>${rule.salary_coefficient}</td>
+                            <td>${rule.insurance}%</td>
+                            <td>${formatDate(rule.start_pay_rate)}</td>
                             <td>${formatDate(rule.end_pay_rate)}</td>
                         </tr>
                         `;
@@ -381,7 +395,7 @@
                 document.getElementById('effectiveDate').value = selected + '-01'; // luôn set ngày 01
             }
         });
-         document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
                 let formatter = new Intl.NumberFormat('vi-VN');
 
                 document.querySelectorAll(".format-currency").forEach(function (input) {
@@ -402,5 +416,7 @@
                 
             });
        
+
+
     </script>
 @endpush
