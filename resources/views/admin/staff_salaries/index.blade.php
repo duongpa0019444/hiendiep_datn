@@ -1,13 +1,10 @@
 @extends('admin.admin')
-@section('title', 'Quản lí lương giáo viên')
+@section('title', 'Quản lí lương nhân viên')
 @section('description', '')
 @section('content')
     <div class="page-content">
         <div class="container-fluid">
-
             <div class="container-xxl">
-
-
                 <nav aria-label="breadcrumb p-0">
                     <ol class="breadcrumb py-0">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
@@ -26,7 +23,7 @@
                                         </h4>
                                         <p class="text-muted fw-medium fs-22 mb-0" id="total_paid">
                                             {{ number_format(
-                                                \DB::table('teacher_salaries')->where('paid', '1')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('total_salary'),
+                                                \DB::table('staff_salaries')->where('paid', '1')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('total_salary'),
                                                 0,
                                                 ',',
                                                 '.',
@@ -55,7 +52,7 @@
                                         </h4>
                                         <p class="text-muted fw-medium fs-22 mb-0" id="total_unpaid">
                                             {{ number_format(
-                                                \DB::table('teacher_salaries')->where('paid', '0')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('total_salary'),
+                                                \DB::table('staff_salaries')->where('paid', '0')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('total_salary'),
                                                 0,
                                                 ',',
                                                 '.',
@@ -82,7 +79,7 @@
                                         <h4 class="card-title mb-2 d-flex align-items-center gap-2 fs-5">Tiền thưởng </h4>
                                         <p class="text-muted fw-medium fs-22 mb-0" id="total_bank_transfer">
                                             {{ number_format(
-                                                \DB::table('teacher_salaries')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('bonus'),
+                                                \DB::table('staff_salaries')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('bonus'),
                                                 0,
                                                 ',',
                                                 '.',
@@ -109,7 +106,7 @@
                                         </h4>
                                         <p class="text-muted fw-medium fs-22 mb-0" id="total_cash">
                                             {{ number_format(
-                                                \DB::table('teacher_salaries')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('penalty'),
+                                                \DB::table('staff_salaries')->where('month', \Carbon\Carbon::now()->month)->where('year', \Carbon\Carbon::now()->year)->sum('penalty'),
                                                 0,
                                                 ',',
                                                 '.',
@@ -147,12 +144,10 @@
                             <iconify-icon icon="mdi:lock" class="fs-20 align-middle me-1"></iconify-icon>
                             Chốt bảng lương
                         </button>
-                        @if(Auth::user()->isAdmin())
                         <button type="button" class="btn btn-outline-success m-1 d-none" id="unlockSalaryBtn">
                             <iconify-icon icon="mdi:lock-open" class="fs-20 align-middle me-1"></iconify-icon>
                             Mở khóa bảng lương
                         </button>
-                        @endif
                     </div>
 
                 </div>
@@ -221,10 +216,10 @@
                             <table class="table table-bordered table-hover table-centered align-middle">
                                 <thead class="table-light">
                                     <tr class="text-center">
-                                        <th>Tên giáo viên</th>
+                                        <th>Tên nhân viên</th>
                                         <th>Thời gian</th>
-                                        <th>Số giờ</th>
-                                        <th>Mức lương</th>
+                                        <th>Lương trước bảo hiểm</th>
+                                        <th>Bảo hiểm</th>
 
                                         <th>Thưởng</th>
                                         <th>Phạt</th>
@@ -234,28 +229,27 @@
                                         <th>Ghi chú</th>
                                     </tr>
                                 </thead>
-                                <tbody id="body-teacher_salaries">
+                                <tbody id="body-staff_salaries">
                                     @foreach ($salaries as $salary)
                                         <tr data-month="{{ $salary->month }}" 
                                             data-year="{{ $salary->year }}">
                                             <td class="text-start detail_ruler">
-                                                <strong class="teacher-detail" style="cursor: pointer;"
+                                                <strong class="staff-detail" style="cursor: pointer;"
                                                     data-bs-toggle="tooltip" title="Chi tiết bảng lương">
-                                                    {{ $salary->teacher_name }}
+                                                    {{ $salary->staff_name }}
                                                 </strong><br>
                                                 <iconify-icon icon="solar:phone-broken" class="fs-16 me-1"></iconify-icon>
-                                                <span class="text-muted">{{ $salary->teacher_phone }}</span>
+                                                <span class="text-muted">{{ $salary->staff_phone }}</span>
                                             </td>
                                             <td class="text-center">
                                                 Tháng {{ $salary->month }} / {{ $salary->year }}
                                             </td>
                                             <td class="text-center">
-                                                {{ $salary->total_hours }} giờ
+                                                {{ number_format($salary->base_salary * $salary->salary_coefficient, 0, ',', '.') }} VNĐ
                                             </td>
-                                            <td class="text-end">
-                                                {{ number_format($salary->pay_rate, 0, ',', '.') }} VNĐ/giờ
+                                            <td class="text-center">
+                                                {{ number_format($salary->insurance_fee * $salary->base_salary * $salary->salary_coefficient/100, 0,',','.')  }} VNĐ
                                             </td>
-
                                             <td class="text-end text-success">
                                                 +{{ number_format($salary->bonus, 0, ',', '.') }} VNĐ
                                             </td>
@@ -405,7 +399,7 @@
             </div>
         </div>
     </div>
-    {{-- Modal chi tiết teacher_ruler --}}
+    {{-- Modal chi tiết staff_ruler --}}
     <div class="modal fade" id="salaryDetailModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -516,14 +510,14 @@
                                             <tr data-month="${salary.month}" 
                                             data-year="${salary.year}">
                                                 <td class="text-start">
-                                                    <strong>${salary.teacher_name}</strong><br> 
+                                                    <strong>${salary.staff_name}</strong><br> 
                                                     <iconify-icon icon="solar:phone-broken" class="fs-16 me-1"></iconify-icon>
-                                                    <span class="text-muted">${salary.teacher_phone}</span>
+                                                    <span class="text-muted">${salary.staff_phone}</span>
                                                 </td>
 
                                                 <td class="text-center">Tháng ${salary.month} / ${salary.year}</td>
-                                                <td class="text-center">${salary.total_hours} giờ</td>
-                                                <td class="text-end">${Number(salary.pay_rate).toLocaleString('vi-VN')} VNĐ/giờ</td>
+                                                <td class="text-center">${Number(salary.base_salary*salary.salary_coefficient).toLocaleString('vi-VN')} VNĐ</td>
+                                                <td class="text-center">${Number(salary.insurance_fee * salary.base_salary * salary.salary_coefficient/100).toLocaleString('vi-VN')} VNĐ</td>
                                                 <td class="text-end text-success">+${Number(salary.bonus).toLocaleString('vi-VN')} VNĐ</td>
                                                 <td class="text-end text-danger">-${Number(salary.penalty).toLocaleString('vi-VN')} VNĐ</td>
                                                 <td class="text-end fw-bold text-success">${Number(salary.total_salary).toLocaleString('vi-VN')} VNĐ</td>
@@ -557,7 +551,7 @@
                                         `;
             });
 
-            $('#body-teacher_salaries').html(html);
+            $('#body-staff_salaries').html(html);
         }
 
 
@@ -578,7 +572,7 @@
                 }); // kiểm tra giá trị thực sự gửi đi
 
                 $.ajax({
-                    url: "{{ route('admin.teacher_salaries.filter') }}",
+                    url: "{{ route('admin.staff_salaries.filter') }}",
                     type: "GET",
                     data: {
                         name: name,
@@ -606,7 +600,7 @@
             });
 
             $('#delelyFilter').on('click', function() {
-                window.location.href = "{{ route('admin.teacher_salaries') }} ";
+                window.location.href = "{{ route('admin.staff_salaries') }} ";
             })
 
             $('#loadSalaryBtn').on('click', function() {
@@ -627,7 +621,6 @@
                 $('#confirmLoadSalary').off('click').on('click', function() {
                     const selectedMonth = $('#salaryMonthInput').val();
                     if (!selectedMonth) {
-                        alert('Vui lòng chọn tháng!');
 
                         Swal.fire({
                             title: 'Lưu ý!',
@@ -636,12 +629,16 @@
                             confirmButtonClass: 'btn btn-primary w-xs mt-2',
                             buttonsStyling: false
                         }).then(() => {
-                            window.location.href = "{{ route('admin.teacher_salaries') }}";
+                            window.location.href = "{{ route('admin.staff_salaries') }}";
                         })
                         return;
                     }
+
+                   
+                    const [year, month] = selectedMonth.split('-');     // ["2025", "08"]
+
                     $.ajax({
-                        url: "{{ route('admin.teacher_salaries.data') }}",
+                        url: "{{ route('admin.staff_salaries.data') }}",
                         type: "GET",
                         data: {
                             month: selectedMonth
@@ -662,8 +659,9 @@
                                                         <thead class="table-primary">
                                                             <tr>
                                                                 <th scope="col">Tên giáo viên</th>
-                                                                <th scope="col">Mức lương / giờ</th>
-                                                                <th scope="col">Số giờ</th>
+                                                                <th scope="col">Lương cơ bản</th>
+                                                                <th scope="col">Hệ số lương</th>
+                                                                <th scope="col">Bảo hiểm</th>
                                                                 <th scope="col">Thưởng</th>
                                                                 <th scope="col">Phạt</th>
                                                                 <th scope="col">Tổng lương</th>
@@ -672,19 +670,20 @@
                                                         <tbody>
                                             `;
 
-                                res.data.forEach(teacher => {
+                                res.data.forEach(staff => {
                                     html += `
                                                     <tr>
                                                         <td class="text-start">
-                                                            <input type="hidden" name="teacher_id[]" value="${teacher.teacher_id}">
-                                                            <strong>${teacher.teacher_name}</strong><br>
-                                                            <small class="text-muted">${teacher.teacher_phone}</small>
+                                                            <input type="hidden" name="staff_id[]" value="${staff.staff_id}">
+                                                            <strong>${staff.name}</strong><br>
+                                                            <small class="text-muted">${staff.phone}</small>
                                                         </td>
-                                                        <td>${Number(teacher.pay_rate).toLocaleString('vi-VN')}</td>
-                                                        <td>${Number(teacher.total_hours)}</td>
-                                                        <td><input type="text" class="form-control text-end" name="bonus[]" value="${Number(teacher.bonus || 0).toLocaleString('vi-VN')}"></td>
-                                                        <td><input type="text" class="form-control text-end" name="penalty[]" value="${Number(teacher.penalty || 0).toLocaleString('vi-VN')}"></td>
-                                                        <td class="fw-bold text-success">${Number(teacher.total_salary).toLocaleString('vi-VN')}</td>
+                                                        <td>${Number(staff.base_salary).toLocaleString('vi-VN')}</td>
+                                                        <td>${Number(staff.salary_coefficient).toFixed(2)}</td>
+                                                        <td>${Number(staff.insurance).toLocaleString('vi-VN')}%</td>
+                                                        <td><input type="text" class="form-control text-end" name="bonus[]" value="${staff.bonus || 0}"></td>
+                                                        <td><input type="text" class="form-control text-end" name="penalty[]" value="${staff.penalty || 0}"></td>
+                                                        <td class="fw-bold text-success">${Number(staff.total_salary).toLocaleString('vi-VN')}</td>
                                                     </tr>
                                                 `;
                                 });
@@ -717,25 +716,25 @@
                     rows.each(function() {
                        let row = $(this).closest('tr');
 
-                        // Nếu có hidden input cho teacher_id
-                        let teacher_id = row.find('input[name="teacher_id[]"]').val();
+                        // Nếu có hidden input cho staff_id
+                        let staff_id = row.find('input[name="staff_id[]"]').val();
 
                         // Lấy dữ liệu từ các cột hiển thị (text)
-                        let pay_rate = parseFloat(row.find('td').eq(1).text().replace(/\D/g, '')) || 0;
-                        let total_hours = parseFloat(row.find('td').eq(2).text().replace(/\D/g, '')) || 0;
+                        let base_salary = parseFloat(row.find('td').eq(1).text().replace(/\D/g, '')) || 0;
+                        let salary_coefficient = parseFloat(row.find('td').eq(2).text().replace(/\D/g, '')) || 0;
+                        let insurance = parseFloat(row.find('td').eq(3).text().replace(/\D/g, '')) || 0;
 
                         // Lấy dữ liệu từ input bonus và penalty (bỏ dấu phân cách)
                         let bonus = parseFloat(row.find('input[name="bonus[]"]').val().replace(/,/g, '').replace(/\./g, '')) || 0;
                         let penalty = parseFloat(row.find('input[name="penalty[]"]').val().replace(/,/g, '').replace(/\./g, '')) || 0;
 
                         // Lấy total salary (cũng bỏ định dạng trước khi parse)
-                        let total_salary = parseFloat(row.find('td').eq(5).text().replace(/,/g, '').replace(/\./g, '')) || 0;
+                        let total_salary = parseFloat(row.find('td').eq(6).text().replace(/,/g, '').replace(/\./g, '')) || 0;
 
 
                         salaries.push({
-                            teacher_id,
-                            pay_rate,
-                            total_hours,
+                            staff_id,
+                            insurance,
                             bonus,
                             penalty,
                             total_salary
@@ -743,7 +742,7 @@
                     });
 
                     $.ajax({
-                        url: "{{ route('admin.teacher_salaries.save') }}",
+                        url: "{{ route('admin.staff_salaries.save') }}",
                         type: "POST",
                         data: {
                             _token: "{{ csrf_token() }}",
@@ -762,7 +761,7 @@
                                     buttonsStyling: false
                                 }).then(() => {
                                     window.location.href =
-                                        "{{ route('admin.teacher_salaries') }}";
+                                        "{{ route('admin.staff_salaries') }}";
                                 })
 
                             } else {
@@ -825,18 +824,19 @@
             let row = $(this).closest('tr');
 
             // Lấy dữ liệu
-            let pay_rate = toMoneyNumber(row.find('td').eq(1).text());   // lương/giờ
-            let total_hours = toHourNumber(row.find('td').eq(2).text()); // số giờ
+            let base_salary = toMoneyNumber(row.find('td').eq(1).text());   // lương cơ bản
+            let salary_coefficient = toHourNumber(row.find('td').eq(2).text()); // hệ số lương
+            let insurance = toHourNumber(row.find('td').eq(3).text()); // bảo hiểm
             let bonus = toMoneyNumber(row.find('input[name="bonus[]"]').val());
             let penalty = toMoneyNumber(row.find('input[name="penalty[]"]').val());
 
             // Tính toán
-            let total_salary = (pay_rate * total_hours) + bonus - penalty;
+            let total_salary = (base_salary * salary_coefficient) - (insurance * base_salary * salary_coefficient)/100 + bonus - penalty;
 
             console.log({ pay_rate, total_hours, bonus, penalty, total_salary });
 
             // Ghi lại vào đúng cột tổng lương (kiểm tra index đúng với HTML)
-            row.find('td').eq(5).text(numberFormatter.format(total_salary));
+            row.find('td').eq(6).text(numberFormatter.format(total_salary));
         });
 
 
@@ -867,7 +867,7 @@
                 }
 
                 $.ajax({
-                    url: "{{ route('admin.teacher_salaries.upload') }}",
+                    url: "{{ route('admin.staff_salaries.upload') }}",
                     type: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
@@ -949,7 +949,7 @@
             const newNote = $('#noteContent').val();
 
             $.ajax({
-                url: '{{ route('admin.teacher_salaries.upload') }}',
+                url: '{{ route('admin.staff_salaries.upload') }}',
                 method: 'POST',
                 data: {
                     _token: '{{ csrf_token() }}',
@@ -971,7 +971,7 @@
                             confirmButtonClass: 'btn btn-primary w-xs mt-2',
                             buttonsStyling: false
                         }).then(() => {
-                            window.location.href = "{{ route('admin.teacher_salaries') }}";
+                            window.location.href = "{{ route('admin.staff_salaries') }}";
                         })
                     }
                 },
@@ -988,22 +988,22 @@
 
       
         // Khi người dùng nhập tên giáo viên vào input
-        $('#teacherInput').on('input', function() {
+        $('#staffInput').on('input', function() {
             const typedName = $(this).val().toLowerCase().trim();
             let found = false;
 
-            $('#teacherSelect option').each(function() {
+            $('#staffSelect option').each(function() {
                 const optionText = $(this).text().toLowerCase().trim();
 
                 if (optionText === typedName) {
-                    $('#teacherSelect').val($(this).val()).trigger('change');
+                    $('#staffSelect').val($(this).val()).trigger('change');
                     found = true;
                     return false; // thoát each
                 }
             });
 
             if (!found) {
-                $('#teacherSelect').val('');
+                $('#staffSelect').val('');
                 $('#payRate').val('');
                 $('#effectiveDate').val('');
                 $('#salaryDetails').hide();
@@ -1091,7 +1091,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '{{ route('admin.teacher_salaries.lock') }}',
+                        url: '{{ route('admin.staff_salaries.lock') }}',
                         type: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
@@ -1107,8 +1107,7 @@
                                     confirmButtonClass: 'btn btn-primary w-xs mt-2',
                                     buttonsStyling: false
                                 }).then(() => {
-                                        // Reload bảng lương bằng ajax
-                                        renderSalaryTable(res.data);
+                                        renderSalaryTable(res.data); // cập nhật lại bảng lương
                                         toggleSalaryButtons(true);
                                         $('#lockSalaryModal').modal('hide'); // đóng modal
                                     });
@@ -1173,7 +1172,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({
-                                url: '{{ route('admin.teacher_salaries.unlock') }}', // route mới
+                                url: '{{ route('admin.staff_salaries.unlock') }}', // route mới
                                 type: 'POST',
                                 data: {
                                     _token: '{{ csrf_token() }}',
@@ -1189,8 +1188,7 @@
                                             confirmButtonClass: 'btn btn-primary w-xs mt-2',
                                             buttonsStyling: false
                                         }).then(() => {
-                                             // Reload bảng lương bằng ajax
-                                                 renderSalaryTable(res.data);
+                                                renderSalaryTable(res.data); // cập nhật lại bảng lương
                                                  toggleSalaryButtons(false);
 
                                                 $('#unlockSalaryModal').modal('hide');

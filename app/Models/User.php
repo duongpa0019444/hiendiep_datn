@@ -20,6 +20,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'snake_case',
         'name',
         'username',
         'email',
@@ -30,8 +31,43 @@ class User extends Authenticatable
         'gender',
         'birth_date',
         'role',
-        
+        'mission'
+
     ];
+
+    // hàm tạo mã người dùng
+    public static function nextSequentialCode(string $role, int $digits = 2): string
+    {
+        $prefixes = [
+            'admin'   => 'AD',
+            'teacher' => 'GV',
+            'student' => 'HS',
+            'staff'   => 'NV',
+        ];
+
+        $prefix = $prefixes[$role] ?? 'US';
+ // tìm mã cuối cùng theo prefix (vd HS05) kể cả trong thùng rác
+        $latest = User::withTrashed() 
+            ->where('snake_case', 'like', $prefix . '%')
+            ->orderBy('snake_case', 'desc')
+            ->value('snake_case');
+
+        if ($latest) {
+            // cắt phần số rồi +1
+            $number = (int) substr($latest, strlen($prefix));
+            $number++;
+        } else {
+            // chưa có user nào cùng prefix → bắt đầu từ 1
+            $number = 1;
+        }
+
+        // padding số để luôn đủ 2 chữ số (01, 02…)
+        $numberPart = str_pad((string) $number, $digits, '0', STR_PAD_LEFT);
+
+        return $prefix . $numberPart;
+    }
+
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -110,9 +146,8 @@ class User extends Authenticatable
         return $this->hasMany(CoursePayment::class, 'student_id');
     }
     // app/Models/User.php
-public function isStaff()
-{
-    return $this->role === 'staff';
-}
-
+    public function isStaff()
+    {
+        return $this->role === 'staff';
+    }
 }

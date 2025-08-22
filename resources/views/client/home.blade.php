@@ -18,6 +18,20 @@
         </script>
     @endif
 
+     @if (session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Toastify({
+                    text: "{{ session('error') }}",
+                    gravity: "top",
+                    position: "center",
+                    className: "error",
+                    duration: 4000
+                }).showToast();
+            });
+        </script>
+    @endif
+
     <main>
         <div class="section-bg hero-bg background-image"
             style="background-image: url('{{ asset('client/images/hero/home-1/hero-bg.png') }}');">

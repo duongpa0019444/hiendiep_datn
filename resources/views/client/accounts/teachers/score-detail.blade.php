@@ -48,11 +48,16 @@
                 <h5 class="">Bảng Điểm </h5>
             </div>
             <div class="">
-                <a href="{{ route('client.score.add', [request('class_id')]) }}" class="btn  btn-outline-primary">
+                <a href="{{ route('admin.score.download', ['class_id' => request('class_id'), 'course_id' => request('course_id')]) }}"
+                    class="btn  btn-secondary">
+                    Tải mẫu nhập điểm
+                </a>
+
+                <a href="{{ route('client.score.add', [request('class_id')]) }}" class="btn  btn-primary">
                     Nhập điểm mới
                 </a>
                 <a href="{{ route('client.scores.export', [request('class_id'), request('course_id')]) }}"
-                    class="btn  btn-outline-success">
+                    class="btn  btn-success">
                     Xuất điểm Excel
                 </a>
 
@@ -71,7 +76,7 @@
                     <input type="file" name="file" accept=".xlsx,.xls" class="" required>
                     <button type="submit" class="btn btn-warning">Nhập Excel</button>
 
-                </div>  
+                </div>
             </form>
 
             {{-- Form Search --}}
@@ -80,7 +85,7 @@
                 class="flex-grow-1">
                 <div class="position-relative">
                     <input type="search" name="searchScoreStudent" class="form-control form-control-sm ps-5"
-                        placeholder="Tìm học sinh..." autocomplete="off"
+                        placeholder="Tìm mã hoặc tên học sinh..." autocomplete="off"
                         value="{{ request()->query('searchScoreStudent') ?? '' }}">
                     <i class="icofont-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
                 </div>
@@ -95,6 +100,7 @@
 
                     <thead>
                         <tr>
+                            <th>Mã học sinh</th>
                             <th>Họ Tên</th>
                             <th>Lớp</th>
                             <th>Khóa học</th>
@@ -108,6 +114,7 @@
                         @forelse ($data as $score)
                             <tr>
                                 {{-- sử lí bảng score và thêm modol score vào --}}
+                                <td>{{ $score->student->snake_case }}</td>
                                 <td>{{ $score->student->name }}</td>
                                 <td>{{ $score->class->name }}</td>
                                 <td>{{ $score->class->course->name }}</td>
@@ -119,9 +126,8 @@
 
                                         <a href="{{ route('client.score.edit', ['class_id' => request('class_id'), 'id' => $score->id]) }}"
                                             class="btn btn-soft-primary "><i class="icofont-pencil-alt-2"></i></a>
-                                        <a href="{{ route('client.score.delete', ['id' => $score->id]) }}"
-                                            class="btn btn-soft-danger "
-                                            onclick="return confirm('Bạn có muốn xóa {{ $score->scoreTypeVN() }} của học sinh {{ $score->student->name }} ?')">
+                                        <a href="#" class="btn btn-soft-danger "
+                                            onclick="showDeleteConfirm({{ $score->id }}, '{{ $score->student->name }}', '{{ $score->score_type }}')">
                                             <i class="icofont-trash"></i>
                                         </a>
                                     </div>
@@ -186,5 +192,23 @@
 
 
 
-    </div>
+    <script>
+        function showDeleteConfirm(id, name, score_type) {
+            Swal.fire({
+                title: 'Xác nhận xóa',
+                text: `Bạn có chắc chắn muốn xóa điểm ${score_type} của học sinh "${name}" không?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/score-delete/${id}`;
+                }
+            });
+        }
+    </script>
+
+
 @endsection
