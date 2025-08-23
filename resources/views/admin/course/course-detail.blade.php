@@ -39,7 +39,6 @@
                                               <th scope="col">Tên Bài Giảng </th>
                                               <th scope="col">tài Liệu Học </th>
                                               <th scope="col">Bài Tập</th>
-                                              <th scope="col">Ngày Cập Nhật </th>
                                               <th scope="col">hành Động </th>
                                               {{-- <th scope="col"></th> --}}
                                           </tr>
@@ -63,7 +62,6 @@
                                                       @endif
                                                   </td>
 
-                                                  <td>{{ $lession->updated_at }}</td>
                                                   <td>
                                                       <a href="{{ route('admin.lession-edit', ['course_id' => $course->id, 'id' => $lession->id]) }} "
                                                           class="btn btn-soft-primary btn-sm"><iconify-icon
