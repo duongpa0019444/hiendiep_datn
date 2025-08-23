@@ -32,19 +32,19 @@
 </script>
 @endif
 
-  
+
     <!-- Breadcrumb Section -->
     <div class="section-bg hero-bg">
         <section class="ed-breadcrumbs background-image"
             style="background-image: url('https://banghieuviet.org/wp-content/uploads/2023/08/nen-xanh-duong-pastel.jpg');">
 
             <div class="container">
-               
+
                 <div class="row justify-content-center">
                     <div class="col-lg-6 col-md-6 col-12">
-                        
+
                         <div class="ed-breadcrumbs__content">
-                            
+
                             <h3 class="ed-breadcrumbs__title">Liên Hệ</h3>
                             <ul class="ed-breadcrumbs__menu">
                                 <li class="active"><a href="{{ route('home') }}">Trang Chủ</a></li>
@@ -58,7 +58,7 @@
         </section>
 
     </div>
-     
+
     <!-- Contact Cards -->
     <div class="container py-5">
         <div class="row g-4">
@@ -114,7 +114,7 @@
                     <form action="{{ route('support.store') }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <select class=" @error('pl_content') is-invalid @enderror" name="pl_content">
+                            <select class="w-100 @error('pl_content') is-invalid @enderror" name="pl_content">
                                 <option value="">-- Chọn phân loại --</option>
                                 <option value="khiếu nại" {{ old('pl_content') == 'khiếu nại' ? 'selected' : '' }}>Khiếu nại</option>
                                 <option value="góp ý" {{ old('pl_content') == 'góp ý' ? 'selected' : '' }}>Góp ý</option>
@@ -141,7 +141,7 @@
 
                         <button type="submit" class="btn btn-primary">Gửi tin nhắn</button>
 
-                       
+
                     </form>
                 </div>
             </div>

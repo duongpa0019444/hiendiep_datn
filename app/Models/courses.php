@@ -9,7 +9,7 @@ class courses extends Model
     //
     protected $table = 'courses';
 
-    protected $fillable = ['name','image', 'price', 'total_sessions', 'description','teaching_method','teaching_goals','is_featured'];
+    protected $fillable = ['name', 'image', 'price', 'total_sessions', 'description', 'teaching_method', 'teaching_goals', 'is_featured'];
 
     // Quan hệ với bảng course_payment
     public function payments()
@@ -63,14 +63,15 @@ class courses extends Model
     //     return $this->belongsToMany(User::class, 'teacher_salary_rules', 'teacher_id');
     // }
 
-    public function course(){
+    public function course()
+    {
         return self::all();
-
     }
     public function getCourseById($id)
     {
         return self::find($id);
     }
-    
+
+
 
 }

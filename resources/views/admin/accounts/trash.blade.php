@@ -42,24 +42,36 @@
             <div class="row">
                 <div class="card">
                     <div class="card-header d-flex align-items-center justify-content-between">
-                        <h4 class="card-title col-6">Thùng rác tài khoản</h4>
-                        <div class="col-6 gap-2">
+                        <h4 class="card-title col-3">Thùng rác tài khoản</h4>
+                        <div class="col-9 gap-2">
 
                             <form method="GET" action="{{ route('admin.account.trash') }}"
                                 class="form-inline d-flex gap-2 align-items-center">
 
-                                <select name="role" class="form-select" style="width: 27%">
-                                    <option value="">-- Vai trò --</option>
-                                    <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Quản trị viên
-                                    </option>
-                                    <option value="staff" {{ request('role') == 'staff' ? 'selected' : '' }}>Nhân viên
-                                    </option>
-                                    <option value="student" {{ request('role') == 'student' ? 'selected' : '' }}>Học sinh
-                                    </option>
-                                    <option value="teacher" {{ request('role') == 'teacher' ? 'selected' : '' }}>Giáo viên
-                                    </option>
-                                    <!-- Thêm các role khác nếu cần -->
-                                </select>
+                                <div class="col-md-2    ">
+                                    <select name="role" class="form-select" >
+                                        <option value="">-- Vai trò --</option>
+                                        <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Quản trị viên
+                                        </option>
+                                        <option value="staff" {{ request('role') == 'staff' ? 'selected' : '' }}>Nhân viên
+                                        </option>
+                                        <option value="student" {{ request('role') == 'student' ? 'selected' : '' }}>Học sinh
+                                        </option>
+                                        <option value="teacher" {{ request('role') == 'teacher' ? 'selected' : '' }}>Giáo viên
+                                        </option>
+                                        <!-- Thêm các role khác nếu cần -->
+                                    </select>
+                                </div>
+
+                                 <div class="col-md-2">
+                                    <select name="gender" class="form-select" >
+                                        <option value="">-- Giới tính --</option>
+                                        <option value="boy" {{ request('gender') == 'boy' ? 'selected' : '' }}>Nam
+                                        </option>
+                                        <option value="girl" {{ request('gender') == 'girl' ? 'selected' : '' }}>Nữ
+                                        </option>
+                                    </select>
+                                </div>
 
                                 <div class="position-relative">
                                     <input type="search" name="accountTrash" class="form-control pe-5"
@@ -83,24 +95,42 @@
                             <table class="table table-hover mb-0 table-centered">
                                 <thead>
                                     <tr>
-                                        <th>Tên</th>
-                                        <th>Giới tính</th>
+                                        <th>Thông tin</th>
                                         <th>Ngày sinh nhật</th>
                                         <th>Email</th>
                                         <th>Số điện thoại</th>
-                                        <th>Ngày xóa</th>
+                                        <th>Địa chỉ</th>
+                                        <th>Thời gian xóa</th>
                                         <th>Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($trash as $data)
+                                    @forelse ($trash as $data)
                                         <tr>
-                                            <td>{{ $data->name }}</td>
-                                            <td>{{ $data->gender }}</td>
-                                            <td>{{ $data->birth_date }}</td>
-                                            <td>{{ $data->email }}</td>
-                                            <td>{{ $data->phone }}</td>
-                                            <td>{{ $data->deleted_at }}</td>
+                                             <td>
+                                                <div style="display: flex; align-items: center; gap: 10px;">
+                                                    <img class="rounded" src="{{ $data->avatar ? asset($data->avatar) : asset('icons/user-solid.svg') }}" width="40"
+                                                        alt="{{ $data->name }}">
+                                                    <div>
+                                                        <div>{{ $data->name ?? '' }}</div>
+                                                        <div style="font-size: 0.9em; color: rgb(255, 81, 0);">
+                                                            @php
+                                                                echo match ($data->gender) {
+                                                                    'boy' => 'Nam',
+                                                                    'girl' => 'Nữ',
+                                                                    default => '',
+                                                                };
+                                                            @endphp</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td> 
+                                                {{ $data->birth_date ? \Carbon\Carbon::parse($data->birth_date)->format('d/m/Y') : '' }}
+                                            </td>
+                                            <td>{{ $data->email ?? '' }}</td>
+                                            <td>{{ $data->phone ?? '' }}</td>
+                                            <td>{{ $data->address ?? '' }}</td>
+                                            <td>{{ $data->deleted_at ? \Carbon\Carbon::parse($data->deleted_at)->format('H:m:s d/m/Y') : '' }}</td>
                                             <td>
                                                 <div class="d-flex gap-2 align-items-center">
                                                     <form action="{{ route('admin.account.restore', $data->id) }}"
@@ -110,7 +140,7 @@
                                                             title="Khôi phục tài khoản">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="30"
                                                                 height="20" viewBox="0 0 512 512">
-                                                                <path fill="#0d0d0d" fill-rule="evenodd"
+                                                                <path fill="white" fill-rule="evenodd"
                                                                     d="M256 448c-97.974 0-178.808-73.383-190.537-168.183l42.341-5.293c9.123 73.734 71.994 130.809 148.196 130.809c82.475 0 149.333-66.858 149.333-149.333S338.475 106.667 256 106.667c-50.747 0-95.581 25.312-122.567 64h79.9v42.666H64V64h42.667v71.31C141.866 91.812 195.685 64 256 64c106.039 0 192 85.961 192 192s-85.961 192-192 192"
                                                                     clip-rule="evenodd" />
                                                             </svg>
@@ -135,7 +165,11 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                    @endforeach
+                                     @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center">Không có dữ liệu</td>
+                                        </tr>
+                                    @endforelse
 
                                 </tbody>
                             </table>

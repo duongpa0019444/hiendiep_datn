@@ -339,7 +339,8 @@ class UserController extends Controller
             $data = Score::with(['student', 'class.course'])
                 ->where('class_id', $class_id)
                 ->whereHas('student', function ($q) use ($query) {
-                    $q->where('name', 'like', "%$query%");
+                    $q->where('name', 'like', "%$query%")
+                    ->orWhere('snake_case', 'like', "%{$query}%");
                 })
                 ->paginate(5);
 

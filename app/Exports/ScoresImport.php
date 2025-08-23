@@ -5,6 +5,7 @@ namespace App\Exports;
 use App\Http\Controllers\admin\ScoreController;
 use App\Models\ClassStudent;
 use App\Models\Classes;
+use App\Models\courses;
 use App\Models\Score;
 use App\Models\User;
 use Illuminate\Support\Collection;
@@ -28,23 +29,24 @@ class ScoresImport implements ToCollection
         foreach ($rows as $index => $row) {
             if ($index === 0) continue; // Bỏ dòng tiêu đề
 
-            $studentName     = trim($row[0]);
-            $studentBirthday = ScoreController::parseExcelDate($row[1]);
+            $maSV            = trim($row[0]);
+            $studentName     = trim($row[1]);
             $className       = trim($row[2]);
-            $scoreType       = strtolower(trim($row[3]));
-            $scoreValue      = floatval($row[4]);
-            $examDate        = ScoreController::parseExcelDate($row[5]);
+            $courseName      = trim($row[3]);
+            $scoreType       = strtolower(trim($row[4]));
+            $scoreValue      = floatval($row[5]);
+            $examDate        = ScoreController::parseExcelDate($row[6]);
 
 
             // dd($studentName, $studentBirthday, $className, $scoreType, $scoreValue, $examDate);
 
             $student = User::where('name', $studentName)
-                ->whereDate('birth_date', $studentBirthday)
+                ->orWhere('snake_case', $maSV)
                 ->first();
             // dd($student);
             if (!$student) {
                  $this->errors[] = "Không tìm thấy tên sinh viên.";
-                Log::warning("Không tìm thấy sinh viên: {$studentName} ({$studentBirthday})");
+                Log::warning("Không tìm thấy sinh viên: {$studentName} ({$maSV})");
                 continue;
             }
 
@@ -69,6 +71,17 @@ class ScoresImport implements ToCollection
                 continue;
             }
 
+            $inCourse = courses::join('classes', 'classes.courses_id', '=', 'courses.id')
+            ->join('class_student', 'class_student.class_id', '=', 'classes.id')
+            ->where('courses.name', $courseName)
+            ->where('class_student.student_id', $studentId)
+            ->exists();
+             if (!$inCourse) {
+                 $this->errors[] = "Không tìm thấy học sinh viên trong lớp này";
+                Log::warning("Học sinh '{$studentName}' không thuộc khóa học '{$courseName}'");
+                continue;
+            }
+
             $existing = Score::where([
                 'student_id' => $studentId,
                 'class_id'   => $classId,
@@ -85,9 +98,9 @@ class ScoresImport implements ToCollection
                 Score::create([
                     'student_id' => $studentId,
                     'class_id'   => $classId,
-                    'score_type' => $scoreType,
-                    'score'      => $scoreValue,
-                    'exam_date'  => $examDate,
+                    'score_type' => $scoreType ?? '',
+                    'score'      => $scoreValue ?? '',
+                    'exam_date'  => $examDate ?? '',
                 ]);
             }
         }

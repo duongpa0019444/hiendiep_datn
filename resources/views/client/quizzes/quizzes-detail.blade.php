@@ -30,10 +30,11 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 14px;
         }
-.border-radius-bottom {
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-}
+
+        .border-radius-bottom {
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
     </style>
 
 </head>
@@ -168,7 +169,8 @@
                                                     class="badge bg-info-subtle text-info">{{ $question->points }}
                                                     điểm</span>
                                             </h5>
-                                            <p class="card-text mb-0 fw-bold"><strong></strong> {{ $question->content }}
+                                            <p class="card-text mb-0 fw-bold"><strong></strong>
+                                                {{ $question->content }}
                                             </p>
                                         </div>
                                         <p class="card-text mt-2 mb-0 fs-6"><strong>Loại:</strong> Trắc nghiệm
@@ -224,7 +226,8 @@
                                                     class="badge bg-info-subtle text-info">{{ $question->points }}
                                                     điểm</span>
                                             </h5>
-                                            <p class="card-text mb-0 fw-bold"><strong></strong> {{ $question->prompt }}
+                                            <p class="card-text mb-0 fw-bold"><strong></strong>
+                                                {{ $question->prompt }}
                                             </p>
                                         </div>
                                         <p class="card-text mt-2 mb-0 fs-6"><strong>Loại:</strong>
@@ -350,7 +353,7 @@
                             <div class="mb-3 col-12 col-md-5">
                                 <label for="points" class="form-label fw-bold">Số điểm</label>
                                 <input type="number" class="form-control form-control-sm" id="points"
-                                    name="points" placeholder="Nhập số điểm" min="0">
+                                    name="points" placeholder="Nhập số điểm" min="0.1" step="any">
                             </div>
 
                             <!-- Đáp án trắc nghiệm -->
@@ -464,7 +467,7 @@
                             <div class="mb-3 col-12 col-md-5">
                                 <label for="fill_points" class="form-label fw-bold">Số điểm</label>
                                 <input type="number" class="form-control form-control-sm" id="fill_points"
-                                    name="points" placeholder="Nhập số điểm" min="0" name="points">
+                                    name="points" placeholder="Nhập số điểm" min="0.1" step="any">
                             </div>
                             <div id="error-questions-fill-container" class="col-12 mb-3 mt-1" style="display: none;">
                             </div>
@@ -526,7 +529,7 @@
                             <div class="mb-3 col-12 col-md-5">
                                 <label for="reorder_points" class="form-label fw-bold">Số điểm</label>
                                 <input type="number" class="form-control form-control-sm" id="reorder_points"
-                                    name="points" placeholder="Nhập số điểm" min="1">
+                                    name="points" placeholder="Nhập số điểm" min="0.1" step="any">
                             </div>
                             <div id="error-questions-reorder-container" class="col-12 mb-3 mt-1"
                                 style="display: none;">
@@ -563,8 +566,9 @@
     <!-- App Javascript (Require in all Page) -->
     <script src="{{ asset('admin/js/app.js') }}"></script>
     <script>
+        let answerIndex = 2; // Đã có sẵn 2 đáp án A và B
+
         document.addEventListener('DOMContentLoaded', function() {
-            let answerIndex = 2; // Đã có sẵn 2 đáp án A và B
             const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
             const questionTypeSelect = document.getElementById('question_type');
@@ -696,6 +700,7 @@
 
             //Xử lý sự kiện mở modal chọn loại câu hỏi
             $(document).on('click', '.btn-open-modal', function() {
+                answerIndex = 2; // Reset lại chỉ số đáp án sau khi lưu
                 const targetModalId = $(this).data('target');
                 const currentModal = $('.modal.show');
 
@@ -740,7 +745,7 @@
                 console.log(formData);
 
                 postEdit(formData, actionUrl, method, errorContainer, formModal);
-
+                answerIndex = 2; // Reset lại chỉ số đáp án sau khi lưu
             });
 
             // Xử lý form thêm / sửa câu hỏi điền từ

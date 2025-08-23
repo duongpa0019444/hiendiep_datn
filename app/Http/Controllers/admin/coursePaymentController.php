@@ -266,7 +266,12 @@ class coursePaymentController extends Controller
             $noti = $noti->fresh();
             event(new PaymentNotificationCreated($noti));
 
-
+            $this->logAction(
+                'update',
+                coursePayment::class,
+                $payment->id,
+                Auth::user()->name . ' đã cập nhật thanh toán học phí: ' . $payment->id
+            );
             return response()->json([
                 'message' => 'Cập nhật thanh toán thành công',
                 'payment' => $payment->load(['user', 'class', 'course'])
@@ -289,6 +294,14 @@ class coursePaymentController extends Controller
     public function delete($id)
     {
         $payment = coursePayment::findOrFail($id);
+
+        $this->logAction(
+            'delete',
+            coursePayment::class,
+            $payment->id,
+            Auth::user()->name . ' đã xóa thanh toán học phí: ' . $payment->id
+        );
+
         $payment->delete();
         return response()->json([
             'success' => 'Xóa thanh toán thành công'
@@ -422,6 +435,13 @@ class coursePaymentController extends Controller
                 NotificationUser::insert($notificationUser);
 
                 event(new PaymentNotificationCreated($noti));
+
+                $this->logAction(
+                    'update',
+                    coursePayment::class,
+                    $payment->id,
+                    Auth::user()->name . ' đã cập nhật thanh toán học phí: ' . $payment->id
+                );
             }
 
             return response()->json([

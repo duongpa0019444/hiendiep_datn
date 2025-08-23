@@ -35,7 +35,7 @@
         <div class="row gx-3 gy-3 ffs-5 fs-md-6">
             <div class="col-12 col-md-4 text-center pe-4">
                 <img src="{{ asset($user->avatar) }}" class="rounded-circle img-fluid border" alt="Ảnh đại diện">
-                <div class="p-2 p-md-4 fw-semibold  ">{{ $user->name }}</div>
+                <div class="p-2 p-md-4 fw-semibold  ">{{ $user->snake_case }} - {{ $user->name }}</div>
             </div>
             <div class="col-12 col-md-8">
                 <div class="card-body">

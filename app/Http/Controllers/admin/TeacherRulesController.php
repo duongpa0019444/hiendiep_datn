@@ -156,6 +156,15 @@ class TeacherRulesController extends Controller
             return redirect()->route('admin.dashboard')
                 ->with('error', 'Bạn không có quyền quản trị này.');
         }
+
+         $data = $request->all();
+
+        // loại bỏ dấu phẩy
+        $data['pay_rate'] = str_replace('.', '', $data['pay_rate']);
+      
+
+        $request->replace($data);
+
         $request->validate([
             'teacher_id' => 'required|exists:users,id',
             'pay_rate' => 'required|numeric|min:0',

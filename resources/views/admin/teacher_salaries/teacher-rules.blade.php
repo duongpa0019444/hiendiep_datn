@@ -1,13 +1,11 @@
 @extends('admin.admin')
-@section('title', 'Trang admin')
+@section('title', 'Chi tiết lương giáo viên')
 @section('description', '')
 @section('content')
     <div class="page-content">
         <div class="container-fluid">
 
             <div class="container-xxl">
-
-
                 <nav aria-label="breadcrumb p-0">
                     <ol class="breadcrumb py-0">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
@@ -247,7 +245,7 @@
                                     <input type="hidden" name="teacher_id" id="modalTeacherId">
                                     <div class="mb-3">
                                         <label>Mức lương</label>
-                                        <input type="number" class="form-control" name="pay_rate" required
+                                        <input type="text" class="form-control format-currency" name="pay_rate" required
                                             min="0">
                                     </div>
                                     <div class="mb-3">
@@ -383,5 +381,26 @@
                 document.getElementById('effectiveDate').value = selected + '-01'; // luôn set ngày 01
             }
         });
+         document.addEventListener("DOMContentLoaded", function () {
+                let formatter = new Intl.NumberFormat('vi-VN');
+
+                document.querySelectorAll(".format-currency").forEach(function (input) {
+                    input.addEventListener("input", function () {
+                        // chỉ giữ số
+                        let raw = this.value.replace(/\D/g, "");
+                        // lưu lại số thô để submit
+                        this.dataset.raw = raw;
+                        // hiển thị có dấu phẩy
+                        this.value = raw ? formatter.format(raw) : "";
+                    });
+
+                    // khi submit form -> đổi thành số thô
+                    input.form.addEventListener("submit", function () {
+                        input.value = input.dataset.raw || "";
+                    });
+                });
+                
+            });
+       
     </script>
 @endpush

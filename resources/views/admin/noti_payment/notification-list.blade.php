@@ -201,12 +201,13 @@
             $('#notificationList').css({
                 'opacity': '0.5'
             });
+             const url = $("#searchForm").attr('action');
             $.ajax({
-                url: this.action,
+                url: url,
                 type: 'GET',
                 data: $(this).serialize(),
                 success: function(response) {
-                    $('#notificationList').html(renderNoti(response.notifications.data));
+                    $('#notificationList').html(renderLog(response.notifications.data));
                     $('#pagination-wrapper').html(response.pagination);
                     $('#notificationList').css({
                         'opacity': '1'
@@ -230,7 +231,8 @@
                 url: url,
                 type: 'GET',
                 success: function(response) {
-                    $('#notificationList').html(renderNoti(response.notifications.data));
+                    console.log(response);
+                    $('#notificationList').html(renderLog(response.notifications.data));
                     $('#pagination-wrapper').html(response.pagination);
                     $('#notificationList').css({
                         'opacity': '1'
@@ -244,7 +246,7 @@
         });
 
         // Render notifications
-        function renderNoti(data) {
+        function renderLog(data) {
             if (data.length === 0) {
                 return `
                     <div class="alert alert-secondary d-flex align-items-center justify-content-center gap-2" style="height: 200px;">
@@ -408,7 +410,7 @@
                                     .id == id);
                                 if (notification) {
                                     $(`.notification-item-list-${id}`).replaceWith(
-                                        renderNotiItem(notification));
+                                        renderLogItem(notification));
                                 }
                             });
                             const badge = document.querySelector('.soluong-notification-2');
@@ -513,7 +515,7 @@
                                 badge.innerText = Math.max(current - 1, 0);
                             }
                             $(`.notification-item-list-${res.notificationUser.id}`).replaceWith(
-                                renderNotiItem(res.notificationUser));
+                                renderLogItem(res.notificationUser));
                         } else {
                             showDataToast(res.error || 'Có lỗi xảy ra!', 'danger');
                         }
@@ -557,7 +559,7 @@
         });
 
         // Render single notification item
-        function renderNotiItem(notification) {
+        function renderLogItem(notification) {
             return `
                 <li class="notification-item notification-item-list-${notification.id} ${notification.status === 'unseen' ? 'bg-light' : ''} d-flex align-items-center justify-content-between p-2 border-bottom">
                     <div class="d-flex align-items-center gap-2 flex-grow-1">

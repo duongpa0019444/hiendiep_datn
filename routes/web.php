@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\AccountController;
+use App\Http\Controllers\admin\ActionLogController;
 use App\Http\Controllers\admin\AttendanceController;
 use App\Http\Controllers\admin\ClassController;
 use App\Http\Controllers\client\HomeController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\admin\topicsController;
 use App\Http\Controllers\client\quizzesController as ClientQuizzesController;
 use App\Http\Controllers\client\CourseController as ClientCourseController;
 use App\Http\Controllers\client\AttendanceController as ClientAttendanceController;
+use App\Http\Controllers\client\newsController as ClientNewsController;
 use App\Http\Controllers\courseController;
 use App\Http\Controllers\admin\ClassroomController;
 
@@ -36,7 +38,8 @@ use App\Models\topics;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
-
+use App\Http\Controllers\admin\StaffRulesController;
+use App\Http\Controllers\admin\StaffSalaryController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -70,13 +73,17 @@ Route::post('/forgot-password', [loginController::class, 'sendResetLinkEmail'])-
 Route::get('/reset-password', [loginController::class, 'showResetPasswordForm'])->name('password.reset');
 Route::post('/reset-password', [loginController::class, 'resetPassword'])->name('password.update');
 
+//Bài viết
+Route::get('/news', [ClientNewsController::class, 'index'])->name('client.news');
+Route::get('/news/{id}/detail/{slug}', [ClientNewsController::class, 'newsDetail'])->name('client.news.detail');
+Route::get('/news/category/{id}/{slug}', [ClientNewsController::class, 'newsCategory'])->name('client.news.category');
 
 
 // Route dành cho admin và nhân viên --
-Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(function () {
+Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(function () {    
     // trang quản trị cho admin
     Route::get('dashboard', [DashboardController::class, 'dashBoard'])->name('admin.dashboard');
-    Route::get('dashboard/chart/{course_id}', [DashboardController::class, 'chart']);
+    Route::get('dashboard/chart/{course_id}', [DashboardController::class, 'chart'])->name('admin.dashboard.chart');
     Route::get('dashboard/schedules/{id}/views', [DashboardController::class, 'getSchedulesViews'])->name('admin.dashboard.schedules.views');
     Route::get('dashboard/schedules/date/{date}', [DashboardController::class, 'getSchedulesByDate'])->name('admin.dashboard.schedules.date');
     Route::get('dashboard/chart/revenue/{year}', [DashboardController::class, 'chartRevenue'])->name('admin.chartRevenue');
@@ -85,10 +92,11 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
 
     // Trang quản lý tài khoản
     Route::get('/account', [AccountController::class, 'account'])->name('admin.account');
+    Route::get('/account-add', [AccountController::class, 'accountAdd'])->name('admin.account-add');  
+    Route::post('/account-store', [AccountController::class, 'accountStore'])->name('admin.account-store');  
     Route::get('/account-search', [AccountController::class, 'search'])->name('admin.account.search');
     Route::get('/account/{role}', [AccountController::class, 'list'])->name('admin.account.list');
     Route::get('/account/{role}/{id}', [AccountController::class, 'detail'])->name('admin.account.detail');
-
     Route::get('/account-add/{role}', [AccountController::class, 'add'])->name('admin.account.add');
     Route::post('/account-store/{role}', [AccountController::class, 'store'])->name('admin.account.store');
     Route::get('/account-edit/{role}/{id}', [AccountController::class, 'edit'])->name('admin.account.edit');
@@ -99,19 +107,24 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/account-trash', [AccountController::class, 'trash'])->name('admin.account.trash');
     Route::post('/account/restore/{id}', [AccountController::class, 'restore'])->name('admin.account.restore');
     Route::delete('/account/force-delete/{id}', [AccountController::class, 'forceDelete'])->name('admin.account.forceDelete');
+    // Lấy lịch dạy của giáo viên
+    Route::get('/account/schedules/{teacher_id}/{class_id}', [AccountController::class, 'schedules'])->name('admin.account.schedules');
 
 
     // Quản lí điểm số
     Route::get('/score', [ScoreController::class, 'index'])->name('admin.score');
     Route::get('/score-search', [ScoreController::class, 'scoreSearch'])->name('admin.score.search');
     Route::get('/score/{class_id}/{course_id}', [ScoreController::class, 'detail'])->name('admin.score.detail');
+    Route::get('/score/detail-search', [ScoreController::class, 'detailSearch'])->name('admin.score.detailSearch');
     Route::get('/score-add/{class_id}', [ScoreController::class, 'add'])->name('admin.score.add');
     Route::post('/score-store/{class_id}', [ScoreController::class, 'store'])->name('admin.score.store');
     Route::get('/score-edit/{class_id}/{id}', [ScoreController::class, 'edit'])->name('admin.score.edit');
     Route::put('/score-update/{class_id}/{id}', [ScoreController::class, 'update'])->name('admin.score.update');
     Route::get('/score-delete/{id}', [ScoreController::class, 'delete'])->name('admin.score.delete');
-    Route::get('/admin/scores/export/{class_id}/{course_id}', [ScoreController::class, 'export'])->name('admin.scores.export');
-    Route::post('/admin/scores/import', [ScoreController::class, 'import'])->name('admin.scores.import');
+    Route::get('scores/export/{class_id}/{course_id}', [ScoreController::class, 'export'])->name('admin.scores.export');
+    Route::post('scores/import', [ScoreController::class, 'import'])->name('admin.scores.import');
+    Route::get('scores/download', [ScoreController::class, 'download'])->name('admin.score.download');
+    
 
 
     // Trang quản lý học phí Thanh toán
@@ -184,7 +197,26 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/admin/teacher-salary-rules/by-teacher/{id}', [TeacherRulesController::class, 'getRulesByTeacher'])->name('admin.teacher-salary-rules.byTeacher');
     Route::get('/admin/teacher-salary-rules/search-teacher', [TeacherRulesController::class, 'searchTeacher'])
         ->name('admin.teacher-salary-rules.searchTeacher');
+    Route::post('/admin/teacher-salaries/lock', [TeacherSalaryController::class, 'lock'])->name('admin.teacher_salaries.lock');
+    Route::post('/admin/teacher-salaries/unlock', [TeacherSalaryController::class, 'unlock'])->name('admin.teacher_salaries.unlock');
 
+
+    //Trang quản lý lương nhân viên
+    Route::get('staff-salaries', [staffSalaryController::class, 'index'])->name('admin.staff_salaries');
+    Route::get('/api/salary-data/staff', [staffSalaryController::class, 'getData'])->name('admin.staff_salaries.data');
+    Route::post('/api/salary-data/staff', [staffSalaryController::class, 'save'])->name('admin.staff_salaries.save');
+    Route::post('/admin/staff-salaries/update-payment', [staffSalaryController::class, 'updatePayment'])->name('admin.staff_salaries.upload');
+    Route::get('/admin/staff-salaries/filter', [staffSalaryController::class, 'filter'])->name('admin.staff_salaries.filter');
+    Route::post('/admin/staff-salaries/lock', [staffSalaryController::class, 'lock'])->name('admin.staff_salaries.lock');
+    Route::post('/admin/staff-salaries/unlock', [staffSalaryController::class, 'unlock'])->name('admin.staff_salaries.unlock');
+
+    //Chi tiết lương nhân viên
+    Route::get('/admin/staff-salary-rules/{id}/details', [staffRulesController::class, 'details'])->name('admin.staff_salary_rules.details');
+    Route::get('/staff-salary-rules/index', [staffRulesController::class, 'indexRules'])->name('admin.staff_salaries.detail');
+    Route::post('/admin/staff-salary-rules/store', [staffRulesController::class, 'store'])->name('admin.staff_salary.store');
+    Route::get('/admin/staff-salary-rules/by-staff/{id}', [staffRulesController::class, 'getRulesBystaff'])->name('admin.staff-salary-rules.bystaff');
+    Route::get('/admin/staff-salary-rules/search-staff', [staffRulesController::class, 'searchstaff'])
+        ->name('admin.staff-salary-rules.searchTeacher');
 
     // Gửi thông báo
     Route::get('admin/notifications', [NotificationsController::class, 'index'])->name('admin.notifications');
@@ -415,7 +447,11 @@ Route::put('classroom/{id}', [ClassroomController::class, 'update'])->name('admi
     Route::post('/notification/course/payment/updateSeenMultiple', [notiCoursePaymentController::class, 'updateSeenMultiple']);
     Route::post('/notification/course/payment/deleteMultiple', [notiCoursePaymentController::class, 'deleteMultiple']);
 
-
+    Route::get('/actions/log', [ActionLogController::class, 'index'])->name('admin.actions.log');
+    Route::get('/actions/log/filter', [ActionLogController::class, 'filter'])->name('admin.actions.log.filter');
+    Route::post('/actions/log/delete', [ActionLogController::class, 'delete'])->name('admin.actions.log.delete');
+    Route::post('/actions/log/delete/{id}', [ActionLogController::class, 'delete'])->name('admin.actions.log.delete');
+    Route::get('/actions/log/view/{id}', [ActionLogController::class, 'viewLog'])->name('admin.actions.log.view');
 });
 
 
@@ -449,6 +485,7 @@ Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function
     Route::get('/score-delete/{id}', [UserController::class, 'Scoredelete'])->name('client.score.delete');
     Route::get('/scores/export/{class_id}/{course_id}', [UserController::class, 'Scoreexport'])->name('client.scores.export');
     Route::post('/scores/import', [UserController::class, 'Scoreimport'])->name('client.scores.import');
+    Route::get('scores/download', [ScoreController::class, 'download'])->name('client.score.download');
 
 
     Route::get('quizz', [UserController::class, 'quizz'])->name('client.quizz');

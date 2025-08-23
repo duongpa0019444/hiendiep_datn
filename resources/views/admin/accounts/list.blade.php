@@ -17,8 +17,8 @@
             <nav aria-label="breadcrumb p-0">
                 <ol class="breadcrumb py-0">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.account') }}">Quản lí người dùng</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ $roles[request('role')] ?? request('role') }}
+                    <li class="breadcrumb-item active" aria-current="page"> Quản lí
+                        {{ $roles[request('role')] ?? request('role') }}
                     </li>
                 </ol>
             </nav>
@@ -55,9 +55,9 @@
             @endif
 
             <div class="d-flex justify-content-between align-items-center w-100 mb-2">
-                <h3 class="">Danh sách </h3>
+                <h3 class="">Danh Sách {{ $roles[request('role')] ?? request('role') }}</h3>
                 <a href="{{ route('admin.account.add', ['role' => request('role')]) }}" class="btn  btn-primary">
-                    Thêm {{ $roles[request('role')] ?? request('role') }}
+                    <i class="fas fa-plus me-2"></i> Thêm {{ $roles[request('role')] ?? request('role') }}
                 </a>
             </div>
 
@@ -66,19 +66,9 @@
                     <div class="card-header ">
                         @if (request('role'))
                             <form id="filterAccountForm" method="GET"
-                                action="{{ route('admin.account.list', request('role')) }}" class=" rounded p-2">
-                                <div class="row g-2 align-items-end  flex-end">
-                                    {{-- Phân loại --}}
-                                    <div class="col-md-2">
-                                        <select name="gender" class="form-select">
-                                            <option value="">Giới tính</option>
-                                            <option value="boy" {{ request('gender') == 'boy' ? 'selected' : '' }}>Nam
-                                            </option>
-                                            <option value="girl" {{ request('gender') == 'girl' ? 'selected' : '' }}>Nữ
-                                            </option>
-                                        </select>
-                                    </div>
-
+                                action="{{ route('admin.account.list', request('role')) }}" class=" rounded">
+                                <div class="row d-flex  align-items-center">
+                                    {{-- Sắp xếp --}}
                                     <div class="col-md-2">
                                         <select class="form-select" id="sort" name="sort">
                                             <option value="created_at_desc"
@@ -96,23 +86,52 @@
                                         </select>
                                     </div>
 
+                                    {{-- Phân loại --}}
+                                    <div class="col-md-2">
+                                        <select name="gender" class="form-select">
+                                            <option value="">Giới tính</option>
+                                            <option value="boy" {{ request('gender') == 'boy' ? 'selected' : '' }}>Nam
+                                            </option>
+                                            <option value="girl" {{ request('gender') == 'girl' ? 'selected' : '' }}>Nữ
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    {{-- Nhiệm vụ nhân viên --}}
+                                    @if (request('role') === 'staff')
+                                        <div class="col-md-2">
+                                            <select name="mission" class="form-select">
+                                                <option value="">Nhiệm vụ</option>
+                                                <option value="train"
+                                                    {{ request('mission') == 'train' ? 'selected' : '' }}>
+                                                    Quản lí đào tạo
+                                                </option>
+                                                <option value="accountant"
+                                                    {{ request('mission') == 'accountant' ? 'selected' : '' }}>
+                                                    Kế toán
+                                                </option>
+                                            </select>
+                                        </div>
+                                    @endif
+
+
                                     <div class="col-md-3">
                                         <div class="position-relative">
                                             <input type="search" name="queryAccountRole" class="form-control"
-                                                placeholder="Tìm học sinh..." autocomplete="off"
+                                                placeholder="Tìm {{ $roles[request('role')] ?? request('role') }}..."
+                                                autocomplete="off"
                                                 value="{{ request()->query('queryAccountRole') ?? '' }}">
                                             <iconify-icon icon="solar:magnifer-linear" class="search-widget-icon"
                                                 style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999;"></iconify-icon>
                                         </div>
                                     </div>
 
-                                    <div class="col-md-2">
-                                        <button type="submit" class="btn btn-success w-100">Lọc</button>
-                                    </div>
+                                    <div class="col-md-3 flex-fill">
+                                        <button type="submit" class="btn btn-success"><i class="fas fa-search me-2"></i>
+                                            Lọc</button>
 
-                                    <div class="col-md-2 ">
-                                        <button id="clearFilterListAccountBtn" type="button"
-                                            class="btn btn-danger w-100">Xóa
+                                        <button id="clearFilterListAccountBtn" type="button" class="btn btn-danger"><i
+                                                class="fas fa-times me-2"></i> Xóa
                                             Lọc</button>
                                     </div>
 
@@ -127,52 +146,116 @@
                             <table class="table table-hover mb-0 table-centered">
                                 <thead>
                                     <tr>
-                                        <th>Ảnh đại diện</th>
-                                        <th>Tên</th>
-                                        <th>Giới tính</th>
+                                        <th>Thông tin</th>
+                                        <th>Mã {{ $roles[request('role')] ?? request('role') }}</th>
+
+                                        @if (request('role') === 'student')
+                                            <th>Khóa học đã đăng kí</th>
+                                        @elseif (request('role') === 'teacher')
+                                            <th>Lớp học được phân công</th>
+                                        @else
+                                            <th>Nhiệm vụ</th>
+                                        @endif
+
                                         <th>Ngày sinh nhật</th>
                                         <th>Email</th>
                                         <th>Số điện thoại</th>
+                                        <th>Địa chỉ</th>
                                         <th>Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse ($users as $data)
                                         <tr>
-                                            <td><img class="rounded" src="{{ asset($data->avatar) }}" width="50"
-                                                    alt="{{ $data->name }}">
+                                            <td>
+                                                <div style="display: flex; align-items: center; gap: 10px;">
+                                                    <img class="rounded"
+                                                        src="{{ $data->avatar ? asset($data->avatar) : asset('icons/user-solid.svg') }}"
+                                                        width="40" alt="{{ $data->name }}">
+                                                    <div>
+                                                        <div>{{ $data->name ?? '' }}</div>
+                                                        <div style="font-size: 0.9em; color: rgb(255, 81, 0);">
+                                                            @php
+                                                                echo match ($data->gender) {
+                                                                    'boy' => 'Nam',
+                                                                    'girl' => 'Nữ',
+                                                                    default => '',
+                                                                };
+                                                            @endphp</div>
+                                                    </div>
+                                                </div>
                                             </td>
-                                            <td>{{ $data->name }}</td>
-                                            <td>{{ $data->gender }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($data->birth_date)->format('d/m/Y') }}</td>
-                                            <td>{{ $data->email }}</td>
-                                            <td>{{ $data->phone }}</td>
+
+
+                                            <td>{{ $data->snake_case ?? '' }}</td>
+
+
+                                            @if (request('role') === 'student')
+                                                @php
+                                                    // đếm số khóa học đã đăng ký
+                                                    $count = DB::table('class_student')
+                                                        ->where('student_id', $data->id)
+                                                        ->count();
+                                                @endphp
+                                                <td>{{ $count ?? 0 }} lớp</td>
+                                            @elseif (request('role') === 'teacher')
+                                                @php
+                                                    // Lấy tất cả lớp học theo lịch học
+                                                    $allClasses = DB::table('schedules')
+                                                        ->where('teacher_id', $data->id)
+                                                        ->distinct('class_id')
+                                                        ->count('class_id');
+                                                @endphp
+                                                <td>{{ $allClasses ?? 0 }} lớp</td>
+                                            @else
+                                                @if (request('role') === 'staff')
+                                                    <td> @php
+                                                        echo match ($data->mission) {
+                                                            'train' => 'Quản lý đào tạo',
+                                                            'accountant' => 'Kế toán',
+                                                            default => 'Chưa có nhiệm vụ',
+                                                        };
+                                                    @endphp
+                                                    </td>
+                                                @else
+                                                    <td>Quản lí toàn hệ thống</td>
+                                                @endif
+                                            @endif
+
+                                            <td>
+                                                {{ $data->birth_date ? \Carbon\Carbon::parse($data->birth_date)->format('d/m/Y') : '' }}
+                                            </td>
+                                            <td>{{ $data->email ?? '' }}</td>
+                                            <td>{{ $data->phone ?? '' }}</td>
+                                            <td>{{ $data->address ?? '' }}</td>
                                             <td>
                                                 <div class="d-flex gap-2">
-
-                                                    <a href="{{ route('admin.account.detail', ['role' => request('role'), 'id' => $data->id]) }}"
-                                                        class="btn btn-soft-primary btn-sm">
-                                                        <iconify-icon icon="solar:eye-broken"
-                                                            class="align-middle fs-18"></iconify-icon>
-                                                    </a>
+                                                    @if (request('role') == 'student' || request('role') == 'teacher')
+                                                        <a href="{{ route('admin.account.detail', ['role' => request('role'), 'id' => $data->id]) }}"
+                                                            class="btn btn-soft-primary btn-sm">
+                                                            <iconify-icon icon="solar:eye-broken"
+                                                                class="align-middle fs-18"></iconify-icon>
+                                                        </a>
+                                                    @endif
 
                                                     <a href="{{ route('admin.account.edit', ['role' => request('role'), 'id' => $data->id]) }}"
                                                         class="btn btn-soft-primary btn-sm"><iconify-icon
                                                             icon="solar:pen-2-broken"
                                                             class="align-middle fs-18"></iconify-icon></a>
 
-                                                   @if (auth()->user()->isAdmin())
-                                                         <a href="#" class="btn btn-soft-danger btn-sm"
-                                                        onclick="showDeleteConfirm({{ $data->id }}, '{{ $data->name }}', '{{ request('role') }}')">
-                                                        <iconify-icon icon="solar:trash-bin-minimalistic-2-broken"
-                                                            class="align-middle fs-18"></iconify-icon></a>
-                                                   @endif
+                                                    @if (auth()->user()->isAdmin())
+                                                        <a href="#" class="btn btn-soft-danger btn-sm"
+                                                            onclick="showDeleteConfirm({{ $data->id }}, '{{ $data->name }}', '{{ request('role') }}')">
+                                                            <iconify-icon icon="solar:trash-bin-minimalistic-2-broken"
+                                                                class="align-middle fs-18"></iconify-icon></a>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center">Không tìm thấy {{ $roles[request('role')] ?? request('role') }} nào.</td>
+                                            <td colspan="7" class="text-center">Không tìm thấy
+                                                {{ $roles[request('role')] ?? request('role') }} nào.</td>
                                         </tr>
                                     @endforelse
 
