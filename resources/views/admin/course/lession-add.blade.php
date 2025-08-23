@@ -49,14 +49,7 @@
 
 
 
-                                    <!-- Ngày cập nhật -->
-                                    <div class="col-lg-6">
-                                        <div class="mb-3">
-                                            <label for="updated_at" class="form-label">Ngày cập nhật</label>
-                                            <input type="datetime-local" name="updated_at" id="updated_at"
-                                                class="form-control">
-                                        </div>
-                                    </div>
+                                   
                                     {{-- Chọn Bài quizz qua các option --}}
                                     <div class="col-lg-6">
                                         <div class="mb-3">

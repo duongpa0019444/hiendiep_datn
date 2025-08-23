@@ -19,10 +19,12 @@ class Schedule extends Model
     ];
 
     protected $casts = [
-        'date' => 'date',
-        'start_time' => 'datetime:H:i:s',
-        'end_time' => 'datetime:H:i:s',
-    ];
+    'date' => 'date',
+    'start_time' => 'string',
+    'end_time' => 'string',
+
+];
+
 
     public function class()
     {

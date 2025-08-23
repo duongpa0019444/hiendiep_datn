@@ -49,15 +49,6 @@ class CourseController  extends Controller
         $totalRevenue = $courses->sum('price');
 
 
-       
-        // $allCourses = $query->get(); // Lấy toàn bộ khóa học (không phân trang)
-
-        // $totalCourses = $allCourses->count();
-        // $totalSessions = $allCourses->sum('total_sessions');
-        // $totalRevenue = $allCourses->sum('price');
-        //         $courses = $query->paginate(10);
-
-
         // Số khóa học được tạo trong tháng hiện tại
         $coursesThisMonth = courses::whereBetween('created_at', [
             Carbon::now()->startOfMonth(),
@@ -156,10 +147,9 @@ class CourseController  extends Controller
         $course->price = $request->input('price');
         $course->total_sessions = $request->input('total_sessions');
         $course->description = $request->input('description');
-        $course->created_at = $request->input('created_at');
-        $course->updated_at = $request->input('updated_at');
         $course->teaching_method = $request->input('teaching_method');
         $course->teaching_goals = $request->input('teaching_goals');
+        $course->created_at = now(); 
 
         // dd ($course->image);
 
@@ -200,8 +190,8 @@ class CourseController  extends Controller
         $course->price = $request->input('price');
         $course->total_sessions = $request->input('total_sessions');
         $course->description = $request->input('description');
-        $course->created_at = $request->input('created_at');
-        $course->updated_at = $request->input('updated_at');
+        // $course->created_at = $request->input('created_at');
+        // $course->updated_at = $request->input('updated_at');
         $course->teaching_method = $request->input('teaching_method');
         $course->teaching_goals = $request->input('teaching_goals');
         $course->save();
@@ -229,11 +219,9 @@ class CourseController  extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'link_document' => 'nullable|url|max:500',
-            'updated_at' => 'nullable|date',
         ],  [
             'name.required' => 'Vui lòng nhập tên khóa học.',
             'link_document.required' => 'Vui lòng nhập link bài giảng .',
-            'updated_at.required' => 'Vui lòng nhập ngày chỉnh sửa .',
         ]);
         $lesson = new Lessions();
 
@@ -242,8 +230,6 @@ class CourseController  extends Controller
         $lesson->course_id = $id;
         $lesson->name = $request->input('name');
         $lesson->link_document = $request->input('link_document');
-        $lesson->created_at = now();
-        $lesson->updated_at = $request->input('updated_at');
         $lesson->save();
 
         // return redirect()->route('admin.course-detail', ['id' => $id])->with('success', 'Thêm bài học thành công!');
@@ -263,31 +249,20 @@ class CourseController  extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'link_document' => 'nullable|url|max:500',
-            'updated_at' => 'nullable|date',
         ],  [
             'name.required' => 'Vui lòng nhập tên khóa học.',
             'link_document.required' => 'Vui lòng nhập link bài giảng .',
-            'updated_at.required' => 'Vui lòng nhập ngày chỉnh sửa .',
         ]);
         $course_id = $course_id;
         $lession = Lessions::findOrFail($id);
         $lession->name = $request->input('name');
         $lession->link_document = $request->input('link_document');
-        $lession->updated_at = now();
         $lession->save();
 
         return redirect()->route('admin.course-detail', ['id' => $course_id])->with('success', 'Cập nhật bài học thành công!');
     }
 
     // noi bat 
-    // public function toggleFeatured($id)
-    // {
-    //     $course = courses::findOrFail($id);
-    //     $course->is_featured = !$course->is_featured;
-    //     $course->save();
-
-    //     return response()->json(['success' => true, 'status' => $course->is_featured]);
-    // }
     public function toggleFeatured($id)
 
     {

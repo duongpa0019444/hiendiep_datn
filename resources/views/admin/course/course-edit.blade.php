@@ -80,24 +80,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Ngày tạo -->
-                                    <div class="col-lg-6">
-                                        <div class="mb-3">
-                                            <label for="created_at" class="form-label">Ngày tạo khóa học</label>
-                                            <input type="datetime-local" name="created_at" id="created_at"
-                                                class="form-control" value="{{ $course->created_at }}">
-                                        </div>
-                                    </div>
-
-                                    <!-- Ngày cập nhật -->
-                                    <div class="col-lg-6">
-                                        <div class="mb-3">
-                                            <label for="updated_at" class="form-label">Ngày cập nhật khóa học</label>
-                                            <input type="datetime-local" name="updated_at" id="updated_at"
-                                                class="form-control" value="{{ $course->updated_at }}">
-                                        </div>
-                                    </div>
-
                                     <!-- Nội dung khóa học -->
                                     <div class="col-lg-12">
                                         <div class="mb-0">
