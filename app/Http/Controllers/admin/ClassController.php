@@ -379,8 +379,6 @@ class ClassController extends Controller
             ->first();
         $course_payment->delete();
 
-
-
         return redirect()->back()->with('success', 'Học sinh đã được xóa khỏi lớp thành công.');
     }
 
@@ -477,7 +475,6 @@ class ClassController extends Controller
         if ($course_payment) {
             $course_payment->forceDelete();
         }
-
 
         return redirect()->back()->with('success', 'Đã xóa vĩnh viễn học viên khỏi lớp.');
     }

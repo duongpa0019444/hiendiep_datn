@@ -122,6 +122,13 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
+        // Hàm để định dạng ngày thành d/m/Y
+        function formatDate(date) {
+            let day = date.getDate().toString().padStart(2, '0');
+            let month = (date.getMonth() + 1).toString().padStart(2, '0');
+            let year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
         $(function() {
             // Chuyển bước 1 -> 2
             $('#to-step-2').click(function() {
@@ -143,7 +150,7 @@
                 while (possibleDates.length < totalSessions) {
                     let weekday = date.getDay(); // 0: CN, 1: T2, ..., 6: T7
                     if (weekdays.includes(weekday)) {
-                        possibleDates.push(date.toISOString().slice(0, 10));
+                        possibleDates.push(formatDate(date));
                     }
                     date.setDate(date.getDate() + 1);
                 }
@@ -211,7 +218,7 @@
                     let weekday = date.getDay();
                     if (weekdays.includes(weekday)) {
                         let thu = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][weekday];
-                        let d = date.toLocaleDateString('vi-VN');
+                        let d = formatDate(date);
                         html += `<div>Buổi ${buoi}: ${thu} ${d} ${startTime}-${endTime}</div>`;
                         buoi++;
                     }

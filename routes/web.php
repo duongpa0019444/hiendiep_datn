@@ -384,6 +384,11 @@ Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function
 
     Route::get('information', [UserController::class, 'information'])->name('client.information');
 
+    // Lớp học
+    Route::get('classroom', [UserController::class, 'classroom'])->name('client.classroom');
+    Route::get('courses/detail/{course}', [UserController::class, 'showCourse'])->name('teacher.courses.show');
+
+
     // Lịch học và điểm danh
     Route::get('schedule', [UserController::class, 'schedule'])->name('client.schedule');
 

@@ -106,7 +106,7 @@
                                         <i class="icofont-check fs-5 text-success mb-2"></i>
                                         <strong>Đã học</strong>
                                         <div class="badge bg-success text-white fw-bold mt-1 p-1 w-100" id="dahoc">
-                                            {{ $hoctaps->student_sessions_present }} buổi</div>
+                                            {{ $hoctaps->student_sessions_present ?? 0}} buổi</div>
                                     </div>
                                 </div>
                             </div>
@@ -128,7 +128,7 @@
                                         <i class="icofont-clock-time fs-5 text-warning mb-2"></i>
                                         <strong>Đến muộn</strong>
                                         <div class="badge bg-warning text-dark fw-bold mt-1 p-1 w-100" id="denmuon">
-                                            {{ $hoctaps->student_sessions_late }} buổi</div>
+                                            {{ $hoctaps->student_sessions_late ?? 0 }} buổi</div>
                                     </div>
                                 </div>
                             </div>

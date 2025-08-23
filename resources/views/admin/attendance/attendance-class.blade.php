@@ -110,7 +110,7 @@
 
                     <!-- Student List -->
                     <div class="student-list" id="studentList">
-                        @foreach ($students as $student)
+                        @forelse ($students as $student)
                             <div class="student-item" data-id="{{ $student->id }}"
                                 data-name="{{ strtolower($student->name) }}"
                                 data-gender="{{ strtolower($student->gender == 'female' ? 'nữ' : 'nam') }}">
@@ -164,7 +164,14 @@
                                     </button>
                                 </div>
                             </div>
-                        @endforeach
+          @empty
+    <div class="no-students text-center py-5">
+        <i class="fas fa-users-slash fa-3x text-muted mb-3"></i>
+        <h3 class="text-muted mb-2">Không có học sinh nào</h3>
+        <p class="text-muted mb-4">Hiện tại danh sách học sinh trống. Hãy thêm học sinh để bắt đầu điểm danh.</p>
+        {{-- <a href="#" class="btn btn-primary btn-lg" onclick="openAddStudentModal()">Thêm học sinh</a> --}}
+    </div>
+@endforelse
                     </div>
 
                     <!-- Modal for Note -->

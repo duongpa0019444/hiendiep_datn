@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 use App\Models\classes;
 use App\Models\classStudent;
 use App\Models\coursePayment;
+use App\Models\courses;
+use App\Models\lessions;
 use App\Models\Quizzes;
 use App\Models\notification;
 use App\Models\Schedule;
@@ -113,9 +115,9 @@ class UserController extends Controller
                 GROUP BY
                     u.id, u.name, c.id, c.name
 
-            ", [$userId, $classes[0]->class_id, $userId]);
+            ", [$userId, $classes[0]->class_id ?? null, $userId]);
 
-            $hoctaps = $attendance[0];
+            $hoctaps = $attendance[0] ?? [];
             return view('client.accounts.students.dashboard', compact('unPaymentInfo', 'notifications', 'classes', 'hoctaps'));
         } elseif (Auth::user()->role == "teacher") {
 
@@ -185,6 +187,174 @@ class UserController extends Controller
     }
 
 
+    public function classroom()
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+
+        switch ($user->role) {
+            case 'student':
+                return $this->getStudentClassroom($userId);
+
+            case 'teacher':
+                return $this->getTeacherClassroom($userId);
+
+            default:
+                abort(403, 'Unauthorized access');
+        }
+    }
+
+    /**
+     * Get classroom data for student
+     */
+    private function getStudentClassroom($userId)
+    {
+        $classes = DB::table('class_student as cs')
+            ->join('classes as c', 'cs.class_id', '=', 'c.id')
+            ->join('courses as co', 'c.courses_id', '=', 'co.id')
+            ->join('users as u', 'cs.student_id', '=', 'u.id')
+            ->leftJoin('schedules as s', 'c.id', '=', 's.class_id')
+            ->leftJoin('users as teacher', 's.teacher_id', '=', 'teacher.id')
+            ->where('cs.student_id', $userId)
+            ->whereNull('cs.deleted_at')
+            ->select([
+                'c.id as class_id',
+                'c.name as class_name',
+                'c.status as class_status',
+                'co.id as course_id',
+                'co.name as course_name',
+                'u.name as student_name',
+                'teacher.name as teacher_name',
+                'teacher.email as teacher_email',
+                's.day_of_week',
+                's.start_time',
+                's.end_time',
+                DB::raw('(SELECT COUNT(*) FROM class_student WHERE class_id = c.id AND deleted_at IS NULL) as students_count')
+            ])
+            ->groupBy([
+                'c.id',
+                'c.name',
+                'c.status',
+                'co.id',
+                'co.name',
+                'u.name',
+                'teacher.name',
+                'teacher.email',
+                's.day_of_week',
+                's.start_time',
+                's.end_time'
+            ])
+            ->orderBy('c.created_at', 'desc')
+            ->paginate(10);
+
+        return view('client.accounts.students.classroom', compact('classes'));
+    }
+
+    /**
+     * Get classroom data for teacher
+     */
+    private function getTeacherClassroom($userId)
+    {
+        $classes = DB::table('schedules as s')
+            ->join('classes as c', 's.class_id', '=', 'c.id')
+            ->join('courses as co', 'c.courses_id', '=', 'co.id')
+            ->join('users as teacher', 's.teacher_id', '=', 'teacher.id')
+            ->where('s.teacher_id', $userId)
+            ->whereNull('c.deleted_at')  // Thêm điều kiện này nếu schedules có soft delete
+            ->select([
+                'c.id as class_id',
+                'c.name as class_name',
+                'c.status as class_status',
+                'c.number_of_sessions',
+                'co.id as course_id',
+                'co.name as course_name',
+                'co.description as course_description',
+                'teacher.name as teacher_name',
+                's.day_of_week',
+                's.start_time',
+                's.end_time',
+                's.created_at as schedule_created',
+                DB::raw('(SELECT COUNT(*) FROM class_student WHERE class_id = c.id AND deleted_at IS NULL) as students_count'),
+                DB::raw('CASE 
+                WHEN c.status = "active" THEN 1
+                WHEN c.status = "upcoming" THEN 2  
+                WHEN c.status = "completed" THEN 3
+                ELSE 4
+            END as status_order')
+            ])
+            ->groupBy([
+                'c.id',
+                'c.name',
+                'c.status',
+                'c.number_of_sessions',
+                'co.id',
+                'co.name',
+                'co.description',
+                'teacher.name',
+                's.day_of_week',
+                's.start_time',
+                's.end_time',
+                's.created_at'
+            ])
+            ->orderBy('status_order', 'asc')
+            ->orderBy('s.day_of_week', 'asc')
+            ->orderBy('s.start_time', 'asc')
+            ->paginate(10);
+
+        // Thống kê cho teacher
+        $statistics = [
+            'total_classes' => $classes->total(),
+            'active_classes' => DB::table('schedules as s')
+                ->join('classes as c', 's.class_id', '=', 'c.id')
+                ->where('s.teacher_id', $userId)
+                ->where('c.status', 'active')
+                ->count(),
+            'total_students' => DB::table('schedules as s')
+                ->join('classes as c', 's.class_id', '=', 'c.id')
+                ->join('class_student as cs', 'c.id', '=', 'cs.class_id')
+                ->where('s.teacher_id', $userId)
+                ->whereNull('cs.deleted_at')
+                ->count(),
+            'scheduled_classes' => DB::table('schedules as s')
+                ->join('classes as c', 's.class_id', '=', 'c.id')
+                ->where('s.teacher_id', $userId)
+                ->whereNotNull('s.day_of_week')
+                ->whereNotNull('s.start_time')
+                ->count()
+        ];
+
+        return view('client.accounts.teachers.classroom', compact('classes', 'statistics'));
+    }
+
+    public function showCourse($courseId)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            abort(403, 'Unauthorized access');
+        }
+
+        $userId = $user->id;
+        $course = Courses::findOrFail($courseId);
+        switch ($user->role) {
+            case 'student':
+                $quizz = Quizzes::where('course_id', $courseId)->paginate(10); // ✔ lấy theo điều kiện
+                // $lessions = Lessions::with('quizz')->where('course_id', $id)->get();
+                $lessions = lessions::with('quizz')->where('course_id', $courseId)->paginate(10);
+
+                $course = courses::findOrFail($courseId);
+                return view('client.accounts.students.course-detail', compact('quizz', 'lessions', 'course'));
+
+            case 'teacher':
+
+                $quizz = Quizzes::where('course_id', $courseId)->paginate(10); // ✔ lấy theo điều kiện
+                // $lessions = Lessions::with('quizz')->where('course_id', $id)->get();
+                $lessions = lessions::with('quizz')->where('course_id', $courseId)->paginate(10);
+
+                $course = courses::findOrFail($courseId);
+                return view('client.accounts.teachers.course-detail', compact('quizz', 'lessions', 'course'));
+        }
+    }
+
 
     public function schedule()
     {
@@ -235,6 +405,7 @@ class UserController extends Controller
                         WHEN "Sat" THEN "Thứ 7"
                         WHEN "Sun" THEN "Chủ nhật"
                     END as day_of_week'),
+                    'classes.name as class_name',
                     'schedules.id as schedule_id',
                     'schedules.date',
                     'schedules.start_time',

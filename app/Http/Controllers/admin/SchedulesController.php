@@ -16,13 +16,13 @@ class SchedulesController extends Controller
         $query = classes::select(
             'classes.id',
             'classes.name',
-            'classes.number_of_sessions as so_buoi_hoc',
+            'classes.number_of_sessions as sessions_count',
             'classes.status',
             'classes.created_at as start_date',
             'courses.name as course_name',
             'courses.description as course_description',
             DB::raw("(SELECT COUNT(*) FROM class_student 
-            WHERE class_student.class_id = classes.id) AS so_hoc_sinh"),
+            WHERE class_student.class_id = classes.id) AS students_count"),
         )
             ->leftJoin('courses', 'classes.courses_id', '=', 'courses.id');
         // ->join('users', 'classes.teacher_id', '=', 'users.id')
@@ -72,6 +72,7 @@ class SchedulesController extends Controller
         // ...existing code...
         if ($request->ajax()) {
             return view('admin.schedules.partials.table', compact('classes'))->render();
+            // return 'OK';
         }
         return view('admin.schedules.index', compact('classes', 'courses'));
     }

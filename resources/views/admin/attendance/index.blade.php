@@ -201,9 +201,9 @@
                     <p class="text-muted mb-0">Lịch học và điểm danh theo thời gian</p>
                 </div>
                 <div>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
+                    {{-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
                         <i class="fas fa-plus me-2"></i>Thêm sự kiện
-                    </button>
+                    </button> --}}
                 </div>
             </div>
 

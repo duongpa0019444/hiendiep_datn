@@ -247,6 +247,13 @@
                                                             </a>
                                                         </li>
                                                         <li>
+                                                            <a href="{{ route('client.classroom') }}"
+                                                                class="dropdown-item p-2" data-section="classroom">
+                                                                <i class="icofont-education me-2"></i> Lớp học
+                                                            </a>
+                                                        </li>
+
+                                                        <li>
                                                             <a href="{{ route('client.schedule') }}"
                                                                 class="dropdown-item p-2" data-section="schedule">
                                                                 <i class="icofont-calendar me-2"></i>

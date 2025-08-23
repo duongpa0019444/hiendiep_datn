@@ -182,6 +182,14 @@
                                     <!-- Item 1 -->
 
                                     @foreach ($notifications as $notification)
+                                        @if (!$notification->coursePayment)
+                                            @php
+                                                \Log::warning('Notification không có coursePayment', [
+                                                    'id' => $notification->id,
+                                                ]);
+                                            @endphp
+                                            @continue
+                                        @endif
                                         <div class="dropdown-item py-3 border-bottom text-wrap position-relative">
                                             <div class="d-flex">
                                                 <div class="flex-shrink-0">

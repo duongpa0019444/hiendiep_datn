@@ -13,6 +13,7 @@
                     <th>Ngày</th>
                     <th>Thời Gian</th>
                     <th>Môn Học</th>
+                    <th>Lớp Học</th>
                     <th>Tác vụ</th>
                 </tr>
                 @foreach ($schedules as $schedule)
@@ -22,6 +23,7 @@
                         <td>{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} -
                             {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}</td>
                         <td>{{ $schedule->course_name }}</td>
+                        <td>{{ $schedule->class_name }}</td>
                         <td>
                             <a href="{{ route('admin.attendance.class', ['id' => $schedule->schedule_id]) }}">
                                 <button class="btn btn-success btn-sm attendance-btn shadow-sm" 
