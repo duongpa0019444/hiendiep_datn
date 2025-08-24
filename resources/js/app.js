@@ -87,14 +87,22 @@ window.addEventListener('load', function () {
                 }
 
                 //định dạng lại thời gian
-                const createdAt = new Date(e.notification.created_at);
-                const formattedDate = createdAt.toLocaleString('vi-VN', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
+                 function parseCustomDate(dateStr) {
+                    // "24/08/2025 14:56:56"
+                    const [day, month, yearAndTime] = dateStr.split("/");
+                    const [year, time] = yearAndTime.split(" ");
+                    return new Date(`${year}-${month}-${day}T${time}`);
+                }
+
+                const createdAt = parseCustomDate(e.notification.created_at);
+                const formattedDate = createdAt.toLocaleString("vi-VN", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
                 });
+
 
                 const html = `
                     <div class="dropdown-item py-3 border-bottom text-wrap position-relative">

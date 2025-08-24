@@ -78,10 +78,11 @@ Route::get('/news/category/{id}/{slug}', [ClientNewsController::class, 'newsCate
 
 
 // Route dành cho admin và nhân viên --
-Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(function () {    
+Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(function () {
     // trang quản trị cho admin
     Route::get('dashboard', [DashboardController::class, 'dashBoard'])->name('admin.dashboard');
-    Route::get('dashboard/chart/{course_id}', [DashboardController::class, 'chart'])->name('admin.dashboard.chart');
+    Route::get('dashboard/renderOverview/{year}', [DashboardController::class, 'renderOverview'])->name('admin.dashboard.renderOverview');
+    Route::get('dashboard/{year}/chart/{course_id}', [DashboardController::class, 'chart'])->name('admin.dashboard.chart');
     Route::get('dashboard/schedules/{id}/views', [DashboardController::class, 'getSchedulesViews'])->name('admin.dashboard.schedules.views');
     Route::get('dashboard/schedules/date/{date}', [DashboardController::class, 'getSchedulesByDate'])->name('admin.dashboard.schedules.date');
     Route::get('dashboard/chart/revenue/{year}', [DashboardController::class, 'chartRevenue'])->name('admin.chartRevenue');
@@ -90,8 +91,8 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
 
     // Trang quản lý tài khoản
     Route::get('/account', [AccountController::class, 'account'])->name('admin.account');
-    Route::get('/account-add', [AccountController::class, 'accountAdd'])->name('admin.account-add');  
-    Route::post('/account-store', [AccountController::class, 'accountStore'])->name('admin.account-store');  
+    Route::get('/account-add', [AccountController::class, 'accountAdd'])->name('admin.account-add');
+    Route::post('/account-store', [AccountController::class, 'accountStore'])->name('admin.account-store');
     Route::get('/account-search', [AccountController::class, 'search'])->name('admin.account.search');
     Route::get('/account/{role}', [AccountController::class, 'list'])->name('admin.account.list');
     Route::get('/account/{role}/{id}', [AccountController::class, 'detail'])->name('admin.account.detail');
@@ -122,7 +123,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('scores/export/{class_id}/{course_id}', [ScoreController::class, 'export'])->name('admin.scores.export');
     Route::post('scores/import', [ScoreController::class, 'import'])->name('admin.scores.import');
     Route::get('scores/download', [ScoreController::class, 'download'])->name('admin.score.download');
-    
+
 
 
     // Trang quản lý học phí Thanh toán

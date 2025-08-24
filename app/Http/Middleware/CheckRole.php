@@ -31,6 +31,7 @@ class CheckRole
                 $trainAllowedRoutes = [
                     // dashboard
                     'admin.dashboard',
+                    'admin.dashboard.renderOverview',
                     'admin.dashboard.schedules.views',
                     'admin.dashboard.schedules.date',
                     'admin.chartRevenue',
@@ -181,6 +182,7 @@ class CheckRole
 
                     // dashboard
                     'admin.dashboard',
+                    'admin.dashboard.renderOverview',
                     'admin.dashboard.schedules.views',
                     'admin.dashboard.schedules.date',
                     'admin.chartRevenue',
@@ -196,6 +198,8 @@ class CheckRole
                     'admin.course_payments.show',
                     'admin.course_payments.statistics',
                     'admin.course_payments.update',
+                    'admin.course_payments.trash',
+                    'admin.course_payments.trash.filter',
 
                     // thông báo học phí
                     'admin.noti.coursepayment',
