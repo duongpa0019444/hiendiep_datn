@@ -88,15 +88,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Ngày cập nhật -->
-                                    <div class="col-lg-6">
-                                        <div class="mb-3">
-                                            <label for="updated_at" class="form-label">Ngày cập nhật khóa học</label>
-                                            <input type="datetime-local" name="updated_at" id="updated_at"
-                                                class="form-control">
-                                        </div>
-                                    </div>
-
                                     <!-- Nội dung khóa học -->
                                     <div class="col-lg-12">
                                         <div class="mb-0">
@@ -105,20 +96,7 @@
                                                 placeholder="Nhập nội dung khóa học"></textarea>
                                         </div>
                                     </div>
-                                    {{-- <div class="col-lg-12">
-                                        <div class="mb-0">
-                                            <label for="teaching_method" class="form-label">Phương pháp dạy học </label>
-                                            <textarea class="form-control bg-light-subtle ckeditor" name="teaching_method" id="teaching_method" rows="7"
-                                                placeholder="Nhập phương pháp dạy học "></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12">
-                                        <div class="mb-0">
-                                            <label for="teaching_goals" class="form-label">Mục tiêu khóa hoc </label>
-                                            <textarea class="form-control bg-light-subtle ckeditor" name="teaching_goals" id="teaching_goals" rows="7"
-                                                placeholder="Nhập mục tiêu khóa học "></textarea>
-                                        </div>
-                                    </div> --}}
+                                    
                                 </div>
                             </div>
                         </div>

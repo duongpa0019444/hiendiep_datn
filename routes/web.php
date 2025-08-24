@@ -25,6 +25,8 @@ use App\Http\Controllers\client\CourseController as ClientCourseController;
 use App\Http\Controllers\client\AttendanceController as ClientAttendanceController;
 use App\Http\Controllers\client\newsController as ClientNewsController;
 use App\Http\Controllers\courseController;
+use App\Http\Controllers\admin\ClassroomController;
+
 
 use App\Http\Controllers\SupportRequestController;
 
@@ -245,6 +247,36 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::delete('classes/{class}/students/{student}/force-delete', [ClassController::class, 'forceDeleteStudent'])->name('admin.classes.force-delete-student');
     // Danh sách lịch hoc của lớp
     Route::get('/classes/{id}/schedules', [ClassController::class, 'schedules'])->name('admin.classes.schedules');
+
+
+
+
+  // phần quản lý phòng học
+  Route::get('/classroom', [ClassroomController::class, 'index'])->name('admin.classroom.list-room');
+  // thêm phòng học
+  Route::get('/classroom/create', [ClassroomController::class, 'create'])->name('admin.classroom.create');
+  Route::post('/classroom/store', [ClassroomController::class, 'store'])->name('admin.classroom.store');
+  // xóa phòng học
+  Route::delete('/admin/classrooms/{id}', [ClassroomController::class, 'delete'])->name('admin.classroom.delete');
+  // lấy thời gian
+  // Route::get('/classroom/{id}/times', [ClassroomController::class, 'getClassTimes'])->name('admin.classroom.get-class-times');
+  // chi tiết phòng học
+  Route::get('/classroom/{id}', [ClassroomController::class, 'detailRoom'])->name('admin.classroom.detail-room');
+
+// thêm lớp vào phòng
+Route::get('/classroom/{id}/add-class', [ClassroomController::class, 'addClass'])->name('admin.classroom.add-class');
+Route::post('/classroom/{id}/store-class', [ClassroomController::class, 'storeClass'])->name('admin.classroom.store-class');
+
+// cập nhật phòng học
+Route::get('classroom/{id}/edit', [ClassroomController::class, 'edit'])->name('admin.classroom.edit');
+Route::put('classroom/{id}', [ClassroomController::class, 'update'])->name('admin.classroom.update');
+
+
+
+
+
+
+
 
 
     // Quản lý lịch học
