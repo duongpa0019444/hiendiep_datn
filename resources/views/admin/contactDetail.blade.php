@@ -1,6 +1,6 @@
 @extends('admin.admin')
 
-@section('title', 'Trang admin')
+@section('title', 'Chi tiết liên hệ')
 @section('description', '')
 @section('content')
 
