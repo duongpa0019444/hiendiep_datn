@@ -479,6 +479,24 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.thongke.daotao') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="solar:widget-5-bold-duotone"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Thống kê đào tạo </span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.thongke.taichinh') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="solar:widget-5-bold-duotone"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Thống kê tài chính </span>
+                            </a>
+                        </li>
+
                         <li class="menu-title mt-2">Quản lý học tập</li>
 
                         <li class="nav-item">
@@ -605,7 +623,7 @@
                             </div>
                         </li>
 
-                         <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link menu-arrow" href="#staffs" data-bs-toggle="collapse" role="button"
                                 aria-expanded="false" aria-controls="staffs">
                                  <span class="nav-icon">
@@ -625,7 +643,7 @@
                                     </li>
                                 </ul>
                             </div>
-                        </li>
+                        </li> --}}
 
                         <li class="menu-title mt-2">Truyền thông & Liên hệ</li>
 
@@ -720,8 +738,8 @@
                                 </ul>
                             </div>
                         </li>
-
-                         <li class="nav-item">
+                            {{-- Ql luong nv --}}
+                         {{-- <li class="nav-item">
                             <a class="nav-link menu-arrow" href="#staffs" data-bs-toggle="collapse" role="button"
                                 aria-expanded="false" aria-controls="staffs">
                                  <span class="nav-icon">
@@ -741,7 +759,7 @@
                                     </li>
                                 </ul>
                             </div>
-                        </li>
+                        </li> --}}
 
                         <li class="menu-title mt-2">Truyền thông & Liên hệ</li>
 

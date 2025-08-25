@@ -125,7 +125,7 @@
 
                     <div class="card-footer">
                         <nav aria-label="Page navigation">
-                            {!! $allClasses->links('pagination::bootstrap-5') !!}
+                            {!! $allClasses->withQueryString()->links('pagination::bootstrap-5') !!}
                         </nav>
                     </div>
                 @elseif ($user->role === 'teacher')
@@ -204,7 +204,7 @@
 
                     <div class="card-footer mt-2">
                         <nav aria-label="Page navigation">
-                            {!! $allClasses->links('pagination::bootstrap-5') !!}
+                            {!! $allClasses->withQueryString()->links('pagination::bootstrap-5') !!}
                         </nav>
                     </div>
 
