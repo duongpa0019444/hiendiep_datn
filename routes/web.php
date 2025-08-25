@@ -91,6 +91,11 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('dashboard/chart/revenueCourse/{year}', [DashboardController::class, 'chartRevenueCourse'])->name('admin.revenueCourse');
     // Quản lý thống kê
     Route::get('/thong-ke-dao-tao', [ThongKeController::class, 'index'])->name('admin.thongke.daotao');
+    Route::get('/sl-hs-theo-lop', [ThongKeController::class, 'classStudentCounts'])->name('admin.thongke.classStudentCounts');
+    Route::get('/diem-tb-theo-lop', [ThongKeController::class, 'classAverageScores'])->name('admin.thongke.classAverageScores');
+
+
+
     Route::get('/thong-ke-tai-chinh', [ThongKeController::class, 'studyStatistics'])->name('admin.thongke.taichinh');
 
 

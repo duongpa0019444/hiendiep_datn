@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-          
+
             <!-- Horizontal Bar Chart -->
             <div class="card">
                 <div class="card-body">
@@ -66,7 +66,7 @@
                     <div id="attendance-chart" class="apex-charts"></div>
                 </div>
 
-                 <div class="card-body">
+                {{-- <div class="card-body">
                     <h4 class="card-title mb-3">Giáo viên dưới chuẩn 80% theo tháng</h4>
                     <div class="table-responsive">
                         <table class="table table-bordered text-center" id="below-standard-table">
@@ -79,9 +79,9 @@
                             <tbody></tbody>
                         </table>
                     </div>
-                </div>
+                </div> --}}
             </div>
-            
+
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title mb-3">Tổng hợp tình trạng lớp học</h4>
@@ -108,9 +108,9 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Khóa học</th>
-                                    <th style="color:#3b82f6">Chưa bắt đầu</th>
-                                    <th style="color:#9333ea">Đang diễn ra</th>
-                                    <th style="color:#f97316">Đã hoàn thành</th>
+                                    <th style="color:#3b82f6">Lớp Chưa bắt đầu</th>
+                                    <th style="color:#9333ea">Lớp Đang diễn ra</th>
+                                    <th style="color:#f97316">Lớp Đã hoàn thành</th>
                                     <th><b>Tổng</b></th>
                                 </tr>
                             </thead>
@@ -150,7 +150,7 @@
                                 @endforeach
 
                                 <tr class="table-secondary">
-                                    <td><b>Tổng cộng</b></td>
+                                    <td><b>Tổng cộng lớp</b></td>
                                     <td style="color:#3b82f6"><b>{{ $totals[0] }}</b></td>
                                     <td style="color:#9333ea"><b>{{ $totals[1] }}</b></td>
                                     <td style="color:#f97316"><b>{{ $totals[2] }}</b></td>
@@ -164,22 +164,27 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title anchor" id="datalables">
-                        Biểu đồ thống kế số lượng học sinh trong từng lớp<a class="anchor-link" href="#datalables">#</a>
-                    </h5>
-
-                    <div id="datalables-bar" class="apex-charts"></div>
+                    <h4 class="card-title mb-3">Thống kê số lượng học sinh trong từng lớp</h4>
+                    <div id="student-class-bar" class="apex-charts"></div>
+                    <div class="d-flex justify-content-center mt-3">
+                        <button id="prevPageClass" class="btn btn-outline-primary btn-sm me-2">⬅ Trước</button>
+                        <span id="pageInfoClass"></span>
+                        <button id="nextPageClass" class="btn btn-outline-primary btn-sm ms-2">Tiếp ➡</button>
+                    </div>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title anchor" id="distributed">Biểu đồ thống kê điểm trung bình của các lớp học</h4>
-                    <div dir="ltr">
-                        <div id="distributed-column" class="apex-charts"></div>
+                    <h4 class="card-title mb-3">Thống kê điểm trung bình các khóa học</h4>
+                    <div id="avg-score-bar" class="apex-charts"></div>
+                    <div class="d-flex justify-content-center mt-3">
+                        <button id="prevPageCourse" class="btn btn-outline-primary btn-sm me-2">⬅ Trước</button>
+                        <span id="pageInfoCourse"></span>
+                        <button id="nextPageCourse" class="btn btn-outline-primary btn-sm ms-2">Tiếp ➡</button>
                     </div>
                 </div>
-                <!-- end card body-->
+
             </div>
 
 
@@ -194,125 +199,129 @@
     <script>
         // Thống kê học sinh đăng kí học theo khóa theo tháng tại trung tâm
         //
-        var months = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9",
-            "Tháng 10", "Tháng 11", "Tháng 12"
-        ];
-        var seriesData = [{
-                name: "Khóa học 1",
-                data: [28, 29, 33, 36, 32, 32, 33, 34, 35, 37, 38, 30]
-            },
-            {
-                name: "Khóa học 2",
-                data: [12, 11, 14, 18, 17, 13, 13, 12, 11, 10, 9, 8]
-            },
-            {
-                name: "Khóa học 3",
-                data: [72, 71, 74, 78, 77, 73, 73, 72, 71, 70, 69, 68]
-            },
-            {
-                name: "Khóa học 4",
-                data: [40, 41, 44, 48, 47, 43, 43, 42, 41, 40, 39, 38]
-            },
-            {
-                name: "Khóa học 5",
-                data: [50, 51, 54, 58, 57, 53, 53, 52, 51, 50, 49, 48]
-            },
-            {
-                name: "Khóa học 6",
-                data: [10, 51, 24, 38, 87, 93, 13, 22, 41, 50, 47, 78]
-            },
-            {
-                name: "Khóa học 7",
-                data: [35, 36, 37, 40, 38, 39, 40, 42, 41, 39, 38, 37]
-            },
-            {
-                name: "Khóa học 8",
-                data: [22, 23, 25, 26, 27, 29, 28, 30, 31, 32, 33, 34]
-            },
-            {
-                name: "Khóa học 9",
-                data: [18, 19, 20, 22, 21, 23, 24, 26, 27, 28, 29, 30]
-            },
-            {
-                name: "Khóa học 10",
-                data: [12, 14, 15, 17, 18, 20, 22, 23, 24, 25, 27, 28]
-            }
-        ];
-
-        var options = {
-            chart: {
-                type: "line",
-                height: 500,
-                toolbar: {
-                    show: true
-                }
-            },
-            stroke: {
-                width: 3,
-                curve: "smooth"
-            },
-            dataLabels: {
-                enabled: false
-            },
-            series: seriesData,
-            xaxis: {
-                categories: months,
-                title: {
-                    text: "Tháng"
-                }
-            },
-            yaxis: {
-                title: {
-                    text: "Số lượng học sinh"
+        function thongKeHsDK() {
+            var months = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9",
+                "Tháng 10", "Tháng 11", "Tháng 12"
+            ];
+            var seriesData = [{
+                    name: "Khóa học 1",
+                    data: [28, 29, 33, 36, 32, 32, 33, 34, 35, 37, 38, 30]
                 },
-                min: 0,
-                max: 100
-            },
-            tooltip: {
-                shared: true,
-                y: {
-                    formatter: (val) => val + " học sinh"
+                {
+                    name: "Khóa học 2",
+                    data: [12, 11, 14, 18, 17, 13, 13, 12, 11, 10, 9, 8]
+                },
+                {
+                    name: "Khóa học 3",
+                    data: [72, 71, 74, 78, 77, 73, 73, 72, 71, 70, 69, 68]
+                },
+                {
+                    name: "Khóa học 4",
+                    data: [40, 41, 44, 48, 47, 43, 43, 42, 41, 40, 39, 38]
+                },
+                {
+                    name: "Khóa học 5",
+                    data: [50, 51, 54, 58, 57, 53, 53, 52, 51, 50, 49, 48]
+                },
+                {
+                    name: "Khóa học 6",
+                    data: [10, 51, 24, 38, 87, 93, 13, 22, 41, 50, 47, 78]
+                },
+                {
+                    name: "Khóa học 7",
+                    data: [35, 36, 37, 40, 38, 39, 40, 42, 41, 39, 38, 37]
+                },
+                {
+                    name: "Khóa học 8",
+                    data: [22, 23, 25, 26, 27, 29, 28, 30, 31, 32, 33, 34]
+                },
+                {
+                    name: "Khóa học 9",
+                    data: [18, 19, 20, 22, 21, 23, 24, 26, 27, 28, 29, 30]
+                },
+                {
+                    name: "Khóa học 10",
+                    data: [12, 14, 15, 17, 18, 20, 22, 23, 24, 25, 27, 28]
                 }
-            },
-            legend: {
-                position: "top",
-                horizontalAlign: "center"
-            },
-            colors: ["#ef5f5f", "#22c55e", "#3b82f6", "#fbbf24", "#6366f1", "#a855f7", "#d97706", "#ff8c00", "#ff5722",
-                "#ff4081"
-            ]
-        };
-        new ApexCharts(document.querySelector("#student-enroll-chart"), options).render();
+            ];
 
-        //
-        // Bảng phụ: Top 3 khóa theo tháng
-        //
-        function buildTop3Table() {
-            let tbody = document.querySelector("#top3-table tbody");
-            tbody.innerHTML = "";
+            var options = {
+                chart: {
+                    type: "line",
+                    height: 500,
+                    toolbar: {
+                        show: true
+                    }
+                },
+                stroke: {
+                    width: 3,
+                    curve: "smooth"
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                series: seriesData,
+                xaxis: {
+                    categories: months,
+                    title: {
+                        text: "Tháng"
+                    }
+                },
+                yaxis: {
+                    title: {
+                        text: "Số lượng học sinh"
+                    },
+                    min: 0,
+                    max: 100
+                },
+                tooltip: {
+                    shared: true,
+                    y: {
+                        formatter: (val) => val + " học sinh"
+                    }
+                },
+                legend: {
+                    position: "top",
+                    horizontalAlign: "center"
+                },
+                colors: ["#ef5f5f", "#22c55e", "#3b82f6", "#fbbf24", "#6366f1", "#a855f7", "#d97706", "#ff8c00",
+                    "#ff5722",
+                    "#ff4081"
+                ]
+            };
+            new ApexCharts(document.querySelector("#student-enroll-chart"), options).render();
 
-            months.forEach((month, idx) => {
-                // Lấy data theo tháng idx
-                let values = seriesData.map(s => ({
-                    name: s.name,
-                    value: s.data[idx]
-                }));
-                // Sort giảm dần
-                values.sort((a, b) => b.value - a.value);
-                // Lấy top 3
-                let top3 = values.slice(0, 3);
+            //
+            // Bảng phụ: Top 3 khóa theo tháng
+            //
+            function buildTop3Table() {
+                let tbody = document.querySelector("#top3-table tbody");
+                tbody.innerHTML = "";
 
-                let row = `<tr>
+                months.forEach((month, idx) => {
+                    // Lấy data theo tháng idx
+                    let values = seriesData.map(s => ({
+                        name: s.name,
+                        value: s.data[idx]
+                    }));
+                    // Sort giảm dần
+                    values.sort((a, b) => b.value - a.value);
+                    // Lấy top 3
+                    let top3 = values.slice(0, 3);
+
+                    let row = `<tr>
                 <td><b>${month}</b></td>
                 <td>${top3[0].name}: ${top3[0].value}</td>
                 <td>${top3[1].name}: ${top3[1].value}</td>
                 <td>${top3[2].name}: ${top3[2].value}</td>
             </tr>`;
-                tbody.innerHTML += row;
-            });
-        }
+                    tbody.innerHTML += row;
+                });
+            }
 
-        buildTop3Table();
+            buildTop3Table();
+        }
+        thongKeHsDK();
 
 
 
@@ -404,6 +413,8 @@
 
 
 
+
+
         //
         // Line Chart: Tỷ lệ chuyên cần giáo viên theo tháng
         //
@@ -437,7 +448,7 @@
         });
 
         //
-        // Biểu đồ
+        // Biểu đồ chuyên cần giáo viên
         //
         var options = {
             chart: {
@@ -505,30 +516,32 @@
 
         new ApexCharts(document.querySelector("#attendance-chart"), options).render();
 
-        //
-        // Bảng phụ: liệt kê GV dưới chuẩn 80% từng tháng
-        //
-        function buildBelowStandardTable() {
-            let tbody = document.querySelector("#below-standard-table tbody");
-            tbody.innerHTML = "";
+        // //
+        // // Bảng phụ: liệt kê GV dưới chuẩn 80% từng tháng
+        // //
+        // function buildBelowStandardTable() {
+        //     let tbody = document.querySelector("#below-standard-table tbody");
+        //     tbody.innerHTML = "";
 
-            months.forEach((month, idx) => {
-                let below = seriesData.filter(s => s.data[idx] < 80)
-                    .map(s => `${s.name} (${s.data[idx]}%)`);
-                let row = `<tr>
-                <td><b>${month}</b></td>
-                <td>${below.length > 0 ? below.join(", ") : "Tất cả đạt chuẩn ✅"}</td>
-            </tr>`;
-                tbody.innerHTML += row;
-            });
-        }
+        //     months.forEach((month, idx) => {
+        //         let below = seriesData.filter(s => s.data[idx] < 80)
+        //             .map(s => `${s.name} (${s.data[idx]}%)`);
+        //         let row = `<tr>
+    //         <td><b>${month}</b></td>
+    //         <td>${below.length > 0 ? below.join(", ") : "Tất cả đạt chuẩn ✅"}</td>
+    //     </tr>`;
+        //         tbody.innerHTML += row;
+        //     });
+        // }
 
-        buildBelowStandardTable();
+        // buildBelowStandardTable();
+
+
 
 
         // SIMPLE PIE CHART
         //
-        // Pie chart trạng thái toàn trung tâm
+        // Pie chart trạng thái lớp học, khóa học 
         var pieOptions = {
             chart: {
                 type: 'pie',
@@ -601,437 +614,211 @@
         new ApexCharts(document.querySelector("#bottom-courses-bar"), bottomBarOptions).render();
 
 
-        // COLUMN CHART WITH DATALABELS
+
+
+        // Tổng học sinh trong lớp học
         //
-        var colors = ["#4ecac2"];
-        var options = {
-            chart: {
-                height: 380,
-                type: 'bar',
-                toolbar: {
-                    show: false
-                }
-            },
-            plotOptions: {
-                bar: {
-                    borderRadius: 10,
-                    dataLabels: {
-                        position: 'top', // top, center, bottom
+        // Giả sử có 50 lớp
+        function tongHsClass() {
+            const pageSize = 10; // số lớp mỗi trang hiển thị trên biểu đồ
+            let currentPage = 1; // trang hiện tại
+            let labels = []; // mảng tên lớp
+            let counts = []; // mảng số học sinh
+            let chart = null; // instance của ApexCharts
+
+
+            async function loadData() {
+                const res = await fetch('/admin/sl-hs-theo-lop');
+                const data = await res.json();
+                labels = data.labels; // truyển dữ liệu trả về vào mảng labels
+                counts = data.counts; // truyển dữ liệu trả về vào mảng counts
+                renderChart(currentPage);
+            }
+
+            // Hàm vẽ lại biểu đồ theo page hiện tại
+            function renderChart(page) {
+                const start = (page - 1) * pageSize; // Cắt dữ liệu theo page hiện tại (mỗi trang 10 lớp)
+                const end = start + pageSize;
+                const slicedNames = labels.slice(start, end);
+                const slicedCounts = counts.slice(start, end);
+
+                // Cấu hình biểu đồ ApexCharts
+                const options = {
+                    chart: {
+                        type: 'bar',
+                        height: 400
                     },
-                }
-            },
-            dataLabels: {
-                enabled: true,
-                formatter: function(val) {
-                    return val + "";
-                },
-                offsetY: -25,
-                style: {
-                    fontSize: '12px',
-                    colors: ["#304758"]
-                }
-            },
-            colors: colors,
-            legend: {
-                show: true,
-                horizontalAlign: "center",
-                offsetX: 0,
-                offsetY: -5,
-            },
-            series: [{
-                name: 'Số lượng lớp',
-                data: [2, 3, 4, 10, 4, 3, 3, 2, 1, 0, 0, 0]
-            }],
-            xaxis: {
-                categories: ["Khóa học 1", "Khóa học 2", "Khóa học 3", "Khóa học 4", "Khóa học 5", "Khóa học 6",
-                    "Khóa học 7", "Khóa học 8", "Khóa học 9", "Khóa học 10", "Khóa học 11", "Khóa học 12"
-                ],
-                position: 'top',
-                labels: {
-                    offsetY: 0,
-                },
-                axisBorder: {
-                    show: false
-                },
-                axisTicks: {
-                    show: false
-                },
-                crosshairs: {
-                    fill: {
-                        type: 'gradient',
-                        gradient: {
-                            colorFrom: '#D8E3F0',
-                            colorTo: '#BED1E6',
-                            stops: [0, 100],
-                            opacityFrom: 0.6,
-                            opacityTo: 0.5,
+                    plotOptions: {
+                        bar: {
+                            horizontal: true,
+                            borderRadius: 4
                         }
-                    }
-                },
-                tooltip: {
-                    enabled: true,
-                    offsetY: -10,
-                }
-            },
-            fill: {
-                gradient: {
-                    enabled: false,
-                    shade: 'light',
-                    type: "horizontal",
-                    shadeIntensity: 0.25,
-                    gradientToColors: undefined,
-                    inverseColors: true,
-                    opacityFrom: 1,
-                    opacityTo: 1,
-                    stops: [50, 0, 100, 100]
-                },
-            },
-            yaxis: {
-                axisBorder: {
-                    show: false
-                },
-                axisTicks: {
-                    show: false,
-                },
-                labels: {
-                    show: false,
-                    formatter: function(val) {
-                        return val + "";
-                    }
-                }
-
-            },
-            title: {
-                text: 'Số lượng lớp theo khóa học',
-                floating: true,
-                offsetY: 360,
-                align: 'center',
-                style: {
-                    color: '#444'
-                }
-            },
-            grid: {
-                row: {
-                    colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
-                    opacity: 0.2
-                },
-                borderColor: '#f1f3fa'
-            }
-        }
-        var chart = new ApexCharts(
-            document.querySelector("#datalabels-column"),
-            options
-        );
-        chart.render();
-
-
-        // CUSTOM DATALABELS BAR
-        //
-
-        var colors = [
-            "#1c84ee",
-            "#53389f",
-            "#7f56da",
-            "#ff86c8",
-            "#ef5f5f",
-            "#ff6c2f",
-            "#f9b931",
-            "#22c55e",
-            "#040505",
-            "#4ecac2",
-        ];
-        var options = {
-            chart: {
-                height: 500,
-                type: "bar",
-                toolbar: {
-                    show: false,
-                },
-            },
-            plotOptions: {
-                bar: {
-                    barHeight: "100%",
-                    distributed: true,
-                    horizontal: true,
+                    },
+                    series: [{
+                        name: 'Số học sinh',
+                        data: slicedCounts
+                    }],
+                    xaxis: {
+                        categories: slicedNames,
+                        title: {
+                            text: 'Số học sinh'
+                        }
+                    },
+                    colors: '#3b82f6',
                     dataLabels: {
-                        position: "bottom",
+                        enabled: true
                     },
-                },
-            },
-            colors: colors,
-            dataLabels: {
-                enabled: true,
-                textAnchor: "start",
-                style: {
-                    colors: ["#fff"],
-                },
-                formatter: function(val, opt) {
-                    return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val;
-                },
-                offsetX: 0,
-                dropShadow: {
-                    enabled: false,
-                },
-            },
-            series: [{
-                data: [400, 430, 448, 470, 540, 580, 690, 1100, 1200, 1380],
-            }, ],
-            stroke: {
-                width: 0,
-                colors: ["#fff"],
-            },
-            xaxis: {
-                categories: [
-                    "Lớp học 1",
-                    "Lớp học 2",
-                    "Lớp học 3",
-                    "Lớp học 4",
-                    "Lớp học 5",
-                    "Lớp học 6",
-                    "Lớp học 7",
-                    "Lớp học 8",
-                    "Lớp học 9",
-                    "Lớp học 10",
-
-                ],
-            },
-            yaxis: {
-                labels: {
-                    show: false,
-                },
-            },
-            grid: {
-                borderColor: "#f1f3fa",
-            },
-
-            tooltip: {
-                theme: "dark",
-                x: {
-                    show: false,
-                },
-                y: {
-                    title: {
-                        formatter: function() {
-                            return "";
-                        },
+                    legend: {
+                        show: false,
                     },
-                },
-            },
-        };
+                };
 
-        var chart = new ApexCharts(document.querySelector("#datalables-bar"), options);
+                // Xóa biểu đồ cũ và render biểu đồ mới
+                document.querySelector('#student-class-bar').innerHTML = '';
+                chart = new ApexCharts(document.querySelector('#student-class-bar'), options);
+                chart.render();
 
-        chart.render();
-
-
-        //
-        // DISTRIBUTED COLUMN CHART
-        //
-        // var apiData = [{
-        //         class: "Lớp A1",
-        //         avg: 7.5
-        //     },
-        //     {
-        //         class: "Lớp Summer 2025",
-        //         avg: 8.2
-        //     },
-        //     {
-        //         class: "Toeic Beginner",
-        //         avg: 6.9
-        //     },
-        //     {
-        //         class: "IELTS Prep",
-        //         avg: 8.8
-        //     },
-        //     {
-        //         class: "Giao tiếp A2",
-        //         avg: 5.9
-        //     },
-        //     {
-        //         class: "Kids English",
-        //         avg: 7.1
-        //     },
-        //     {
-        //         class: "Lớp B1",
-        //         avg: 6.3
-        //     },
-        //     {
-        //         class: "Summer Kids",
-        //         avg: 9.0
-        //     },
-        //     {
-        //         class: "Lớp C1",
-        //         avg: 7.8
-        //     },
-        //     {
-        //         class: "Toeic Advanced 1",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced 2",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "Toeic Advanced",
-        //         avg: 8.5
-        //     },
-        //     {
-        //         class: "ABc",
-        //         avg: 8.5
-        //     },
-        //     // … bạn có thể thêm tới 50+ lớp
-        // ];
-
-        // var categories = apiData.map(item => item.class);
-        // var values = apiData.map(item => item.avg);
-
-
-        var colors = ['#1c84ee', '#53389f', '#7f56da', '#ff86c8', '#ef5f5f', '#ff6c2f', '#f9b931', '#22c55e'];
-        var options = {
-            chart: {
-                height: 380,
-                type: 'bar',
-                toolbar: {
-                    show: false
-                },
-                events: {
-                    click: function(chart, w, e) {
-                        console.log(chart, w, e)
-                    }
-                },
-            },
-            colors: colors,
-            plotOptions: {
-                bar: {
-                    columnWidth: '45%',
-                    distributed: true
-                }
-            },
-            dataLabels: {
-                enabled: false,
-            },
-            series: [{
-                data: [1.5, 2, 3, 4, 5.1, 6, 7, 8, 9.4, 10]
-            }],
-            yaxis: [{
-                title: {
-                    text: 'Điểm trung bình'
-                }
-            }],
-            xaxis: {
-                categories: ['Khóa học 1', 'Khóa học 2', 'Khóa học 3', 'Khóa học 4', 'Khóa học 5', 'Khóa học 6',
-                    'Khóa học 7', 'Khóa học 8', 'Khóa học 9', 'Khóa học 10'
-                ],
-                labels: {
-                    style: {
-                        colors: colors,
-                        fontSize: '14px'
-                    }
-                }
-            },
-            legend: {
-                offsetY: 7
-            },
-            grid: {
-                row: {
-                    colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
-                    opacity: 0.2
-                },
-                borderColor: '#f1f3fa'
+                // Cập nhật số trang
+                document.getElementById('pageInfoClass').innerText =
+                    `Trang ${page}/${Math.ceil(labels.length / pageSize)}`;
             }
+            // Disable nút nếu chỉ có 1 trang hoặc ở đầu/cuối
+            document.getElementById('prevPageClass').disabled = currentPage <= 1;
+            document.getElementById('nextPageClass').disabled = currentPage >= Math.ceil(labels.length / pageSize);
+
+            // Event click nút Prev
+            document.getElementById('prevPageClass').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderChart(currentPage);
+                }
+            });
+
+            // Event click nút Next
+            document.getElementById('nextPageClass').addEventListener('click', () => {
+                if (currentPage < Math.ceil(labels.length / pageSize)) {
+                    currentPage++;
+                    renderChart(currentPage);
+                }
+            });
+
+
+            // Gọi API khi load trang
+            loadData();
         }
-        var chart = new ApexCharts(
-            document.querySelector("#distributed-column"),
-            options
-        );
-        chart.render();
+        tongHsClass();
+
+
+
+
+        // Điểm trung bình các khóa học
+        // Tạo 50 khóa học
+
+        function diemTbLop() {
+            const benchmark = 5.0;
+            const pageSize = 10;
+            let currentPage = 1;
+            let labels = [];
+            let scores = [];
+
+            async function loadData() {
+                const res = await fetch('/admin/diem-tb-theo-lop');
+                const data = await res.json();
+                labels = data.labels;
+                scores = data.scores;
+                renderChart(currentPage);
+            }
+
+            function renderChart(page) {
+                const start = (page - 1) * pageSize;
+                const end = start + pageSize;
+                const pageLabels = labels.slice(start, end);
+                const pageScores = scores.slice(start, end);
+
+                const maxScore = Math.max(...pageScores);
+                const minScore = Math.min(...pageScores);
+                const colors = pageScores.map(s => {
+                    if (s === maxScore) return "#10b981";
+                    if (s === minScore) return "#ef4444";
+                    return s >= benchmark ? "#3b82f6" : "#f59e0b";
+                });
+
+                const options = {
+                    chart: {
+                        type: 'bar',
+                        height: 400
+                    },
+                    plotOptions: {
+                        bar: {
+                            columnWidth: '55%',
+                            borderRadius: 6,
+                            distributed: true
+                        }
+                    },
+                    series: [{
+                        name: "Điểm trung bình",
+                        data: pageScores
+                    }],
+                    xaxis: {
+                        categories: pageLabels,
+                        title: {
+                            text: "Lớp"
+                        }
+                    },
+                    yaxis: {
+                        title: {
+                            text: "Điểm trung bình"
+                        },
+                        min: 0,
+                        max: 10
+                    },
+                    fill: {
+                        colors: colors
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        formatter: val => val.toFixed(1)
+                    },
+                    annotations: {
+                        yaxis: [{
+                            y: benchmark,
+                            borderColor: '#e11d48',
+                            label: {
+                                borderColor: '#e11d48',
+                                style: {
+                                    color: '#fff',
+                                    background: '#e11d48'
+                                },
+                                text: `Chuẩn ${benchmark}`
+                            }
+                        }]
+                    }
+                };
+
+                document.querySelector("#avg-score-bar").innerHTML = "";
+                new ApexCharts(document.querySelector("#avg-score-bar"), options).render();
+
+                const totalPages = Math.ceil(labels.length / pageSize);
+                document.getElementById("pageInfoCourse").innerText = `Trang ${page}/${totalPages}`;
+                document.getElementById("prevPageCourse").disabled = page <= 1;
+                document.getElementById("nextPageCourse").disabled = page >= totalPages;
+            }
+
+            document.getElementById("prevPageCourse").addEventListener("click", () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderChart(currentPage);
+                }
+            });
+            document.getElementById("nextPageCourse").addEventListener("click", () => {
+                if (currentPage < Math.ceil(labels.length / pageSize)) {
+                    currentPage++;
+                    renderChart(currentPage);
+                }
+            });
+
+            loadData();
+        }
+        diemTbLop();
     </script>
 @endpush
