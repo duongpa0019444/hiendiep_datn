@@ -42,4 +42,10 @@ class classes extends Model
     {
         return $this->hasMany(CoursePayment::class, 'class_id');
     }
+
+     // Quan hệ với schedules
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class, 'class_id');
+    }
 }

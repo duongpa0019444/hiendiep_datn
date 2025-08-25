@@ -17,7 +17,7 @@
 
 
     <!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
 
     <!-- App favicon -->
@@ -835,7 +835,14 @@
                                 <span class="nav-text"> Quản lý lớp học </span>
                             </a>
                         </li>
-
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.classroom.list-room') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:google-classroom"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý phòng học </span>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.schedules.index') }}">
                                 <span class="nav-icon">

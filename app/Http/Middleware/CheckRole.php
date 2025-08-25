@@ -168,7 +168,16 @@ class CheckRole
                     'admin.contactDetail',
                     'contact.approve',
                     'contact.reject',
-                    'contact.delete'
+                    'contact.delete',
+
+                    //Quản lý phòng học
+                    'admin.classroom.list-room',
+                    'admin.classroom.create',
+                    'admin.classroom.store',
+                    'admin.classroom.delete',
+                    'admin.classroom.detail-room',
+                    'admin.classroom.edit',
+                    'admin.classroom.update'
                 ];
 
 

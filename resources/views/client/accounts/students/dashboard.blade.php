@@ -62,6 +62,12 @@
                     <div class="card-header">
                         <i class="icofont-calendar me-2"></i> Lớp Đang Học
                     </div>
+                    @if (count($classes) == 0)
+                        <div class="card-body">
+                            <p class="mb-0">Bạn hiện không có lớp học nào.</p>
+                        </div>
+
+                    @endif
                     @foreach ($classes as $class)
                         <div class="card-body">
                             <h6 class="card-title">

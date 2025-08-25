@@ -1022,6 +1022,7 @@
             e.preventDefault();
             const form = $(this).closest('form');
             const actionUrl = form.attr('action');
+            console.log('Xóa URL:', actionUrl);
             Swal.fire({
                 title: 'Bạn có chắc chắn?',
                 text: "Bạn sẽ không thể hoàn tác hành động này!",
@@ -1042,14 +1043,15 @@
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
-                        success: function() {
+                        success: function(response) {
+
                             Swal.fire('Đã xóa!', 'Câu hỏi đã được xóa thành công.',
                                 'success');
                             form.closest('.question-item').remove();
 
                         },
-                        error: function() {
-                            Swal.fire('Lỗi!', 'Không thể xóa câu hỏi này.', 'error');
+                        error: function(xhr) {
+                            Swal.fire('Lỗi!', xhr.responseJSON?.error, 'error');
                         }
                     });
                 }

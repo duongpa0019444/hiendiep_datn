@@ -32,7 +32,7 @@ class UserController extends Controller
     public function information()
     {
         if (Auth::user()->role == "student") {
-            
+
             $user = Auth::user();
             $userId = $user->id;
             $unPaymentInfo = coursePayment::where('student_id', $userId)
@@ -44,7 +44,7 @@ class UserController extends Controller
                     ->where('student_id', $user->id)
                     ->value('class_id');
             }
-           
+
             $now = Carbon::now();
             // Lấy danh sách thông báo phù hợp
             $notifications = Notification::where(function ($q) use ($user, $classId) {
@@ -73,7 +73,7 @@ class UserController extends Controller
             $classes = DB::table('class_student as cs')
                 ->join('classes as c', 'cs.class_id', '=', 'c.id')
                 ->join('courses as co', 'c.courses_id', '=', 'co.id')
-                ->join('schedules as s', 'c.id', '=', 's.class_id')
+                ->leftJoin('schedules as s', 'c.id', '=', 's.class_id')
                 ->join('users as u', 'cs.student_id', '=', 'u.id')
                 ->join('users as t', 's.teacher_id', '=', 't.id')
                 ->where('cs.student_id', $userId)
@@ -90,7 +90,7 @@ class UserController extends Controller
                 ->groupBy('u.name', 'c.name', 'c.status', 'co.name', 't.name', 'c.id')
                 ->orderBy('c.created_at', 'asc')
                 ->get();
-
+            // dd($classes->all());
 
             $attendance = DB::select("
                 SELECT
@@ -117,7 +117,7 @@ class UserController extends Controller
             ", [$userId, $classes[0]->class_id ?? 0, $userId]);
 
             $hoctaps = $attendance[0] ?? [];
-           
+
             return view('client.accounts.students.dashboard', compact('unPaymentInfo', 'notifications', 'classes', 'hoctaps'));
         } elseif (Auth::user()->role == "teacher") {
 

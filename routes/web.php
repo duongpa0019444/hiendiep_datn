@@ -251,30 +251,16 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
 
 
 
-  // phần quản lý phòng học
-  Route::get('/classroom', [ClassroomController::class, 'index'])->name('admin.classroom.list-room');
-  // thêm phòng học
-  Route::get('/classroom/create', [ClassroomController::class, 'create'])->name('admin.classroom.create');
-  Route::post('/classroom/store', [ClassroomController::class, 'store'])->name('admin.classroom.store');
-  // xóa phòng học
-  Route::delete('/admin/classrooms/{id}', [ClassroomController::class, 'delete'])->name('admin.classroom.delete');
-  // lấy thời gian
-  // Route::get('/classroom/{id}/times', [ClassroomController::class, 'getClassTimes'])->name('admin.classroom.get-class-times');
-  // chi tiết phòng học
-  Route::get('/classroom/{id}', [ClassroomController::class, 'detailRoom'])->name('admin.classroom.detail-room');
+    // phần quản lý phòng học
+    Route::get('/classroom', [ClassroomController::class, 'index'])->name('admin.classroom.list-room');
+    Route::get('/classroom/create', [ClassroomController::class, 'create'])->name('admin.classroom.create');
+    Route::post('/classroom/store', [ClassroomController::class, 'store'])->name('admin.classroom.store');
+    Route::delete('/admin/classrooms/{id}', [ClassroomController::class, 'delete'])->name('admin.classroom.delete');
+    Route::get('/classroom/{id}', [ClassroomController::class, 'detailRoom'])->name('admin.classroom.detail-room');
 
-// thêm lớp vào phòng
-Route::get('/classroom/{id}/add-class', [ClassroomController::class, 'addClass'])->name('admin.classroom.add-class');
-Route::post('/classroom/{id}/store-class', [ClassroomController::class, 'storeClass'])->name('admin.classroom.store-class');
-
-// cập nhật phòng học
-Route::get('classroom/{id}/edit', [ClassroomController::class, 'edit'])->name('admin.classroom.edit');
-Route::put('classroom/{id}', [ClassroomController::class, 'update'])->name('admin.classroom.update');
-
-
-
-
-
+    // cập nhật phòng học
+    Route::get('classroom/{id}/edit', [ClassroomController::class, 'edit'])->name('admin.classroom.edit');
+    Route::put('classroom/{id}', [ClassroomController::class, 'update'])->name('admin.classroom.update');
 
 
 

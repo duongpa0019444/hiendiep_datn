@@ -970,8 +970,8 @@
                             form.closest('.question-item').remove();
 
                         },
-                        error: function() {
-                            Swal.fire('Lỗi!', 'Không thể xóa câu hỏi này.', 'error');
+                         error: function(xhr) {
+                            Swal.fire('Lỗi!', xhr.responseJSON?.error, 'error');
                         }
                     });
                 }

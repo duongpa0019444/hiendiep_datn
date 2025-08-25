@@ -29,26 +29,26 @@ class ClassroomController extends Controller
 
         // Lọc theo sức chứa
         if ($request->filled('capacity')) {
-            $query->where('Capacity', $request->capacity);
+            $query->where('capacity', $request->capacity);
         }
-        // Lấy danh sách + phân trang
-        $classrooms = $query->orderBy('id', 'desc')->paginate(10);
-        $classrooms->appends($request->all());
 
+        // Lấy danh sách + phân trang
+        $classrooms = $query
+            ->withCount(['classes as classes_count' => function ($q) {
+                $q->select(DB::raw('count(distinct classes.id)'))
+                    ->where('classes.status', 'in_progress');
+            }])
+            ->orderBy('id', 'desc')
+             ->paginate($request->limit ?? 10);
+
+
+
+        $classrooms->appends($request->all());
+        // dd($classrooms->all());
         // ===== Thống kê =====
         $totalRooms = Classroom::count();
-        $roomsInUse = 0;
-        $roomsEmpty = 0;
-
-        $now = now();
-
-        foreach ($classrooms as $room) {
-            if ($room->status == 0) {
-                $room->status_text = 'Đang được sử dụng';
-            } elseif ($room->status == 1) {
-                $room->status_text = 'Chưa được sử dụng';
-            }
-        }
+        $roomsInUse = Classroom::where('status', 1)->count();
+        $roomsEmpty = Classroom::where('status', 0)->count();
 
         return view('admin.classroom.list-room', compact(
             'classrooms',
@@ -84,29 +84,31 @@ class ClassroomController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'room_name'  => 'required|string|max:255|unique:class_room,room_name',
-            'status'     => 'required|in:0,1',
-            'Capacity'   => 'required|integer|min:1|max:100',
-            'note'       => 'nullable|string',
-            'class_id'   => 'nullable|exists:classes,id',
-            'name_class' => 'nullable|string|max:255',
+            'room_name' => 'required|string|max:255|unique:class_room,room_name',
+            'status'    => 'required|in:0,1',
+            'capacity'  => 'required|integer|min:1|max:100',
+            'note'      => 'nullable|string|max:500',
         ];
 
-        $data = $request->validate($rules);
+        $messages = [
+            'room_name.required' => 'Tên phòng không được để trống.',
+            'room_name.string'   => 'Tên phòng phải là chuỗi ký tự.',
+            'room_name.max'      => 'Tên phòng không được vượt quá 255 ký tự.',
+            'room_name.unique'   => 'Tên phòng này đã tồn tại.',
 
-        // Nếu có class_id thì lấy thời gian từ schedules
-        if (!empty($data['class_id'])) {
-            $minTime = DB::table('schedules')->where('class_id', $data['class_id'])->min('start_time');
-            $maxTime = DB::table('schedules')->where('class_id', $data['class_id'])->max('end_time');
+            'status.required'    => 'Trạng thái là bắt buộc.',
+            'status.in'          => 'Trạng thái chỉ được chọn 0 (không hoạt động) hoặc 1 (hoạt động).',
 
-            if (!$minTime || !$maxTime) {
-                return back()->with('error', 'Lớp này chưa có lịch học, không thể gán phòng.');
-            }
+            'capacity.required'  => 'Sức chứa là bắt buộc.',
+            'capacity.integer'   => 'Sức chứa phải là số nguyên.',
+            'capacity.min'       => 'Sức chứa tối thiểu là 1.',
+            'capacity.max'       => 'Sức chứa tối đa là 100.',
 
-            $data['start_time'] = $minTime;
-            $data['end_time']   = $maxTime;
-        }
+            'note.string'        => 'Ghi chú phải là chuỗi ký tự.',
+            'note.max'           => 'Ghi chú không được vượt quá 500 ký tự.',
+        ];
 
+        $data = $request->validate($rules, $messages);
 
         Classroom::create($data);
 
@@ -114,7 +116,7 @@ class ClassroomController extends Controller
             ->with('success', 'Thêm phòng học thành công!');
     }
 
-    // 
+    //
     public function listRoom()
     {
         session()->forget('_old_input'); // Xóa dữ liệu cũ của form
@@ -132,11 +134,6 @@ class ClassroomController extends Controller
                 return back()->with('error', 'Phòng "' . $classroom->room_name . '" đã có lớp học, không thể xoá.');
             }
 
-            // Nếu bạn vẫn muốn check thêm trạng thái
-            if ((int)$classroom->status === 1) {
-                return back()->with('error', 'Phòng đang được sử dụng, không thể xoá.');
-            }
-
             $classroom->delete();
 
             return redirect()
@@ -147,44 +144,37 @@ class ClassroomController extends Controller
         }
     }
 
-   public function detailRoom(Request $request, $id)
-{
-    $classroom = Classroom::findOrFail($id);
+    public function detailRoom(Request $request, $id)
+    {
+        $classroom = Classroom::findOrFail($id);
 
-   $query = Schedule::with([
-            'class:id,name,status,courses_id',      // load lớp
-            'class.course:id,name'                  // load khóa học của lớp
-        ])
-        ->where('room', $classroom->id);
+        $query = \App\Models\Classes::with('course:id,name')
+            ->whereHas('schedules', function ($q) use ($id, $request) {
+                $q->where('room', $id);
+            });
 
-    // ===== Bộ lọc =====
+        $allClasses = $query->pluck('name', 'id');
 
-    // Lọc theo tên lớp
-    if ($request->filled('name')) {
-        $query->whereHas('class', function ($q) use ($request) {
-            $q->where('name', 'like', '%' . $request->name . '%'); 
-        });
+        // Lọc theo tên lớp
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        // Ưu tiên lớp đang học lên đầu
+        // Lấy danh sách lớp (distinct để tránh trùng) + phân trang
+        $classes = $query->distinct()
+            ->orderByRaw("CASE
+            WHEN status = 'in_progress' THEN 1
+            WHEN status = 'not_started' THEN 2
+            WHEN status = 'completed' THEN 3
+            ELSE 4
+          END")
+            ->orderBy('id', 'desc')
+            ->paginate($request->limit ?? 9) // số lượng item mỗi trang
+            ->withQueryString(); // giữ lại query filter khi phân trang
+
+        return view('admin.classroom.detail_room', compact('classroom', 'classes', 'allClasses'));
     }
-
-    // Lọc theo ngày
-    if ($request->filled('date')) {
-        $query->whereDate('date', $request->date);
-    }
-
-    // Lọc theo giờ bắt đầu
-    if ($request->filled('start_time')) {
-        $query->where('start_time', '>=', $request->start_time);
-    }
-
-    // Lọc theo giờ kết thúc
-    if ($request->filled('end_time')) {
-        $query->where('end_time', '<=', $request->end_time);
-    }
-
-    $schedules = $query->orderBy('date', 'asc')->get();
-
-    return view('admin.classroom.detail_room', compact('classroom', 'schedules'));
-}
 
 
     // sửa phòng
@@ -197,14 +187,36 @@ class ClassroomController extends Controller
 
     public function update(Request $request, $id)
     {
+        // dd($request->all());
         $classroom = Classroom::findOrFail($id);
 
         $rules = [
-            'status'   => 'required|in:0,1',
-            'Capacity' => 'required|integer|min:1|max:100',
+            'room_name' => 'required|string|max:255|unique:class_room,room_name,' . $id,
+            'status'    => 'required|in:0,1',
+            'capacity'  => 'required|integer|min:1|max:100',
+            'note'      => 'nullable|string|max:500',
         ];
 
-        $data = $request->validate($rules);
+        $messages = [
+            'room_name.required' => 'Tên phòng không được để trống.',
+            'room_name.string'   => 'Tên phòng phải là chuỗi ký tự.',
+            'room_name.max'      => 'Tên phòng không được vượt quá 255 ký tự.',
+            'room_name.unique'   => 'Tên phòng này đã tồn tại.',
+
+            'status.required'    => 'Trạng thái là bắt buộc.',
+            'status.in'          => 'Trạng thái chỉ được chọn 0 (không hoạt động) hoặc 1 (hoạt động).',
+
+            'capacity.required'  => 'Sức chứa là bắt buộc.',
+            'capacity.integer'   => 'Sức chứa phải là số nguyên.',
+            'capacity.min'       => 'Sức chứa tối thiểu là 1.',
+            'capacity.max'       => 'Sức chứa tối đa là 100.',
+
+            'note.string'        => 'Ghi chú phải là chuỗi ký tự.',
+            'note.max'           => 'Ghi chú không được vượt quá 500 ký tự.',
+        ];
+
+        $data = $request->validate($rules, $messages);
+
 
         $classroom->update($data);
 
