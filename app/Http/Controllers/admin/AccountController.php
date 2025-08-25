@@ -542,13 +542,32 @@ class AccountController extends Controller
             $trashQuery->where('gender', $gender);
         }
 
-        $trash = $trashQuery->paginate(10);
+        $trash = $trashQuery->paginate(10)->appends($request->query());
 
         return view('admin.accounts.trash', compact('trash', 'query', 'role'));
     }
 
 
+    public function trashList($role, Request $request)
+    {
+        // dd($role);
+        $query = trim($request->query('accountTrashList'));
+        $gender = $request->query('genderList');
 
+        $trashQuery = User::where('role', $role)->orderBy('deleted_at', 'desc');
+
+        if ($query) {
+            $trashQuery->where('name', 'like', "%$query%");
+        }
+
+        if ($gender) {
+            $trashQuery->where('gender', $gender);
+        }
+
+        $trash = $trashQuery->paginate(10)->appends($request->query());
+
+        return view('admin.accounts.trash-list', ['role' => $role, 'trash' => $trash]);
+    }
 
     public function restore($id)
     {

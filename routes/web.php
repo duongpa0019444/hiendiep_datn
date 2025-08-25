@@ -25,6 +25,7 @@ use App\Http\Controllers\client\CourseController as ClientCourseController;
 use App\Http\Controllers\client\AttendanceController as ClientAttendanceController;
 use App\Http\Controllers\client\newsController as ClientNewsController;
 use App\Http\Controllers\courseController;
+use App\Http\Controllers\Admin\ThongKeController;
 use App\Http\Controllers\admin\ClassroomController;
 
 
@@ -89,6 +90,9 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('dashboard/schedules/date/{date}', [DashboardController::class, 'getSchedulesByDate'])->name('admin.dashboard.schedules.date');
     Route::get('dashboard/chart/revenue/{year}', [DashboardController::class, 'chartRevenue'])->name('admin.chartRevenue');
     Route::get('dashboard/chart/revenueCourse/{year}', [DashboardController::class, 'chartRevenueCourse'])->name('admin.revenueCourse');
+    // Quản lý thống kê
+    Route::get('/thong-ke-dao-tao', [ThongKeController::class, 'index'])->name('admin.thongke.daotao');
+    Route::get('/thong-ke-tai-chinh', [ThongKeController::class, 'studyStatistics'])->name('admin.thongke.taichinh');
 
 
     // Trang quản lý tài khoản
@@ -105,7 +109,8 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     // check nguoi dung co đang liên kết với các bảng khác không
     Route::get('/account/check/{id}', [AccountController::class, 'check'])->name('admin.account.check');
     Route::get('/account/delete/{role}/{id}', [AccountController::class, 'delete'])->name('admin.account.delete');
-    Route::get('/account-trash', [AccountController::class, 'trash'])->name('admin.account.trash');
+    Route::get('/trash-account', [AccountController::class, 'trash'])->name('admin.account.trash');
+    Route::get('/account-trash/{role}', [AccountController::class, 'trashList'])->name('admin.account.trash.list');
     Route::post('/account/restore/{id}', [AccountController::class, 'restore'])->name('admin.account.restore');
     Route::delete('/account/force-delete/{id}', [AccountController::class, 'forceDelete'])->name('admin.account.forceDelete');
     // Lấy lịch dạy của giáo viên
@@ -439,6 +444,14 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::post('/actions/log/delete', [ActionLogController::class, 'delete'])->name('admin.actions.log.delete');
     Route::post('/actions/log/delete/{id}', [ActionLogController::class, 'delete'])->name('admin.actions.log.delete');
     Route::get('/actions/log/view/{id}', [ActionLogController::class, 'viewLog'])->name('admin.actions.log.view');
+
+    //Thống kê tài chính
+    Route::get('/statistics/finance/tong-quy-luong/{year}', [ThongKeController::class, 'salarystatistics'])->name('admin.statistics.finance.tong-quy-luong');
+    Route::get('/statistics/finance/tong-doanh-thu/{year}', [ThongKeController::class, 'revenuestatistics'])->name('admin.statistics.finance.tong-doanh-thu');
+    Route::get('/statistics/finance/hoc-phi-lop/{year}', [ThongKeController::class, 'classTuitionFee'])->name('admin.statistics.finance.hoc-phi-lop');
+    Route::get('/statistics/finance/lai-lo/{year}', [ThongKeController::class, 'laiLoStatistics'])->name('admin.statistics.finance.lai-lo');
+
+
 });
 
 

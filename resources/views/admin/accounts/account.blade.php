@@ -606,7 +606,7 @@
                     </div> <!-- end card body -->
                     <div class="card-footer border-top">
                         <nav aria-label="Page navigation">
-                            {!! $role->links('pagination::bootstrap-5') !!}
+                            {!! $role->withQueryString()->links('pagination::bootstrap-5') !!}
                         </nav>
                     </div>
                 </div>
