@@ -16,6 +16,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
 
+    <!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('client/images/logo-icon.png') }}">
 
@@ -526,6 +530,14 @@
                                     <iconify-icon icon="mdi:google-classroom"></iconify-icon>
                                 </span>
                                 <span class="nav-text"> Quản lý lớp học </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.classroom.list-room') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:google-classroom"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý phòng học </span>
                             </a>
                         </li>
 
