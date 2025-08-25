@@ -1,6 +1,6 @@
 @extends('admin.admin')
 
-@section('title', 'Hỗ trợ đã nhận')
+@section('title', 'Quản lí liên hệ')
 @section('description', 'Danh sách tin nhắn hỗ trợ đã có nhân viên nhận xử lý.')
 
 @section('content')

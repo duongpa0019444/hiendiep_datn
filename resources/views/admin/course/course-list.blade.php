@@ -1,4 +1,4 @@
-@section('title', 'Trang admin')
+@section('title', 'Quản lí khóa học')
 @section('description', '')
 @section('content')
     {{-- Hiển thị thông báo lỗi hoặc thành công --}}
