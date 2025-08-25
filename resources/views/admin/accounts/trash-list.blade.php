@@ -46,38 +46,23 @@
                         <div class="col-9 gap-2">
 
                             <form id="trashFilterForm" method="GET" 
-                                action="{{ route('admin.account.trash') }}"
+                                action="{{ route('admin.account.trash.list', request('role')) }}"
                                 class="form-inline d-flex gap-2 align-items-center">
-
-                                <div class="col-md-2    ">
-                                    <select name="role" class="form-select" >
-                                        <option value="">-- Vai trò --</option>
-                                        <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Quản trị viên
-                                        </option>
-                                        <option value="staff" {{ request('role') == 'staff' ? 'selected' : '' }}>Nhân viên
-                                        </option>
-                                        <option value="student" {{ request('role') == 'student' ? 'selected' : '' }}>Học sinh
-                                        </option>
-                                        <option value="teacher" {{ request('role') == 'teacher' ? 'selected' : '' }}>Giáo viên
-                                        </option>
-                                        <!-- Thêm các role khác nếu cần -->
-                                    </select>
-                                </div>
-
+                               
                                  <div class="col-md-2">
-                                    <select name="gender" class="form-select" >
+                                    <select name="genderList" class="form-select" >
                                         <option value="">-- Giới tính --</option>
-                                        <option value="boy" {{ request('gender') == 'boy' ? 'selected' : '' }}>Nam
+                                        <option value="boy" {{ request('genderList') == 'boy' ? 'selected' : '' }}>Nam
                                         </option>
-                                        <option value="girl" {{ request('gender') == 'girl' ? 'selected' : '' }}>Nữ
+                                        <option value="girl" {{ request('genderList') == 'girl' ? 'selected' : '' }}>Nữ
                                         </option>
                                     </select>
                                 </div>
 
                                 <div class="position-relative">
-                                    <input type="search" name="accountTrash" class="form-control pe-5"
+                                    <input type="search" name="accountTrashList" class="form-control pe-5"
                                         placeholder="Tìm tài khoản..." autocomplete="off"
-                                        value="{{ request()->query('accountTrash') ?? '' }}">
+                                        value="{{ request()->query('accountTrashList') ?? '' }}">
                                     <iconify-icon icon="solar:magnifer-linear" class="search-widget-icon"
                                         style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999;"></iconify-icon>
                                 </div>
@@ -97,6 +82,7 @@
                                 <thead>
                                     <tr>
                                         <th>Thông tin</th>
+                                        <th>Vai trò</th>
                                         <th>Ngày sinh nhật</th>
                                         <th>Email</th>
                                         <th>Số điện thoại</th>
@@ -124,6 +110,18 @@
                                                             @endphp</div>
                                                     </div>
                                                 </div>
+                                            </td>
+                                            <td>
+                                                @php
+                                                    echo match (true) {
+                                                        $data->role === 'admin' => 'Quản trị viên',
+                                                        $data->role === 'student' => 'Học sinh',
+                                                        $data->role === 'teacher' => 'Giáo viên',
+                                                        $data->mission === 'train' => 'Đào tạo',
+                                                        $data->mission === 'accountant' => 'Kế toán',
+                                                        default => '',
+                                                    };
+                                                @endphp
                                             </td>
                                             <td> 
                                                 {{ $data->birth_date ? \Carbon\Carbon::parse($data->birth_date)->format('d/m/Y') : '' }}
@@ -208,11 +206,11 @@
     </div>
 
     <script>
-          document.getElementById('clearFilterListTrashBtn').addEventListener('click', function() {
+         document.getElementById('clearFilterListTrashBtn').addEventListener('click', function() {
             document.getElementById('trashFilterForm').reset();
 
             // Redirect về URL gốc không có query
-            window.location.href = "{{ route('admin.account.trash') }}";
+            window.location.href = "{{ route('admin.account.trash.list', request('role')) }}";
 
         });
 
