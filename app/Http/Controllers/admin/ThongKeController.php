@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\classes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -15,29 +16,315 @@ class ThongKeController extends Controller
         return view('admin.thongkedaotao');
     }
 
-    /**
-     * Hàm trả về JSON chứa số lượng học sinh theo từng lớp.
-     * - Join 3 bảng: classes, class_student, users.
-     * - Lọc các bản ghi bị xóa mềm (deleted_at IS NULL).
-     * - Chỉ tính user có role = 'student'.
-     */
-    public function classStudentCounts(Request $request)
+    //Hàm trả về số học sinh đăng ký theo năm dưới dạng JSON.
+    public function registerStudent($year = null)
     {
-        $rows = DB::table('classes as c')
+        $registerStudent = DB::select("
+            WITH dang_ky AS (
+                SELECT
+                    cp.course_id,
+                    MONTH(cp.created_at) AS thang,
+                    COUNT(cp.student_id) AS so_hoc_sinh
+                FROM course_payments cp
+                WHERE YEAR(cp.created_at) = ?
+                GROUP BY cp.course_id, MONTH(cp.created_at)
+            )
+            SELECT
+                c.id AS course_id,
+                c.name AS course_name,
+                COALESCE(SUM(CASE WHEN d.thang = 1  THEN d.so_hoc_sinh END), 0) AS Thang1,
+                COALESCE(SUM(CASE WHEN d.thang = 2  THEN d.so_hoc_sinh END), 0) AS Thang2,
+                COALESCE(SUM(CASE WHEN d.thang = 3  THEN d.so_hoc_sinh END), 0) AS Thang3,
+                COALESCE(SUM(CASE WHEN d.thang = 4  THEN d.so_hoc_sinh END), 0) AS Thang4,
+                COALESCE(SUM(CASE WHEN d.thang = 5  THEN d.so_hoc_sinh END), 0) AS Thang5,
+                COALESCE(SUM(CASE WHEN d.thang = 6  THEN d.so_hoc_sinh END), 0) AS Thang6,
+                COALESCE(SUM(CASE WHEN d.thang = 7  THEN d.so_hoc_sinh END), 0) AS Thang7,
+                COALESCE(SUM(CASE WHEN d.thang = 8  THEN d.so_hoc_sinh END), 0) AS Thang8,
+                COALESCE(SUM(CASE WHEN d.thang = 9  THEN d.so_hoc_sinh END), 0) AS Thang9,
+                COALESCE(SUM(CASE WHEN d.thang = 10 THEN d.so_hoc_sinh END), 0) AS Thang10,
+                COALESCE(SUM(CASE WHEN d.thang = 11 THEN d.so_hoc_sinh END), 0) AS Thang11,
+                COALESCE(SUM(CASE WHEN d.thang = 12 THEN d.so_hoc_sinh END), 0) AS Thang12,
+                COALESCE(SUM(d.so_hoc_sinh), 0) AS TongCaNam
+            FROM courses c
+            LEFT JOIN dang_ky d
+                ON d.course_id = c.id
+            GROUP BY c.id, c.name
+            ORDER BY c.id;
+
+        ", [$year]);
+
+        $data = [];
+        foreach ($registerStudent as $item) {
+            $data[] = [
+                'name' => $item->course_name,
+                'data' => [
+                    $item->Thang1,
+                    $item->Thang2,
+                    $item->Thang3,
+                    $item->Thang4,
+                    $item->Thang5,
+                    $item->Thang6,
+                    $item->Thang7,
+                    $item->Thang8,
+                    $item->Thang9,
+                    $item->Thang10,
+                    $item->Thang11,
+                    $item->Thang12
+                ]
+            ];
+        }
+
+        //Top 3 khóa học có số học sinh đăng ký nhiều nhất trong năm
+        $top3Courses = DB::select("
+            WITH dang_ky AS (
+                SELECT
+                    YEAR(cp.created_at) AS nam,
+                    MONTH(cp.created_at) AS thang,
+                    cp.course_id,
+                    COUNT(cp.student_id) AS so_hoc_sinh
+                FROM course_payments cp
+                WHERE YEAR(cp.created_at) = ?
+                GROUP BY YEAR(cp.created_at), MONTH(cp.created_at), cp.course_id
+                ),
+                xep_hang AS (
+                SELECT
+                    d.nam,
+                    d.thang,
+                    d.course_id,
+                    d.so_hoc_sinh,
+                    ROW_NUMBER() OVER (
+                    PARTITION BY d.nam, d.thang
+                    ORDER BY d.so_hoc_sinh DESC
+                    ) AS rn
+            FROM dang_ky d
+            )
+            SELECT
+            x.thang,
+            MAX(CASE WHEN x.rn = 1 THEN CONCAT(c.name, ' (', x.so_hoc_sinh, ')') END) AS Top1,
+            MAX(CASE WHEN x.rn = 2 THEN CONCAT(c.name, ' (', x.so_hoc_sinh, ')') END) AS Top2,
+            MAX(CASE WHEN x.rn = 3 THEN CONCAT(c.name, ' (', x.so_hoc_sinh, ')') END) AS Top3
+            FROM xep_hang x
+            JOIN courses c ON c.id = x.course_id
+            WHERE x.rn <= 3
+            GROUP BY x.thang
+            ORDER BY x.thang;
+
+
+        ", [$year]);
+
+
+
+        return response()->json([
+            'data' => $data,
+            'top3Courses' => $top3Courses
+        ]);
+    }
+
+
+    //Hàm thống kê buổi dạy của giáo viên
+    public function thongkebuoiday($year = null)
+    {
+        $year = $year ?? date('Y');
+        $dataBuoiday = DB::select("
+            WITH lich_day AS (
+                SELECT
+                    s.teacher_id,
+                    YEAR(s.date) AS nam,
+                    MONTH(s.date) AS thang,
+                    COUNT(*) AS so_buoi_day
+                FROM schedules s
+                JOIN users u ON u.id = s.teacher_id AND u.role = 'teacher'
+                WHERE YEAR(s.date) = ?
+                GROUP BY s.teacher_id, YEAR(s.date), MONTH(s.date)
+                )
+                SELECT
+                u.id AS teacher_id,
+                u.name AS teacher_name,
+                COALESCE(MAX(CASE WHEN l.thang = 1 THEN l.so_buoi_day END), 0) AS Th1,
+                COALESCE(MAX(CASE WHEN l.thang = 2 THEN l.so_buoi_day END), 0) AS Th2,
+                COALESCE(MAX(CASE WHEN l.thang = 3 THEN l.so_buoi_day END), 0) AS Th3,
+                COALESCE(MAX(CASE WHEN l.thang = 4 THEN l.so_buoi_day END), 0) AS Th4,
+                COALESCE(MAX(CASE WHEN l.thang = 5 THEN l.so_buoi_day END), 0) AS Th5,
+                COALESCE(MAX(CASE WHEN l.thang = 6 THEN l.so_buoi_day END), 0) AS Th6,
+                COALESCE(MAX(CASE WHEN l.thang = 7 THEN l.so_buoi_day END), 0) AS Th7,
+                COALESCE(MAX(CASE WHEN l.thang = 8 THEN l.so_buoi_day END), 0) AS Th8,
+                COALESCE(MAX(CASE WHEN l.thang = 9 THEN l.so_buoi_day END), 0) AS Th9,
+                COALESCE(MAX(CASE WHEN l.thang = 10 THEN l.so_buoi_day END), 0) AS Th10,
+                COALESCE(MAX(CASE WHEN l.thang = 11 THEN l.so_buoi_day END), 0) AS Th11,
+                COALESCE(MAX(CASE WHEN l.thang = 12 THEN l.so_buoi_day END), 0) AS Th12
+                FROM users u
+                LEFT JOIN lich_day l
+                    ON u.id = l.teacher_id
+                WHERE u.role = 'teacher'
+                GROUP BY u.id, u.name
+                ORDER BY u.id;
+
+        ", [$year]);
+
+        $data = [];
+        foreach ($dataBuoiday as $item) {
+            $data[] = [
+                'name' => $item->teacher_name,
+                'data' => [
+                    $item->Th1,
+                    $item->Th2,
+                    $item->Th3,
+                    $item->Th4,
+                    $item->Th5,
+                    $item->Th6,
+                    $item->Th7,
+                    $item->Th8,
+                    $item->Th9,
+                    $item->Th10,
+                    $item->Th11,
+                    $item->Th12
+                ]
+            ];
+        }
+        return response()->json(['data' => $data]);
+    }
+
+
+    //Hàm thống kê trạng thái lớp học
+    public function statusClasses($year = null)
+    {
+        $year = $year ?? date('Y');
+        $statusClasses = DB::select("
+            SELECT
+                YEAR(c.created_at) AS nam,
+                c.status,
+                COUNT(*) AS so_lop,
+                ROUND(100.0 * COUNT(*) / t.tong, 1) AS ti_le_phan_tram
+            FROM classes c
+            JOIN (
+                SELECT YEAR(created_at) AS nam, COUNT(*) AS tong
+                FROM classes
+                WHERE YEAR(created_at) = ?
+                GROUP BY YEAR(created_at)
+            ) t ON t.nam = YEAR(c.created_at)
+            WHERE YEAR(c.created_at) = ?
+            GROUP BY YEAR(c.created_at), c.status, t.tong
+            ORDER BY nam, c.status;
+        ", [$year, $year]);
+
+        foreach ($statusClasses as $item) {
+            if ($item->status === 'not_started') {
+                $chuabatdau = $item->so_lop;
+            } elseif ($item->status === 'in_progress') {
+                $dangdienra = $item->so_lop;
+            } elseif ($item->status === 'completed') {
+                $dahoanthanh = $item->so_lop;
+            }
+        }
+
+
+        //Top 3 khóa nhiều lớp nhất
+        $top3Courses = DB::select("
+            SELECT *
+                FROM (
+                    SELECT
+                        YEAR(c.created_at) AS nam,
+                        co.id AS course_id,
+                        co.name AS course_name,
+                        COUNT(c.id) AS so_lop,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY YEAR(c.created_at)
+                            ORDER BY COUNT(c.id) DESC
+                        ) AS xep_hang
+                    FROM classes c
+                    JOIN courses co ON co.id = c.courses_id
+                    WHERE YEAR(c.created_at) = ?
+                    GROUP BY YEAR(c.created_at), co.id, co.name
+                ) ranked
+                WHERE xep_hang <= 3
+                ORDER BY nam, so_lop DESC;
+        ", [$year]);
+        $top3 = [];
+        $dataTop3 = [];
+        foreach ($top3Courses as $item) {
+            $top3[] = $item->course_name;
+            $dataTop3[] = $item->so_lop;
+        }
+
+        $bottom3Courses = DB::select("
+            SELECT *
+                FROM (
+                    SELECT
+                        YEAR(c.created_at) AS nam,
+                        co.id AS course_id,
+                        co.name AS course_name,
+                        COUNT(c.id) AS so_lop,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY YEAR(c.created_at)
+                            ORDER BY COUNT(c.id) ASC
+                        ) AS xep_hang
+                    FROM classes c
+                    JOIN courses co ON co.id = c.courses_id
+                    WHERE YEAR(c.created_at) = ?
+                    GROUP BY YEAR(c.created_at), co.id, co.name
+                ) ranked
+                WHERE xep_hang <= 3
+                ORDER BY nam, so_lop ASC;
+        ", [$year]);
+        $bottom3 = [];
+        $dataBottom3 = [];
+        foreach ($bottom3Courses as $item) {
+            $bottom3[] = $item->course_name;
+            $dataBottom3[] = $item->so_lop;
+        }
+
+        //Thống kê tổng trạng thái lớp học theo khóa
+        $statusClassesCourses = DB::select("
+            SELECT
+                YEAR(c.created_at) AS nam,
+                co.id AS courses_id,
+                co.name AS course_name,
+                SUM(CASE WHEN c.status = 'not_started' THEN 1 ELSE 0 END) AS lop_chua_bat_dau,
+                SUM(CASE WHEN c.status = 'in_progress'  THEN 1 ELSE 0 END) AS lop_dang_dien_ra,
+                SUM(CASE WHEN c.status = 'completed' THEN 1 ELSE 0 END) AS lop_da_hoan_thanh,
+                COUNT(c.id) AS tong_lop
+            FROM courses co
+            LEFT JOIN classes c ON c.courses_id = co.id
+            WHERE YEAR(c.created_at) = ?
+            GROUP BY YEAR(c.created_at), co.id, co.name
+            ORDER BY nam, co.id;
+        ", [$year]);
+
+
+        return response()->json([
+            'labelsClasses' => ['Chưa bắt đầu', 'Đang diễn ra', 'Đã hoàn thành'],
+            'statusClasses' => [$chuabatdau ?? 0, $dangdienra ?? 0, $dahoanthanh ?? 0],
+            'top3' => $top3,
+            'dataTop3' => $dataTop3,
+            'bottom3' => $bottom3,
+            'dataBottom3' => $dataBottom3,
+            'statusClassesCourses' => $statusClassesCourses
+        ]);
+    }
+
+
+
+
+
+    //Hàm trả về JSON chứa số lượng học sinh theo từng lớp.
+    public function classStudentCounts($year = null)
+    {
+        $rows = classes::query()
+            ->select('classes.id', 'classes.name', DB::raw('COUNT(users.id) as student_count'))
             ->leftJoin('class_student as cs', function ($join) {
-                $join->on('cs.class_id', '=', 'c.id')
-                    ->whereNull('cs.deleted_at'); // bỏ học sinh đã bị xóa mềm trong class_student
+                $join->on('cs.class_id', '=', 'classes.id')
+                    ->whereNull('cs.deleted_at');
             })
-            ->leftJoin('users as u', function ($join) {
-                $join->on('u.id', '=', 'cs.student_id')
-                    ->where('u.role', '=', 'student')
-                    ->whereNull('u.deleted_at');
+            ->leftJoin('users', function ($join) {
+                $join->on('users.id', '=', 'cs.student_id')
+                    ->where('users.role', '=', 'student')
+                    ->whereNull('users.deleted_at');
             })
-            ->whereNull('c.deleted_at')
-            ->groupBy('c.id', 'c.name')
-            ->orderBy('c.id')
-            ->select('c.id', 'c.name', DB::raw('COUNT(u.id) as student_count'))
-            ->get();
+            ->whereNull('classes.deleted_at')
+            ->whereYear('classes.created_at', $year)
+            ->groupBy('classes.id', 'classes.name')
+            ->orderBy('classes.created_at', 'desc')
+            ->paginate(10); // 10 dòng mỗi trang
 
         // Tách labels (tên lớp) và counts (số học sinh)
         $labels = $rows->pluck('name')->values();
@@ -47,28 +334,35 @@ class ThongKeController extends Controller
         return response()->json([
             'labels' => $labels,
             'counts' => $counts,
-            'total' => $rows->count(),
-            'page' => 1,
-            'per_page' => $rows->count(),
+            'pagination' => $rows->links('pagination::bootstrap-5')->toHtml()
         ]);
     }
 
     // Hàm lấy điểm trung bình theo lớp
-    public function classAverageScores()
+    public function classAverageScores($year = null)
     {
         $rows = DB::table('classes as c')
             ->join('scores as s', 's.class_id', '=', 'c.id')
             ->whereNotNull('s.score')
+            ->whereYear('c.created_at', $year)
             ->groupBy('c.id', 'c.name')
-            ->orderBy('c.id')
+            ->orderByDesc('c.created_at')
             ->select('c.id', 'c.name', DB::raw('ROUND(AVG(s.score),1) as avg_score'))
-            ->get();
+            ->paginate(10);
 
         return response()->json([
             'labels' => $rows->pluck('name'),
             'scores' => $rows->pluck('avg_score')->map(fn($v) => (float)$v),
+            'pagination' => $rows->links('pagination::bootstrap-5')->toHtml()
+
         ]);
     }
+
+
+
+
+
+
 
     public function studyStatistics()
     {

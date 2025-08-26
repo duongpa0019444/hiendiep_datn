@@ -453,7 +453,6 @@
                                 <td>
                                     <strong>Khóa học:</strong> ${payment.course?.name || 'N/A'}<br>
                                     <strong>Lớp:</strong> ${payment.class?.name || 'N/A'}<br>
-                                    <strong>Mã thanh toán:</strong> ${payment.payment_code || 'N/A'}
                                 </td>
                                 <td class="text-end">${Number(payment.amount || 0).toLocaleString('vi-VN')}</td>
                             </tr>

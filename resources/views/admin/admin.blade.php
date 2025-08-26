@@ -483,7 +483,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.thongke.daotao') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="solar:widget-5-bold-duotone"></iconify-icon>
+                                    <iconify-icon icon="mdi:school-outline"></iconify-icon>
                                 </span>
                                 <span class="nav-text"> Thống kê đào tạo </span>
                             </a>
@@ -492,11 +492,12 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.thongke.taichinh') }}">
                                 <span class="nav-icon">
-                                    <iconify-icon icon="solar:widget-5-bold-duotone"></iconify-icon>
+                                    <iconify-icon icon="mdi:finance"></iconify-icon>
                                 </span>
                                 <span class="nav-text"> Thống kê tài chính </span>
                             </a>
                         </li>
+
 
                         <li class="menu-title mt-2">Quản lý học tập</li>
 
@@ -708,6 +709,16 @@
                             </a>
                         </li>
 
+                         <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.thongke.taichinh') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:finance"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Thống kê tài chính </span>
+                            </a>
+                        </li>
+
+
                         <li class="menu-title mt-2">Tài chính</li>
 
                         <li class="nav-item">
@@ -741,8 +752,8 @@
                             </div>
                         </li>
 
-                            {{-- Ql luong nv --}}
-                         {{-- <li class="nav-item">
+                        {{-- Ql luong nv --}}
+                        {{-- <li class="nav-item">
                             <a class="nav-link menu-arrow" href="#staffs" data-bs-toggle="collapse" role="button"
                                 aria-expanded="false" aria-controls="staffs">
                                 <span class="nav-icon">
@@ -824,6 +835,16 @@
                                     <iconify-icon icon="solar:widget-5-bold-duotone"></iconify-icon>
                                 </span>
                                 <span class="nav-text"> Dashboard </span>
+                            </a>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.thongke.daotao') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:school-outline"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Thống kê đào tạo </span>
                             </a>
                         </li>
 

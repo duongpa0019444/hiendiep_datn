@@ -38,6 +38,15 @@ class CheckRole
                     'admin.revenueCourse',
                     'admin.dashboard.chart',
 
+                    //Thống kê đâò tạo
+                    'admin.thongke.daotao',
+                    'admin.thongke.hocinhdangky',
+                    'admin.thongke.buoiday',
+                    'admin.thongke.statusClasses',
+                    'admin.thongke.classStudentCounts',
+                    'admin.thongke.classAverageScores',
+
+
 
                     // người dùng
                     'admin.account',
@@ -197,6 +206,13 @@ class CheckRole
                     'admin.chartRevenue',
                     'admin.revenueCourse',
                     'admin.dashboard.chart',
+
+                    //Thống kê tài chính
+                    'admin.statistics.finance.tong-quy-luong',
+                    'admin.statistics.finance.tong-doanh-thu',
+                    'admin.statistics.finance.hoc-phi-lop',
+                    'admin.statistics.finance.lai-lo',
+                    'admin.thongke.taichinh',
 
                     // học phí
                     'admin.course_payments',
