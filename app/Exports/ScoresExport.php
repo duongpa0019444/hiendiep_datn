@@ -27,11 +27,12 @@ class ScoresExport implements FromCollection, WithHeadings
             ->get()
             ->map(function ($item) {
                 return [
+                    'Mã học sinh'=> optional($item->student)->snake_case,
                     'Học sinh'   => optional($item->student)->name,
                     'Lớp'        => optional($item->class)->name,
                     'Khóa'       => optional($item->class->course)->name,
-                    'Điểm'       => $item->score,
                     'Loại điểm'  => $item->score_type,
+                    'Điểm'       => $item->score,
                     'Ngày'       => \Carbon\Carbon::parse($item->exam_date)->format('d/m/Y'),
                 ];
             });
@@ -39,7 +40,7 @@ class ScoresExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ['Học sinh', 'Lớp', 'Khóa', 'Điểm', 'Loại điểm', 'Ngày'];
+        return ['Mã học sinh', 'Học sinh', 'Lớp', 'Khóa', 'Loại điểm', 'Điểm', 'Ngày'];
     }
 }
 
