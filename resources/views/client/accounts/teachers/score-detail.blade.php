@@ -48,7 +48,7 @@
                 <h5 class="">Bảng Điểm </h5>
             </div>
             <div class="">
-                <a href="{{ route('admin.score.download', ['class_id' => request('class_id'), 'course_id' => request('course_id')]) }}"
+                <a href="{{ route('client.score.download', ['class_id' => request('class_id'), 'course_id' => request('course_id')]) }}"
                     class="btn  btn-secondary">
                     Tải mẫu nhập điểm
                 </a>

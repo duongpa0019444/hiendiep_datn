@@ -115,7 +115,7 @@
                                             <td>{{ $score->class->name ?? '' }}</td>
                                             <td>{{ $score->class->course->name ?? '' }}</td>
                                             <td>{{ $score->score_type ?? '' }}</td> {{-- làm hàm trong model score --}}
-                                            <td>{{ $score->score }}</td>
+                                            <td>{{ $score->score ?? '' }}</td>
                                             <td>{{ \Carbon\Carbon::parse($score->exam_date)->format('d/m/Y') }}</td>
                                             <td>
                                                 <div class="d-flex gap-2">
@@ -182,7 +182,8 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = `admin/score-delete/${id}`;
+                   window.location.href = "{{ route('admin.score.delete', '') }}/" + id;
+
                 }
             });
         }
