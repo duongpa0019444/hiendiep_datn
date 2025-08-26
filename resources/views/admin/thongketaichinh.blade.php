@@ -1,9 +1,34 @@
 @extends('admin.admin')
-@section('title', 'Quản lí thống kê')
+@section('title', 'Quản lí thống kê tài chính')
 
 @section('content')
     <div class="page-content">
         <div class="container-fluid ">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb py-0">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Thống kê tài chính</li>
+                </ol>
+            </nav>
+            <div class="col-12 d-flex align-items-center justify-content-between">
+                <h4 class="card-title mb-1">Thống kê tài chính</h4>
+                <div class="d-flex align-items-center justify-content-center gap-2 mt-2">
+                    <!-- Nút chuyển năm -->
+                    <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center"
+                        id="prevYear">
+                        <i class="me-1">&laquo;</i> Năm trước
+                    </button>
+                    <!-- Hiển thị năm hiện tại -->
+                    <span id="currentYear" class="px-3 py-1 bg-light rounded border fw-semibold text-primary">
+                        {{ date('Y') }}
+                    </span>
+                    <!-- Nút chuyển năm -->
+                    <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center"
+                        id="nextYear">
+                        Năm sau <i class="ms-1">&raquo;</i>
+                    </button>
+                </div>
+            </div>
 
             <!-- Line Chart (Lương giáo viên) -->
             <div class="card">
@@ -12,6 +37,8 @@
                     <div id="salary-area-chart" class="apex-charts"></div>
                 </div>
             </div>
+
+
             {{-- Tong doanh thu --}}
             <div class="card">
                 <div class="card-body">
@@ -22,8 +49,11 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-3">Tình trạng đóng học phí theo tháng</h4>
+                    <h4 class="card-title mb-3">Tình trạng đóng học phí theo lớp</h4>
                     <div id="tuition-stacked-chart" class="apex-charts"></div>
+                    <div id="pagination-hocphi" class="card-footer border-top">
+
+                    </div>
                 </div>
             </div>
 
@@ -41,289 +71,436 @@
 @endsection
 @push('scripts')
     <script>
-        
-        //
-        // Line chart: lương giáo viên theo tháng
-        //
-        // --- Data mẫu ---
-        // --- Data mẫu ---
-        var categories = ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7", "Th8", "Th9", "Th10", "Th11", "Th12"];
-        var seriesData = [{
-                name: "GV A",
-                data: [90, 92, 94, 93, 95, 60, 61, 59, 58, 57, 60, 62]
-            },
-            {
-                name: "GV B",
-                data: [85, 83, 84, 86, 80, 20, 21, 30, 40, 50, 60, 79]
-            },
-            {
-                name: "GV C",
-                data: [88, 87, 89, 90, 88, 70, 72, 71, 69, 70, 60, 50]
-            },
-            {
-                name: "GV D",
-                data: [95, 96, 94, 95, 97, 80, 82, 81, 79, 80, 60, 40]
-            },
-            {
-                name: "GV E",
-                data: [80, 82, 81, 79, 80, 60, 62, 61, 59, 60, 50, 30]
+        // Gọi hàm vẽ biểu đồ khi trang được tải
+        $(document).ready(function() {
+            // Khởi tạo năm hiện tại từ hệ thống
+            var year = new Date().getFullYear();
+            var $currentYearEl = $('#currentYear');
+
+            // Biến lưu trữ biểu đồ để có thể destroy khi vẽ lại
+            var CharTongLuong = null;
+            var CharDoanhThu = null;
+            var CharHocPhi = null;
+            var CharLaiLo = null;
+
+            // Hàm load dữ liệu từ API
+            function loadDashboardData(year) {
+                $currentYearEl.text(year);
+
+                // Gọi API lấy tổng quỹ lương
+                $.ajax({
+                    url: `/admin/statistics/finance/tong-quy-luong/${year}`,
+                    type: 'GET',
+                    success: function(res) {
+                        renderTongQuyLuong(res.data); // res.data là array giống dataNewTongLuong
+                    },
+                    error: function(xhr) {
+                        console.error("Lỗi khi lấy tổng quỹ lương:", xhr.responseText);
+                    }
+                });
+
+                // Gọi API lấy doanh thu
+                $.ajax({
+                    url: `/admin/statistics/finance/tong-doanh-thu/${year}`,
+                    type: 'GET',
+                    success: function(res) {
+                        renderTongDoanhThu(res.data); // res.data là array 12 tháng
+                    },
+                    error: function(xhr) {
+                        console.error("Lỗi khi lấy doanh thu:", xhr.responseText);
+                    }
+                });
+
+                // Gọi API lấy học phí
+                $.ajax({
+                    url: `/admin/statistics/finance/hoc-phi-lop/${year}`,
+                    type: 'GET',
+                    success: function(res) {
+                        RenderHocPhi(res.data.data);
+                        $('#pagination-hocphi').html(res.pagination);
+                    },
+                    error: function(xhr) {
+                        console.error("Lỗi khi lấy học phí:", xhr.responseText);
+                    }
+                });
+
+                // Gọi API lấy lãi lỗ
+                $.ajax({
+                    url: `/admin/statistics/finance/lai-lo/${year}`,
+                    type: 'GET',
+                    success: function(res) {
+                        console.log(res.data);
+                        renderLaiLo(res.data);
+                    },
+                    error: function(xhr) {
+                        console.error("Lỗi khi lấy lãi lỗ:", xhr.responseText);
+                    }
+                });
+
             }
-        ];
 
-        //
-        // Tong doah thu
-        // 
-        var options = {
-            chart: {
-                type: 'line',
-                height: 400,
-                toolbar: {
-                    show: true
-                }
-            },
-            stroke: {
-                curve: 'smooth',
-                width: 3
-            },
-            markers: {
-                size: 5
-            },
-            dataLabels: {
-                enabled: false
-            },
-            series: [{
-                name: "Doanh thu",
-                data: [120, 150, 180, 220, 200, 250, 270, 300, 280, 260, 310, 330] // triệu VNĐ
-            }],
-            xaxis: {
-                categories: ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7", "Th8", "Th9", "Th10", "Th11", "Th12"],
-                title: {
-                    text: "Tháng"
-                }
-            },
-            yaxis: {
-                title: {
-                    text: "Doanh thu (triệu VNĐ)"
-                },
-                labels: {
-                    formatter: function(val) {
-                        return val + " tr"
-                    }
-                }
-            },
-            tooltip: {
-                y: {
-                    formatter: function(val) {
-                        return val + " triệu VNĐ"
-                    }
-                }
-            },
+            // Sự kiện khi click "Năm trước"
+            $('#prevYear').on('click', function() {
+                year--;
+                loadDashboardData(year);
+            });
 
-        };
+            // Sự kiện khi click "Năm sau"
+            $('#nextYear').on('click', function() {
+                year++;
+                loadDashboardData(year);
+            });
 
-        new ApexCharts(document.querySelector("#revenue-line-chart"), options).render();
-
-        // Biểu đồ tình trạng đóng học phí theo tháng
-        var paidData = [100, 120, 130, 140, 150, 160, 170, 180, 175, 160, 190, 200]; // triệu VNĐ
-        var unpaidData = [20, 15, 10, 12, 18, 22, 15, 10, 8, 12, 14, 18]; // triệu VNĐ
-        var categories = ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7", "Th8", "Th9", "Th10", "Th11", "Th12"];
-
-        // Tính % theo tháng
-        var totalByMonth = paidData.map((val, i) => val + unpaidData[i]);
-        var percentPaid = paidData.map((val, i) => ((val / totalByMonth[i]) * 100).toFixed(1));
-        var percentUnpaid = unpaidData.map((val, i) => ((val / totalByMonth[i]) * 100).toFixed(1));
-
-        var options = {
-            chart: {
-                type: 'bar',
-                height: 420,
-                stacked: true,
-                stackType: '100%',
-                toolbar: {
-                    show: true
-                }
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    columnWidth: '55%',
-                    borderRadius: 4
-                }
-            },
-            dataLabels: {
-                enabled: true,
-                formatter: function(val) {
-                    return val.toFixed(1) + "%"; // Hiển thị % trên cột
-                }
-            },
-            series: [{
-                    name: "Đã đóng",
-                    data: percentPaid
-                },
-                {
-                    name: "Chưa đóng",
-                    data: percentUnpaid
-                }
-            ],
-            xaxis: {
-                categories: categories,
-                title: {
-                    text: "Tháng"
-                }
-            },
-            yaxis: {
-                title: {
-                    text: "Tỷ lệ (%)"
-                },
-                max: 100
-            },
-            colors: ['#22c55e', '#e11d48'], // xanh = đã đóng, đỏ = chưa đóng
-            tooltip: {
-                y: {
-                    formatter: function(val, opts) {
-                        let monthIdx = opts.dataPointIndex;
-                        let label = opts.seriesIndex === 0 ? "Đã đóng" : "Chưa đóng";
-                        let rawValue = opts.seriesIndex === 0 ? paidData[monthIdx] : unpaidData[monthIdx];
-                        return label + ": " + rawValue + " triệu (" + val.toFixed(1) + "%)";
-                    }
-                }
-            },
-            legend: {
-                position: 'top',
-                horizontalAlign: 'center'
-            },
-            fill: {
-                opacity: 0.9
-            }
-        };
-
-        new ApexCharts(document.querySelector("#tuition-stacked-chart"), options).render();
-
-        //
-        // Stacked Area Chart (Tổng quỹ lương)
-        //
-        var optionsArea = {
-            chart: {
-                type: 'area',
-                height: 420,
-                stacked: true,
-                toolbar: {
-                    show: true
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                curve: 'smooth',
-                width: 2
-            },
-            series: seriesData,
-            xaxis: {
-                categories: categories,
-                title: {
-                    text: "Tháng"
-                }
-            },
-            yaxis: {
-                title: {
-                    text: "Tổng quỹ lương (triệu VNĐ)"
-                }
-            },
-            tooltip: {
-                shared: true,
-                y: {
-                    formatter: (val) => val + " tr"
-                }
-            },
-            legend: {
-                position: 'top'
-            },
-            colors: ['#1E90FF', '#22c55e', '#f97316', '#e11d48', '#9333ea'],
-            grid: {
-                borderColor: "#f1f3fa"
-            }
-        };
-        new ApexCharts(document.querySelector("#salary-area-chart"), optionsArea).render();
+            // Gọi API lấy dữ liệu đầu tiên khi load trang
+            $(document).ready(function() {
+                loadDashboardData(year);
+            });
 
 
-        // Lãi lỗ
-        var months = ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7", "Th8", "Th9", "Th10", "Th11", "Th12"];
-        var revenue = [120, 140, 150, 160, 180, 190, 200, 210, 220, 200, 230, 240]; // triệu VNĐ
-        var salary = [80, 90, 95, 100, 110, 120, 130, 150, 160, 170, 180, 200]; // triệu VNĐ
-        var profit = revenue.map((val, idx) => val - salary[idx]);
+            function renderTongQuyLuong(data = null) {
+                var categories = ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7", "Th8", "Th9", "Th10", "Th11",
+                    "Th12"
+                ];
+                var seriesData = data ?? [];
 
-        var options = {
-            chart: {
-                height: 420,
-                type: 'line',
-                toolbar: {
-                    show: true
-                }
-            },
-            stroke: {
-                width: [0, 0, 3],
-                curve: 'smooth'
-            },
-            dataLabels: {
-                enabled: true,
-                enabledOnSeries: [2]
-            }, // chỉ hiển thị label trên line
-            series: [{
-                    name: 'Doanh thu',
-                    type: 'column',
-                    data: revenue
-                },
-                {
-                    name: 'Chi phí lương',
-                    type: 'column',
-                    data: salary
-                },
-                {
-                    name: 'Lãi/Lỗ',
-                    type: 'line',
-                    data: profit
-                }
-            ],
-            xaxis: {
-                categories: months,
-                title: {
-                    text: "Tháng"
-                }
-            },
-            yaxis: [{
-                    title: {
-                        text: "Doanh thu & Chi phí (triệu VNĐ)"
-                    }
-                },
-                {
-                    opposite: true,
-                    title: {
-                        text: "Lãi/Lỗ (triệu VNĐ)"
-                    }
-                }
-            ],
-            tooltip: {
-                shared: true,
-                y: {
-                    formatter: function(val, opts) {
-                        if (opts.seriesIndex === 2) {
-                            return val + " triệu (" + (val >= 0 ? "Lãi" : "Lỗ") + ")";
+                var optionsArea = {
+                    chart: {
+                        type: 'area',
+                        height: 420,
+                        stacked: true,
+                        toolbar: {
+                            show: true
                         }
-                        return val + " triệu VNĐ";
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    stroke: {
+                        curve: 'smooth',
+                        width: 2
+                    },
+                    series: seriesData,
+                    xaxis: {
+                        categories: categories,
+                        title: {
+                            text: "Tháng"
+                        }
+                    },
+                    yaxis: {
+                        title: {
+                            text: "Tổng quỹ lương (triệu VNĐ)"
+                        },
+                        labels: {
+                            formatter: function(val) {
+                                // Định dạng số theo locale VN và thêm hậu tố
+                                return val.toLocaleString('vi-VN') + " tr";
+                            }
+                        }
+                    },
+                    tooltip: {
+                        shared: true,
+                        y: {
+                            formatter: function(val) {
+                                return val.toLocaleString('vi-VN') + " VNĐ";
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'top'
+                    },
+                    colors: ['#1E90FF', '#22c55e', '#f97316', '#e11d48', '#9333ea'],
+                    grid: {
+                        borderColor: "#f1f3fa"
                     }
-                }
-            },
-            colors: ['#1E90FF', '#e11d48', '#22c55e'], // xanh dương = revenue, đỏ = lương, xanh lá = lãi
-            legend: {
-                position: 'top',
-                horizontalAlign: 'center'
-            },
-            grid: {
-                borderColor: "#f1f3fa"
-            }
-        };
+                };
 
-        new ApexCharts(document.querySelector("#profit-chart"), options).render();
+                if (CharTongLuong !== null) {
+                    CharTongLuong.destroy();
+                }
+                CharTongLuong = new ApexCharts(document.querySelector("#salary-area-chart"), optionsArea);
+                CharTongLuong.render();
+            }
+
+
+
+
+            function renderTongDoanhThu(data = null) {
+                var options = {
+                    chart: {
+                        type: 'line',
+                        height: 400,
+                        toolbar: {
+                            show: true
+                        }
+                    },
+                    stroke: {
+                        curve: 'smooth',
+                        width: 3
+                    },
+                    markers: {
+                        size: 5
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: "Doanh thu",
+                        data: data ?? []
+                    }],
+                    xaxis: {
+                        categories: ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7", "Th8", "Th9", "Th10",
+                            "Th11", "Th12"
+                        ],
+                        title: {
+                            text: "Tháng"
+                        }
+                    },
+                    yaxis: {
+                        title: {
+                            text: "Doanh thu (triệu VNĐ)"
+                        },
+                        labels: {
+                            formatter: function(val) {
+                                return val.toLocaleString('vi-VN') + " tr";
+                            }
+                        }
+                    },
+                    tooltip: {
+                        y: {
+                            formatter: function(val) {
+                                return val.toLocaleString('vi-VN') + " triệu VNĐ";
+                            }
+                        }
+                    }
+                };
+
+                if (CharDoanhThu !== null) {
+                    CharDoanhThu.destroy();
+                }
+                CharDoanhThu = new ApexCharts(document.querySelector("#revenue-line-chart"), options);
+                CharDoanhThu.render();
+            }
+
+
+
+
+            // Biểu đồ tình trạng đóng học phí theo lớp
+            function RenderHocPhi(data = null) {
+
+                // Lấy tên lớp
+                var categories = data.map(item => item.class_name);
+
+                // Tổng tiền (VNĐ)
+                var paidData = data.map(item => parseFloat(item.total_paid_amount));
+                var unpaidData = data.map(item => parseFloat(item.total_unpaid_amount));
+
+                // Tổng số học sinh
+                var paidCount = data.map(item => parseInt(item.paid_students));
+                var unpaidCount = data.map(item => parseInt(item.unpaid_students));
+
+                // Tính % theo tiền
+                var totalByClass = paidData.map((val, i) => val + unpaidData[i]);
+                var percentPaid = paidData.map((val, i) => ((val / totalByClass[i]) * 100).toFixed(1));
+                var percentUnpaid = unpaidData.map((val, i) => ((val / totalByClass[i]) * 100).toFixed(1));
+
+                var options = {
+                    chart: {
+                        type: 'bar',
+                        height: 500,
+                        stacked: true,
+                        stackType: '100%',
+                        toolbar: {
+                            show: true
+                        }
+                    },
+                    plotOptions: {
+                        bar: {
+                            horizontal: false,
+                            borderRadius: 4
+                        }
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function(val) {
+                            return val.toFixed(1) + "%";
+                        }
+                    },
+                    series: [{
+                            name: "Đã đóng",
+                            data: percentPaid
+                        },
+                        {
+                            name: "Chưa đóng",
+                            data: percentUnpaid
+                        }
+                    ],
+                    xaxis: {
+                        categories: categories,
+                        title: {
+                            text: "Lớp học"
+                        }
+                    },
+                    yaxis: {
+                        title: {
+                            text: "Tỷ lệ (%)"
+                        },
+                        max: 100
+                    },
+                    colors: ['#22c55e', '#e11d48'],
+                    tooltip: {
+                        y: {
+                            formatter: function(val, opts) {
+                                let idx = opts.dataPointIndex;
+                                let raw = opts.seriesIndex === 0 ? paidData[idx] : unpaidData[idx];
+                                let count = opts.seriesIndex === 0 ? paidCount[idx] : unpaidCount[idx];
+
+                                // format số tiền với dấu phân cách hàng nghìn
+                                let formattedMoney = raw.toLocaleString('vi-VN', {
+                                    minimumFractionDigits: 0
+                                });
+
+                                return `${formattedMoney} VNĐ (${val.toFixed(1)}%) | ${count} học sinh`;
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                        horizontalAlign: 'center'
+                    },
+                    fill: {
+                        opacity: 0.9
+                    }
+                };
+
+                if (CharHocPhi !== null) {
+                    CharHocPhi.destroy();
+                }
+                CharHocPhi = new ApexCharts(document.querySelector("#tuition-stacked-chart"), options);
+                CharHocPhi.render();
+            }
+
+
+
+
+            //Biểu đồ Lãi lỗ
+            function renderLaiLo(data = null) {
+                var months = ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7", "Th8", "Th9", "Th10", "Th11",
+                    "Th12"
+                ];
+                var revenue = data.map(item => parseFloat(item.tong_doanh_thu)); // triệu VNĐ
+                var salary = data.map(item => parseFloat(item.tong_luong_gv)); // triệu VNĐ
+                var profit = revenue.map((val, idx) => val - salary[idx]);
+
+                var options = {
+                    chart: {
+                        height: 420,
+                        type: 'line',
+                        toolbar: {
+                            show: true
+                        }
+                    },
+                    stroke: {
+                        width: [0, 0, 3],
+                        curve: 'smooth'
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        enabledOnSeries: [2] // chỉ hiển thị label trên line
+                    },
+                    series: [{
+                            name: 'Doanh thu',
+                            type: 'column',
+                            data: revenue
+                        },
+                        {
+                            name: 'Chi phí lương',
+                            type: 'column',
+                            data: salary
+                        },
+                        {
+                            name: 'Lãi/Lỗ',
+                            type: 'line',
+                            data: profit
+                        }
+                    ],
+                    xaxis: {
+                        categories: months,
+                        title: {
+                            text: "Tháng"
+                        }
+                    },
+                    yaxis: [{
+                            title: {
+                                text: "Doanh thu & Chi phí (triệu VNĐ)"
+                            }
+                        },
+                        {
+                            opposite: true,
+                            title: {
+                                text: "Lãi/Lỗ (triệu VNĐ)"
+                            }
+                        }
+                    ],
+                    tooltip: {
+                        shared: true,
+                        y: {
+                            formatter: function(val, opts) {
+                                // format số với dấu chấm ngăn cách nghìn
+                                let formatted = val.toLocaleString('vi-VN', {
+                                    minimumFractionDigits: 0
+                                });
+
+                                if (opts.seriesIndex === 2) {
+                                    // series Lãi/Lỗ
+                                    return formatted + " triệu (" + (val >= 0 ? "Lãi" : "Lỗ") + ")";
+                                }
+                                return formatted + " triệu VNĐ";
+                            }
+                        }
+                    },
+                    colors: ['#1E90FF', '#e11d48',
+                        '#22c55e'
+                    ], // xanh dương = revenue, đỏ = lương, xanh lá = lãi
+                    legend: {
+                        position: 'top',
+                        horizontalAlign: 'center'
+                    },
+                    grid: {
+                        borderColor: "#f1f3fa"
+                    }
+                };
+
+                // Nếu đã có chart → destroy trước khi tạo mới
+                if (CharLaiLo !== null) {
+                    CharLaiLo.destroy();
+                }
+
+                CharLaiLo = new ApexCharts(document.querySelector("#profit-chart"), options);
+                CharLaiLo.render();
+            }
+
+
+
+
+
+            //Phân trang học phí
+            $(document).on('click', '#pagination-hocphi a', function(e) {
+                e.preventDefault();
+                const url = this.href;
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function(response) {
+                        RenderHocPhi(response.data.data);
+                        //Cập nhật phân trang
+                        $('#pagination-hocphi').html(response.pagination);
+                    },
+                    error: function(xhr) {
+                        console.error('Lỗi phân trang:', xhr.responseText);
+                    }
+                });
+            });
+
+        });
     </script>
 @endpush

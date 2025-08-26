@@ -29,6 +29,7 @@ class news extends Model
         'show_on_homepage',
         'is_featured',
         'is_latest',
+        'publish_status'
     ];
 
 

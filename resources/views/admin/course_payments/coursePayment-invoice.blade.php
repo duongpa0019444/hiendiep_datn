@@ -211,7 +211,6 @@
                         <td>
                             <strong>Khóa học:</strong> {{ $payment->course->name ?? 'Chưa xác định' }}<br>
                             <strong>Lớp:</strong> {{ $payment->class->name ?? 'Chưa xác định' }}<br>
-                            <strong>Mã thanh toán:</strong> {{ $payment->id }}
                         </td>
                         <td class="text-right">{{ number_format($payment->amount, 0, ',', '.') }}</td>
                     </tr>

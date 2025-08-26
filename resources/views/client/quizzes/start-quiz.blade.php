@@ -421,7 +421,7 @@
                     confirmButtonText: '<i class="icofont-check"></i> Nộp luôn',
                     cancelButtonText: '<i class="icofont-reply"></i> Quay lại',
                     customClass: {
-                        confirmButton: 'btn btn-warning w-xs mx-1',
+                        confirmButton: 'btn btn-primary w-xs mx-1',
                         cancelButton: 'btn btn-success w-xs mx-1'
                     },
                     buttonsStyling: false,

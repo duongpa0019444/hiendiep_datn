@@ -31,11 +31,21 @@ class CheckRole
                 $trainAllowedRoutes = [
                     // dashboard
                     'admin.dashboard',
+                    'admin.dashboard.renderOverview',
                     'admin.dashboard.schedules.views',
                     'admin.dashboard.schedules.date',
                     'admin.chartRevenue',
                     'admin.revenueCourse',
                     'admin.dashboard.chart',
+
+                    //Thống kê đâò tạo
+                    'admin.thongke.daotao',
+                    'admin.thongke.hocinhdangky',
+                    'admin.thongke.buoiday',
+                    'admin.thongke.statusClasses',
+                    'admin.thongke.classStudentCounts',
+                    'admin.thongke.classAverageScores',
+
 
 
                     // người dùng
@@ -167,7 +177,16 @@ class CheckRole
                     'admin.contactDetail',
                     'contact.approve',
                     'contact.reject',
-                    'contact.delete'
+                    'contact.delete',
+
+                    //Quản lý phòng học
+                    'admin.classroom.list-room',
+                    'admin.classroom.create',
+                    'admin.classroom.store',
+                    'admin.classroom.delete',
+                    'admin.classroom.detail-room',
+                    'admin.classroom.edit',
+                    'admin.classroom.update'
                 ];
 
 
@@ -181,11 +200,19 @@ class CheckRole
 
                     // dashboard
                     'admin.dashboard',
+                    'admin.dashboard.renderOverview',
                     'admin.dashboard.schedules.views',
                     'admin.dashboard.schedules.date',
                     'admin.chartRevenue',
                     'admin.revenueCourse',
                     'admin.dashboard.chart',
+
+                    //Thống kê tài chính
+                    'admin.statistics.finance.tong-quy-luong',
+                    'admin.statistics.finance.tong-doanh-thu',
+                    'admin.statistics.finance.hoc-phi-lop',
+                    'admin.statistics.finance.lai-lo',
+                    'admin.thongke.taichinh',
 
                     // học phí
                     'admin.course_payments',
@@ -196,6 +223,8 @@ class CheckRole
                     'admin.course_payments.show',
                     'admin.course_payments.statistics',
                     'admin.course_payments.update',
+                    'admin.course_payments.trash',
+                    'admin.course_payments.trash.filter',
 
                     // thông báo học phí
                     'admin.noti.coursepayment',

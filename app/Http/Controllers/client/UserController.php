@@ -74,7 +74,7 @@ class UserController extends Controller
             $classes = DB::table('class_student as cs')
                 ->join('classes as c', 'cs.class_id', '=', 'c.id')
                 ->join('courses as co', 'c.courses_id', '=', 'co.id')
-                ->join('schedules as s', 'c.id', '=', 's.class_id')
+                ->leftJoin('schedules as s', 'c.id', '=', 's.class_id')
                 ->join('users as u', 'cs.student_id', '=', 'u.id')
                 ->join('users as t', 's.teacher_id', '=', 't.id')
                 ->where('cs.student_id', $userId)
@@ -91,7 +91,7 @@ class UserController extends Controller
                 ->groupBy('u.name', 'c.name', 'c.status', 'co.name', 't.name', 'c.id')
                 ->orderBy('c.created_at', 'asc')
                 ->get();
-
+            // dd($classes->all());
 
             $attendance = DB::select("
                 SELECT

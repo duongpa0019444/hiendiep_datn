@@ -13,6 +13,7 @@ use App\Models\quizzes;
 use App\Models\Quizzes as ModelsQuizzes;
 use App\Models\sentenceAnswers;
 use App\Models\sentenceQuestions;
+use App\Models\studentAnswers;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -940,4 +941,8 @@ class quizzesController extends Controller
 
         return response()->json($course);
     }
+
+
+
+
 }

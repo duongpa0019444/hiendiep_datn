@@ -5,11 +5,14 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\answers;
 use App\Models\questions;
+use App\Models\quizAttempts;
 use App\Models\Quizzes;
 use App\Models\sentenceAnswers;
 use App\Models\sentenceQuestions;
+use App\Models\studentAnswers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class questionsController extends Controller
@@ -133,12 +136,12 @@ class questionsController extends Controller
             'answers' => $answersToInsert,
             'question_type' => 'multiple_choice'
         ], 201);
-
     }
 
 
 
-    public function edit($id){
+    public function edit($id)
+    {
         $question = questions::findOrFail($id);
 
         if (!$question) {
@@ -156,121 +159,166 @@ class questionsController extends Controller
 
     public function update($id, Request $request)
     {
-         $validator = Validator::make($request->all(), [
-            'quiz_id' => 'required|integer|exists:quizzes,id',
-            'content' => 'required|string',
-            'type' => 'required|in:single,multiple',
-            'points' => 'required|min:0.1',
+        try {
+            $validator = Validator::make($request->all(), [
+                'quiz_id' => 'required|integer|exists:quizzes,id',
+                'content' => 'required|string',
+                'type' => 'required|in:single,multiple',
+                'points' => 'required|min:0.1',
 
-            'answers' => 'required|array|min:2',
-            'answers.*.content' => 'required|string',
-            'answers.*.is_correct' => 'required|in:0,1',
-        ], [
-            'quiz_id.required' => 'Vui lòng chọn bài quiz.',
-            'quiz_id.integer' => 'ID của quiz phải là số.',
-            'quiz_id.exists' => 'Quiz đã chọn không tồn tại trong hệ thống.',
+                'answers' => 'required|array|min:2',
+                'answers.*.content' => 'required|string',
+                'answers.*.is_correct' => 'required|in:0,1',
+            ], [
+                'quiz_id.required' => 'Vui lòng chọn bài quiz.',
+                'quiz_id.integer' => 'ID của quiz phải là số.',
+                'quiz_id.exists' => 'Quiz đã chọn không tồn tại trong hệ thống.',
 
-            'content.required' => 'Vui lòng nhập nội dung câu hỏi.',
-            'content.string' => 'Nội dung câu hỏi phải là chuỗi ký tự.',
+                'content.required' => 'Vui lòng nhập nội dung câu hỏi.',
+                'content.string' => 'Nội dung câu hỏi phải là chuỗi ký tự.',
 
-            'type.required' => 'Vui lòng chọn loại câu hỏi.',
-            'type.in' => 'Loại câu hỏi không hợp lệ. Chỉ chấp nhận: single hoặc multiple.',
+                'type.required' => 'Vui lòng chọn loại câu hỏi.',
+                'type.in' => 'Loại câu hỏi không hợp lệ. Chỉ chấp nhận: single hoặc multiple.',
 
-            'points.required' => 'Vui lòng nhập điểm cho câu hỏi.',
-            'points.min' => 'Điểm tối thiểu phải là 0.1.',
+                'points.required' => 'Vui lòng nhập điểm cho câu hỏi.',
+                'points.min' => 'Điểm tối thiểu phải là 0.1.',
 
-            'answers.required' => 'Vui lòng nhập ít nhất 2 đáp án.',
-            'answers.array' => 'Đáp án phải được gửi dưới dạng mảng.',
-            'answers.min' => 'Phải có ít nhất 2 đáp án.',
+                'answers.required' => 'Vui lòng nhập ít nhất 2 đáp án.',
+                'answers.array' => 'Đáp án phải được gửi dưới dạng mảng.',
+                'answers.min' => 'Phải có ít nhất 2 đáp án.',
 
-            'answers.*.content.required' => 'Một hoặc nhiều đáp án chưa được nhập nội dung.',
-            'answers.*.content.string' => 'Nội dung đáp án phải là chuỗi ký tự.',
-            'answers.*.is_correct.required' => 'Vui lòng chọn đúng/sai cho từng đáp án.',
-            'answers.*.is_correct.in' => 'Giá trị đúng/sai phải là 0 hoặc 1.',
-        ]);
+                'answers.*.content.required' => 'Một hoặc nhiều đáp án chưa được nhập nội dung.',
+                'answers.*.content.string' => 'Nội dung đáp án phải là chuỗi ký tự.',
+                'answers.*.is_correct.required' => 'Vui lòng chọn đúng/sai cho từng đáp án.',
+                'answers.*.is_correct.in' => 'Giá trị đúng/sai phải là 0 hoặc 1.',
+            ]);
 
-        // 2. GỘP LỖI (nếu có)
-        if ($validator->fails()) {
-            $rawErrors = $validator->errors()->toArray();
-            $filteredErrors = $rawErrors;
+            // 2. GỘP LỖI (nếu có)
+            if ($validator->fails()) {
+                $rawErrors = $validator->errors()->toArray();
+                $filteredErrors = $rawErrors;
 
-            // Gộp lỗi nội dung
-            $contentErrors = array_filter(array_keys($rawErrors), function ($key) {
-                return preg_match('/^answers\.\d+\.content$/', $key);
+                // Gộp lỗi nội dung
+                $contentErrors = array_filter(array_keys($rawErrors), function ($key) {
+                    return preg_match('/^answers\.\d+\.content$/', $key);
+                });
+
+                if (!empty($contentErrors)) {
+                    $filteredErrors['answers'] = ['Vui lòng nhập nội dung cho tất cả các đáp án.'];
+                    foreach ($contentErrors as $key) {
+                        unset($filteredErrors[$key]);
+                    }
+                }
+
+                // Gộp lỗi is_correct
+                $correctErrors = array_filter(array_keys($rawErrors), function ($key) {
+                    return preg_match('/^answers\.\d+\.is_correct$/', $key);
+                });
+
+                if (!empty($correctErrors)) {
+                    $filteredErrors['answers'][] = 'Vui lòng chọn ít nhất một đáp án đúng..';
+                    foreach ($correctErrors as $key) {
+                        unset($filteredErrors[$key]);
+                    }
+                }
+
+                return response()->json(['errors' => $filteredErrors], 422);
+            }
+
+            // 3. KIỂM TRA CÓ ÍT NHẤT 1 ĐÁP ÁN ĐÚNG
+            $hasCorrectAnswer = collect($request->input('answers'))->contains(function ($ans) {
+                return isset($ans['is_correct']) && (string)$ans['is_correct'] === '1';
             });
 
-            if (!empty($contentErrors)) {
-                $filteredErrors['answers'] = ['Vui lòng nhập nội dung cho tất cả các đáp án.'];
-                foreach ($contentErrors as $key) {
-                    unset($filteredErrors[$key]);
+            if (!$hasCorrectAnswer) {
+                return response()->json([
+                    'errors' => [
+                        'answers' => ['Vui lòng chọn ít nhất một đáp án đúng.']
+                    ]
+                ], 422);
+            }
+
+
+            $question = questions::findOrFail($id);
+            $oldPoints = $question->points;
+            $oldCorrect = answers::where('question_id', $question->id)
+                ->where('is_correct', 1)
+                ->pluck('content')
+                ->sort()
+                ->values()
+                ->toArray();
+
+
+            // Cập nhật câu hỏi
+            $question->content = $request->input('content');
+            $question->type = $request->input('type');
+            $question->points = $request->input('points');
+            $question->explanation = $request->input('explanation', null);
+            $question->updated_at = now();
+            $question->save();
+
+            //Cập nhật đáp án
+            $existingAnswers = answers::where('question_id', $id)->get();
+
+            $answersToUpdate = $request->input('answers');
+
+            // Lặp theo index
+            foreach ($answersToUpdate as $index => $ans) {
+                if (isset($existingAnswers[$index])) {
+                    // Cập nhật đáp án cũ theo thứ tự
+                    $answer = $existingAnswers[$index];
+                    $answer->content = $ans['content'];
+                    $answer->is_correct = (int)$ans['is_correct'];
+                    $answer->updated_at = now();
+                    $answer->save();
+                } else {
+                    // Thêm đáp án mới (không có id match)
+                    answers::create([
+                        'question_id' => $id,
+                        'content' => $ans['content'],
+                        'is_correct' => (int)$ans['is_correct'],
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
                 }
             }
 
-            // Gộp lỗi is_correct
-            $correctErrors = array_filter(array_keys($rawErrors), function ($key) {
-                return preg_match('/^answers\.\d+\.is_correct$/', $key);
-            });
 
-            if (!empty($correctErrors)) {
-                $filteredErrors['answers'][] = 'Vui lòng chọn ít nhất một đáp án đúng..';
-                foreach ($correctErrors as $key) {
-                    unset($filteredErrors[$key]);
-                }
+            $answersResponse = answers::where('question_id', $id)->get();
+
+
+            //Kiểm tra xem nếu như cập nhật điểm số / đáp án đúng sai của câu hỏi thì sẽ cập nhật lại điểm số của các attempt đã hoàn thành
+            // Kiểm tra nếu điểm thay đổi hoặc tập hợp đáp án đúng thay đổi
+            $newCorrect = collect($request->answers)
+                ->filter(fn($ans) => (int)$ans['is_correct'] === 1)
+                ->pluck('content')
+                ->sort()
+                ->values()
+                ->toArray();
+
+
+            // dd($newCorrect, $oldCorrect);
+            if ((float)$request->points !== (float)$oldPoints || $newCorrect !== $oldCorrect) {
+                $this->recalculateQuizAttempts($question->quiz_id);
             }
 
-            return response()->json(['errors' => $filteredErrors], 422);
-        }
+            $this->logAction(
+                'update',
+                Quizzes::class,
+                $question->id,
+                Auth::user()->name . ' đã cập nhật câu hỏi trắc nghiệm: ' . $question->content
+            );
 
-        // 3. KIỂM TRA CÓ ÍT NHẤT 1 ĐÁP ÁN ĐÚNG
-        $hasCorrectAnswer = collect($request->input('answers'))->contains(function ($ans) {
-            return isset($ans['is_correct']) && (string)$ans['is_correct'] === '1';
-        });
-
-        if (!$hasCorrectAnswer) {
             return response()->json([
-                'errors' => [
-                    'answers' => ['Vui lòng chọn ít nhất một đáp án đúng.']
-                ]
-            ], 422);
+                'message' => 'Câu hỏi và đáp án đã được cập nhật thành công.',
+                'question' => $question,
+                'answers' => $answersResponse,
+                'question_type' => 'multiple_choice'
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Lỗi khi cập nhật câu hỏi: ' . $e->getMessage());
+            return response()->json(['error' => 'Lỗi không xác định: ' . $e->getMessage()], 500);
         }
-
-        $question = questions::findOrFail($id);
-
-        // Cập nhật câu hỏi
-        $question->content = $request->input('content');
-        $question->type = $request->input('type');
-        $question->points = $request->input('points');
-        $question->explanation = $request->input('explanation', null);
-        $question->updated_at = now();
-        $question->save();
-        // Xóa tất cả các đáp án cũ
-        answers::where('question_id', $id)->delete();
-        // Lưu các đáp án mới
-        $answersToInsert = [];
-        foreach ($request->input('answers') as $answer) {
-            $answersToInsert[] = [
-                'question_id' => $question->id,
-                'content' => $answer['content'],
-                'is_correct' => $answer['is_correct'] == '1' ? 1 : 0,
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
-        }
-        answers::insert($answersToInsert);
-
-        $this->logAction(
-            'update',
-            Quizzes::class,
-            $question->id,
-            Auth::user()->name . ' đã cập nhật câu hỏi trắc nghiệm: ' . $question->content
-        );
-
-        return response()->json([
-            'message' => 'Câu hỏi và đáp án đã được cập nhật thành công.',
-            'question' => $question,
-            'answers' => $answersToInsert,
-            'question_type' => 'multiple_choice'
-        ], 200);
     }
 
     public function delete($id)
@@ -281,8 +329,12 @@ class questionsController extends Controller
             return response()->json(['error' => 'Câu hỏi không tồn tại.'], 404);
         }
 
+        if (answers::where('question_id', $id)->exists()) {
+            return response()->json(['error' => 'Không thể xóa vì đã có học sinh làm câu hỏi này!'], 400);
+        }
+
         // Xóa tất cả các đáp án liên quan đến câu hỏi này
-        answers::where('question_id', $id)->delete();
+        // answers::where('question_id', $id)->delete();
         $this->logAction(
             'delete',
             Quizzes::class,
@@ -351,10 +403,10 @@ class questionsController extends Controller
             Quizzes::class,
             $question->id,
             Auth::user()->name . ' đã tạo câu hỏi ' .
-            ($question->type == 'fill'
-                ? 'điền từ: '
-                : 'sắp xếp câu: ')
-            . $question->prompt
+                ($question->type == 'fill'
+                    ? 'điền từ: '
+                    : 'sắp xếp câu: ')
+                . $question->prompt
         );
 
         return response()->json([
@@ -410,6 +462,8 @@ class questionsController extends Controller
         }
 
         $questionSentence = sentenceQuestions::findOrFail($id);
+        $oldPoints = $questionSentence->points;
+        $oldCorrect = trim(strtolower($questionSentence->correct_answer));
 
         // Cập nhật câu hỏi
         $questionSentence->quiz_id = $request->quiz_id;
@@ -420,15 +474,23 @@ class questionsController extends Controller
         $questionSentence->explanation = $request->explanation ?? null;
         $questionSentence->updated_at = now();
         $questionSentence->save();
+
+        $newCorrect = trim(strtolower($request->correct_answer));
+        // dd($newCorrect, $oldCorrect);
+        if ((float)$request->points !== (float)$oldPoints || $newCorrect !== $oldCorrect) {
+            $this->recalculateQuizAttempts($questionSentence->quiz_id);
+        }
+
+
         $this->logAction(
             'update',
             Quizzes::class,
             $questionSentence->id,
             Auth::user()->name . ' đã cập nhật câu hỏi ' .
-            ($questionSentence->type == 'fill'
-                ? 'điền từ: '
-                : 'sắp xếp câu: ')
-            . $questionSentence->prompt
+                ($questionSentence->type == 'fill'
+                    ? 'điền từ: '
+                    : 'sắp xếp câu: ')
+                . $questionSentence->prompt
         );
 
         return response()->json([
@@ -448,8 +510,12 @@ class questionsController extends Controller
             return response()->json(['error' => 'Câu hỏi không tồn tại.'], 404);
         }
 
+        if (sentenceAnswers::where('question_id', $id)->exists()) {
+            return response()->json(['error' => 'Không thể xóa vì đã có học sinh làm câu hỏi này!'], 400);
+        }
+
         // Xóa tất cả các đáp án liên quan đến câu hỏi này
-        sentenceAnswers::where('question_id', $id)->delete();
+        // sentenceAnswers::where('question_id', $id)->delete();
         $this->logAction(
             'update',
             Quizzes::class,
@@ -462,4 +528,84 @@ class questionsController extends Controller
         return response()->json(['message' => 'Câu hỏi và đáp án đã được xóa thành công.'], 200);
     }
 
+
+
+    //Hàm cập nhật đáp án học sinh khi giáo viên chỉnh sửa câu hỏi trong lúc học sinh đang làm bài
+    public function recalculateQuizAttempts($quizId)
+    {
+        try {
+            // 1. Lấy toàn bộ attempts
+            $attempts = quizAttempts::where('quiz_id', $quizId)->get();
+
+            // 2. Lấy câu hỏi và đáp án hiện tại
+            $mcQuestions = questions::where('quiz_id', $quizId)->get()->map(function ($q) {
+                $q->question_type = 'multiple_choice';
+                return $q;
+            });
+
+            $fillQuestions = sentenceQuestions::where('quiz_id', $quizId)->get()->map(function ($q) {
+                $q->question_type = 'fill_blank';
+                return $q;
+            });
+
+            $allQuestions = $mcQuestions->concat($fillQuestions)->sortBy('created_at')->values();
+            $answers = answers::whereIn('question_id', $mcQuestions->pluck('id'))->get();
+
+            foreach ($attempts as $attempt) {
+                $scoreStudent = 0;
+                $totalCorrect = 0;
+
+                // 3. Lấy lại đáp án học sinh trong attempt này
+                $studentMcAnswers = studentAnswers::where('attempt_id', $attempt->id)->get();
+                $studentFillAnswers = sentenceAnswers::where('attempt_id', $attempt->id)->get();
+
+                foreach ($allQuestions as $question) {
+                    if ($question->question_type == 'multiple_choice') {
+                        $studentAnswerIds = $studentMcAnswers->where('question_id', $question->id)->pluck('answer_id')->toArray();
+                        $correctIds = $answers->where('question_id', $question->id)->where('is_correct', 1)->pluck('id')->sort()->values()->toArray();
+
+                        if ($question->type === 'single') {
+                            if (isset($studentAnswerIds[0]) && (int)$studentAnswerIds[0] === (int)$correctIds[0]) {
+                                $scoreStudent += $question->points;
+                                $totalCorrect++;
+                            }
+                        } elseif ($question->type === 'multiple') {
+                            sort($studentAnswerIds);
+                            if ($studentAnswerIds === $correctIds) {
+                                $scoreStudent += $question->points;
+                                $totalCorrect++;
+                            }
+                        }
+                    } elseif ($question->question_type == 'fill_blank') {
+                        $studentAns = $studentFillAnswers->where('question_id', $question->id)->first();
+                        $correctAnswer = trim(strtolower($question->correct_answer));
+                        $studentText = trim(strtolower($studentAns?->user_answer ?? ''));
+
+                        //cập nhật lại iscorrect trong bảng sentence_answers
+                        if ($studentAns) {
+                            Log::info('StudentAns:', [$studentAns]);
+
+                            $studentAns->is_correct = ($correctAnswer == $studentText) ? 1 : 0;
+                            $studentAns->save();
+                        }
+                        if ($correctAnswer === $studentText) {
+
+                            $scoreStudent += $question->points;
+                            $totalCorrect++;
+                        }
+                    }
+                }
+
+                // 4. Cập nhật lại kết quả
+                $attempt->update([
+                    'score' => $scoreStudent,
+                    'total_correct' => $totalCorrect,
+                    'total_questions' => count($allQuestions),
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Lỗi khi cập nhật câu hỏi: ' . $e->getMessage());
+            return response()->json(['error' => 'Lỗi không xác định: ' . $e->getMessage()], 500);
+        }
+    }
 }
