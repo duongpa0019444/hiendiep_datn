@@ -40,7 +40,7 @@ class ScoresExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ['Học sinh', 'Lớp', 'Khóa', 'Điểm', 'Loại điểm', 'Ngày'];
+        return ['Mã học sinh', 'Học sinh', 'Lớp', 'Khóa', 'Loại điểm', 'Điểm', 'Ngày'];
     }
 }
 
