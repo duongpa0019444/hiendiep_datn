@@ -38,10 +38,6 @@ class CourseController  extends Controller
         } elseif ($request->sort == 'price_desc') {
             $query->orderBy('price', 'desc');
         }
-
-        // Lấy tất cả khóa học sau khi lọc dùng ->paginate(10))
-        // dd($courses);
-
         $limit = $request->input('limit2', 10); // lấy số lượng bản ghi mỗi trang từ request, mặc định 10
         $courses = $query->paginate($limit);
         $totalCourses = $courses->count();
@@ -79,8 +75,7 @@ class CourseController  extends Controller
 
     {
         $quizz = Quizzes::where('course_id', $id)->get(); // ✔ lấy theo điều kiện
-        // $lessions = Lessions::with('quizz')->where('course_id', $id)->get();
-        $lessions = Lessions::with('quizz')->where('course_id', $id)->get();
+        $lessions = Lessions::where('course_id', $id)->get();
 
         $course = courses::findOrFail($id);
         return view('admin.course.course-detail', compact('course', 'lessions', 'quizz'));
@@ -151,7 +146,6 @@ class CourseController  extends Controller
         $course->teaching_goals = $request->input('teaching_goals');
         $course->created_at = now();
 
-        // dd ($course->image);
 
 
         $course->save();
@@ -190,8 +184,6 @@ class CourseController  extends Controller
         $course->price = $request->input('price');
         $course->total_sessions = $request->input('total_sessions');
         $course->description = $request->input('description');
-        // $course->created_at = $request->input('created_at');
-        // $course->updated_at = $request->input('updated_at');
         $course->teaching_method = $request->input('teaching_method');
         $course->teaching_goals = $request->input('teaching_goals');
         $course->save();
@@ -204,13 +196,13 @@ class CourseController  extends Controller
         $lession = Lessions::findOrFail($id);
         $lession->delete();
         // return redirect()->route('admin.course-detail', ['id' => $course_id]);
-        return redirect()->back()->with('success', 'Xóa khóa học thành công thành công ');
+        return redirect()->back()->with('success', 'Xóa bài giảng thành công thành công ');
     }
     public function addLession($id)
     {
         $course = courses::findOrFail($id);
-        $quizz = Quizzes::all(); // lấy toàn bộ
-        return view('admin.course.lession-add', compact('id', 'course', 'quizz'));
+        // $quizz = Quizzes::all(); // lấy toàn bộ
+        return view('admin.course.lession-add', compact('id', 'course'));
     }
 
 
@@ -224,15 +216,16 @@ class CourseController  extends Controller
             'link_document.required' => 'Vui lòng nhập link bài giảng .',
         ]);
         $lesson = new Lessions();
-
-        $lesson->quizzes_id = $request->input('quizz_id'); // ← THÊM DÒNG NÀY
-
+        // $lesson->quizzes_id = $request->input('quizz_id'); // THÊM DÒNG NÀY
         $lesson->course_id = $id;
         $lesson->name = $request->input('name');
         $lesson->link_document = $request->input('link_document');
+        $lesson->created_at = now();
+        $lesson->updated_at = now();
+        
+
         $lesson->save();
 
-        // return redirect()->route('admin.course-detail', ['id' => $id])->with('success', 'Thêm bài học thành công!');
         return redirect()->route('admin.course-detail', ['id' => $id])->with('success', 'Thêm bài giảng thành công!');
     }
     public function editLession($course_id, $id)
@@ -240,9 +233,9 @@ class CourseController  extends Controller
         // dd($course_id, $id);
         $course_id = $course_id;
         $lession = Lessions::findOrFail($id);
-        $quizz = Quizzes::where('course_id', $course_id)->get(); // hoặc Quizzes::all() nếu không cần lọc
+        // $quizz = Quizzes::where('course_id', $course_id)->get(); // hoặc Quizzes::all() nếu không cần lọc
 
-        return view('admin.course.lession-edit', ['id' => $id], compact('lession', 'course_id', 'quizz', 'id'));
+        return view('admin.course.lession-edit', ['id' => $id], compact('lession', 'course_id', 'id'));
     }
     public function updateLession(Request $request, $course_id, $id)
     {
@@ -256,7 +249,9 @@ class CourseController  extends Controller
         $course_id = $course_id;
         $lession = Lessions::findOrFail($id);
         $lession->name = $request->input('name');
+        // $lession->quizzes_id = $request->input('quizz_id'); // THÊM DÒNG NÀY
         $lession->link_document = $request->input('link_document');
+        $lession->updated_at = now();
         $lession->save();
 
         return redirect()->route('admin.course-detail', ['id' => $course_id])->with('success', 'Cập nhật bài học thành công!');

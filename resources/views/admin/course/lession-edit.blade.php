@@ -49,26 +49,21 @@
                                     </div>
 
                                     <!-- Chọn Bài quizz qua các option -->
-
+{{-- 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <select name="quizz_id" id="quizz_id" class="form-select">
                                                 {{-- <option value=" {{ $quizz->name }}"></option> --}}
-                                                <option value="">-- Chọn bài Quiz --</option>
+                                                {{-- <option value="">-- Chọn bài Quiz --</option>
                                                 @foreach ($quizz as $quiz)
-                                                    {{-- <option value="{{ $quiz->id }}">{{ $quiz->name }}</option> --}}
                                                     <option value="{{ $quiz->id }}">{{ $quiz->title }}</option>
                                                 @endforeach
 
                                             </select>
-                                        </div>
-
-
-
-
+                                        </div> --}} 
                                         <!-- Buttons -->
-
-
+                                        {{-- ngày cập nhật --}}
+                                      
 
 
                                     </div>

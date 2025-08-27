@@ -45,13 +45,12 @@
                                                 class="form-control" placeholder="Tài liệu học">
                                         </div>
                                     </div>
-
-
+                                    {{-- Ngày tạo bài giảng --}}
 
 
 
                                     {{-- Chọn Bài quizz qua các option --}}
-                                    <div class="col-lg-6">
+                                    {{-- <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="quizz_id" class="form-label">Bài Quizz liên kết</label>
                                             <select name="quizz_id" id="quizz_id" class="form-select">
@@ -61,7 +60,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                 </div>
                             </div>
@@ -85,7 +84,7 @@
                 </div>
         </form>
 
-         <!-- Footer -->
+        <!-- Footer -->
         <footer class="footer">
             <div class="container-fluid">
                 <div class="row">
@@ -93,8 +92,7 @@
                         <script>
                             document.write(new Date().getFullYear())
                         </script> © DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC THANH HÓA
-                        <iconify-icon icon="iconamoon:heart-duotone"
-                            class="fs-18 align-middle text-danger"></iconify-icon>
+                        <iconify-icon icon="iconamoon:heart-duotone" class="fs-18 align-middle text-danger"></iconify-icon>
                         <a href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
                     </div>
                 </div>
