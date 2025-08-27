@@ -132,7 +132,7 @@
                             @foreach ($notis as $noti)
                                 <div class="card mb-3 shadow-sm">
                                     <div class="row g-0 align-items-center">
-                                       
+
                                         <div class="col-md-10">
                                             <div class="card-body py-2">
                                                 <span class="fw-bold">{{ $noti->title }}</span>
@@ -157,6 +157,23 @@
                 </div>
             </div>
         </div>
+
+
+            <!-- ========== Footer Start ========== -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <script>
+                            document.write(new Date().getFullYear())
+                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC THANH HÓA <iconify-icon
+                            icon="iconamoon:heart-duotone" class="fs-18 align-middle text-danger"></iconify-icon> <a
+                            href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- ========== Footer End ========== -->
     </div>
 
     <script>
@@ -180,7 +197,7 @@
                     html += `
                 <div class="card mb-3 shadow-sm">
                     <div class="row g-0 align-items-center">
-                       
+
                         <div class="col-md-10">
                             <div class="card-body py-2">
                                <span class="fw-bold">${noti.title}</span>
