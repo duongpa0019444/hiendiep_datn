@@ -263,6 +263,23 @@
                 </div>
             </div>
         </div>
+
+
+        <!-- ========== Footer Start ========== -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <script>
+                            document.write(new Date().getFullYear())
+                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC THANH HÓA <iconify-icon
+                            icon="iconamoon:heart-duotone" class="fs-18 align-middle text-danger"></iconify-icon> <a
+                            href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- ========== Footer End ========== -->
     </div>
 @endsection
 @push('scripts')

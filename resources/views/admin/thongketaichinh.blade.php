@@ -33,7 +33,12 @@
             <!-- Line Chart (Lương giáo viên) -->
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-3">Tổng quỹ lương giáo viên theo tháng</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="card-title mb-0">Tổng quỹ lương giáo viên theo tháng</h4>
+                        <button class="btn btn-sm btn-primary btn-export-salary-area-chart">
+                            <i class="fas fa-file-export me-1"></i> Xuất báo cáo
+                        </button>
+                    </div>
                     <div id="salary-area-chart" class="apex-charts"></div>
                 </div>
             </div>
@@ -42,14 +47,24 @@
             {{-- Tong doanh thu --}}
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-3">Tổng doanh thu học phí theo tháng</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="card-title mb-3">Tổng doanh thu học phí theo tháng</h4>
+                        <button class="btn btn-sm btn-primary btn-export-revenue-line-chart">
+                            <i class="fas fa-file-export me-1"></i> Xuất báo cáo
+                        </button>
+                    </div>
                     <div id="revenue-line-chart" class="apex-charts"></div>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-3">Tình trạng đóng học phí theo lớp</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="card-title mb-3">Tình trạng đóng học phí theo lớp</h4>
+                        <button class="btn btn-sm btn-primary btn-export-tuition-stacked-chart">
+                            <i class="fas fa-file-export me-1"></i> Xuất báo cáo
+                        </button>
+                    </div>
                     <div id="tuition-stacked-chart" class="apex-charts"></div>
                     <div id="pagination-hocphi" class="card-footer border-top">
 
@@ -59,12 +74,33 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-3">So sánh Doanh thu & Chi phí lương (Lãi/Lỗ)</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="card-title mb-3">So sánh Doanh thu & Chi phí lương (Lãi/Lỗ)</h4>
+                        <button class="btn btn-sm btn-primary btn-export-profit-chart">
+                            <i class="fas fa-file-export me-1"></i> Xuất báo cáo
+                        </button>
+                    </div>
                     <div id="profit-chart" class="apex-charts"></div>
                 </div>
             </div>
 
         </div>
+
+        <!-- ========== Footer Start ========== -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <script>
+                            document.write(new Date().getFullYear())
+                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC THANH HÓA <iconify-icon
+                            icon="iconamoon:heart-duotone" class="fs-18 align-middle text-danger"></iconify-icon> <a
+                            href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- ========== Footer End ========== -->
     </div>
 
 
@@ -220,7 +256,45 @@
                 CharTongLuong = new ApexCharts(document.querySelector("#salary-area-chart"), optionsArea);
                 CharTongLuong.render();
             }
+            // Xuất báo cáo tổng quỹ lương
+            $(document).on('click', '.btn-export-salary-area-chart', function(e) {
+                e.preventDefault();
 
+                let year = new Date().getFullYear();
+                console.log(year);
+                Swal.fire({
+                    title: 'Đang xử lý...',
+                    text: 'Vui lòng chờ trong giây lát',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: `/admin/statistics/finance/xuat-bao-cao/tong-quy-luong/${year}`,
+                    type: 'GET',
+                    xhrFields: {
+                        responseType: 'blob' // nhận file Excel
+                    },
+                    success: function(blob) {
+                        Swal.close(); // tắt loading
+
+                        // Tải file xuống
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `bao_cao_quy_luong_${year}.xlsx`;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                    },
+                    error: function(xhr) {
+                        Swal.fire("Lỗi", "Không thể xuất báo cáo", "error");
+                        console.error("Lỗi khi lấy tổng quỹ lương:", xhr.responseText);
+                    }
+                });
+            });
 
 
 
@@ -280,6 +354,45 @@
                 CharDoanhThu = new ApexCharts(document.querySelector("#revenue-line-chart"), options);
                 CharDoanhThu.render();
             }
+            // Xuất báo cáo tổng doanh thu học phí
+            $(document).on('click', '.btn-export-revenue-line-chart', function(e) {
+                e.preventDefault();
+
+                let year = new Date().getFullYear();
+                console.log(year);
+                Swal.fire({
+                    title: 'Đang xử lý...',
+                    text: 'Vui lòng chờ trong giây lát',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: `/admin/statistics/finance/xuat-bao-cao/doanh-thu/${year}`,
+                    type: 'GET',
+                    xhrFields: {
+                        responseType: 'blob' // nhận file Excel
+                    },
+                    success: function(blob) {
+                        Swal.close(); // tắt loading
+
+                        // Tải file xuống
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `bao_cao_doanh_thu_${year}.xlsx`;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                    },
+                    error: function(xhr) {
+                        Swal.fire("Lỗi", "Không thể xuất báo cáo", "error");
+                        console.error("Lỗi khi lấy tổng quỹ lương:", xhr.responseText);
+                    }
+                });
+            });
 
 
 
@@ -378,7 +491,45 @@
                 CharHocPhi = new ApexCharts(document.querySelector("#tuition-stacked-chart"), options);
                 CharHocPhi.render();
             }
+            // Xuất báo cáo tình trạng đóng học phí theo lớp
+            $(document).on('click', '.btn-export-tuition-stacked-chart', function(e) {
+                e.preventDefault();
 
+                let year = new Date().getFullYear();
+                console.log(year);
+                Swal.fire({
+                    title: 'Đang xử lý...',
+                    text: 'Vui lòng chờ trong giây lát',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: `/admin/statistics/finance/xuat-bao-cao/hoc-phi-lop/${year}`,
+                    type: 'GET',
+                    xhrFields: {
+                        responseType: 'blob' // nhận file Excel
+                    },
+                    success: function(blob) {
+                        Swal.close(); // tắt loading
+
+                        // Tải file xuống
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `bao_cao_hoc_phi_theo_lop_nam_${year}.xlsx`;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                    },
+                    error: function(xhr) {
+                        Swal.fire("Lỗi", "Không thể xuất báo cáo", "error");
+                        console.error("Lỗi khi lấy tổng quỹ lương:", xhr.responseText);
+                    }
+                });
+            });
 
 
 
@@ -478,7 +629,45 @@
                 CharLaiLo = new ApexCharts(document.querySelector("#profit-chart"), options);
                 CharLaiLo.render();
             }
+            // Xuất báo cáo lãi lỗ
+            $(document).on('click', '.btn-export-profit-chart', function(e) {
+                e.preventDefault();
 
+                let year = new Date().getFullYear();
+                console.log(year);
+                Swal.fire({
+                    title: 'Đang xử lý...',
+                    text: 'Vui lòng chờ trong giây lát',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: `/admin/statistics/finance/xuat-bao-cao/lai-lo/${year}`,
+                    type: 'GET',
+                    xhrFields: {
+                        responseType: 'blob' // nhận file Excel
+                    },
+                    success: function(blob) {
+                        Swal.close(); // tắt loading
+
+                        // Tải file xuống
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `bao_cao_lai_lo_nam_${year}.xlsx`;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                    },
+                    error: function(xhr) {
+                        Swal.fire("Lỗi", "Không thể xuất báo cáo", "error");
+                        console.error("Lỗi khi lấy tổng quỹ lương:", xhr.responseText);
+                    }
+                });
+            });
 
 
 
@@ -500,6 +689,8 @@
                     }
                 });
             });
+
+
 
         });
     </script>

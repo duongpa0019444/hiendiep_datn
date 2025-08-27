@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Classroom;
 use App\Models\classes; // Model tương ứng với bảng classes
 use App\Models\Schedule; // Model tương ứng với bảng classes
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 
@@ -39,7 +40,7 @@ class ClassroomController extends Controller
                     ->where('classes.status', 'in_progress');
             }])
             ->orderBy('id', 'desc')
-             ->paginate($request->limit ?? 10);
+            ->paginate($request->limit ?? 10);
 
 
 
@@ -110,7 +111,14 @@ class ClassroomController extends Controller
 
         $data = $request->validate($rules, $messages);
 
-        Classroom::create($data);
+        $classroom = Classroom::create($data);
+
+        $this->logAction(
+            'create',
+            Classroom::class,
+            $classroom->id,
+            Auth::user()->name . ' đã tạo phòng học: ' . $classroom->room_name
+        );
 
         return redirect()->route('admin.classroom.list-room')
             ->with('success', 'Thêm phòng học thành công!');
@@ -129,18 +137,23 @@ class ClassroomController extends Controller
             $classroom = Classroom::findOrFail($id);
 
             // Kiểm tra xem phòng có lớp nào đã xếp chưa
-            $hasSchedules = Schedule::where('room', $classroom->room_name)->exists();
+            $hasSchedules = Schedule::where('room', $classroom->id)->exists();
             if ($hasSchedules) {
-                return back()->with('error', 'Phòng "' . $classroom->room_name . '" đã có lớp học, không thể xoá.');
+                return back()->with('error', 'Phòng ' . $classroom->room_name . ' đã có lớp học, không thể xoá.');
             }
-
+            $this->logAction(
+                'delete',
+                Classroom::class,
+                $classroom->id,
+                Auth::user()->name . ' đã xóa phòng học: ' . $classroom->room_name
+            );
             $classroom->delete();
 
             return redirect()
                 ->route('admin.classroom.list-room')
                 ->with('success', 'Xoá phòng học thành công!');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Không xoá được phòng học: ' . $e->getMessage());
+            return back()->with('error', 'Không xoá được phòng học');
         }
     }
 
@@ -219,7 +232,12 @@ class ClassroomController extends Controller
 
 
         $classroom->update($data);
-
+        $this->logAction(
+            'update',
+            Classroom::class,
+            $classroom->id,
+            Auth::user()->name . ' đã cập nhật phòng học: ' . $classroom->room_name
+        );
         return redirect()->route('admin.classroom.list-room')
             ->with('success', 'Cập nhật phòng học thành công!');
     }

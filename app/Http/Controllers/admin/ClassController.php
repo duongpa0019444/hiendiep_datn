@@ -235,41 +235,41 @@ class ClassController extends Controller
             // dd(get_class($students), $students); // "Illuminate\Pagination\LengthAwarePaginator"
 
             // Xử lý tìm kiếm
-        if (request('search')) {
-            $search = request('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('users.name', 'like', "%{$search}%")
-                  ->orWhere('users.email', 'like', "%{$search}%");
-            });
-        }
+            if (request('search')) {
+                $search = request('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('users.name', 'like', "%{$search}%")
+                        ->orWhere('users.email', 'like', "%{$search}%");
+                });
+            }
 
-        // Xử lý sắp xếp
-        $sortBy = request('sort_by', 'created_at_desc'); // Mặc định sắp xếp theo created_at giảm dần
-        switch ($sortBy) {
-            case 'name':
-                $query->orderBy('users.name', 'asc');
-                break;
-            case 'name_desc':
-                $query->orderBy('users.name', 'desc');
-                break;
-            case 'email':
-                $query->orderBy('users.email', 'asc');
-                break;
-            case 'email_desc':
-                $query->orderBy('users.email', 'desc');
-                break;
-            case 'created_at':
-                $query->orderBy('class_student.created_at', 'asc');
-                break;
-            case 'created_at_desc':
-            default:
-                $query->orderBy('class_student.created_at', 'desc');
-                break;
-        }
+            // Xử lý sắp xếp
+            $sortBy = request('sort_by', 'created_at_desc'); // Mặc định sắp xếp theo created_at giảm dần
+            switch ($sortBy) {
+                case 'name':
+                    $query->orderBy('users.name', 'asc');
+                    break;
+                case 'name_desc':
+                    $query->orderBy('users.name', 'desc');
+                    break;
+                case 'email':
+                    $query->orderBy('users.email', 'asc');
+                    break;
+                case 'email_desc':
+                    $query->orderBy('users.email', 'desc');
+                    break;
+                case 'created_at':
+                    $query->orderBy('class_student.created_at', 'asc');
+                    break;
+                case 'created_at_desc':
+                default:
+                    $query->orderBy('class_student.created_at', 'desc');
+                    break;
+            }
 
-        // Xử lý số bản ghi mỗi trang
-        $perPage = request('per_page', 10); // Mặc định 10 bản ghi mỗi trang
-        $students = $query->paginate($perPage);
+            // Xử lý số bản ghi mỗi trang
+            $perPage = request('per_page', 10); // Mặc định 10 bản ghi mỗi trang
+            $students = $query->paginate($perPage);
 
             // Lấy danh sách học viên đã bị xóa mềm
             $trashedStudents = classStudent::onlyTrashed()
@@ -373,11 +373,15 @@ class ClassController extends Controller
         $classes = classes::where('classes.id', $classId)
             ->with(['course'])
             ->first();
+
+        //Kiểm tra xem nếu học sinh đã đóng tiền thì ko xóa mà sẽ lưu lại
         $course_payment = coursePayment::where('class_id', $classId)
             ->where('student_id', $studentId)
             ->where('course_id', $classes->course->id)
             ->first();
-        $course_payment->delete();
+        if ($course_payment->status = 'unpaid') {
+            $course_payment->delete();
+        }
 
 
 

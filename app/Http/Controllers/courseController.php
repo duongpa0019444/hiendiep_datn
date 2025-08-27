@@ -42,7 +42,7 @@ class CourseController  extends Controller
         // Lấy tất cả khóa học sau khi lọc dùng ->paginate(10))
         // dd($courses);
 
-         $limit = $request->input('limit2', 10); // lấy số lượng bản ghi mỗi trang từ request, mặc định 10
+        $limit = $request->input('limit2', 10); // lấy số lượng bản ghi mỗi trang từ request, mặc định 10
         $courses = $query->paginate($limit);
         $totalCourses = $courses->count();
         $totalSessions = $courses->sum('total_sessions');
@@ -90,22 +90,22 @@ class CourseController  extends Controller
 
         try {
             $course = courses::findOrFail($id);
-
+            $img = $course->image;
+            $course->delete();
             // Xóa file ảnh nếu tồn tại
-            if ($course->image) {
-                $imagePath = public_path($course->image);
+            if ($img) {
+                $imagePath = public_path($img);
                 if (File::exists($imagePath)) {
                     File::delete($imagePath);
                 }
             }
-            $course->delete();
             return redirect()->route('admin.course-list')->with('success', 'Xóa khóa học thành công');
         } catch (QueryException $e) {
             $class = classes::where('courses_id', $id)->first();
             $lession = lessions::where('course_id', $id)->first();
             if ($class) {
                 return redirect()->route('admin.course-list')
-                    ->with('error', 'Không thể xóa khóa học vì đã có lớp học liên kết. Vui lòng xóa lớp học trước.');
+                    ->with('error', 'Không thể xóa khóa học vì đã có lớp học liên kết.');
             } else if ($lession) {
                 return redirect()->route('admin.course-list')
                     ->with('error', 'Không thể xóa khóa học vì đã có bài giảng liên kết. Vui lòng xóa bài giảng trước.');
@@ -149,7 +149,7 @@ class CourseController  extends Controller
         $course->description = $request->input('description');
         $course->teaching_method = $request->input('teaching_method');
         $course->teaching_goals = $request->input('teaching_goals');
-        $course->created_at = now(); 
+        $course->created_at = now();
 
         // dd ($course->image);
 
@@ -262,7 +262,7 @@ class CourseController  extends Controller
         return redirect()->route('admin.course-detail', ['id' => $course_id])->with('success', 'Cập nhật bài học thành công!');
     }
 
-    // noi bat 
+    // noi bat
     public function toggleFeatured($id)
 
     {
