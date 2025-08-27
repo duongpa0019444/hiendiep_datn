@@ -56,7 +56,6 @@
                                                 {{-- <option value=" {{ $quizz->name }}"></option> --}}
                                                 <option value="">-- Chọn bài Quiz --</option>
                                                 @foreach ($quizz as $quiz)
-                                                    {{-- <option value="{{ $quiz->id }}">{{ $quiz->name }}</option> --}}
                                                     <option value="{{ $quiz->id }}">{{ $quiz->title }}</option>
                                                 @endforeach
 
