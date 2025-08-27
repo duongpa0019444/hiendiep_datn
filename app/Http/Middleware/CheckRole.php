@@ -214,6 +214,13 @@ class CheckRole
                     'admin.statistics.finance.lai-lo',
                     'admin.thongke.taichinh',
 
+                    //Xuất báo cáo
+                    'admin.statistics.finance.tong-quy-luong.xuatExcel',
+                    'admin.statistics.finance.tong-doanh-thu.xuatExcel',
+                    'admin.statistics.finance.hoc-phi-lop.xuatExcel',
+                    'admin.statistics.finance.lai-lo.xuatExcel',
+
+
                     // học phí
                     'admin.course_payments',
                     'admin.course_payments.detail',

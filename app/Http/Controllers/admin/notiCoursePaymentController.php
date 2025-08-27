@@ -90,6 +90,7 @@ class notiCoursePaymentController extends Controller
         $notificationUser->status = 'seen';
         $notificationUser->save();
         $notificationUserItem = NotificationUser::with('notification')->find($id);
+
         return response()->json([
             'notificationUser' => $notificationUserItem,
             'success' => 'Thông báo đã được đánh dấu là đã đọc'

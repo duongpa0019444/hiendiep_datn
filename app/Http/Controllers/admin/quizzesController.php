@@ -149,17 +149,22 @@ class quizzesController extends Controller
 
     public function delete($id)
     {
+        // Lấy quiz
         $quiz = Quizzes::with('creator')->findOrFail($id);
-        $this->logAction(
-            'delete',
-            ModelsQuizzes::class,
-            $quiz->id,
-            Auth::user()->name . ' đã chuyển bài quiz: ' . $quiz->title . ' vào thùng rác.'
-        );
 
-        $quiz->delete();
+        // 1. Kiểm tra nếu đã có học sinh làm bài (ví dụ bảng quiz_attempts)
+        $attemptExists = DB::table('quiz_attempts')
+            ->where('quiz_id', $quiz->id)
+            ->exists();
 
-        // Truy vấn số câu hỏi dạng multiple + sentence
+        if ($attemptExists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể xóa, đã có học sinh làm bài quiz này.'
+            ], 400);
+        }
+
+        // 2. Đếm số câu hỏi trước khi xóa
         $counts = DB::table('quizzes as q')
             ->leftJoin('questions as ques', 'q.id', '=', 'ques.quiz_id')
             ->leftJoin('sentence_questions as sq', 'q.id', '=', 'sq.quiz_id')
@@ -168,6 +173,17 @@ class quizzesController extends Controller
             ->first();
 
         $quiz->total_questions = $counts->total_questions ?? 0;
+
+        // 3. Log hành động
+        $this->logAction(
+            'delete',
+            ModelsQuizzes::class,
+            $quiz->id,
+            Auth::user()->name . ' đã chuyển bài quiz: ' . $quiz->title . ' vào thùng rác.'
+        );
+
+        // 4. Xóa quiz (soft delete)
+        $quiz->delete();
 
         return response()->json($quiz);
     }
@@ -941,8 +957,4 @@ class quizzesController extends Controller
 
         return response()->json($course);
     }
-
-
-
-
 }
