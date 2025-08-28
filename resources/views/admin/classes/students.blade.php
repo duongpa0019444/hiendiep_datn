@@ -216,7 +216,7 @@
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label for="student_id" class="form-label">Chọn học viên</label>
-                                <select class="form-select" id="student_id" name="student_id" required>
+                                <select class="form-select" id="student_id" name="student_id" required data-choices>
                                     <option value="">-- Chọn học viên --</option>
                                     @foreach ($availableStudents as $user)
                                         <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})
@@ -334,6 +334,25 @@
                         $(this).closest('form').submit();
                     }
                 });
+
+                // Khởi tạo Choices.js cho dropdown thêm học viên
+                const studentSelect = document.getElementById('student_id');
+                if (studentSelect) {
+                    new Choices(studentSelect, {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        shouldSort: false,
+                        placeholder: true,
+                        placeholderValue: '-- Chọn học viên --',
+                        searchPlaceholderValue: 'Tìm kiếm học viên...',
+                        noResultsText: 'Không tìm thấy kết quả',
+                        noChoicesText: 'Không còn lựa chọn nào',
+                        maxItemCount: 5,
+                        renderSelectedChoices: 'always',
+                        searchResultLimit: 10,
+                        removeItemButton: false
+                    });
+                }
             });
             // Xác nhận xóa học viên
             $(document).on('submit', '.delete-student-form', function(e) {
