@@ -1,6 +1,24 @@
 @extends('client.accounts.information')
 
 @section('content-information')
+    @if (session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Toastify({
+                    text: "{{ session('error') }}",
+                    gravity: "top",
+                    position: "center",
+                    duration: 2000,
+                    style: {
+                        background: "linear-gradient(to right, #e74c3c, #c0392b)", // đỏ cảnh báo
+                        color: "#fff", // chữ trắng
+                        fontWeight: "bold",
+                        borderRadius: "8px"
+                    }
+                }).showToast();
+            });
+        </script>
+    @endif
     <div id="quizzes" class="content-section">
 
         <!-- Header Section -->
@@ -55,7 +73,8 @@
                             <p class="mb-4 opacity-75  text-dark">Nhập mã quiz mà giáo viên đã cung cấp để tham gia</p>
                             <div class="mb-3">
                                 <input type="text" class="form-control quiz-code-input"
-                                    placeholder="Nhập mã quiz (VD: 123123)" style="text-transform: uppercase; color: black;">
+                                    placeholder="Nhập mã quiz (VD: 123123)"
+                                    style="text-transform: uppercase; color: black;">
                             </div>
                             <button class="btn btn-join">
                                 <i class="fas fa-sign-in-alt me-2"></i>Tham gia Quiz
@@ -399,7 +418,7 @@
 
         $(document).on('click', '.quiz-result-completed', function(e) {
             e.preventDefault();
-             $('#simple-preloader').css('display', 'flex');
+            $('#simple-preloader').css('display', 'flex');
 
             const url = $(this).attr('href');
             $.ajax({
@@ -485,7 +504,7 @@
 
         $(document).on('click', '#modal-detail-result', function(e) {
             e.preventDefault();
-              $('#simple-preloader').css('display', 'flex');
+            $('#simple-preloader').css('display', 'flex');
             const url = $(this).attr('href');
             $.ajax({
                 url: url,

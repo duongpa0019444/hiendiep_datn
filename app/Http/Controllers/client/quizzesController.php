@@ -24,6 +24,14 @@ class quizzesController extends Controller
 
     public function start($id)
     {
+
+        //Kiểm tra xem học sinh đã được xếp hớp hay chưa , nếu chưa thì hiển thị lỗi
+        $statusClass = classStudent::where('student_id', Auth::id())->exists();
+        if (!$statusClass) {
+           return back()->with('error', 'Bạn chưa được xếp lớp, không thể làm quiz!');
+
+        }
+
         $quiz = quizzes::withCount(['questions', 'sentenceQuestions'])->with(['class'])->findOrFail($id);
         // dd(Auth::user()->classStudents);
 
@@ -31,8 +39,7 @@ class quizzesController extends Controller
         $classStudent = DB::table('class_student')
             ->join('classes', 'class_student.class_id', '=', 'classes.id')
             ->where('class_student.student_id', Auth::user()->id)
-            ->where('classes.status', 'in_progress')
-            ->orderBy('classes.created_at', 'asc')
+            ->orderBy('classes.created_at', 'desc')
             ->select('class_student.*', 'classes.name as class_name') // chỉ lấy dữ liệu từ bảng class_student
             ->first();
 
@@ -74,7 +81,7 @@ class quizzesController extends Controller
     }
 
 
-    public function resultsQuizzStudent($id, $attemptId, $studentId=null)
+    public function resultsQuizzStudent($id, $attemptId, $studentId = null)
     {
         $quiz = quizzes::findOrFail($id);
         $studentId = $studentId ?? Auth::user()->id;
@@ -354,7 +361,6 @@ class quizzesController extends Controller
                 'statistics' => $statistics[0]
             ]);
         }
-
     }
 
     public function resultsClassStudent($id, $class, $student, Request $request)

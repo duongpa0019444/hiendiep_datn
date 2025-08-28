@@ -20,7 +20,7 @@
                             <h4 class="card-title mb-0">{{ $isEdit ? 'Sửa Tin tức' : 'Thêm Tin tức' }}</h4>
                         </div>
                         <div class="card-body">
-                            <form id="news-form" action="{{ $isEdit ? route('admin.news.update', $news->id) : route('admin.news.store') }}" method="POST" enctype="multipart/form-data">
+                            <form id="news-form" action="{{ $isEdit ? route('admin.news.update', $news->id) : route('admin.news.store') }}" method="POST"  enctype="multipart/form-data">
                                 @csrf
                                 @if($isEdit)
                                     @method('PUT')

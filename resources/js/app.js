@@ -115,7 +115,7 @@ window.addEventListener('load', function () {
                                 </div>
                             </div>
                             <div class="flex-grow-1 pe-4">
-                                <a href="#" class="mb-1 fw-semibold fs-6">
+                                <a href="/admin/notification/course/payment/detail/${e.notification.id}" class="mb-1 fw-semibold fs-6">
                                     ${e.notification.title}
                                 </a>
                                 <p class="mb-0 text-muted text-wrap fs-6">
