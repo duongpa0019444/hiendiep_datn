@@ -15,6 +15,9 @@
                             <li><a href="{{ route('client.information') }}" data-section="dashboard" class="active">
                                 <i class="icofont-chart-bar-graph"></i>Dashboard</a>
                             </li>
+                            <li><a href="{{ route('client.classroom') }}" data-section="classroom">
+                                    <i class="icofont-education me-2"></i>Lớp học</a>
+                            </li>
                             <li><a href="{{ route('client.schedule') }}" data-section="schedule">
                                 <i class="icofont-calendar"></i> Lịch học</a>
                             </li>
@@ -30,6 +33,9 @@
                         @elseif (Auth::user()->role == 'teacher')
                            <li><a href="{{ route('client.information') }}" data-section="dashboard" class="active">
                                 <i class="icofont-chart-bar-graph"></i>Dashboard</a>
+                            </li>
+                            <li><a href="{{ route('client.classroom') }}" data-section="classroom">
+                                    <i class="icofont-education me-2"></i>Lớp học</a>
                             </li>
                             <li><a href="{{ route('client.schedule') }}" data-section="schedule">
                                 <i class="icofont-calendar"></i> Lịch dạy</a>

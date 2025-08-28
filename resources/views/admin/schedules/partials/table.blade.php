@@ -25,9 +25,6 @@
                                 <div class="d-flex align-items-center">
                                     <div>
                                         <h6 class="mb-0">{{ $class->name }}</h6>
-                                        @if ($class->description)
-                                            <small class="text-muted">{{ Str::limit($class->description, 50) }}</small>
-                                        @endif
                                     </div>
                                 </div>
                             </td>
@@ -45,7 +42,7 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-calendar-alt text-muted me-2"></i>
-                                    <span>{{ $class->sessions_count ?? ($class->so_buoi_hoc ?? 0) }}</span>
+                                    <span>{{ $class->sessions_count }}</span>
                                 </div>
                             </td>
                             <td data-status="{{ $class->status }}">
@@ -55,7 +52,7 @@
                                     @break
 
                                     @case('not_started')
-                                        <span class="badge bg-warning">Tạm dừng</span>
+                                        <span class="badge bg-warning">Chưa bắt đầu</span>
                                     @break
 
                                     @case('completed')
@@ -69,7 +66,7 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-users text-muted me-2"></i>
-                                    <span>{{ $class->students_count ?? ($class->so_hoc_sinh ?? 0) }}</span>
+                                    <span>{{ $class->students_count }}</span>
                                 </div>
                             </td>
                             <td>
@@ -92,7 +89,7 @@
                         </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">
+                                <td colspan="8" class="text-center text-muted py-4">
                                     Không có dữ liệu phù hợp
                                 </td>
                             </tr>

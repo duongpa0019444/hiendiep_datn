@@ -8,6 +8,8 @@ use App\Models\Schedule;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class SchedulesController extends Controller
 {
@@ -16,13 +18,18 @@ class SchedulesController extends Controller
         $query = classes::select(
             'classes.id',
             'classes.name',
-            'classes.number_of_sessions as so_buoi_hoc',
+            'classes.number_of_sessions as sessions_count',
             'classes.status',
             'classes.created_at as start_date',
             'courses.name as course_name',
             'courses.description as course_description',
-            DB::raw("(SELECT COUNT(*) FROM class_student
-            WHERE class_student.class_id = classes.id) AS so_hoc_sinh"),
+            DB::raw("(SELECT COUNT(*) 
+              FROM schedules 
+              WHERE schedules.class_id = classes.id) as scheduled_sessions"),
+            DB::raw("(SELECT COUNT(DISTINCT schedules.id) 
+              FROM schedules 
+              JOIN attendances ON attendances.schedule_id = schedules.id
+              WHERE schedules.class_id = classes.id) as attended_sessions")
         )
             ->leftJoin('courses', 'classes.courses_id', '=', 'courses.id');
         // ->join('users', 'classes.teacher_id', '=', 'users.id')
@@ -72,6 +79,7 @@ class SchedulesController extends Controller
         // ...existing code...
         if ($request->ajax()) {
             return view('admin.schedules.partials.table', compact('classes'))->render();
+            // return 'OK';
         }
         return view('admin.schedules.index', compact('classes', 'courses'));
     }
@@ -100,15 +108,19 @@ class SchedulesController extends Controller
     {
         $request->validate([
             'class_id'   => 'required|exists:classes,id',
+            'room'       => 'required|integer|exists:class_room,id', // Sửa room_id -> room
             'sessions'   => 'required|array|min:1',
             'sessions.*.ngay' => 'required|date_format:d/m/Y',
             'sessions.*.thu'  => 'required|string',
             'sessions.*.start_time' => 'required',
             'sessions.*.end_time'   => 'required',
+            'sessions.*.room' => 'required|integer|exists:class_room,id', // Thêm validate cho từng session
         ]);
 
         $classId = $request->class_id;
         $teacherId = $request->teacher_id;
+        $room = $request->room; // Sửa room_id -> room
+        $roomName = DB::table('class_room')->where('id', $room)->value('room_name'); // Sửa room_id -> room
 
         // Xóa lịch cũ nếu cần
         // DB::table('schedules')->where('class_id', $classId)->delete();
@@ -168,6 +180,26 @@ class SchedulesController extends Controller
                 ], 422);
             }
 
+            // Kiểm tra phòng học bị trùng lịch
+            $roomSession = $session['room']; // Sửa room_id -> room
+            $roomConflict = DB::table('schedules')
+                ->where('room', $roomSession) // Sửa room_id -> room
+                ->where('date', $dateStr)
+                ->where(function ($q) use ($start, $end) {
+                    $q->where(function ($q2) use ($start, $end) {
+                        $q2->where('start_time', '<', $end)
+                            ->where('end_time', '>', $start);
+                    });
+                })
+                ->exists();
+
+            if ($roomConflict) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Phòng học đã được đặt trong thời gian này: Ngày ' . $session['ngay'] . ', tiết ' . $start . ' - ' . $end
+                ], 422);
+            }
+
             // --- KIỂM TRA HỌC VIÊN BỊ TRÙNG LỊCH ---
             // Lấy danh sách học viên của lớp này
             $studentIds = DB::table('class_student')->where('class_id', $classId)->pluck('student_id');
@@ -198,6 +230,7 @@ class SchedulesController extends Controller
                 'start_time'     => $start,
                 'end_time'       => $end,
                 'teacher_id'     => $teacherId,
+                'room'           => $roomSession, // Sửa room_id -> room
                 'created_at'     => now(),
             ];
         }
@@ -205,6 +238,158 @@ class SchedulesController extends Controller
         DB::table('schedules')->insert($sessions);
 
         return response()->json(['success' => true, 'message' => 'Tạo lịch học thành công!']);
+    }
+
+    public function storeSingle(Request $request)
+    {
+        // Log data để debug
+        Log::info('Storing single schedule', $request->all());
+
+        // Validate dữ liệu
+        $validated = $request->validate([
+            'class_id' => 'required|exists:classes,id',
+            'weekday' => 'required|in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
+            'date' => 'required|date_format:d/m/Y',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+            'teacher_id' => 'required|exists:users,id',
+            'room_id' => 'required|exists:class_room,id',
+        ]);
+
+        // Chuyển đổi định dạng ngày
+        $dateStr = Carbon::createFromFormat('d/m/Y', $validated['date'])->format('Y-m-d');
+        $start = $validated['start_time'];
+        $end = $validated['end_time'];
+        $classId = $validated['class_id'];
+        $teacherId = $validated['teacher_id'];
+        $room = $validated['room_id']; // Sử dụng 'room_id' từ validated
+
+        // Lấy thông tin khóa học từ lớp học
+        $course = DB::table('classes')
+            ->join('courses', 'classes.courses_id', '=', 'courses.id')
+            ->where('classes.id', $classId)
+            ->select('courses.total_sessions')
+            ->first();
+
+        if (!$course) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy khóa học liên kết với lớp.'
+            ], 422);
+        }
+
+        // Đếm số buổi học hiện tại của lớp
+        $currentSessionCount = DB::table('schedules')
+            ->where('class_id', $classId)
+            ->count();
+
+        // Kiểm tra nếu số buổi vượt quá giới hạn của khóa học
+        if ($currentSessionCount >= $course->total_sessions) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Số buổi học đã đạt giới hạn của khóa học (' . $course->total_sessions . ' buổi).'
+            ], 422);
+        }
+
+        // Kiểm tra trùng lịch giáo viên
+        $teacherConflict = DB::table('schedules')
+            ->where('teacher_id', $teacherId)
+            ->where('date', $dateStr)
+            ->where(function ($q) use ($start, $end) {
+                $q->where('start_time', '<', $end)
+                    ->where('end_time', '>', $start);
+            })
+            ->exists();
+
+        if ($teacherConflict) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Giáo viên đã có lịch dạy trùng thời gian: Ngày ' . $validated['date'] . ', tiết ' . $start . ' - ' . $end
+            ], 422);
+        }
+
+        // Kiểm tra trùng lịch lớp học
+        $classConflict = DB::table('schedules')
+            ->where('class_id', $classId)
+            ->where('date', $dateStr)
+            ->where(function ($q) use ($start, $end) {
+                $q->where('start_time', '<', $end)
+                    ->where('end_time', '>', $start);
+            })
+            ->exists();
+
+        if ($classConflict) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lớp đã có lịch học trùng thời gian: Ngày ' . $validated['date'] . ', tiết ' . $start . ' - ' . $end
+            ], 422);
+        }
+
+        // Kiểm tra trùng lịch phòng học
+        $roomConflict = DB::table('schedules')
+            ->where('room', $room) // Giả sử cột trong database là 'room', sửa nếu cần thành 'room_id'
+            ->where('date', $dateStr)
+            ->where(function ($q) use ($start, $end) {
+                $q->where('start_time', '<', $end)
+                    ->where('end_time', '>', $start);
+            })
+            ->exists();
+
+        if ($roomConflict) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Phòng học đã được đặt trong thời gian này: Ngày ' . $validated['date'] . ', tiết ' . $start . ' - ' . $end
+            ], 422);
+        }
+
+        // Kiểm tra trùng lịch học viên
+        $studentIds = DB::table('class_student')->where('class_id', $classId)->pluck('student_id');
+        foreach ($studentIds as $studentId) {
+            $studentConflict = DB::table('schedules')
+                ->join('class_student', 'schedules.class_id', '=', 'class_student.class_id')
+                ->where('class_student.student_id', $studentId)
+                ->where('schedules.date', $dateStr)
+                ->where('schedules.class_id', '!=', $classId) // Loại trừ lớp hiện tại
+                ->where(function ($q) use ($start, $end) {
+                    $q->where('schedules.start_time', '<', $end)
+                        ->where('schedules.end_time', '>', $start);
+                })
+                ->exists();
+
+            if ($studentConflict) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Có học viên bị trùng lịch học với lớp khác vào ngày ' . $validated['date'] . ', tiết ' . $start . ' - ' . $end
+                ], 422);
+            }
+        }
+
+        // Chuẩn bị dữ liệu để lưu
+        $data = [
+            'class_id' => $classId,
+            'day_of_week' => $validated['weekday'],
+            'date' => $dateStr,
+            'start_time' => $start,
+            'end_time' => $end,
+            'teacher_id' => $teacherId,
+            'room' => $room, // Sửa thành 'room' nếu cột trong database là 'room'
+            'created_at' => now(),
+        ];
+
+        // Lưu vào database
+        try {
+            DB::table('schedules')->insert($data);
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã thêm lịch học thành công.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error storing schedule: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi khi lưu lịch học: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function getClassData($classId)
@@ -224,13 +409,23 @@ class SchedulesController extends Controller
                 return ['id' => $user->id, 'name' => $user->name];
             });
 
+        // Lấy danh sách phòng học khả dụng (ưu tiên trạng thái chưa sử dụng)
+        $rooms = DB::table('class_room')
+            ->select('id', 'room_name as name')
+            ->orderByDesc('status') // nếu status=1 là chưa sử dụng
+            ->get()
+            ->map(function ($room) {
+                return ['id' => $room->id, 'name' => $room->name];
+            });
+
         return response()->json([
             'class' => ['name' => $classData->class_name],
             'course' => [
                 'name' => $classData->course_name,
                 'total_sessions' => $classData->total_sessions
             ],
-            'teachers' => $teachers
+            'teachers' => $teachers,
+            'rooms' => $rooms
         ]);
     }
 
@@ -239,6 +434,18 @@ class SchedulesController extends Controller
         $schedule = DB::table('schedules')->where('id', $id)->first();
         if (!$schedule) {
             return response()->json(['success' => false, 'message' => 'Không tìm thấy lịch học.'], 404);
+        }
+
+        // Kiểm tra có attendance liên quan không
+        $attendanceCount = DB::table('attendances')
+            ->where('schedule_id', $id)
+            ->count();
+
+        if ($attendanceCount > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể xóa lịch học vì đã điểm danh!'
+            ], 400);
         }
 
         DB::table('schedules')->where('id', $id)->delete();
@@ -258,22 +465,142 @@ class SchedulesController extends Controller
 
     public function update(Request $request, $id)
     {
+        // Log data để debug
+        Log::info('Updating schedule', $request->all());
+
+        // Validate dữ liệu
+        $validated = $request->validate([
+            'weekday' => 'required|in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
+            'date' => 'required|date_format:d/m/Y',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+            'teacher_id' => 'required|exists:users,id',
+            'room' => 'required|exists:class_room,id',
+        ], [
+            'weekday.required' => 'Trường thứ trong tuần là bắt buộc.',
+            'weekday.in' => 'Trường thứ trong tuần phải là một trong các giá trị: Mon, Tue, Wed, Thu, Fri, Sat, Sun.',
+        ]);
+
+        // Chuyển đổi định dạng ngày
+        $dateStr = Carbon::createFromFormat('d/m/Y', $validated['date'])->format('Y-m-d');
+        $start = $validated['start_time'];
+        $end = $validated['end_time'];
+        $teacherId = $validated['teacher_id'];
+        $room = $validated['room'];
+        $classId = DB::table('schedules')->where('id', $id)->value('class_id');
+
+        if (!$classId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lịch học không tồn tại.'
+            ], 404);
+        }
+
+        // Kiểm tra trùng lịch giáo viên
+        $teacherConflict = DB::table('schedules')
+            ->where('teacher_id', $teacherId)
+            ->where('date', $dateStr)
+            ->where('id', '!=', $id) // Loại trừ lịch hiện tại
+            ->where(function ($q) use ($start, $end) {
+                $q->where('start_time', '<', $end)
+                    ->where('end_time', '>', $start);
+            })
+            ->exists();
+
+        if ($teacherConflict) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Giáo viên đã có lịch dạy trùng thời gian: Ngày ' . $validated['date'] . ', tiết ' . $start . ' - ' . $end
+            ], 422);
+        }
+
+        // Kiểm tra trùng lịch lớp học
+        $classConflict = DB::table('schedules')
+            ->where('class_id', $classId)
+            ->where('date', $dateStr)
+            ->where('id', '!=', $id) // Loại trừ lịch hiện tại
+            ->where(function ($q) use ($start, $end) {
+                $q->where('start_time', '<', $end)
+                    ->where('end_time', '>', $start);
+            })
+            ->exists();
+
+        if ($classConflict) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lớp đã có lịch học trùng thời gian: Ngày ' . $validated['date'] . ', tiết ' . $start . ' - ' . $end
+            ], 422);
+        }
+
+        // Kiểm tra trùng lịch phòng học
+        $roomConflict = DB::table('schedules')
+            ->where('room', $room)
+            ->where('date', $dateStr)
+            ->where('id', '!=', $id) // Loại trừ lịch hiện tại
+            ->where(function ($q) use ($start, $end) {
+                $q->where('start_time', '<', $end)
+                    ->where('end_time', '>', $start);
+            })
+            ->exists();
+
+        if ($roomConflict) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Phòng học đã được đặt trong thời gian này: Ngày ' . $validated['date'] . ', tiết ' . $start . ' - ' . $end
+            ], 422);
+        }
+
+        // Kiểm tra trùng lịch học viên
+        $studentIds = DB::table('class_student')
+            ->where('class_id', $classId)
+            ->whereNull('deleted_at')
+            ->pluck('student_id');
+
+        foreach ($studentIds as $studentId) {
+            $studentConflict = DB::table('schedules')
+                ->join('class_student', 'schedules.class_id', '=', 'class_student.class_id')
+                ->where('class_student.student_id', $studentId)
+                ->where('schedules.date', $dateStr)
+                ->where('schedules.class_id', '!=', $classId)
+                ->where('schedules.id', '!=', $id) // Loại trừ lịch hiện tại
+                ->where(function ($q) use ($start, $end) {
+                    $q->where('schedules.start_time', '<', $end)
+                        ->where('schedules.end_time', '>', $start);
+                })
+                ->exists();
+
+            if ($studentConflict) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Có học viên bị trùng lịch học với lớp khác vào ngày ' . $validated['date'] . ', tiết ' . $start . ' - ' . $end
+                ], 422);
+            }
+        }
+
+        // Chuẩn bị dữ liệu để cập nhật
+        $data = [
+            'day_of_week' => $validated['weekday'], // Ánh xạ weekday sang day_of_week
+            'date' => $dateStr,
+            'start_time' => $start,
+            'end_time' => $end,
+            'teacher_id' => $teacherId,
+            'room' => $room,
+            'updated_at' => now(),
+        ];
+
+        // Cập nhật vào database
         try {
-            $schedule = Schedule::findOrFail($id);
-
-            $schedule->update([
-                'date' => \Carbon\Carbon::createFromFormat('d/m/Y', $request->date)->format('Y-m-d'),
-                'start_time' => $request->start_time . ':00', // Thêm giây nếu cần
-                'end_time' => $request->end_time . ':00',    // Thêm giây nếu cần
-                'teacher_id' => $request->teacher_id,
+            DB::table('schedules')->where('id', $id)->update($data);
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã cập nhật lịch học thành công.'
             ]);
-
-            return response()->json(['success' => true, 'message' => 'Cập nhật thành công']);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Lỗi: ' . $e->getMessage()], 500);
+            Log::error('Error updating schedule: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi khi cập nhật lịch học: ' . $e->getMessage()
+            ], 500);
         }
     }
-
-
-
 }

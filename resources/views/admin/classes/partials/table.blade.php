@@ -37,7 +37,7 @@
                                         <h6 class="mb-0">{{ $class->course_name ?? 'N/A' }}</h6>
                                         @if ($class->course_description)
                                             <small
-                                                class="text-muted">{{ Str::limit($class->course_description, 50) }}</small>
+                                                class="text-muted">{!! Str::limit($class->course_description, 50) !!}</small>
                                         @endif
                                     </div>
                                 </div>
@@ -55,7 +55,7 @@
                                     @break
 
                                     @case('not_started')
-                                        <span class="badge bg-warning">Tạm dừng</span>
+                                        <span class="badge bg-warning">Chưa bắt đầu</span>
                                     @break
 
                                     @case('completed')
@@ -86,11 +86,11 @@
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $class->id }}">
                                         <li>
-                                            <a class="dropdown-item"
-                                                href="{{ route('admin.classes.show', $class->id) }}">
-                                                <i class="fas fa-eye me-2"></i>Xem chi tiết
-                                            </a>
-                                        </li>
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('admin.classes.detail', $class->id) }}">
+                                                                    <i class="fas fa-eye me-2"></i>Xem chi tiết
+                                                                </a>
+                                                            </li>
                                         <li>
                                             <a class="dropdown-item"
                                                 href="{{ route('admin.classes.edit', $class->id) }}">
@@ -113,7 +113,7 @@
                                                     @csrf
                                                     @method('PATCH')
                                                     <button type="submit" class="dropdown-item text-warning">
-                                                        <i class="fas fa-pause me-2"></i>Tạm dừng
+                                                        <i class="fas fa-pause me-2"></i>Chưa bắt đầu
                                                     </button>
                                                 </form>
                                             </li>
@@ -130,10 +130,13 @@
                                             </li>
                                         @endif
                                         <li>
-                                            <button type="button" class="dropdown-item text-danger"
-                                                onclick="confirmDelete({{ $class->id }}, '{{ $class->name }}')">
-                                                <i class="fas fa-trash me-2"></i>Xóa lớp
-                                            </button>
+                                            @if (auth()->user()->isAdmin())
+                                                                    <button type="button"
+                                                                        class="dropdown-item text-danger btn-delete-class"
+                                                                        data-id="{{ $class->id }}">
+                                                                        <i class="fas fa-trash me-2"></i>Xóa lớp
+                                                                    </button>
+                                                                @endif
                                         </li>
                                     </ul>
                                 </div>

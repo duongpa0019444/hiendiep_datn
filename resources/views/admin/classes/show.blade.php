@@ -74,7 +74,7 @@
                                     @break
 
                                     @case('not_started')
-                                        <span class="badge bg-warning">Tạm dừng</span>
+                                        <span class="badge bg-warning">Chưa bắt đầu</span>
                                     @break
 
                                     @case('completed')

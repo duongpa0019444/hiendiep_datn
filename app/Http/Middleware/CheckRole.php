@@ -64,6 +64,10 @@ class CheckRole
                     'admin.attendance.class',
                     'admin.attendance.getSchedules',
                     'admin.attendance.index',
+                    'admin.attendance.getSchedulesByClass',
+                    'admin.attendance.getClassDetail',
+                    'admin.attendance.summary.update',
+                    'admin.attendance.save',
 
                     // khóa học
                     'admin.classes.add-student',

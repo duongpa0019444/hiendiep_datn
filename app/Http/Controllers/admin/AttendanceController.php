@@ -43,29 +43,83 @@ class AttendanceController extends Controller
         $schedules = DB::table('schedules')
             ->join('users as teachers', function ($join) {
                 $join->on('schedules.teacher_id', '=', 'teachers.id')
-                    ->where('teachers.role', '=', 'teacher'); // hoặc số
+                    ->where('teachers.role', '=', 'teacher');
             })
             ->join('classes', 'schedules.class_id', '=', 'classes.id')
             ->join('courses', 'classes.courses_id', '=', 'courses.id')
             ->leftJoin('class_student', 'schedules.class_id', '=', 'class_student.class_id')
             ->select(
-                // 'classes.id as class_id',
+                'classes.id as class_id',
+                'classes.name as class_name',
+                'schedules.id as schedule_id',
+                'schedules.date',
+                'schedules.start_time',
+                'schedules.end_time',
+                'schedules.status',
+                'teachers.name as teacher_name',
+                'courses.name as courses_name',
+                DB::raw('COUNT(class_student.student_id) as student_count')
+            )
+            ->groupBy(
+                'classes.id',
+                'classes.name',
+                'schedules.id',
+                'schedules.date',
+                'schedules.start_time',
+                'schedules.end_time',
+                'schedules.status',
+                'teachers.name',
+                'courses.name'
+            )
+            ->get()
+            ->map(function ($schedule) {
+                return [
+                    'title' => $schedule->class_name,
+                    'start' => Carbon::parse($schedule->date . ' ' . $schedule->start_time)->toIso8601String(),
+                    'end' => $schedule->end_time && $schedule->end_time > $schedule->start_time
+                        ? Carbon::parse($schedule->date . ' ' . $schedule->end_time)->toIso8601String()
+                        : null,
+                    'extendedProps' => [
+                        'classId' => $schedule->class_id,
+                        'scheduleId' => $schedule->schedule_id,
+                        'class_name' => $schedule->class_name,
+                        'courses_name' => $schedule->courses_name,
+                        'teacher_name' => $schedule->teacher_name,
+                        'student_count' => $schedule->student_count,
+                        'status' => $schedule->status,
+                        'type' => 'class'
+                    ]
+                ];
+            });
+
+        // ✅ TRẢ VỀ JSON CHO FETCH
+        return response()->json($schedules);
+    }
+
+    // Lấy danh sách lịch học theo lớp
+    public function getSchedulesByClass(Request $request, $classId)
+    {
+        $query = DB::table('schedules')
+            ->join('users as teachers', function ($join) {
+                $join->on('schedules.teacher_id', '=', 'teachers.id')
+                    ->where('teachers.role', '=', 'teacher');
+            })
+            ->join('classes', 'schedules.class_id', '=', 'classes.id')
+            ->join('courses', 'classes.courses_id', '=', 'courses.id')
+            ->leftJoin('class_student', 'schedules.class_id', '=', 'class_student.class_id')
+            ->select(
                 'classes.name as class_name',
                 'schedules.id',
                 'schedules.date',
                 'schedules.start_time',
                 'schedules.end_time',
                 'schedules.status',
-                // 'schedules.type',
                 'teachers.name as teacher_name',
                 'courses.name as courses_name',
-                // 'schedules.room',
                 DB::raw('COUNT(class_student.student_id) as student_count'),
-                // 'schedules.attended',
-                // 'schedules.exam_type'
             )
+            ->where('schedules.class_id', $classId)
             ->groupBy(
-                // 'classes.id',
                 'classes.name',
                 'schedules.id',
                 'schedules.date',
@@ -74,31 +128,52 @@ class AttendanceController extends Controller
                 'schedules.status',
                 'teachers.name',
                 'courses.name',
-                // 'schedules.attended',
-                // 'schedules.exam_type'
             )
-            ->get()
+            ->orderBy('schedules.date', 'asc')
+            ->orderBy('schedules.start_time', 'asc');
+
+        // Filter theo ngày nếu có
+        if ($request->has('date') && $request->date) {
+            $query->where('schedules.date', $request->date);
+        }
+
+        $schedules = $query->get()
             ->map(function ($schedule) {
                 return [
-                    'title' => $schedule->class_name,
-                    'start' => Carbon::parse($schedule->date . ' ' . $schedule->start_time)->toIso8601String(),
-                    'end' => Carbon::parse($schedule->date . ' ' . $schedule->end_time)->toIso8601String(),
-                    'extendedProps' => [
-                        // 'type' => $schedule->type,
-                        'scheduleId' => $schedule->id,
-                        'teacher' => $schedule->teacher_name,
-                        'courses' => $schedule->courses_name,
-                        // 'room' => $schedule->room,
-                        'students' => $schedule->student_count,
-                        'status' => $schedule->status,
-                        // 'attended' => $schedule->attended,
-                        // 'examType' => $schedule->exam_type,
-                    ]
+                    'id' => $schedule->id,
+                    'date' => $schedule->date,
+                    'start_time' => $schedule->start_time,
+                    'end_time' => $schedule->end_time,
+                    'status' => $schedule->status,
+                    'teacher_name' => $schedule->teacher_name,
+                    'courses_name' => $schedule->courses_name,
+                    'student_count' => $schedule->student_count,
+                    'formatted_date' => Carbon::parse($schedule->date)->format('d/m/Y'),
+                    'formatted_start_time' => Carbon::parse($schedule->start_time)->format('H:i'),
+                    'formatted_end_time' => Carbon::parse($schedule->end_time)->format('H:i'),
                 ];
             });
 
-        // ✅ TRẢ VỀ JSON CHO FETCH
         return response()->json($schedules);
+    }
+
+    // Lấy thông tin chi tiết lớp
+    public function getClassDetail($classId)
+    {
+        $classDetail = DB::table('classes')
+            ->join('courses', 'classes.courses_id', '=', 'courses.id')
+            ->leftJoin('class_student', 'classes.id', '=', 'class_student.class_id')
+            ->select(
+                'classes.id',
+                'classes.name as class_name',
+                'courses.name as course_name',
+                DB::raw('COUNT(class_student.student_id) as total_students')
+            )
+            ->where('classes.id', $classId)
+            ->groupBy('classes.id', 'classes.name', 'courses.name')
+            ->first();
+
+        return response()->json($classDetail);
     }
 
     public function attendanceClass($id)
@@ -139,6 +214,7 @@ class AttendanceController extends Controller
             // Lấy danh sách học sinh từ class_student
             $studentUserIdsFromClass = DB::table('class_student')
                 ->where('class_id', $scheduleData->class_id)
+                ->whereNull('deleted_at')
                 ->pluck('student_id')
                 ->toArray();
 
@@ -196,7 +272,7 @@ class AttendanceController extends Controller
             $data = [
                 'present' => (int) ($summary->present_count ?? 0),
                 'absent' => (int) ($summary->absent_count ?? 0),
-                'undone' => (int) $notAttended, 
+                'undone' => (int) $notAttended,
                 'total' => (int) ($summary->total_count ?? 0)
             ];
 
@@ -264,6 +340,14 @@ class AttendanceController extends Controller
             // Nếu là lần điểm danh đầu tiên, cập nhật status của lịch học thành 1
             if ($laDiemDanhDauTien) {
                 DB::table('schedules')->where('id', $scheduleId)->update(['status' => 1]);
+
+                // Lấy class_id từ lịch học
+                $classId = $schedule->class_id;
+
+                // Tăng số buổi đã học lên 1
+                DB::table('classes')
+                    ->where('id', $classId)
+                    ->increment('number_of_sessions');
             }
 
             // Commit transaction

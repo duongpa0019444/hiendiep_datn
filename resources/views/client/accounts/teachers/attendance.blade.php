@@ -594,7 +594,7 @@
                 if (result.isConfirmed) {
                     showLoading(true);
 
-                    fetch('{{ route('attendance.save') }}', {
+                    fetch('{{ route('client.attendance.save') }}', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
