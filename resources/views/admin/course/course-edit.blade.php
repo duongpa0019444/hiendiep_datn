@@ -1,6 +1,6 @@
 @extends('admin.admin')
 
-@section('title', 'Trang admin')
+@section('title', 'Sửa khóa học')
 @section('description', '')
 @section('content')
 
@@ -15,15 +15,15 @@
 
             <div class="container-xxl">
                 <div class="row">
-                     @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     <div class="col-xl-12 col-lg-10">
                         <nav aria-label="breadcrumb p-6">
                             <ol class="breadcrumb py-0">
@@ -53,11 +53,14 @@
                             </div>
                             <div class="card-body">
                                 <div class="row">
+                                    <input type="hidden" name="name" value="{{ $course->name }}">
+                                    <input type="hidden" name="price" value="{{ $course->price }}">
+                                    <input type="hidden" name="total_sessions" value="{{ $course->total_sessions }}">
                                     <!-- Tên khóa học -->
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="name" class="form-label">Tên khóa học</label>
-                                            <input type="text" name="name" id="name"
+                                            <input type="text" name="name" id="name" disabled
                                                 class="form-control"value="{{ $course->name }}">
                                         </div>
                                     </div>
@@ -67,7 +70,7 @@
                                         <div class="mb-3">
                                             <label for="price" class="form-label">Giá khóa học</label>
                                             <input type="number" name="price" id="price" class="form-control"
-                                                value="{{ $course->price }}">
+                                                value="{{ $course->price }}" disabled>
                                         </div>
                                     </div>
 
@@ -75,7 +78,7 @@
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="total_sessions" class="form-label">Tổng số buổi học</label>
-                                            <input type="number" name="total_sessions" id="total_sessions"
+                                            <input type="number" name="total_sessions" id="total_sessions" disabled
                                                 class="form-control" value="{{ $course->total_sessions }}">
                                         </div>
                                     </div>
@@ -84,36 +87,30 @@
                                     <div class="col-lg-12">
                                         <div class="mb-0">
                                             <label for="description" class="form-label">Nội dung khóa học</label>
-                                            <textarea class="form-control bg-light-subtle ckeditor" name="description" id="description" rows="7"
-                                                >{{ $course->description }}</textarea>
+                                            <textarea class="form-control bg-light-subtle ckeditor" name="description" id="description" rows="7">{{ $course->description }}</textarea>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-
-                        <!-- Buttons -->
-                        <div class="p-3 bg-light mb-3 rounded">
-
-                            <div class="row justify-content-end g-2">
-
-                                <div class="col-lg-2">
-                                    <button type="reset" class="btn btn-primary w-100">Cancel</button>
-                                </div>
-
-                                <div class="col-lg-2">
-                                    <button type="submit" class="btn btn-outline-secondary w-100">Save Change</button>
+                            <!-- Buttons -->
+                            <div class="p-3 mb-3 rounded bg-light">
+                                <div class="row justify-content-between align-items-center">
+                                    <div class="col-auto">
+                                        <a href="{{ route('admin.course-list') }}" class="btn btn-outline-secondary">
+                                            <i class="bx bx-arrow-to-left align-middle fs-16"></i> Quay lại
+                                        </a>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="bx bx-save align-middle fs-16"></i> Lưu thay đổi
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
+
                         </div>
-                        <div class="mt-3">
-                                  <button class="btn btn-soft-primary">
-                                      <a href="{{ route('admin.course-list') }}"
-                                          class="link-primary text-decoration-underline link-offset-2" style="color: black">Trở về trang khóa học <i
-                                              class="bx bx-arrow-to-right align-middle fs-16"></i></a>
-                                  </button>
-                              </div>
+
 
                     </div>
                 </div>

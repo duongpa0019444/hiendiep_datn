@@ -284,6 +284,7 @@ class newsController extends Controller
         $news->is_visible = $request->is_visible;
         $news->show_on_homepage = $request->show_on_homepage;
         $news->is_featured = $request->is_featured;
+        $news->publish_status = $request->publish_status;
         $news->save();
 
         $this->logAction(

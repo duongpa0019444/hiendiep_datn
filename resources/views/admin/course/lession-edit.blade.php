@@ -1,6 +1,6 @@
 @extends('admin.admin')
 
-@section('title', 'Trang admin')
+@section('title', 'Sửa bài giảng')
 @section('description', '')
 @section('content')
 
@@ -24,6 +24,17 @@
                         </div>
                     @endif
                     <div class="col-xl-12 col-lg-10">
+                         <nav aria-label="breadcrumb p-6">
+                            <ol class="breadcrumb py-0">
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><a
+                                        href="{{ route('admin.course-list') }}">Quản lí khóa học</a> </li>
+                                <li class="breadcrumb-item active" aria-current="page"
+                                    > <a href="{{ route('admin.course-detail', ['id' => $course->id]) }}"> Chi tiết khóa học </a> </li>
+                                <li class="breadcrumb-item">Sửa bài giảng</li>
+
+                            </ol>
+                        </nav>
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">Sửa thông tin</h4>
@@ -49,26 +60,21 @@
                                     </div>
 
                                     <!-- Chọn Bài quizz qua các option -->
-
+{{-- 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <select name="quizz_id" id="quizz_id" class="form-select">
                                                 {{-- <option value=" {{ $quizz->name }}"></option> --}}
-                                                <option value="">-- Chọn bài Quiz --</option>
+                                                {{-- <option value="">-- Chọn bài Quiz --</option>
                                                 @foreach ($quizz as $quiz)
-                                                    {{-- <option value="{{ $quiz->id }}">{{ $quiz->name }}</option> --}}
                                                     <option value="{{ $quiz->id }}">{{ $quiz->title }}</option>
                                                 @endforeach
 
                                             </select>
-                                        </div>
-
-
-
-                                
+                                        </div> --}} 
                                         <!-- Buttons -->
-
-
+                                        {{-- ngày cập nhật --}}
+                                      
 
 
                                     </div>
@@ -97,7 +103,25 @@
                                 </div>
 
                             </div>
+                        </div>
+                    </div>
+                </div>
         </form>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <script>
+                            document.write(new Date().getFullYear())
+                        </script> © DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC THANH HÓA
+                        <iconify-icon icon="iconamoon:heart-duotone" class="fs-18 align-middle text-danger"></iconify-icon>
+                        <a href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 
 @endsection

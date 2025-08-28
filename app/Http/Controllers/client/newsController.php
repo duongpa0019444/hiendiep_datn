@@ -13,10 +13,14 @@ class newsController extends Controller
     {
 
         $news = news::where('event_type', 'news')
+            ->where('publish_status', 'published')
+            ->where('is_visible', 1)
             ->orderBy('created_at', 'desc')
             ->get();
 
         $events = news::where('event_type', 'event')
+            ->where('publish_status', 'published')
+            ->where('is_visible', 1)
             ->orderBy('created_at', 'desc')
             ->get();
         return view('client.news.news-list', compact('news', 'events'));
@@ -34,7 +38,9 @@ class newsController extends Controller
 
     public function newsCategory($id){
         $topic = topics::find($id);
-        $newsCategorys = news::where('topic_id', $id)->orderBy('created_at', 'desc')->get();
+        $newsCategorys = news::where('topic_id', $id)
+        ->where('publish_status', 'published')
+        ->orderBy('created_at', 'desc')->get();
         return view('client.news.news-category', compact('newsCategorys', 'topic'));
     }
 }

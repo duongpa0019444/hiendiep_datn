@@ -1,5 +1,7 @@
-<?php 
+<?php
+
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -8,19 +10,22 @@ class Classroom extends Model
     use HasFactory;
     protected $table = 'class_room';
     protected $fillable = [
-        'room_name', 'Capacity', 'status', 'description', 'created_at', 'updated_at', 'name_class','start_time', 'end_time'
+        'room_name',
+        'capacity',
+        'status',
+        'created_at',
+        'updated_at',
+        'note'
     ];
-     public function setStartTimeAttribute($value)
+
+    public function schedules()
     {
-        $this->attributes['start_time'] = date('Y-m-d H:i:s', strtotime($value));
+        return $this->hasMany(Schedule::class, 'room');
     }
 
-    public function setEndTimeAttribute($value)
+    // Quan hệ gián tiếp tới classes qua schedules
+    public function classes()
     {
-        $this->attributes['end_time'] = date('Y-m-d H:i:s', strtotime($value));
+        return $this->hasManyThrough(classes::class, Schedule::class, 'room', 'id', 'id', 'class_id');
     }
-
-   
 }
-
-?>

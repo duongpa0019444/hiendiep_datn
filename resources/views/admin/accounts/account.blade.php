@@ -606,7 +606,7 @@
                     </div> <!-- end card body -->
                     <div class="card-footer border-top">
                         <nav aria-label="Page navigation">
-                            {!! $role->links('pagination::bootstrap-5') !!}
+                            {!! $role->withQueryString()->links('pagination::bootstrap-5') !!}
                         </nav>
                     </div>
                 </div>
@@ -624,9 +624,9 @@
                     <div class="col-12 text-center">
                         <script>
                             document.write(new Date().getFullYear())
-                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT THANH HÓA<iconify-icon
+                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC  THANH HÓA<iconify-icon
                             icon="iconamoon:heart-duotone" class="fs-18 align-middle text-danger"></iconify-icon> <a
-                            href="#" class="fw-bold footer-text" target="_blank">NHÓM 4</a>
+                            href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
                     </div>
                 </div>
             </div>

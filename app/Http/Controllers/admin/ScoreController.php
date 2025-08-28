@@ -15,7 +15,9 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class ScoreController extends Controller
 {
@@ -61,7 +63,7 @@ class ScoreController extends Controller
             ->when($keyword !== '', function ($query) use ($keyword) {
                 $query->whereHas('student', function ($q) use ($keyword) {
                     $q->where('name', 'like', "%{$keyword}%")
-                    ->orWhere('snake_case', 'like', "%{$keyword}%");
+                        ->orWhere('snake_case', 'like', "%{$keyword}%");
                 });
             })
             ->orderByDesc('created_at')
@@ -91,8 +93,15 @@ class ScoreController extends Controller
 
         $validated = $request->validate([
             'class_id'    => 'nullable',
-            'student_id'  => 'required',
-            'score_type'  => 'required|string|max:255|unique:scores,score_type',
+            'student_id'  => 'required|exists:users,id',
+            'score_type'  => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('scores')->where(function ($query) use ($request) {
+                    return $query->where('student_id', $request->student_id);
+                }),
+            ],
             'score'       => 'required|numeric|min:0|max:10',
             'exam_date'   => 'required|date',
         ]);
@@ -100,7 +109,16 @@ class ScoreController extends Controller
 
 
         $validated['class_id'] = $class_id;
-        Score::create($validated);
+        $score = Score::create($validated);
+        // Lấy tên học sinh từ bảng users
+        $studentName = User::where('id', $validated['student_id'])->value('name');
+
+        $this->logAction(
+            'create',
+            Score::class,
+            $score->id,
+            Auth::user()->name . ' đã thêm điểm ' . $score->score_type . ' cho học sinh: ' . $studentName
+        );
 
         $course_id = classes::find($class_id)?->courses_id;
 
@@ -122,17 +140,28 @@ class ScoreController extends Controller
 
     public function update($class_id, Request $request)
     {
+        // Tìm điểm theo id truyền vào (nên truyền id)
+        $score = Score::find($request->id);
+
         $validated = $request->validate([
-            'student_id'  => 'required',
-            'score_type'  => 'required|string|max:255',
+            'class_id'    => 'nullable',
+            'student_id'  => 'required|exists:users,id',
+            'score_type'  => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('scores')
+                    ->where(function ($query) use ($request) {
+                        return $query->where('student_id', $request->student_id)
+                            ->where('class_id', $request->class_id);
+                    })
+                    ->ignore($score->id), // bỏ qua bản ghi đang update
+            ],
             'score'       => 'required|numeric|min:0|max:10',
             'exam_date'   => 'required|date',
         ]);
 
         $validated['class_id'] = $class_id;
-
-        // Tìm điểm theo id truyền vào (nên truyền id)
-        $score = Score::find($request->id);
 
         if (!$score) {
             return redirect()->back()->with('error', 'Không tìm thấy điểm để cập nhật.');
@@ -150,6 +179,14 @@ class ScoreController extends Controller
         }
 
         $score->update($validated);
+        // Lấy tên học sinh từ bảng users
+        $studentName = User::where('id', $validated['student_id'])->value('name');
+        $this->logAction(
+            'update',
+            Score::class,
+            $score->id,
+            Auth::user()->name . ' đã cập nhật điểm ' . $score->score_type . ' cho học sinh: ' . $studentName
+        );
 
         $course_id = classes::findOrFail($class_id)?->courses_id;
 
@@ -164,11 +201,20 @@ class ScoreController extends Controller
     {
 
         $errors = [];
-        Excel::import(new ScoresImport($errors), $request->file('file'));
+        $sclassNameIP = null;
+        $score = Excel::import(new ScoresImport($errors), $request->file('file'));
+        // dd($score);
 
         if (!empty($errors)) {
             return back()->with('error', $errors);
         }
+
+        $this->logAction(
+            'import',
+            Score::class,
+            null,
+            Auth::user()->name . ' đã thêm điểm từ file excel cho lớp ' . $sclassNameIP
+        );
         return back()->with('success', 'Đã nhập điểm thành công!');
     }
 
@@ -182,26 +228,27 @@ class ScoreController extends Controller
 
             // Nếu là số serial Excel
             if (is_numeric($value)) {
-                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value)->format('Y-d-m');
+                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value)->format('Y-m-d');
             }
 
             // Nếu là chuỗi có dấu /
             if (strpos($value, '/') !== false) {
-                return \Carbon\Carbon::createFromFormat('d/m/Y', trim($value))->format('Y-d-m');
+                return \Carbon\Carbon::createFromFormat('d/m/Y', trim($value))->format('Y-m-d');
             }
 
             // Nếu là chuỗi có dấu -
             if (strpos($value, '-') !== false) {
-                return \Carbon\Carbon::createFromFormat('Y-m-d', trim($value))->format('Y-d-m');
+                return \Carbon\Carbon::createFromFormat('d-m-Y', trim($value))->format('Y-m-d');
             }
 
             // Cuối cùng thử auto parse
-            return \Carbon\Carbon::parse($value)->format('Y-d-m');
+            return \Carbon\Carbon::parse($value)->format('Y-m-d');
         } catch (\Throwable $e) {
             Log::warning("❌ Lỗi parse ngày: [$value] - " . $e->getMessage());
             return null;
         }
     }
+
 
 
 
@@ -222,5 +269,27 @@ class ScoreController extends Controller
             . '.xlsx';
 
         return Excel::download(new TemplateScoresExport($classId, $courseId), $fileName);
+    }
+
+    public function delete($id)
+    {
+        $score = Score::find($id);
+        if ($score) {
+            $class_id = $score->class_id;
+            $course_id = classes::find($class_id)?->courses_id;
+
+            // Lấy tên học sinh từ bảng users
+            $studentName = User::where('id', $score->student_id)->value('name');
+            $this->logAction(
+                'delete',
+                Score::class,
+                $score->id,
+                Auth::user()->name . ' đã xóa điểm ' . $score->score_type . ' cho học sinh: ' . $studentName
+            );
+
+            $score->delete();
+            return redirect()->route('admin.score.detail', ['class_id' => $class_id, 'course_id' => $course_id])->with('success', 'Đã xóa điểm thành công!');
+        }
+        return redirect()->back()->with('error', 'Không tìm thấy điểm để xóa.');
     }
 }

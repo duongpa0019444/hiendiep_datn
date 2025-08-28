@@ -205,7 +205,7 @@
                 <!-- Pagination -->
                 <div class="card-footer border-top">
                     <nav aria-label="Page navigation">
-                        {!! $users->links('pagination::bootstrap-5') !!}
+                        {!! $users->withQueryString()->links('pagination::bootstrap-5') !!}
                     </nav>
                 </div>
 

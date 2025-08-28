@@ -37,7 +37,7 @@
                                         <h6 class="mb-0">{{ $class->course_name ?? 'N/A' }}</h6>
                                         @if ($class->course_description)
                                             <small
-                                                class="text-muted">{{ Str::limit($class->course_description, 50) }}</small>
+                                                class="text-muted">{!! Str::limit($class->course_description, 50) !!}</small>
                                         @endif
                                     </div>
                                 </div>
@@ -86,11 +86,11 @@
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $class->id }}">
                                         <li>
-                                            <a class="dropdown-item"
-                                                href="{{ route('admin.classes.show', $class->id) }}">
-                                                <i class="fas fa-eye me-2"></i>Xem chi tiết
-                                            </a>
-                                        </li>
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('admin.classes.detail', $class->id) }}">
+                                                                    <i class="fas fa-eye me-2"></i>Xem chi tiết
+                                                                </a>
+                                                            </li>
                                         <li>
                                             <a class="dropdown-item"
                                                 href="{{ route('admin.classes.edit', $class->id) }}">

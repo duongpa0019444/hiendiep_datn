@@ -119,7 +119,7 @@
                                                 class="form-control" placeholder="Nhập số điện thoại...">
                                         </div>
                                     </div>
-                                    
+
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="" class="form-label fw-semibold">Địa chỉ</label>
@@ -136,7 +136,7 @@
                                         </div>
                                     </div>
 
-                                   
+
 
                                     <div class="col-lg-6">
                                         <label for="" class="form-label fw-semibold">Giới tính</label>
@@ -163,7 +163,7 @@
                                 </div>
 
                             </div>
-                            
+
                             <div class="card-footer border-top text-end pe-3">
                                 <a href="{{ route('admin.account.list', request('role')) }}" class="btn btn-secondary me-2">Quay Lại</a>
                                 <button type="submit" class="btn btn-primary">Lưu</button>
@@ -183,9 +183,9 @@
                     <div class="col-12 text-center">
                         <script>
                             document.write(new Date().getFullYear())
-                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT THANH HÓA<iconify-icon
+                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC  THANH HÓA<iconify-icon
                             icon="iconamoon:heart-duotone" class="fs-18 align-middle text-danger"></iconify-icon> <a
-                            href="#" class="fw-bold footer-text" target="_blank">NHÓM 4</a>
+                            href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
                     </div>
                 </div>
             </div>

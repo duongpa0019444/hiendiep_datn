@@ -79,7 +79,7 @@ class topicsController extends Controller
 
         $this->logAction(
             'create',
-            topics::class,
+            news::class,
             $topic->id,
             Auth::user()->name . ' đã tạo chủ đề: ' . $topic->name
         );
@@ -121,7 +121,7 @@ class topicsController extends Controller
 
         $this->logAction(
             'update',
-            topics::class,
+            news::class,
             $topic->id,
             Auth::user()->name . ' đã cập nhật chủ đề: ' . $topic->name
         );
@@ -134,7 +134,7 @@ class topicsController extends Controller
         $topic = topics::findOrFail($id);
         $this->logAction(
             'delete',
-            topics::class,
+            news::class,
             $topic->id,
             Auth::user()->name . ' đã xóa chủ đề: ' . $topic->name
         );
@@ -187,7 +187,7 @@ class topicsController extends Controller
         $topic->restore();
         $this->logAction(
             'update',
-            topics::class,
+            news::class,
             $topic->id,
             Auth::user()->name . ' đã khôi phục chủ đề: ' . $topic->name
         );
@@ -203,7 +203,7 @@ class topicsController extends Controller
         $topic = topics::onlyTrashed()->findOrFail($id);
         $this->logAction(
             'delete',
-            topics::class,
+            news::class,
             $topic->id,
             Auth::user()->name . ' đã xóa vĩnh viễn chủ đề: ' . $topic->name
         );

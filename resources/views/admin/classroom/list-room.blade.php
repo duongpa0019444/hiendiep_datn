@@ -59,7 +59,7 @@
                                 <i class="bi bi-door-open fs-2 text-warning"></i>
                             </div>
                             <div>
-                                <h5 class="fw-bold mb-1 text-dark">Phòng Đang Sử Dụng</h5>
+                                <h5 class="fw-bold mb-1 text-dark">Được phép Sử Dụng</h5>
                                 <p class="mb-0 fs-4 fw-semibold text-warning">{{ $roomsInUse ?? 0 }}</p>
                             </div>
                         </div>
@@ -72,7 +72,7 @@
                                 <i class="bi bi-door-closed fs-2 text-success"></i>
                             </div>
                             <div>
-                                <h5 class="fw-bold mb-1 text-dark">Phòng Còn Trống</h5>
+                                <h5 class="fw-bold mb-1 text-dark">Chưa được sử dụng</h5>
                                 <p class="mb-0 fs-4 fw-semibold text-success">{{ $roomsEmpty ?? 0 }}</p>
                             </div>
                         </div>
@@ -86,8 +86,10 @@
                 <div class="col-xl-12">
                     <div class="card">
                         <div class="card-header">
-                            <form action="{{ route('admin.classroom.list-room') }}" method="GET"
+                            <form action="{{ route('admin.classroom.list-room') }}" method="GET" id="searchForm"
                                 class="row g-2 align-items-end">
+
+                                <input type="hidden" name="limit" id="limit" value="{{ request('limit', 10) }}">
                                 <!-- Từ khóa -->
                                 <div class="col">
                                     <label for="name" class="form-label mb-1">Từ khóa</label>
@@ -101,10 +103,10 @@
                                     <label for="status" class="form-label mb-1">Trạng thái phòng</label>
                                     <select name="status" id="status" class="form-select form-select-sm">
                                         <option value="">Tất cả</option>
-                                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>chưa được
+                                        <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Chưa được
                                             sử dụng
                                         </option>
-                                        <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Đang được
+                                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Được phép
                                             sử dụng
                                         </option>
                                     </select>
@@ -130,7 +132,7 @@
 
                                 <!-- Nút thêm -->
                                 <div class="col-auto">
-                                    <a href="{{ route('admin.classroom.create') }}" class="btn btn-warning btn-sm">Thêm
+                                    <a href="{{ route('admin.classroom.create') }}" class="btn btn-primary btn-sm">Thêm
                                         phòng học</a>
                                 </div>
                             </form>
@@ -142,14 +144,17 @@
                 <!-- Bảng dữ liệu -->
                 <div class="col-xl-12">
                     <div class="card">
-                        <div class="table-responsive">
+                        <div class="table-responsive table-gridjs">
                             <table class="table align-middle mb-0 table-hover table-centered">
-                                <thead class="bg-light-subtle">
+                                <thead class="table-light">
                                     <tr>
                                         <th>STT</th>
                                         <th>Tên Phòng Học</th>
                                         <th>Trạng Thái Phòng</th>
                                         <th>Sức Chứa </th>
+                                        <th>Ghi chú </th>
+                                        <th>Ngày tạo </th>
+                                        <th>Ngày cập nhật </th>
                                         <th>Hành Động</th>
                                     </tr>
                                 </thead>
@@ -157,17 +162,30 @@
                                     @forelse ($classrooms as $key => $room)
                                         <tr>
                                             <td>{{ $classrooms->firstItem() + $key }}</td>
-                                            <td>{{ $room->room_name }}</td>
                                             <td>
-                                                @if ($room->status == 1)
-                                                    <span class="badge bg-secondary">Chưa được sử dụng</span>
+                                                <div class="d-flex flex-column">
+                                                    <span class="fw-bold">{{ $room->room_name }}</span>
+                                                    <small class="text-muted">{{ $room->classes_count }} lớp đang
+                                                        học</small>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                @if ($room->status == 0)
+                                                    <small class="bade bg-secondary-subtle text-secondary rounded p-1">Chưa được
+                                                        sử dụng</small>
                                                 @else
-                                                    <span class="badge bg-success">Đang được sử dụng</span>
+                                                    <small class="bade bg-success-subtle text-success rounded p-1">Được phép sử
+                                                        dụng</small>
                                                 @endif
                                             </td>
 
 
-                                            <td>{{ $room->Capacity ?? '-' }}</td>
+                                            <td>{{ $room->capacity ?? '-' }}</td>
+                                            <td>{{ $room->note ?? '' }}</td>
+                                            <td>{{ $room->created_at ? $room->created_at->format('d/m/Y H:i') : '' }}</td>
+                                            <td>{{ $room->updated_at ? $room->updated_at->format('d/m/Y H:i') : '' }}</td>
+
                                             <!-- Hiển thị giờ bắt đầu và kết thúc sử dụng -->
                                             <td>
                                                 <div class="dropdown">
@@ -221,16 +239,47 @@
                                     @endforelse
                                 </tbody>
                             </table>
+
+                            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 m-3">
+                                <div id="pagination-wrapper" class="flex-grow-1">
+                                    {{ $classrooms->links('pagination::bootstrap-5') }}
+                                </div>
+
+                                <div class="d-flex align-items-center" style="min-width: 160px;">
+                                    <label for="limit2" class="form-label mb-0 me-2 small">Hiển thị</label>
+                                    <select name="limit2" id="limit2" class="form-select form-select-sm"
+                                        style="width: 100px;">
+                                        <option value="10" selected>10</option>
+                                        <option value="20">20</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Phân trang -->
-                        <div class="m-3">
-                            {{ $classrooms->links('pagination::bootstrap-5') }}
-                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
+
+
+        <!-- ========== Footer Start ========== -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <script>
+                            document.write(new Date().getFullYear())
+                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC THANH HÓA <iconify-icon
+                            icon="iconamoon:heart-duotone" class="fs-18 align-middle text-danger"></iconify-icon> <a
+                            href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- ========== Footer End ========== -->
     </div>
 @endsection
 @push('scripts')
@@ -273,5 +322,12 @@
                 }
             });
         }
+
+         // Xử lý thay đổi số dòng hiển thị
+        $('#limit2').change(function() {
+            const limitValue = $(this).val();
+            $('#searchForm #limit').val(limitValue);
+            $('#searchForm').submit();
+        });
     </script>
 @endpush

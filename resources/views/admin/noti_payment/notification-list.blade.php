@@ -174,6 +174,23 @@
                 </div>
             </div>
         </div>
+
+
+        <!-- ========== Footer Start ========== -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <script>
+                            document.write(new Date().getFullYear())
+                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC THANH HÓA <iconify-icon
+                            icon="iconamoon:heart-duotone" class="fs-18 align-middle text-danger"></iconify-icon> <a
+                            href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- ========== Footer End ========== -->
     </div>
 @endsection
 
@@ -201,7 +218,7 @@
             $('#notificationList').css({
                 'opacity': '0.5'
             });
-             const url = $("#searchForm").attr('action');
+            const url = $("#searchForm").attr('action');
             $.ajax({
                 url: url,
                 type: 'GET',
@@ -274,25 +291,25 @@
                                 ${formatDateTime(notification.created_at)}
                             </div>
                             ${notification.status === 'seen' ? `
-                                        <div class="position-relative d-inline-block" style="width:20px; height:20px;" title="Đã xem">
-                                            <i class="fas fa-check text-success position-absolute" style="left:0; top:0;"></i>
-                                            <i class="fas fa-check text-success position-absolute" style="left:6px; top:0;"></i>
-                                        </div>
-                                    ` : `
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="event.stopPropagation();">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li>
-                                                    <button class="dropdown-item mark-as-read btn-seen-noti-all" data-id="${notification.id}">
-                                                        <i class="fas fa-check-circle me-1 text-success"></i> Đánh dấu là đã đọc
-                                                    </button>
-                                                </li>
+                                            <div class="position-relative d-inline-block" style="width:20px; height:20px;" title="Đã xem">
+                                                <i class="fas fa-check text-success position-absolute" style="left:0; top:0;"></i>
+                                                <i class="fas fa-check text-success position-absolute" style="left:6px; top:0;"></i>
+                                            </div>
+                                        ` : `
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="event.stopPropagation();">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li>
+                                                        <button class="dropdown-item mark-as-read btn-seen-noti-all" data-id="${notification.id}">
+                                                            <i class="fas fa-check-circle me-1 text-success"></i> Đánh dấu là đã đọc
+                                                        </button>
+                                                    </li>
 
-                                            </ul>
-                                        </div>
-                                    `}
+                                                </ul>
+                                            </div>
+                                        `}
                         </div>
                     </li>
                 `;
@@ -473,7 +490,7 @@
                                         '.soluong-notification-2');
                                     if (badge) {
                                         let current = parseInt(badge.innerText
-                                        .trim()) || 0;
+                                            .trim()) || 0;
                                         badge.innerText = Math.max(current - selectedIds
                                             .length, 0);
                                     }
@@ -516,6 +533,9 @@
                             }
                             $(`.notification-item-list-${res.notificationUser.id}`).replaceWith(
                                 renderLogItem(res.notificationUser));
+                            $(`.notification-${res.notificationUser.id}`).remove();
+                            $('.soluong-notification').text(parseInt($('.soluong-notification').text()) - 1);
+
                         } else {
                             showDataToast(res.error || 'Có lỗi xảy ra!', 'danger');
                         }
@@ -575,25 +595,25 @@
                             ${formatDateTime(notification.created_at)}
                         </div>
                         ${notification.status === 'seen' ? `
-                                    <div class="position-relative d-inline-block" style="width:20px; height:20px;" title="Đã xem">
-                                        <i class="fas fa-check text-success position-absolute" style="left:0; top:0;"></i>
-                                        <i class="fas fa-check text-success position-absolute" style="left:6px; top:0;"></i>
-                                    </div>
-                                ` : `
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="event.stopPropagation();">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li>
-                                                <button class="dropdown-item mark-as-read btn-seen-noti-all" data-id="${notification.id}">
-                                                    <i class="fas fa-check-circle me-1 text-success"></i> Đánh dấu là đã đọc
-                                                </button>
-                                            </li>
+                                        <div class="position-relative d-inline-block" style="width:20px; height:20px;" title="Đã xem">
+                                            <i class="fas fa-check text-success position-absolute" style="left:0; top:0;"></i>
+                                            <i class="fas fa-check text-success position-absolute" style="left:6px; top:0;"></i>
+                                        </div>
+                                    ` : `
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="event.stopPropagation();">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <button class="dropdown-item mark-as-read btn-seen-noti-all" data-id="${notification.id}">
+                                                        <i class="fas fa-check-circle me-1 text-success"></i> Đánh dấu là đã đọc
+                                                    </button>
+                                                </li>
 
-                                        </ul>
-                                    </div>
-                                `}
+                                            </ul>
+                                        </div>
+                                    `}
                     </div>
                 </li>
             `;

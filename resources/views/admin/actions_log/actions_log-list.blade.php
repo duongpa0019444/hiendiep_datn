@@ -42,6 +42,11 @@
                                             <i class="fas fa-chalkboard-teacher fs-16 me-2 align-middle"></i> Lớp học
                                         </span>
                                     </a>
+                                    <a class="nav-link py-1" data-model-type="App\Models\Classroom" href="#">
+                                        <span class="d-flex align-items-center">
+                                            <i class="fas fa-chalkboard-teacher fs-16 me-2 align-middle"></i> Phòng học
+                                        </span>
+                                    </a>
                                     <a class="nav-link py-1" data-model-type="App\Models\Schedule" href="#">
                                         <span class="d-flex align-items-center">
                                             <i class="fas fa-calendar-alt fs-16 me-2 align-middle"></i> Lịch học

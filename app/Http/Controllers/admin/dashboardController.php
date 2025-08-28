@@ -88,34 +88,95 @@ class dashboardController extends Controller
         return view('admin.dashdoard', compact('users', 'classs', 'countPayments', 'courses', 'schedules', 'formattedDate'));
     }
 
-
-
-    public function chart($id)
+    public function renderOverview($year = null)
     {
-        $course_id = $id ? $id : 0; // Mặc định là 0 (Tất cả khóa học)
+        $year = $year ?? date('Y'); // nếu không truyền thì lấy năm hiện tại
+
+        $users = DB::select("
+            SELECT
+                COUNT(*) AS total_users,
+                SUM(CASE WHEN role = 'student' THEN 1 ELSE 0 END) AS total_students,
+                SUM(CASE WHEN role = 'teacher' THEN 1 ELSE 0 END) AS total_teachers,
+                SUM(CASE WHEN role = 'staff' THEN 1 ELSE 0 END) AS total_staff,
+                SUM(CASE WHEN role = 'admin' THEN 1 ELSE 0 END) AS total_admins
+            FROM `users`
+            WHERE YEAR(created_at) = ?
+        ", [$year]);
+
+        $classs = DB::select("
+            SELECT
+                (SELECT COUNT(*) FROM `classes` WHERE YEAR(created_at) = ?) AS total_classes,
+                (SELECT COUNT(*) FROM `classes` WHERE status = 'in_progress' AND YEAR(created_at) = ?) AS total_classes_in_progress,
+                (SELECT COUNT(*) FROM `classes` WHERE status = 'completed' AND YEAR(created_at) = ?) AS total_classes_completed,
+                (SELECT COUNT(*) FROM `classes` WHERE status = 'not_started' AND YEAR(created_at) = ?) AS total_classes_unstarted
+        ", [$year, $year, $year, $year]);
+
+        $countPayments = DB::select("
+            SELECT
+                (SELECT COALESCE(SUM(amount), 0)
+                FROM `course_payments`
+                WHERE `status` = 'paid' AND YEAR(created_at) = ?) AS total_revenue,
+
+                (SELECT COUNT(*)
+                FROM `course_payments`
+                WHERE `status` = 'paid' AND YEAR(created_at) = ?) AS total_paid_records,
+
+                (SELECT COUNT(*)
+                FROM `course_payments`
+                WHERE `status` = 'unpaid' AND YEAR(created_at) = ?) AS total_unpaid_records
+        ", [$year, $year, $year]);
+
+            return response()->json([
+                'users' => $users,
+                'classs' => $classs,
+                'countPayments' => $countPayments,
+                'year' => (int) $year
+            ]);
+    }
+    public function chart($year = null, $id)
+    {
+        $course_id = $id ?? 0;
+        $year = $year ?? date('Y'); // nếu không truyền thì lấy năm hiện tại
+
         $classes_informations = classes::query()
             ->select('classes.name as class_name', 'classes.id')
-            ->selectRaw('COALESCE((SELECT COUNT(DISTINCT cs.student_id) FROM class_student cs WHERE cs.class_id = classes.id AND EXISTS (SELECT 1 FROM course_payments cp WHERE cp.student_id = cs.student_id AND cp.class_id = cs.class_id AND cp.status = \'paid\')), 0) as paid_students')
-            ->selectRaw('COALESCE((SELECT COUNT(DISTINCT cs.student_id) FROM class_student cs WHERE cs.class_id = classes.id AND NOT EXISTS (SELECT 1 FROM course_payments cp WHERE cp.student_id = cs.student_id AND cp.class_id = cs.class_id AND cp.status = \'paid\')), 0) as unpaid_students')
-            ->where(function ($query) {
-                $query->where('status', 'in_progress')
-                    ->orWhere('status', 'not_started');
-            })
-            ->when($course_id != 0, function ($query) use ($course_id) {
-                return $query->where('courses_id', $course_id);
-            })
+            ->selectRaw('COALESCE((
+            SELECT COUNT(DISTINCT cs.student_id)
+            FROM class_student cs
+            WHERE cs.class_id = classes.id
+              AND EXISTS (
+                  SELECT 1 FROM course_payments cp
+                  WHERE cp.student_id = cs.student_id
+                    AND cp.class_id   = cs.class_id
+                    AND cp.status     = "paid"
+              )
+        ), 0) as paid_students')
+            ->selectRaw('COALESCE((
+            SELECT COUNT(DISTINCT cs.student_id)
+            FROM class_student cs
+            WHERE cs.class_id = classes.id
+              AND NOT EXISTS (
+                  SELECT 1 FROM course_payments cp
+                  WHERE cp.student_id = cs.student_id
+                    AND cp.class_id   = cs.class_id
+                    AND cp.status     = "paid"
+              )
+        ), 0) as unpaid_students')
+            ->whereIn('status', ['in_progress', 'not_started'])
+            ->when($course_id != 0, fn($q) => $q->where('courses_id', $course_id))
+            ->whereYear('classes.created_at', $year)
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('class_student as cs')
                     ->whereColumn('cs.class_id', 'classes.id');
             })
-            ->orderBy('name')
+            ->orderBy('classes.name')
             ->paginate(6);
-
 
         return response()->json([
             'data' => $classes_informations,
-            'pagination' => $classes_informations->links('pagination::bootstrap-5')->render()
+            'pagination' => $classes_informations->links('pagination::bootstrap-5')->render(),
+            'year' => $year
 
         ]);
     }
@@ -286,5 +347,4 @@ class dashboardController extends Controller
             'courses' => $courses
         ]);
     }
-
 }

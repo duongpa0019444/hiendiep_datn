@@ -389,10 +389,10 @@
                     <div class="col-12 text-center">
                         <script>
                             document.write(new Date().getFullYear())
-                        </script> © DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT THANH HÓA
+                        </script> © DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC THANH HÓA
                         <iconify-icon icon="iconamoon:heart-duotone"
                             class="fs-18 align-middle text-danger"></iconify-icon>
-                        <a href="#" class="fw-bold footer-text" target="_blank">NHÓM 4</a>
+                        <a href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
                     </div>
                 </div>
             </div>
@@ -671,9 +671,12 @@
                                 'success');
                             form.closest('tr').remove();
                         },
-                        error: function() {
-                            Swal.fire('Lỗi!', 'Không thể xóa quiz.', 'error');
+                        error: function(xhr) {
+                            let msg = xhr.responseJSON?.message ||
+                                'Có lỗi xảy ra, vui lòng thử lại!';
+                            Swal.fire('Lỗi!', msg, 'error');
                         }
+
                     });
                 }
             });
@@ -696,11 +699,11 @@
                             <td>
                                 ${quiz.is_public ? `
 
-                                    <div class="fw-bold">Tất cả</div>
-                                ` : `
-                                    <div class="fw-bold">${quiz.class?.name || 'Tất cả'}</div>
-                                    <div class="fs-6">Khóa: ${quiz.course?.name || 'Tất cả'}</div>
-                                `}
+                                        <div class="fw-bold">Tất cả</div>
+                                    ` : `
+                                        <div class="fw-bold">${quiz.class?.name || 'Tất cả'}</div>
+                                        <div class="fs-6">Khóa: ${quiz.course?.name || 'Tất cả'}</div>
+                                    `}
 
                             </td>
                             <td>${quiz.creator?.name || 'Không rõ'}</td>

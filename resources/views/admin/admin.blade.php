@@ -17,7 +17,7 @@
 
 
     <!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
 
     <!-- App favicon -->
@@ -295,11 +295,12 @@
                                         <i class="bx bx-lock text-muted fs-18 align-middle me-1"></i><span
                                             class="align-middle">Lock screen</span>
                                     </a> --}}
-                                    <a class="dropdown-item" href="{{ route('admin.actions.log') }}">
-                                        <i class="bx bx-user-pin text-muted fs-18 align-middle me-1"></i>
-                                        <span class="align-middle">Lịch sử thao tác</span>
-
-                                    </a>
+                                    @if (auth()->user()->isAdmin())
+                                        <a class="dropdown-item" href="{{ route('admin.actions.log') }}">
+                                            <i class="bx bx-user-pin text-muted fs-18 align-middle me-1"></i>
+                                            <span class="align-middle">Lịch sử thao tác</span>
+                                        </a>
+                                    @endif
 
                                     <div class="dropdown-divider my-1"></div>
 
@@ -479,6 +480,25 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.thongke.daotao') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:school-outline"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Thống kê đào tạo </span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.thongke.taichinh') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:finance"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Thống kê tài chính </span>
+                            </a>
+                        </li>
+
+
                         <li class="menu-title mt-2">Quản lý học tập</li>
 
                         <li class="nav-item">
@@ -605,27 +625,28 @@
                             </div>
                         </li>
 
-                         <li class="nav-item">
+
+                        {{-- <li class="nav-item">
                             <a class="nav-link menu-arrow" href="#staffs" data-bs-toggle="collapse" role="button"
                                 aria-expanded="false" aria-controls="staffs">
-                                 <span class="nav-icon">
+                                <span class="nav-icon">
                                     <iconify-icon icon="mdi:cash-plus"></iconify-icon>
                                 </span>
                                 <span class="nav-text"> Quản lý lương nhân viên </span>
                             </a>
                             <div class="collapse" id="staffs">
-                                 <ul class="nav sub-navbar-nav">
+                                <ul class="nav sub-navbar-nav">
                                     <li class="sub-nav-item">
                                         <a class="sub-nav-link" href="{{ route('admin.staff_salaries') }}">Bảng
                                             lương</a>
                                     </li>
                                     <li class="sub-nav-item">
-                                        <a class="sub-nav-link"
-                                            href="{{ route('admin.staff_salaries.detail') }}">Chi tiết lương NV</a>
+                                        <a class="sub-nav-link" href="{{ route('admin.staff_salaries.detail') }}">Chi
+                                            tiết lương NV</a>
                                     </li>
                                 </ul>
                             </div>
-                        </li>
+                        </li> --}}
 
                         <li class="menu-title mt-2">Truyền thông & Liên hệ</li>
 
@@ -688,6 +709,16 @@
                             </a>
                         </li>
 
+                         <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.thongke.taichinh') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:finance"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Thống kê tài chính </span>
+                            </a>
+                        </li>
+
+
                         <li class="menu-title mt-2">Tài chính</li>
 
                         <li class="nav-item">
@@ -721,27 +752,28 @@
                             </div>
                         </li>
 
-                         <li class="nav-item">
+                        {{-- Ql luong nv --}}
+                        {{-- <li class="nav-item">
                             <a class="nav-link menu-arrow" href="#staffs" data-bs-toggle="collapse" role="button"
                                 aria-expanded="false" aria-controls="staffs">
-                                 <span class="nav-icon">
+                                <span class="nav-icon">
                                     <iconify-icon icon="mdi:cash-plus"></iconify-icon>
                                 </span>
                                 <span class="nav-text"> Quản lý lương nhân viên </span>
                             </a>
                             <div class="collapse" id="staffs">
-                                 <ul class="nav sub-navbar-nav">
+                                <ul class="nav sub-navbar-nav">
                                     <li class="sub-nav-item">
                                         <a class="sub-nav-link" href="{{ route('admin.staff_salaries') }}">Bảng
                                             lương</a>
                                     </li>
                                     <li class="sub-nav-item">
-                                        <a class="sub-nav-link"
-                                            href="{{ route('admin.staff_salaries.detail') }}">Chi tiết lương NV</a>
+                                        <a class="sub-nav-link" href="{{ route('admin.staff_salaries.detail') }}">Chi
+                                            tiết lương NV</a>
                                     </li>
                                 </ul>
                             </div>
-                        </li>
+                        </li> --}}
 
                         <li class="menu-title mt-2">Truyền thông & Liên hệ</li>
 
@@ -806,9 +838,19 @@
                             </a>
                         </li>
 
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.thongke.daotao') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:school-outline"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Thống kê đào tạo </span>
+                            </a>
+                        </li>
+
                         <li class="menu-title mt-2">Quản lý học tập</li>
 
-                         <li class="nav-item">
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.account.list', 'student') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="ph:student-fill" width="24"></iconify-icon>
@@ -816,7 +858,7 @@
                                 <span class="nav-text"> Quản lý học sinh </span>
                             </a>
                         </li>
-                        
+
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.account.list', 'teacher') }}">
                                 <span class="nav-icon">
@@ -834,7 +876,14 @@
                                 <span class="nav-text"> Quản lý lớp học </span>
                             </a>
                         </li>
-
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.classroom.list-room') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:google-classroom"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý phòng học </span>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.schedules.index') }}">
                                 <span class="nav-icon">
@@ -980,13 +1029,15 @@
 
 
 </body>
+@vite('resources/js/app.js')
+
 <script>
     @auth
     window.currentUserId = {{ Auth::id() }};
+    window.mission = @json(auth()->user()->mission);
     @else
         window.currentUserId = null;
     @endauth
 </script>
-@vite('resources/js/app.js')
 
 </html>

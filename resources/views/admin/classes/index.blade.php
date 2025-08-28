@@ -1,6 +1,6 @@
 @extends('admin.admin')
 
-@section('title', 'Classes')
+@section('title', 'Quản lí lớp học')
 @section('description', 'Manage your classes here.')
 
 @section('content')

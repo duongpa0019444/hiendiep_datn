@@ -98,7 +98,7 @@
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
 
-                                    
+
                                     <h6 class="mb-1 fs-5">Chủ đề</h6>
                                     <p class="text-muted fw-semibold fs-5 mb-0">{{ $statistics[0]->total_topics }}</p>
                                 </div>
@@ -294,10 +294,16 @@
 
                                                         {{-- Thông tin tiêu đề + chủ đề --}}
                                                         <div>
-                                                            <div class="fw-bold"
-                                                                style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; line-height: 1.4em; max-height: 2.8em;">
+                                                            <a @if($article->publish_status == 'published')
+                                                                    href="{{ route('client.news.detail', ['id'=> $article->id, 'slug'=> $article->slug]) }}"
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                @endif
+                                                                class="fw-bold">
                                                                 {{ $article->title }}
-                                                            </div>
+                                                            </a>
+
+
 
                                                             <div class="text-danger small">
                                                                 <strong>Chủ đề:</strong>
@@ -371,10 +377,6 @@
                                                                 class="fs-5"></iconify-icon>
                                                         </button>
                                                         <ul class="dropdown-menu">
-                                                            <li><a href=""
-                                                                    class="dropdown-item text-info"><iconify-icon
-                                                                        icon="solar:eye-broken"
-                                                                        class="me-1"></iconify-icon> Chi tiết</a></li>
 
                                                             <li><a href="{{ route('admin.news.edit', $article->id) }}"
                                                                     class="dropdown-item text-warning"><iconify-icon
@@ -431,10 +433,10 @@
                     <div class="col-12 text-center">
                         <script>
                             document.write(new Date().getFullYear())
-                        </script> © DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT THANH HÓA
+                        </script> © DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC  THANH HÓA
                         <iconify-icon icon="iconamoon:heart-duotone"
                             class="fs-18 align-middle text-danger"></iconify-icon>
-                        <a href="#" class="fw-bold footer-text" target="_blank">NHÓM 4</a>
+                        <a href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
                     </div>
                 </div>
             </div>
@@ -544,7 +546,14 @@
                                     class="rounded"
                                     style="width: 70px; height: 50px; object-fit: cover;">
                                 <div>
-                                    <div class="fw-bold">${article.title}</div>
+                                    <a
+                                        ${article.publish_status === 'published'
+                                            ? `href="/news/${article.id}/detail/${article.slug}" target="_blank" rel="noopener noreferrer"`
+                                            : `class="fw-bold text-muted disabled-link"`}
+                                        class="fw-bold"
+                                    >
+                                        ${article.title}
+                                    </a>
                                     <div class="text-danger small">
                                         <strong>Chủ đề:</strong>
                                         ${article.topic?.name ?? 'Không có chủ đề'}
@@ -613,11 +622,7 @@
                                     <iconify-icon icon="solar:settings-bold" class="fs-5"></iconify-icon>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li>
-                                        <a href="" class="dropdown-item text-info">
-                                            <iconify-icon icon="solar:eye-broken" class="me-1"></iconify-icon> Chi tiết
-                                        </a>
-                                    </li>
+
                                     <li>
                                         <a href="/admin/news/edit/${article.id}" class="dropdown-item text-warning">
                                             <iconify-icon icon="solar:pen-2-broken" class="me-1"></iconify-icon> Sửa

@@ -45,7 +45,8 @@
                         <h4 class="card-title col-3">Thùng rác tài khoản</h4>
                         <div class="col-9 gap-2">
 
-                            <form method="GET" action="{{ route('admin.account.trash') }}"
+                            <form id="trashFilterForm" method="GET"
+                                action="{{ route('admin.account.trash') }}"
                                 class="form-inline d-flex gap-2 align-items-center">
 
                                 <div class="col-md-2    ">
@@ -83,7 +84,7 @@
 
                                 <button type="submit" class="btn btn-success">Lọc</button>
 
-                                <a href="{{ route('admin.account.trash') }}"><button class="btn btn-danger">Xóa</button></a>
+                                <button type="button" id="clearFilterListTrashBtn" class="btn btn-danger">Xóa</button>
                             </form>
 
                         </div>
@@ -124,7 +125,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td> 
+                                            <td>
                                                 {{ $data->birth_date ? \Carbon\Carbon::parse($data->birth_date)->format('d/m/Y') : '' }}
                                             </td>
                                             <td>{{ $data->email ?? '' }}</td>
@@ -195,9 +196,9 @@
                     <div class="col-12 text-center">
                         <script>
                             document.write(new Date().getFullYear())
-                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT THANH HÓA<iconify-icon
+                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC  THANH HÓA<iconify-icon
                             icon="iconamoon:heart-duotone" class="fs-18 align-middle text-danger"></iconify-icon> <a
-                            href="#" class="fw-bold footer-text" target="_blank">NHÓM 4</a>
+                            href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
                     </div>
                 </div>
             </div>
@@ -207,6 +208,14 @@
     </div>
 
     <script>
+          document.getElementById('clearFilterListTrashBtn').addEventListener('click', function() {
+            document.getElementById('trashFilterForm').reset();
+
+            // Redirect về URL gốc không có query
+            window.location.href = "{{ route('admin.account.trash') }}";
+
+        });
+
         function forceDelete(userId, userName) {
             Swal.fire({
                 title: `Bạn có chắc muốn xóa vĩnh viễn người dùng "${userName}"?`,

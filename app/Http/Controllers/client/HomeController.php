@@ -50,14 +50,16 @@ class HomeController extends Controller
 
         $news = news::where('show_on_homepage', 1)
             ->where('event_type', 'news')
+            ->where('publish_status', 'published')
+            ->where('is_visible', 1)
             ->orderBy('created_at', 'desc')
-            ->limit(4)
             ->get();
 
         $events = news::where('show_on_homepage', 1)
             ->where('event_type', 'event')
+            ->where('publish_status', 'published')
+            ->where('is_visible', 1)
             ->orderBy('created_at', 'desc')
-            ->limit(4)
             ->get();
         return view('client.home', compact('featuredCourses', 'news', 'events'));
     }

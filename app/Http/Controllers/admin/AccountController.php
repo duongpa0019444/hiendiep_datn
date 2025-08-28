@@ -87,7 +87,7 @@ class AccountController extends Controller
 
         if ($filter) {
             $query->where('role', $filter)
-                    ->orWhere('mission', $filter);
+                ->orWhere('mission', $filter);
         }
         if ($gender) {
             $query->where('gender', $gender);
@@ -151,7 +151,7 @@ class AccountController extends Controller
         if ($request->has('queryAccountRole') && $request->queryAccountRole !== null) {
             $keyword = $request->queryAccountRole;
             $query->where('name', 'like', '%' . $keyword . '%')
-                ->orWhere('snake_case', 'like', '%' . $keyword . '%' );
+                ->orWhere('snake_case', 'like', '%' . $keyword . '%');
         }
 
         $users = $query->orderBy('id', 'desc')->paginate(10);
@@ -258,7 +258,6 @@ class AccountController extends Controller
             'success' => true,
             'schedules' => $schedules,
         ]);
-
     }
 
     // Thêm người dùng
@@ -266,8 +265,8 @@ class AccountController extends Controller
     {
         // Kiểm tra quyền của người dùng hiện tại
         if (Auth::user()->role == 'staff') {
-                return redirect()->route('admin.account')
-                    ->with('error', 'Bạn không có quyền thực hiện thao tác này');
+            return redirect()->route('admin.account')
+                ->with('error', 'Bạn không có quyền thực hiện thao tác này');
         }
 
 
@@ -278,8 +277,8 @@ class AccountController extends Controller
     {
         // Kiểm tra quyền của người dùng hiện tại
         if (Auth::user()->role == 'staff') {
-                return redirect()->route('admin.account')
-                    ->with('error', 'Bạn không có quyền thực hiện thao tác này');
+            return redirect()->route('admin.account')
+                ->with('error', 'Bạn không có quyền thực hiện thao tác này');
         }
 
         $validated = $request->validate([
@@ -326,6 +325,12 @@ class AccountController extends Controller
         $validated['birth_date'] = $validated['birth_date'] ?: null;
 
         $user = User::create($validated);
+        $this->logAction(
+            'create',
+            User::class,
+            $user->id,
+            Auth::user()->name . ' đã thêm người dùng: ' . $user->name
+        );
 
 
         return redirect()->route('admin.account')->with('success', 'Thêm người dùng thành công');
@@ -400,6 +405,12 @@ class AccountController extends Controller
         $validated['birth_date'] = $validated['birth_date'] ?: null;
 
         $user = User::create($validated);
+        $this->logAction(
+            'create',
+            User::class,
+            $user->id,
+            Auth::user()->name . ' đã thêm ' . $role . ': ' . $user->name
+        );
 
 
         return redirect()->route('admin.account.list', ['role' => $role])->with('success', 'Thêm người dùng thành công');
@@ -467,14 +478,19 @@ class AccountController extends Controller
         }
 
         $user->update($validated);
+        $this->logAction(
+            'update',
+            User::class,
+            $user->id,
+            Auth::user()->name . ' đã cập nhật ' . $role . ': ' . $user->name
+        );
 
-        if(in_array($role, ['teacher', 'student'])){
+        if (in_array($role, ['teacher', 'student'])) {
             return redirect()->route('admin.account.list', ['role' => $role])
-            ->with('success', 'Cập nhật người dùng thành công');
-        }else{
+                ->with('success', 'Cập nhật người dùng thành công');
+        } else {
             return redirect()->route('admin.account')->with('success', 'Sửa người dùng thành công');
         }
-        
     }
 
 
@@ -508,7 +524,16 @@ class AccountController extends Controller
                         ->with('error', 'Không thể xóa người dùng vì đây là người dùng quản trị duy nhất');
                 }
             }
-            User::find($id)->delete();
+            $user = User::find($id);
+            $user->delete();
+
+            $this->logAction(
+                'delete',
+                User::class,
+                $user->id,
+                Auth::user()->name . ' đã xóa ' . $role . ': ' . $user->name
+            );
+
             if (in_array($role, ['student', 'teacher'])) {
                 return redirect()->route('admin.account.list', ['role' => $role])->with('success', 'Xóa người dùng thành công');
             } else {
@@ -542,25 +567,68 @@ class AccountController extends Controller
             $trashQuery->where('gender', $gender);
         }
 
-        $trash = $trashQuery->paginate(10);
+        $trash = $trashQuery->paginate(10)->appends($request->query());
 
         return view('admin.accounts.trash', compact('trash', 'query', 'role'));
     }
 
 
+    public function trashList($role, Request $request)
+    {
+        // dd($role);
+        $query = trim($request->query('accountTrashList'));
+        $gender = $request->query('genderList');
 
+        $trashQuery = User::onlyTrashed()->where('role', $role)->orderBy('deleted_at', 'desc');
+
+        if ($query) {
+            $trashQuery->where('name', 'like', "%$query%");
+        }
+
+        if ($gender) {
+            $trashQuery->where('gender', $gender);
+        }
+
+        $trash = $trashQuery->paginate(10)->appends($request->query());
+
+        return view('admin.accounts.trash-list', ['role' => $role, 'trash' => $trash]);
+    }
 
     public function restore($id)
     {
         $user = User::onlyTrashed()->findOrFail($id);
         $user->restore();
-        return redirect()->route('admin.account.trash')->with('success', 'Khôi phục tài khoản thành công');
+
+        $this->logAction(
+            'restore',
+            User::class,
+            $user->id,
+            Auth::user()->name . ' đã khôi phục ' . $user->role . ': ' . $user->name
+        );
+        if (in_array($user->role, ['student', 'teacher'])) {
+            return redirect()->route('admin.account.trash.list', $user->role)->with('success', 'Khôi phục tài khoản thành công');
+        } else {
+            return redirect()->route('admin.account.trash')->with('success', 'Khôi phục tài khoản thành công');
+        }
+
     }
 
     public function forceDelete($id)
     {
         $user = User::onlyTrashed()->findOrFail($id);
+
+        $this->logAction(
+            'forceDelete',
+            User::class,
+            $user->id,
+            Auth::user()->name . ' đã xóa vĩnh viễn ' . $user->role . ': ' . $user->name
+        );
         $user->forceDelete();
-        return redirect()->route('admin.account.trash')->with('success', 'Xóa vĩnh viễn tài khoản thành công');
+
+        if (in_array($user->role, ['student', 'teacher'])) {
+            return redirect()->route('admin.account.trash.list', $user->role)->with('success', 'Xóa vĩnh viễn tài khoản thành công');
+        } else {
+            return redirect()->route('admin.account.trash')->with('success', 'Xóa vĩnh viễn tài khoản thành công');
+        }
     }
 }

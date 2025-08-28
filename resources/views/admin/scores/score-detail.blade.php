@@ -115,7 +115,7 @@
                                             <td>{{ $score->class->name ?? '' }}</td>
                                             <td>{{ $score->class->course->name ?? '' }}</td>
                                             <td>{{ $score->score_type ?? '' }}</td> {{-- làm hàm trong model score --}}
-                                            <td>{{ $score->score }}</td>
+                                            <td>{{ $score->score ?? '' }}</td>
                                             <td>{{ \Carbon\Carbon::parse($score->exam_date)->format('d/m/Y') }}</td>
                                             <td>
                                                 <div class="d-flex gap-2">
@@ -160,9 +160,9 @@
                     <div class="col-12 text-center">
                         <script>
                             document.write(new Date().getFullYear())
-                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT THANH HÓA<iconify-icon
+                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC  THANH HÓA<iconify-icon
                             icon="iconamoon:heart-duotone" class="fs-18 align-middle text-danger"></iconify-icon> <a
-                            href="#" class="fw-bold footer-text" target="_blank">NHÓM 4</a>
+                            href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
                     </div>
                 </div>
             </div>
@@ -182,7 +182,8 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = `admin/score-delete/${id}`;
+                   window.location.href = "{{ route('admin.score.delete', '') }}/" + id;
+
                 }
             });
         }

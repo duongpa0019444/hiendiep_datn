@@ -472,10 +472,10 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12 text-center">
-                            2025 © DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT THANH HÓA
+                            2025 © DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC  THANH HÓA
                             <iconify-icon icon="iconamoon:heart-duotone"
                                 class="fs-18 align-middle text-danger"></iconify-icon>
-                            <a href="#" class="fw-bold footer-text" target="_blank">NHÓM 4</a>
+                            <a href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
                         </div>
                     </div>
                 </div>
@@ -970,8 +970,8 @@
                             form.closest('.question-item').remove();
 
                         },
-                        error: function() {
-                            Swal.fire('Lỗi!', 'Không thể xóa câu hỏi này.', 'error');
+                         error: function(xhr) {
+                            Swal.fire('Lỗi!', xhr.responseJSON?.error, 'error');
                         }
                     });
                 }

@@ -397,11 +397,15 @@ class ClassController extends Controller
         $classes = classes::where('classes.id', $classId)
             ->with(['course'])
             ->first();
+
+        //Kiểm tra xem nếu học sinh đã đóng tiền thì ko xóa mà sẽ lưu lại
         $course_payment = coursePayment::where('class_id', $classId)
             ->where('student_id', $studentId)
             ->where('course_id', $classes->course->id)
             ->first();
-        $course_payment->delete();
+        if ($course_payment->status = 'unpaid') {
+            $course_payment->delete();
+        }
 
         return redirect()->back()->with('success', 'Học sinh đã được xóa khỏi lớp thành công.');
     }
