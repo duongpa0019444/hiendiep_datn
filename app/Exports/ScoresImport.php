@@ -115,13 +115,14 @@ class ScoresImport implements ToCollection
                     'exam_date' => $examDate,
                 ]);
             } else {
-                Score::create([
+                $sclassNameIP = Score::create([
                     'student_id' => $studentId,
                     'class_id'   => $classId,
                     'score_type' => $scoreType ?? '',
                     'score'      => $scoreValue ?? '',
                     'exam_date'  => $examDate ?? '',
                 ]);
+                return $sclassNameIP;
             }
         }
     }

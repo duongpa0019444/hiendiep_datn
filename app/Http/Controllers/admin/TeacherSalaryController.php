@@ -15,13 +15,6 @@ class TeacherSalaryController extends Controller
 {
     public function index()
     {
-        // Kiểm tra quyền của người dùng hiện tại
-        if (Auth::user()->role == 'staff') {
-            
-            return redirect()->route('admin.dashboard')
-                    ->with('error', 'Bạn không có quyền quản trị này.');
-            
-        }
 
         $month = Carbon::now()->month;
         $year = Carbon::now()->year;
@@ -60,24 +53,18 @@ class TeacherSalaryController extends Controller
             ->whereIn('teacher_id', $salaries->pluck('class_id')->unique())
             ->get();
         $salaryStatus = DB::table('teacher_salaries')
-        ->where('month', $month)
-        ->where('year', $year)
-        ->first();
+            ->where('month', $month)
+            ->where('year', $year)
+            ->first();
 
-         $isLocked = $salaryStatus ? ($salaryStatus->active == 1) : false;
+        $isLocked = $salaryStatus ? ($salaryStatus->active == 1) : false;
 
         return view('admin.teacher_salaries.index', compact('salaries', 'payRates', 'shechedules', 'isLocked'));
     }
 
     public function getData(Request $request)
-    {   
-        // Kiểm tra quyền của người dùng hiện tại
-        if (Auth::user()->role == 'staff') {
-            
-            return redirect()->route('admin.dashboard')
-                    ->with('error', 'Bạn không có quyền quản trị này.');
-            
-        }
+    {
+
         $input = $request->input('month', now()->format('Y-m'));
         [$year, $month] = explode('-', $input);
         $year = (int)$year;
@@ -174,14 +161,7 @@ class TeacherSalaryController extends Controller
 
 
     public function save(Request $request)
-    {   
-        // Kiểm tra quyền của người dùng hiện tại
-        if (Auth::user()->role == 'staff') {
-            
-            return redirect()->route('admin.dashboard')
-                    ->with('error', 'Bạn không có quyền quản trị này.');
-            
-        }
+    {
         Log::debug('Saving salaries: ', $request->all()); // <- debug dữ liệu gửi lên
 
 
@@ -215,18 +195,19 @@ class TeacherSalaryController extends Controller
             );
         }
 
+        $this->logAction(
+            'addSalaries',
+            teacher_salaries::class,
+            null,
+            Auth::user()->name . ' đã thêm bảng lương mới cho tháng ' . $month . ' năm ' . $year
+        );
+
         return response()->json(['success' => true]);
     }
 
     public function updatePayment(Request $request)
     {
-        // Kiểm tra quyền của người dùng hiện tại
-        if (Auth::user()->role == 'staff') {
-            
-            return redirect()->route('admin.dashboard')
-                    ->with('error', 'Bạn không có quyền quản trị này.');
-            
-        }
+
         $salary = teacher_salaries::find($request->salary_id);
 
         if (!$salary) {
@@ -245,26 +226,25 @@ class TeacherSalaryController extends Controller
 
         $salary->save();
 
-       return response()->json([
-                    'success' => true,
-                    'paid' => $salary->paid,
-                    'payment_date' => $salary->payment_date, // dạng YYYY-MM-DD
-                    ]);
+        return response()->json([
+            'success' => true,
+            'paid' => $salary->paid,
+            'payment_date' => $salary->payment_date, // dạng YYYY-MM-DD
+        ]);
     }
 
 
     public function filter(Request $request)
-    {   
+    {
         // Kiểm tra quyền của người dùng hiện tại
         if (Auth::user()->role == 'staff') {
-            
+
             return redirect()->route('admin.dashboard')
-                    ->with('error', 'Bạn không có quyền quản trị này.');
-            
+                ->with('error', 'Bạn không có quyền quản trị này.');
         }
         $query = DB::table('teacher_salaries as ts')
             ->join('users as u', 'u.id', '=', 'ts.teacher_id');
-           $month = null;
+        $month = null;
         $year = null;
         // Nếu có tháng, lấy khoảng ngày tháng
         if ($request->filled('month')) {
@@ -345,67 +325,67 @@ class TeacherSalaryController extends Controller
     }
 
     public function lock(Request $request)
-        {
-            $request->validate([
-                'month' => 'required|integer|min:1|max:12',
-                'year'  => 'required|integer|min:2000'
+    {
+        $request->validate([
+            'month' => 'required|integer|min:1|max:12',
+            'year'  => 'required|integer|min:2000'
+        ]);
+
+        $month = (int)$request->month;
+        $year  = (int)$request->year;
+
+        // Kiểm tra nếu chưa có bảng lương của tháng/năm này
+        $hasSalary = DB::table('teacher_salaries')
+            ->where('month', $request->month)
+            ->where('year', $request->year)
+            ->exists();
+
+        if (!$hasSalary) {
+            return response()->json([
+                'success' => false,
+                'message' => "Không tìm thấy bảng lương tháng {$request->month}/{$request->year}."
             ]);
+        }
 
-            $month = (int)$request->month;
-             $year  = (int)$request->year;
+        // Kiểm tra nếu đã chốt trước đó
+        $isLocked = DB::table('teacher_salaries')
+            ->where('month', $request->month)
+            ->where('year', $request->year)
+            ->where('active', 1)
+            ->exists();
 
-            // Kiểm tra nếu chưa có bảng lương của tháng/năm này
-            $hasSalary = \DB::table('teacher_salaries')
-                ->where('month', $request->month)
-                ->where('year', $request->year)
-                ->exists();
+        if ($isLocked) {
+            return response()->json([
+                'success' => false,
+                'message' => "Bảng lương tháng {$request->month}/{$request->year} đã được chốt trước đó."
+            ]);
+        }
 
-            if (!$hasSalary) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Không tìm thấy bảng lương tháng {$request->month}/{$request->year}."
-                ]);
-            }
+        // 🔹 Kiểm tra nếu có bản ghi chưa thanh toán (payment_status != 'paid')
+        $hasUnpaid = DB::table('teacher_salaries')
+            ->where('month', $request->month)
+            ->where('year', $request->year)
+            ->where('paid',  0)
+            ->exists();
 
-            // Kiểm tra nếu đã chốt trước đó
-            $isLocked = \DB::table('teacher_salaries')
-                ->where('month', $request->month)
-                ->where('year', $request->year)
-                ->where('active', 1)
-                ->exists();
+        if ($hasUnpaid) {
+            return response()->json([
+                'success' => false,
+                'message' => "Không thể chốt vì vẫn còn giáo viên chưa được thanh toán lương tháng {$request->month}/{$request->year}."
+            ]);
+        }
 
-            if ($isLocked) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Bảng lương tháng {$request->month}/{$request->year} đã được chốt trước đó."
-                ]);
-            }
+        // Chốt bảng lương
+        DB::table('teacher_salaries')
+            ->where('month', $request->month)
+            ->where('year', $request->year)
+            ->update(['active' => 1]);
+        $startOfMonth = Carbon::create($year, $month, 1)->startOfMonth()->toDateString();
+        $endOfMonth   = Carbon::create($year, $month, 1)->endOfMonth()->toDateString();
 
-            // 🔹 Kiểm tra nếu có bản ghi chưa thanh toán (payment_status != 'paid')
-            $hasUnpaid = \DB::table('teacher_salaries')
-                ->where('month', $request->month)
-                ->where('year', $request->year)
-                ->where('paid',  0)
-                ->exists();
-
-            if ($hasUnpaid) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Không thể chốt vì vẫn còn giáo viên chưa được thanh toán lương tháng {$request->month}/{$request->year}."
-                ]);
-            }
-
-            // Chốt bảng lương
-            \DB::table('teacher_salaries')
-                ->where('month', $request->month)
-                ->where('year', $request->year)
-                ->update(['active' => 1]);
-             $startOfMonth = Carbon::create($year, $month, 1)->startOfMonth()->toDateString();
-            $endOfMonth   = Carbon::create($year, $month, 1)->endOfMonth()->toDateString();
-
-            $salaries = DB::table('teacher_salaries as ts')
-                ->join('users as u', 'u.id', '=', 'ts.teacher_id')
-                ->leftJoin(DB::raw("
+        $salaries = DB::table('teacher_salaries as ts')
+            ->join('users as u', 'u.id', '=', 'ts.teacher_id')
+            ->leftJoin(DB::raw("
                     (
                         SELECT t1.*
                         FROM teacher_salary_rules t1
@@ -418,33 +398,40 @@ class TeacherSalaryController extends Controller
                         ) t2 ON t1.teacher_id = t2.teacher_id AND t1.effective_date = t2.effective_date
                     ) as tsr
                 "), 'ts.teacher_id', '=', 'tsr.teacher_id')
-                ->where('ts.month', $month)
-                ->where('ts.year', $year)
-                ->select(
-                    'ts.*',
-                    'u.name as teacher_name',
-                    'u.phone as teacher_phone',
-                    'tsr.pay_rate' // LƯU Ý: lấy từ tsr như filter()
-                )
-                ->get();
+            ->where('ts.month', $month)
+            ->where('ts.year', $year)
+            ->select(
+                'ts.*',
+                'u.name as teacher_name',
+                'u.phone as teacher_phone',
+                'tsr.pay_rate' // LƯU Ý: lấy từ tsr như filter()
+            )
+            ->get();
 
-            return response()->json([
-                'success' => true,
-                'message' => "Đã chốt bảng lương tháng {$request->month}/{$request->year}",
-                'data' => $salaries
-            ]);
-        }
-    public function unlock(Request $request)
-        {
-          $request->validate([
-        'month' => 'required|integer|min:1|max:12',
-        'year'  => 'required|integer|min:2000'
+        $this->logAction(
+            'lockSalary',
+            teacher_salaries::class,
+            null,
+            Auth::user()->name . ' đã chốt bảng lương cho tháng ' . $month . ' năm ' . $year
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => "Đã chốt bảng lương tháng {$request->month}/{$request->year}",
+            'data' => $salaries
         ]);
-         $month = (int)$request->month;
-         $year  = (int)$request->year;
+    }
+    public function unlock(Request $request)
+    {
+        $request->validate([
+            'month' => 'required|integer|min:1|max:12',
+            'year'  => 'required|integer|min:2000'
+        ]);
+        $month = (int)$request->month;
+        $year  = (int)$request->year;
 
         // Kiểm tra có tồn tại bảng lương tháng/năm không
-        $exists = \DB::table('teacher_salaries')
+        $exists = DB::table('teacher_salaries')
             ->where('month', $request->month)
             ->where('year', $request->year)
             ->exists();
@@ -457,7 +444,7 @@ class TeacherSalaryController extends Controller
         }
 
         // Kiểm tra xem đã chốt chưa
-        $isLocked = \DB::table('teacher_salaries')
+        $isLocked = DB::table('teacher_salaries')
             ->where('month', $request->month)
             ->where('year', $request->year)
             ->where('active', 1)
@@ -471,18 +458,18 @@ class TeacherSalaryController extends Controller
         }
 
         // Cập nhật tất cả record cùng tháng/năm
-        \DB::table('teacher_salaries')
+        DB::table('teacher_salaries')
             ->where('month', $request->month)
             ->where('year', $request->year)
             ->update(['active' => 0]);
 
-            
-            $startOfMonth = Carbon::create($year, $month, 1)->startOfMonth()->toDateString();
-            $endOfMonth   = Carbon::create($year, $month, 1)->endOfMonth()->toDateString();
 
-            $salaries = DB::table('teacher_salaries as ts')
-                ->join('users as u', 'u.id', '=', 'ts.teacher_id')
-                ->leftJoin(DB::raw("
+        $startOfMonth = Carbon::create($year, $month, 1)->startOfMonth()->toDateString();
+        $endOfMonth   = Carbon::create($year, $month, 1)->endOfMonth()->toDateString();
+
+        $salaries = DB::table('teacher_salaries as ts')
+            ->join('users as u', 'u.id', '=', 'ts.teacher_id')
+            ->leftJoin(DB::raw("
                     (
                         SELECT t1.*
                         FROM teacher_salary_rules t1
@@ -495,21 +482,64 @@ class TeacherSalaryController extends Controller
                         ) t2 ON t1.teacher_id = t2.teacher_id AND t1.effective_date = t2.effective_date
                     ) as tsr
                 "), 'ts.teacher_id', '=', 'tsr.teacher_id')
-                ->where('ts.month', $month)
-                ->where('ts.year', $year)
-                ->select(
-                    'ts.*',
-                    'u.name as teacher_name',
-                    'u.phone as teacher_phone',
-                    'tsr.pay_rate' // LƯU Ý: lấy từ tsr như filter()
-                )
-                ->get();
+            ->where('ts.month', $month)
+            ->where('ts.year', $year)
+            ->select(
+                'ts.*',
+                'u.name as teacher_name',
+                'u.phone as teacher_phone',
+                'tsr.pay_rate' // LƯU Ý: lấy từ tsr như filter()
+            )
+            ->get();
+        $this->logAction(
+            'unlockSalary',
+            teacher_salaries::class,
+            null,
+            Auth::user()->name . ' đã mở khóa bảng lương cho tháng ' . $month . ' năm ' . $year
+        );
 
-            return response()->json([
-                'success' => true,
-                'message' => "Đã mở khóa bảng lương tháng {$request->month}/{$request->year}.",
-                'data' => $salaries
-            ]);
+        return response()->json([
+            'success' => true,
+            'message' => "Đã mở khóa bảng lương tháng {$request->month}/{$request->year}.",
+            'data' => $salaries
+        ]);
+    }
+
+    public function updateSalary(Request $request)
+    {
+        $salary = teacher_salaries::findOrFail($request->salary_id);
+
+        // $sum = $request->amount - $salary->bonus;
+        // $hieu = $request->amount - $salary->penalty;
+
+        if ($request->type === 'bonus') {
+            $diff = $request->amount - $salary->bonus; // chênh lệch bonus
+            $salary->bonus = $request->amount;
+            $salary->total_salary += $diff; // bonus tăng -> tổng tăng
+        } elseif ($request->type === 'penalty') {
+            $diff = $request->amount - $salary->penalty; // chênh lệch penalty
+            $salary->penalty = $request->amount;
+            $salary->total_salary -= $diff; // penalty tăng -> tổng giảm
         }
 
+        $salary->save();
+
+        $this->logAction(
+            'editSalaries',
+            teacher_salaries::class,
+            null,
+            Auth::user()->name . ' đã sửa bảng lương mới cho tháng ' . $salary->month . ' năm ' . $salary->year
+        );
+
+        return response()->json([
+            'success' => true,
+            'new_value' => number_format(
+                $request->type === 'bonus' ? $salary->bonus : $salary->penalty,
+                0,
+                ',',
+                '.'
+            ),
+            'new_total' => number_format($salary->total_salary, 0, ',', '.')
+        ]);
+    }
 }

@@ -15,7 +15,8 @@
                 <h4>Thống kê đào tạo</h4>
                 <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
                     <!-- Nút chuyển năm -->
-                    <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center" id="prevYear">
+                    <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center"
+                        id="prevYear">
                         <i class="me-1">&laquo;</i> Năm trước
                     </button>
 
@@ -34,7 +35,12 @@
             <!-- Biểu đồ -->
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-3">Số lượng học sinh đăng ký theo khóa theo tháng</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="card-title mb-0">Số lượng học sinh đăng ký theo khóa theo tháng</h4>
+                        <button class="btn btn-sm btn-primary btn-export-student-enroll-chart">
+                            <i class="fas fa-file-export me-1"></i> Xuất báo cáo
+                        </button>
+                    </div>
                     <div id="student-enroll-chart" class="apex-charts"></div>
                 </div>
 
@@ -60,7 +66,12 @@
             <!-- Horizontal Bar Chart -->
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-3">Thống kê số buổi dạy của giáo viên theo tháng</h4>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h4 class="card-title">Thống kê số buổi dạy của giáo viên theo tháng</h4>
+                        <button class="btn btn-sm btn-primary btn-export-teaching-report">
+                            <i class="fas fa-file-export me-1"></i> Xuất báo cáo
+                        </button>
+                    </div>
                     <div id="teaching-chart" class="apex-charts"></div>
                 </div>
             </div>
@@ -77,7 +88,13 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-3">Tổng hợp tình trạng lớp học</h4>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <h4 class="card-title">Tổng hợp tình trạng lớp học</h4>
+                        <button class="btn btn-sm btn-primary btn-export-class-report">
+                            <i class="fas fa-file-export me-1"></i> Xuất báo cáo
+                        </button>
+                    </div>
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <div id="class-status-pie" class="apex-charts mt-4"></div>
@@ -117,7 +134,12 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-3">Thống kê số lượng học sinh trong từng lớp</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="card-title">Thống kê số lượng học sinh trong từng lớp</h4>
+                        <button class="btn btn-sm btn-primary btn-export-student-class-chart">
+                            <i class="fas fa-file-export me-1"></i> Xuất báo cáo
+                        </button>
+                    </div>
                     <div id="student-class-bar" class="apex-charts"></div>
                     <div id="pagination-student-classes" class="card-footer border-top">
 
@@ -127,7 +149,12 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-3">Thống kê điểm trung bình các lớp</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="card-title">Thống kê điểm trung bình các lớp</h4>
+                        <button class="btn btn-sm btn-primary btn-export-avgscore-class-chart">
+                            <i class="fas fa-file-export me-1"></i> Xuất báo cáo
+                        </button>
+                    </div>
                     <div id="avg-score-bar" class="apex-charts"></div>
                     <div id="pagination-diemtb-lop" class="card-footer border-top">
 
@@ -187,6 +214,7 @@
                 type: 'GET',
                 success: function(res) {
                     console.log(res);
+                    // ExcelcharThongKeHsDK = res;
                     renderThongKeHsDK(res);
                 },
                 error: function(xhr) {
@@ -352,6 +380,24 @@
 
         }
 
+        // Xuất báo cáo số học đk theo khóa học theo tháng
+        $(document).on('click', '.btn-export-student-enroll-chart', function(e) {
+            e.preventDefault();
+
+            
+            console.log(year);
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            window.location.href = `/admin/xuat-bao-cao/hoc-sinh-dang-ky/${year}`;
+            Swal.close();
+        });
 
 
 
@@ -412,6 +458,25 @@
             chartBuoiDay = new ApexCharts(document.querySelector("#teaching-chart"), options);
             chartBuoiDay.render();
         }
+
+        // Xuất báo cáo số học đk theo khóa học theo tháng
+        $(document).on('click', '.btn-export-teaching-report', function(e) {
+            e.preventDefault();
+
+            
+            console.log(year);
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            window.location.href = `/admin/xuat-bao-cao/so-buoi-day-giao-vien/${year}`;
+            Swal.close();
+        });
 
 
 
@@ -565,6 +630,27 @@
 
         }
 
+        // Xuất báo cáo tổng hợp tình trạng lớp học
+        $(document).on('click', '.btn-export-class-report', function(e) {
+            e.preventDefault();
+
+            
+            console.log(year);
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            window.location.href = `/admin/xuat-bao-cao/tong-tinh-trang-lop-hoc/${year}`;
+            Swal.close();
+        });
+
+        
+
 
 
         // Tổng học sinh trong lớp học
@@ -632,6 +718,25 @@
                     console.error('Lỗi phân trang:', xhr.responseText);
                 }
             });
+        });
+
+        // Xuất báo cáo số học sinh trong lớp
+        $(document).on('click', '.btn-export-student-class-chart', function(e) {
+            e.preventDefault();
+
+            
+            console.log(year);
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            window.location.href = `/admin/xuat-bao-cao/so-hoc-sinh-trong-lop/${year}`;
+            Swal.close();
         });
 
 
@@ -722,6 +827,25 @@
                     console.error('Lỗi phân trang:', xhr.responseText);
                 }
             });
+        });
+
+        // Xuất báo cáo tổng hợp tình trạng lớp học
+        $(document).on('click', '.btn-export-avgscore-class-chart', function(e) {
+            e.preventDefault();
+
+            
+            console.log(year);
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            window.location.href = `/admin/xuat-bao-cao/diem-trung-binh-cac-lop/${year}`;
+            Swal.close();
         });
 
 
