@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
@@ -108,7 +109,16 @@ class ScoreController extends Controller
 
 
         $validated['class_id'] = $class_id;
-        Score::create($validated);
+        $score = Score::create($validated);
+        // Lấy tên học sinh từ bảng users
+        $studentName = User::where('id', $validated['student_id'])->value('name');
+
+        $this->logAction(
+            'create',
+            Score::class,
+            $score->id,
+            Auth::user()->name . ' đã thêm điểm ' . $score->score_type . ' cho học sinh: ' . $studentName
+        );
 
         $course_id = classes::find($class_id)?->courses_id;
 
@@ -169,6 +179,14 @@ class ScoreController extends Controller
         }
 
         $score->update($validated);
+        // Lấy tên học sinh từ bảng users
+        $studentName = User::where('id', $validated['student_id'])->value('name');
+        $this->logAction(
+            'update',
+            Score::class,
+            $score->id,
+            Auth::user()->name . ' đã cập nhật điểm ' . $score->score_type . ' cho học sinh: ' . $studentName
+        );
 
         $course_id = classes::findOrFail($class_id)?->courses_id;
 
@@ -183,11 +201,20 @@ class ScoreController extends Controller
     {
 
         $errors = [];
-        Excel::import(new ScoresImport($errors), $request->file('file'));
+        $sclassNameIP = null;
+        $score = Excel::import(new ScoresImport($errors), $request->file('file'));
+        // dd($score);
 
         if (!empty($errors)) {
             return back()->with('error', $errors);
         }
+
+        $this->logAction(
+            'import',
+            Score::class,
+            null,
+            Auth::user()->name . ' đã thêm điểm từ file excel cho lớp ' . $sclassNameIP
+        );
         return back()->with('success', 'Đã nhập điểm thành công!');
     }
 
@@ -250,6 +277,16 @@ class ScoreController extends Controller
         if ($score) {
             $class_id = $score->class_id;
             $course_id = classes::find($class_id)?->courses_id;
+
+            // Lấy tên học sinh từ bảng users
+            $studentName = User::where('id', $score->student_id)->value('name');
+            $this->logAction(
+                'delete',
+                Score::class,
+                $score->id,
+                Auth::user()->name . ' đã xóa điểm ' . $score->score_type . ' cho học sinh: ' . $studentName
+            );
+
             $score->delete();
             return redirect()->route('admin.score.detail', ['class_id' => $class_id, 'course_id' => $course_id])->with('success', 'Đã xóa điểm thành công!');
         }

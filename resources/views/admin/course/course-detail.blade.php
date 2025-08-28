@@ -12,7 +12,8 @@
                 <nav aria-label="breadcrumb p-0">
                     <ol class="breadcrumb py-0">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('admin.course-list') }}">Quản lí
+                        <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('admin.course-list') }}">Quản
+                                lí
                                 khóa học</a> </li>
                         <li class="breadcrumb-item active" aria-current="page">Chi tiết khóa học </li>
                     </ol>
@@ -43,7 +44,9 @@
                                         <tr>
                                             <th scope="col">Tên Bài Giảng </th>
                                             <th scope="col">tài Liệu Học </th>
-                                            <th scope="col">Bài Tập</th>
+                                            <th scope="col">Ngày Tạo</th>
+                                            <th scope="col">Ngày Cập Nhật</th>
+
                                             <th scope="col">hành Động </th>
                                             {{-- <th scope="col"></th> --}}
                                         </tr>
@@ -57,16 +60,17 @@
                                                             icon="mdi:file-pdf-box" class="text-danger"
                                                             style="font-size: 40px;"></iconify-icon>
                                                     </a></td>
-                                                <td>
-                                                    @if ($lession->quizz)
-                                                        <a
-                                                            href="{{ route('admin.quizzes.detail', ['id' => $lession->quizz->id]) }}">
-                                                            {{ $lession->quizz->title }}
-                                                        </a>
-                                                    @else
-                                                        <span class="text-muted">Chưa có bài tập</span>
-                                                    @endif
-                                                </td>
+                                                <td>{{ $lession->created_at->format('d/m/Y H:i') }}</td>
+                                                <td>{{ $lession->updated_at->format('d/m/Y H:i') }}</td>
+                                                {{-- @if ($lession->quizz)
+                                                    <a
+                                                        href="{{ route('admin.quizzes.detail', ['id' => $lession->quizz->id]) }}">
+                                                        {{ $lession->quizz->title }}
+                                                    </a>
+                                                @else
+                                                    <span class="text-muted">Chưa có bài tập</span>
+                                                @endif
+                                                </td>  --}}
 
                                                 <td>
                                                     <a href="{{ route('admin.lession-edit', ['course_id' => $course->id, 'id' => $lession->id]) }} "

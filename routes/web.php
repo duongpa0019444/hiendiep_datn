@@ -1,5 +1,10 @@
 <?php
 
+use App\Exports\TkDaoTaoExport1;
+use App\Exports\TkDaoTaoExport2;
+use App\Exports\TkDaoTaoExport3;
+use App\Exports\TkDaoTaoExport4;
+use App\Exports\TkDaoTaoExport5;
 use App\Http\Controllers\admin\AccountController;
 use App\Http\Controllers\admin\ActionLogController;
 use App\Http\Controllers\admin\AttendanceController;
@@ -97,6 +102,23 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/thong-ke-trang-thai-lop/{year}', [ThongKeController::class, 'statusClasses'])->name('admin.thongke.statusClasses');
     Route::get('/sl-hs-theo-lop/{year}', [ThongKeController::class, 'classStudentCounts'])->name('admin.thongke.classStudentCounts');
     Route::get('/diem-tb-theo-lop/{year}', [ThongKeController::class, 'classAverageScores'])->name('admin.thongke.classAverageScores');
+    // Xuất báo cáo học sinh đk theo khóa theo tháng 
+    Route::get('/xuat-bao-cao/hoc-sinh-dang-ky/{year}', function ($year) {
+        return Excel::download(new TkDaoTaoExport1($year), "bao_cao_hoc_sinh_dang_ky_$year.xlsx");
+    });
+    // Xuất báo cáo số buổi dạy
+    Route::get('/xuat-bao-cao/so-buoi-day-giao-vien/{year}', function ($year) {
+        return Excel::download(new TkDaoTaoExport2($year), "bao_cao_so_buoi_day_giao_vien_$year.xlsx");
+    });
+    Route::get('/xuat-bao-cao/tong-tinh-trang-lop-hoc/{year}', function ($year) {
+        return Excel::download(new TkDaoTaoExport3($year), "bao_cao_tong_tinh_trang_lop_hoc_$year.xlsx");
+    });
+    Route::get('/xuat-bao-cao/so-hoc-sinh-trong-lop/{year}', function ($year) {
+        return Excel::download(new TkDaoTaoExport4($year), "bao_cao_so_hoc_sinh_trong_lop_$year.xlsx");
+    });
+    Route::get('/xuat-bao-cao/diem-trung-binh-cac-lop/{year}', function ($year) {
+        return Excel::download(new TkDaoTaoExport5($year), "bao_cao_diem_trung_binh_cac_lop_$year.xlsx");
+    });
 
     //Thống kê tài chính
     Route::get('/statistics/finance/tong-quy-luong/{year}', [ThongKeController::class, 'salarystatistics'])->name('admin.statistics.finance.tong-quy-luong');
@@ -209,6 +231,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::post('/api/salary-data', [TeacherSalaryController::class, 'save'])->name('admin.teacher_salaries.save');
     Route::post('/admin/teacher-salaries/update-payment', [TeacherSalaryController::class, 'updatePayment'])->name('admin.teacher_salaries.upload');
     Route::get('/admin/teacher-salaries/filter', [TeacherSalaryController::class, 'filter'])->name('admin.teacher_salaries.filter');
+    Route::post('/update-salary', [TeacherSalaryController::class, 'updateSalary']);
 
 
     //Chi tiết lương giáo viên
@@ -289,6 +312,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/admin/schedules', [SchedulesController::class, 'index'])->name('admin.schedules.index');
     Route::get('/admin/schedules/{id}/create', [SchedulesController::class, 'create'])->name('admin.schedules.create');
     Route::post('/admin/schedules/store', [SchedulesController::class, 'store'])->name('admin.schedules.store');
+    Route::post('/admin/schedules/store-single', [SchedulesController::class, 'storeSingle'])->name('admin.schedules.store-single');
     Route::get('/schedules/{id}/edit', [SchedulesController::class, 'edit'])->name('admin.schedules.edit');
     Route::put('/schedules/{id}', [SchedulesController::class, 'update'])->name('admin.schedules.update');
     // Route::put('/admin/schedules/{id}', [SchedulesController::class, 'update'])->name('admin.schedules.update');
@@ -300,17 +324,16 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     //
     Route::get('classes/{id}/data', [SchedulesController::class, 'getClassData'])->name('admin.classes.show');
 
-    // Quản lý điểm danh
+    // Điểm danh
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('admin.attendance.index');
     Route::get('/attendance/getSchedules', [AttendanceController::class, 'getSchedules'])->name('admin.attendance.getSchedules');
-
+    Route::get('/attendance/class/{classId}/schedules', [AttendanceController::class, 'getSchedulesByClass'])->name('admin.attendance.getSchedulesByClass');
+    Route::get('/attendance/class/{classId}/detail', [AttendanceController::class, 'getClassDetail'])->name('admin.attendance.getClassDetail');
     Route::get('/attendance/schedules/{id}', [AttendanceController::class, 'attendanceClass'])->name('admin.attendance.class');
-
+    
     // Mới thêm
-    Route::post('/attendance/summary', [AttendanceController::class, 'updateSummary'])->name('attendance.summary.update');
-    Route::post('/attendance/save', [AttendanceController::class, 'saveAttendance'])->name('attendance.save');
-    Route::get('/attendance/export', [AttendanceController::class, 'exportAttendance'])->name('attendance.export');
-    Route::get('/attendance/schedules/{id}', [AttendanceController::class, 'attendanceClass'])->name('admin.attendance.class');
+    Route::post('/attendance/summary', [AttendanceController::class, 'updateSummary'])->name('admin.attendance.summary.update');
+    Route::post('/attendance/save', [AttendanceController::class, 'saveAttendance'])->name('admin.attendance.save');
 
 
     // Quản lý bài viết & tin tức
@@ -459,8 +482,6 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::post('/actions/log/delete', [ActionLogController::class, 'delete'])->name('admin.actions.log.delete');
     Route::post('/actions/log/delete/{id}', [ActionLogController::class, 'delete'])->name('admin.actions.log.delete');
     Route::get('/actions/log/view/{id}', [ActionLogController::class, 'viewLog'])->name('admin.actions.log.view');
-
-
 });
 
 
@@ -471,14 +492,19 @@ Route::middleware([CheckRoleClient::class . ':student,teacher'])->group(function
 
     Route::get('information', [UserController::class, 'information'])->name('client.information');
 
+    // Lớp học
+    Route::get('classroom', [UserController::class, 'classroom'])->name('client.classroom');
+    Route::get('courses/detail/{course}', [UserController::class, 'showCourse'])->name('teacher.courses.show');
+
+
     // Lịch học và điểm danh
     Route::get('schedule', [UserController::class, 'schedule'])->name('client.schedule');
 
     // Mới thêm
-    Route::get('schedule/{id}/attendance', [ClientAttendanceController::class, 'attendanceClass'])->name('admin.attendance.class');
-    Route::post('schedule/attendance/summary', [ClientAttendanceController::class, 'updateSummary'])->name('attendance.summary.update');
+    Route::get('schedule/{id}/attendance', [ClientAttendanceController::class, 'attendanceClass'])->name('client.attendance.class');
+    Route::post('schedule/attendance/summary', [ClientAttendanceController::class, 'updateSummary'])->name('client.attendance.summary.update');
     Route::post('schedule/attendance/save', [ClientAttendanceController::class, 'saveAttendance'])->name('client.attendance.save');
-    Route::get('schedule/attendance/export', [ClientAttendanceController::class, 'exportAttendance'])->name('attendance.export');
+    Route::get('schedule/attendance/export', [ClientAttendanceController::class, 'exportAttendance'])->name('client.attendance.export');
 
 
 
