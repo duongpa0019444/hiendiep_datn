@@ -293,12 +293,12 @@ class SchedulesController extends Controller
             ->count();
 
         // Kiểm tra nếu số buổi vượt quá giới hạn của khóa học
-        if ($currentSessionCount >= $course->total_sessions) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Số buổi học đã đạt giới hạn của khóa học (' . $course->total_sessions . ' buổi).'
-            ], 422);
-        }
+        // if ($currentSessionCount >= $course->total_sessions) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Số buổi học đã đạt giới hạn của khóa học (' . $course->total_sessions . ' buổi).'
+        //     ], 422);
+        // }
 
         // Kiểm tra trùng lịch giáo viên
         $teacherConflict = DB::table('schedules')
