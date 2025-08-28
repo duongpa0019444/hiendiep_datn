@@ -14,15 +14,17 @@ class Schedule extends Model
         'start_time',
         'end_time',
         'teacher_id',
-        'room',
+        'room_id',
         'status'
     ];
 
     protected $casts = [
-        'date' => 'date',
-        'start_time' => 'datetime:H:i:s',
-        'end_time' => 'datetime:H:i:s',
-    ];
+    'date' => 'date',
+    'start_time' => 'string',
+    'end_time' => 'string',
+
+];
+
 
     public function class()
     {

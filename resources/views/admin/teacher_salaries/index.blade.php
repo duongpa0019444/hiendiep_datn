@@ -1,5 +1,5 @@
 @extends('admin.admin')
-@section('title', 'Trang admin')
+@section('title', 'Quản lí lương giáo viên')
 @section('description', '')
 @section('content')
     <div class="page-content">
@@ -140,6 +140,19 @@
                             <iconify-icon icon="mdi:printer" class="fs-20 align-middle me-1"></iconify-icon>
                             In bảng lương
                         </button>
+                        <script>
+                            let isLocked = {{ $isLocked ? 'true' : 'false' }};
+                        </script>
+                        <button type="button" class="btn btn-outline-danger m-1" id="lockSalaryBtn">
+                            <iconify-icon icon="mdi:lock" class="fs-20 align-middle me-1"></iconify-icon>
+                            Chốt bảng lương
+                        </button>
+                        @if(Auth::user()->isAdmin())
+                        <button type="button" class="btn btn-outline-success m-1 d-none" id="unlockSalaryBtn">
+                            <iconify-icon icon="mdi:lock-open" class="fs-20 align-middle me-1"></iconify-icon>
+                            Mở khóa bảng lương
+                        </button>
+                        @endif
                     </div>
 
                 </div>
@@ -223,7 +236,8 @@
                                 </thead>
                                 <tbody id="body-teacher_salaries">
                                     @foreach ($salaries as $salary)
-                                        <tr>
+                                        <tr data-month="{{ $salary->month }}" 
+                                            data-year="{{ $salary->year }}">
                                             <td class="text-start detail_ruler">
                                                 <strong class="teacher-detail" style="cursor: pointer;"
                                                     data-bs-toggle="tooltip" title="Chi tiết bảng lương">
@@ -251,35 +265,39 @@
                                             <td class="text-end fw-bold text-success">
                                                 {{ number_format($salary->total_salary, 0, ',', '.') }} VNĐ
                                             </td>
-                                            <td class="text-center">
-                                                <select class="form-select payment-status-select"
-                                                    data-salary-id="{{ $salary->id }}">
-                                                    <option value="0" {{ $salary->paid == 0 ? 'selected' : '' }}>
-                                                        Chưa thanh toán
-                                                    </option>
-                                                    <option value="1" {{ $salary->paid == 1 ? 'selected' : '' }}>
-                                                        Đã thanh toán
-                                                    </option>
-                                                </select>
-                                            </td>
-
-                                            <td class="text-center">
-                                                @if ($salary->payment_date)
-                                                    <span
-                                                        class="badge bg-success">{{ \Carbon\Carbon::parse($salary->payment_date)->format('d/m/Y') }}</span>
+                                            <td class="text-center status-cell">
+                                                @if ($salary->active == 1)
+                                                    <span class="badge bg-secondary">Đã chốt</span>
                                                 @else
-                                                    <span class="badge bg-danger">Chưa thanh toán</span>
+                                                    <select class="form-select payment-status-select"
+                                                        data-salary-id="{{ $salary->id }}"
+                                                        data-original="{{ $salary->paid }}">
+                                                        <option value="0" {{ $salary->paid == 0 ? 'selected' : '' }}>Chưa thanh toán</option>
+                                                        <option value="1" {{ $salary->paid == 1 ? 'selected' : '' }}>Đã thanh toán</option>
+                                                    </select>
                                                 @endif
                                             </td>
-                                            <td class="text-start note-cell" data-id="{{ $salary->id }}"
-                                                data-note="{{ $salary->note ?? '' }}" style="cursor: pointer;">
-                                                {{ $salary->note ?? 'Thêm' }}
+
+                                          <td class="text-center payment-date-cell" data-salary-id="{{ $salary->id }}" >
+                                                    @if ($salary->payment_date)
+                                                        <span class="badge bg-success">
+                                                            {{ \Carbon\Carbon::parse($salary->payment_date)->format('d/m/Y') }}
+                                                        </span>
+                                                    @else
+                                                        <span class="badge bg-danger">Chưa thanh toán</span>
+                                                    @endif
+                                                </td>
+                                           <td class="note-cell"
+                                                data-id="{{ $salary->id }}"
+                                                data-note="{{ $salary->note }}"
+                                                data-active="{{ $salary->active }}"
+                                                style="cursor: {{ $salary->active == 1 ? 'not-allowed' : 'pointer' }}">
+                                                {{ $salary->note ?: 'Thêm' }}
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
-
                         </div>
                     </div>
                     <!-- end table-responsive -->
@@ -402,6 +420,78 @@
             </div>
         </div>
     </div>
+    <!-- Modal Chốt bảng lương -->
+    <div class="modal fade" id="lockSalaryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chốt bảng lương</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="lockMonth" class="form-label">Tháng</label>
+                        <select id="lockMonth" class="form-select">
+                            @for ($m = 1; $m <= 12; $m++)
+                                <option value="{{ $m }}">{{ $m }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="lockYear" class="form-label">Năm</label>
+                        <select id="lockYear" class="form-select">
+                            @for ($y = date('Y'); $y >= 2020; $y--)
+                                <option value="{{ $y }}">{{ $y }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="confirmLockSalaryBtn">
+                        <iconify-icon icon="mdi:lock"></iconify-icon> Chốt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="unlockSalaryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mở khóa bảng lương</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="unlockMonth" class="form-label">Tháng</label>
+                    <select id="unlockMonth" class="form-select">
+                        @for ($m = 1; $m <= 12; $m++)
+                            <option value="{{ $m }}">{{ $m }}</option>
+                        @endfor
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="unlockYear" class="form-label">Năm</label>
+                    <select id="unlockYear" class="form-select">
+                        @for ($y = date('Y'); $y >= 2020; $y--)
+                            <option value="{{ $y }}">{{ $y }}</option>
+                        @endfor
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-success" id="confirmUnlockSalaryBtn">
+                    <iconify-icon icon="mdi:lock-open"></iconify-icon> Mở khóa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 
@@ -423,26 +513,47 @@
 
             data.forEach(salary => {
                 html += `
-                                            <tr>
+                                            <tr data-month="${salary.month}" 
+                                            data-year="${salary.year}">
                                                 <td class="text-start">
-                                                    <strong>${salary.teacher_name}</strong><br>
+                                                    <strong>${salary.teacher_name}</strong><br> 
+                                                    <iconify-icon icon="solar:phone-broken" class="fs-16 me-1"></iconify-icon>
                                                     <span class="text-muted">${salary.teacher_phone}</span>
                                                 </td>
+
                                                 <td class="text-center">Tháng ${salary.month} / ${salary.year}</td>
                                                 <td class="text-center">${salary.total_hours} giờ</td>
                                                 <td class="text-end">${Number(salary.pay_rate).toLocaleString('vi-VN')} VNĐ/giờ</td>
                                                 <td class="text-end text-success">+${Number(salary.bonus).toLocaleString('vi-VN')} VNĐ</td>
                                                 <td class="text-end text-danger">-${Number(salary.penalty).toLocaleString('vi-VN')} VNĐ</td>
                                                 <td class="text-end fw-bold text-success">${Number(salary.total_salary).toLocaleString('vi-VN')} VNĐ</td>
-                                                <td class="text-center">
-                                                    <select class="form-select payment-status-select" data-salary-id="${salary.id}">
-                                                        <option value="0" ${salary.paid == 0 ? 'selected' : ''}>Chưa thanh toán</option>
-                                                        <option value="1" ${salary.paid == 1 ? 'selected' : ''}>Đã thanh toán</option>
-                                                    </select>
+
+                                                <td class="text-center status-cell">
+                                                    ${salary.active == 1 
+                                                        ? '<span class="badge bg-secondary">Đã chốt</span>' 
+                                                        : `<select class="form-select payment-status-select" data-salary-id="${salary.id}" data-original="${salary.paid}">
+                                                                <option value="0" ${salary.paid == 0 ? 'selected' : ''}>Chưa thanh toán</option>
+                                                                <option value="1" ${salary.paid == 1 ? 'selected' : ''}>Đã thanh toán</option>
+                                                        </select>`
+                                                    }
                                                 </td>
-                                                <td class="text-center">${salary.payment_date ? salary.payment_date : '<span class="badge bg-danger">Chưa thanh toán</span>'}</td>
-                                                <td class="text-start">${salary.note || ''}</td>
+
+                                                <td class="text-center payment-date-cell" data-salary-id="${salary.id}">
+                                                    ${salary.paid == 1 && salary.payment_date 
+                                                        ? `<span class="badge bg-success">${moment(salary.payment_date).format('DD/MM/YYYY')}</span>` 
+                                                        : '<span class="badge bg-danger">Chưa thanh toán</span>'
+                                                    }
+                                                </td>
+
+                                                <td class="note-cell"
+                                                    data-id="${salary.id}"
+                                                    data-note="${salary.note}"
+                                                    data-active="${salary.active}"
+                                                    style="cursor: ${salary.active == 1 ? 'not-allowed' : 'pointer'};">
+                                                    ${salary.note || 'Thêm'}
+                                                </td>
                                             </tr>
+
                                         `;
             });
 
@@ -478,7 +589,15 @@
                         if (res.success) {
                             console.log(res.data);
                             renderSalaryTable(res.data); // xử lý HTML lại
-                        }
+
+                                if (res.isLocked == 1) {
+                                    $('#lockSalaryBtn').addClass('d-none');
+                                    $('#unlockSalaryBtn').removeClass('d-none');
+                                } else {
+                                    $('#lockSalaryBtn').removeClass('d-none');
+                                    $('#unlockSalaryBtn').addClass('d-none');
+                                }
+                           }
                     },
                     error: function() {
                         alert("Lỗi khi lọc dữ liệu.");
@@ -562,9 +681,9 @@
                                                             <small class="text-muted">${teacher.teacher_phone}</small>
                                                         </td>
                                                         <td>${Number(teacher.pay_rate).toLocaleString('vi-VN')}</td>
-                                                        <td>${Number(teacher.total_hours).toFixed(2)}</td>
-                                                        <td><input type="number" class="form-control text-end" name="bonus[]" value="${teacher.bonus || 0}"></td>
-                                                        <td><input type="number" class="form-control text-end" name="penalty[]" value="${teacher.penalty || 0}"></td>
+                                                        <td>${Number(teacher.total_hours)}</td>
+                                                        <td><input type="text" class="form-control text-end" name="bonus[]" value="${Number(teacher.bonus || 0).toLocaleString('vi-VN')}"></td>
+                                                        <td><input type="text" class="form-control text-end" name="penalty[]" value="${Number(teacher.penalty || 0).toLocaleString('vi-VN')}"></td>
                                                         <td class="fw-bold text-success">${Number(teacher.total_salary).toLocaleString('vi-VN')}</td>
                                                     </tr>
                                                 `;
@@ -596,21 +715,22 @@
                     let salaries = [];
 
                     rows.each(function() {
-                        let row = $(this).closest('tr');
+                       let row = $(this).closest('tr');
 
                         // Nếu có hidden input cho teacher_id
                         let teacher_id = row.find('input[name="teacher_id[]"]').val();
 
                         // Lấy dữ liệu từ các cột hiển thị (text)
-                        let pay_rate = row.find('td').eq(1).text().trim() // cột thứ 2
-                        let total_hours = row.find('td').eq(2).text().trim() // cột thứ 3
+                        let pay_rate = parseFloat(row.find('td').eq(1).text().replace(/\D/g, '')) || 0;
+                        let total_hours = parseFloat(row.find('td').eq(2).text().replace(/\D/g, '')) || 0;
 
-                        // Lấy dữ liệu từ input bonus và penalty
-                        let bonus = row.find('input[name="bonus[]"]').val();
-                        let penalty = row.find('input[name="penalty[]"]').val();
+                        // Lấy dữ liệu từ input bonus và penalty (bỏ dấu phân cách)
+                        let bonus = parseFloat(row.find('input[name="bonus[]"]').val().replace(/,/g, '').replace(/\./g, '')) || 0;
+                        let penalty = parseFloat(row.find('input[name="penalty[]"]').val().replace(/,/g, '').replace(/\./g, '')) || 0;
 
-                        let total_salary = row.find('td').eq(5).text().trim();
-                        // Chuyển đổi dữ liệu sang định dạng số nếu cần
+                        // Lấy total salary (cũng bỏ định dạng trước khi parse)
+                        let total_salary = parseFloat(row.find('td').eq(5).text().replace(/,/g, '').replace(/\./g, '')) || 0;
+
 
                         salaries.push({
                             teacher_id,
@@ -668,27 +788,57 @@
         });
 
 
+       const numberFormatter = new Intl.NumberFormat('vi-VN');
 
+            function toMoneyNumber(str) {
+                if (!str) return 0;
+                return parseInt(str.replace(/\D/g, ''), 10) || 0;
+            }
 
+            // Chuyển từ "4,00" => 4.00  (giữ số thập phân)
+            function toHourNumber(str) {
+                if (!str) return 0;
+                return parseFloat(str.replace(',', '.')) || 0;
+            }
+        $(document).on('input', 'input[name="bonus[]"], input[name="penalty[]"]', function () {
+            let input = this;
 
-        // Cập nhật bonus và penalty
-        $(document).on('input', 'input[name="bonus[]"], input[name="penalty[]"]', function() {
+            // Lấy vị trí con trỏ hiện tại
+            let cursorPos = input.selectionStart;
+
+            // Lấy giá trị raw (chỉ số)
+            let rawValue = input.value.replace(/\D/g, '');
+
+            // Format lại
+            let formattedValue = rawValue ? numberFormatter.format(rawValue) : '';
+
+            // Tính toán độ chênh lệch độ dài
+            let diff = formattedValue.length - input.value.length;
+
+            // Gán lại giá trị
+            input.value = formattedValue;
+
+            // Cập nhật lại vị trí con trỏ
+            input.setSelectionRange(cursorPos + diff, cursorPos + diff);
+
+            // --- Tính lại lương ---
             let row = $(this).closest('tr');
 
-            // ✅ Lấy giá trị từ các ô td hiển thị
-            let pay_rate = parseFloat(row.find('td').eq(1).text().replace(/\./g, '').trim()) || 0;
-            let total_hours = parseFloat(row.find('td').eq(2).text().trim()) || 0;
+            // Lấy dữ liệu
+            let pay_rate = toMoneyNumber(row.find('td').eq(1).text());   // lương/giờ
+            let total_hours = toHourNumber(row.find('td').eq(2).text()); // số giờ
+            let bonus = toMoneyNumber(row.find('input[name="bonus[]"]').val());
+            let penalty = toMoneyNumber(row.find('input[name="penalty[]"]').val());
 
-            // ✅ Lấy giá trị từ các input
-            let bonus = parseFloat(row.find('input[name="bonus[]"]').val()) || 0;
-            let penalty = parseFloat(row.find('input[name="penalty[]"]').val()) || 0;
-
-            // ✅ Tính toán cẩn thận, tránh lỗi kiểu
+            // Tính toán
             let total_salary = (pay_rate * total_hours) + bonus - penalty;
 
-            // ✅ Cập nhật lại cột hiển thị lương
-            row.find('td').eq(5).text(total_salary);
+            console.log({ pay_rate, total_hours, bonus, penalty, total_salary });
+
+            // Ghi lại vào đúng cột tổng lương (kiểm tra index đúng với HTML)
+            row.find('td').eq(5).text(numberFormatter.format(total_salary));
         });
+
 
         // Cập nhật tổng lương Khi người dùng thay đổi Trạng thái trả lương
         $(document).on('change', '.payment-status-select', function() {
@@ -713,10 +863,7 @@
             }).then((result) => {
                 if (!result.isConfirmed) {
                     select.val(select.data('original'));
-                    window.location.href =
-                        "{{ route('admin.teacher_salaries') }}";
                     return;
-
                 }
 
                 $.ajax({
@@ -729,6 +876,7 @@
                     },
                     success: function(res) {
                         if (res.success) {
+                            select.data('original', res.paid);
                             Swal.fire({
                                 title: 'Sửa thành công!',
                                 text: 'Sửa trạng thái thành công',
@@ -736,8 +884,16 @@
                                 confirmButtonClass: 'btn btn-primary w-xs mt-2',
                                 buttonsStyling: false
                             }).then(() => {
-                                window.location.href =
-                                    "{{ route('admin.teacher_salaries') }}";
+                                const cell = $('.payment-date-cell[data-salary-id="' + salaryId + '"]');
+
+                                    if (res.paid == 1 && res.payment_date) {
+                                        // Nếu đã thanh toán
+                                        const formattedDate = moment(res.payment_date).format('DD/MM/YYYY');
+                                        cell.html('<span class="badge bg-success">' + formattedDate + '</span>');
+                                    } else {
+                                        // Nếu chuyển lại chưa thanh toán
+                                        cell.html('<span class="badge bg-danger">Chưa thanh toán</span>');
+                                    }
                             });
                         } else {
                             Swal.fire({
@@ -770,11 +926,23 @@
         let currentSalaryId = null;
 
         $(document).on('click', '.note-cell', function() {
-            currentSalaryId = $(this).data('id');
-            const note = $(this).data('note');
-            $('#noteContent').val(note);
-            const modal = new bootstrap.Modal(document.getElementById('noteModal'));
-            modal.show();
+            // kiểm tra trạng thái chốt lương
+                if ($(this).data('active') == 1) {
+                    // Có thể show thông báo nếu muốn
+                    Swal.fire({
+                        title: 'Bảng lương đã chốt!',
+                        text: 'Không thể thêm hoặc sửa ghi chú.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                    return; // dừng không cho mở modal
+                }
+
+                currentSalaryId = $(this).data('id');
+                const note = $(this).data('note');
+                $('#noteContent').val(note);
+                const modal = new bootstrap.Modal(document.getElementById('noteModal'));
+                modal.show();
         });
 
         $('#saveNoteBtn').on('click', function() {
@@ -814,72 +982,11 @@
         });
 
         // Hiển thị thông báo khi Hover vào tên
-        $(document).ready(function() {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            });
-        });
 
         // Xử lý click vào tên giáo viên
 
 
-        $(document).on('click', '.teacher-detail', function() {
-            const salaryId = $(this).data('salary-id');
-
-            console.log(salaryId);
-
-            $.ajax({
-                url: `./admin/teacher-salary-rules/${salaryId}/details`,
-                type: 'GET',
-                success: function(res) {
-                    console.log(res.data);
-                    if (res.success) {
-
-                        let html = '<ul class="list-group">';
-                        res.data.forEach(item => {
-                            let [year, month, day] = item.effective_date.split('-');
-                            html += `
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong class="fs-5">${item.name}</strong>
-                                        <div class="text-muted small">
-                                            <i class="bi bi-telephone"></i> ${item.phone}
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div>
-                                    <span class="fw-semibold">Mức lương:</span>
-                                    <span class="text-success">
-                                        ${new Intl.NumberFormat('vi-VN').format(item.pay_rate)} VNĐ/giờ
-                                    </span>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <span class="text-muted">
-                                    Áp dụng từ: <i>${day}/${month}/${year}</i>
-                                </span>
-                            </li>
-                        `;
-                        });
-                        html += '</ul>';
-                        $('#salaryDetailContent').html(html);
-                    } else {
-                        $('#salaryDetailContent').html(`<div class="text-danger">${res.message}</div>`);
-                    }
-                    const modal = new bootstrap.Modal(document.getElementById('salaryDetailModal'));
-                    modal.show();
-                },
-                error: function() {
-                    $('#salaryDetailContent').html(
-                        '<div class="text-danger">Lỗi khi tải chi tiết</div>');
-                }
-            });
-        });
-
+      
         // Khi người dùng nhập tên giáo viên vào input
         $('#teacherInput').on('input', function() {
             const typedName = $(this).val().toLowerCase().trim();
@@ -931,6 +1038,228 @@
             newWin.print();
             newWin.close();
         }
+
+
+          function toggleSalaryButtons(isLocked) {
+                    if (isLocked) {
+                        $('#lockSalaryBtn').addClass('d-none');
+                        $('#unlockSalaryBtn').removeClass('d-none');
+                    } else {
+                        $('#unlockSalaryBtn').addClass('d-none');
+                        $('#lockSalaryBtn').removeClass('d-none');
+                    }
+                }
+        toggleSalaryButtons(isLocked);
+
+        // $(document).ready(function () {
+        //     toggleSalaryButtons(isLocked);
+        // });
+
+        $('#lockSalaryBtn').on('click', function () {
+            $('#lockSalaryModal').modal('show');
+        });
+
+        // Khi bấm xác nhận chốt
+        $('#confirmLockSalaryBtn').on('click', function () {
+            let month, year;
+
+            // Lấy giá trị từ input filter
+            let filterVal = $('#filterMonth').val(); // dạng "2025-08"
+
+            if (filterVal) {
+                // Nếu có chọn ở bộ lọc thì tách ra
+                let parts = filterVal.split('-');
+                year = parts[0];
+                month = parseInt(parts[1], 10); // bỏ số 0 ở trước
+            } else {
+                // Nếu không có thì lấy tháng/năm hiện tại
+                let today = new Date();
+                month = today.getMonth() + 1; // getMonth trả 0-11
+                year = today.getFullYear();
+            }
+
+            Swal.fire({
+                title: `Bạn có chắc muốn chốt bảng lương tháng ${month}/${year}?`,
+                text: "Sau khi chốt sẽ không thể chỉnh sửa.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Chốt ngay',
+                cancelButtonText: 'Hủy',
+                confirmButtonClass: 'btn btn-primary w-xs mt-2',
+                cancelButtonClass: 'btn btn-secondary w-xs mt-2',
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route('admin.teacher_salaries.lock') }}',
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            month: month,
+                            year: year
+                        },
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire({
+                                    title: 'Thành công!',
+                                    text: res.message,
+                                    icon: 'success',
+                                    confirmButtonClass: 'btn btn-primary w-xs mt-2',
+                                    buttonsStyling: false
+                                }).then(() => {
+                                        // Reload bảng lương bằng ajax
+                                        renderSalaryTable(res.data);
+                                        toggleSalaryButtons(true);
+                                        $('#lockSalaryModal').modal('hide'); // đóng modal
+                                    });
+                            } else {
+                                Swal.fire({
+                                    title: 'Cập nhật thất bại!',
+                                    text: res.message || 'Sửa trạng thái thất bại',
+                                    icon: 'error',
+                                    confirmButtonClass: 'btn btn-primary w-xs mt-2',
+                                    buttonsStyling: false
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                title: 'Cập nhật thất bại!',
+                                text: 'Có lỗi xảy ra khi chốt bảng lương.',
+                                icon: 'error',
+                                confirmButtonClass: 'btn btn-primary w-xs mt-2',
+                                buttonsStyling: false
+                            });
+                        }
+                    });
+                }
+            });
+            
+        });
+
+        $('#unlockSalaryBtn').on('click', function () {
+            $('#unlockSalaryModal').modal('show');
+        });
+
+        // Khi bấm xác nhận mở khóa
+                $('#confirmUnlockSalaryBtn').on('click', function () {
+                    let month, year;
+
+                    // Lấy giá trị từ input filter
+                    let filterVal = $('#filterMonth').val(); // dạng "2025-08"
+
+                    if (filterVal) {
+                        // Nếu có chọn ở bộ lọc thì tách ra
+                        let parts = filterVal.split('-');
+                        year = parts[0];
+                        month = parseInt(parts[1], 10); // bỏ số 0 ở trước
+                    } else {
+                        // Nếu không có thì lấy tháng/năm hiện tại
+                        let today = new Date();
+                        month = today.getMonth() + 1; // getMonth trả 0-11
+                        year = today.getFullYear();
+                    }
+
+                    Swal.fire({
+                        title: `Bạn có chắc muốn mở khóa bảng lương tháng ${month}/${year}?`,
+                        text: "Sau khi mở khóa có thể chỉnh sửa lại.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Mở khóa ngay',
+                        cancelButtonText: 'Hủy',
+                        confirmButtonClass: 'btn btn-success w-xs mt-2',
+                        cancelButtonClass: 'btn btn-secondary w-xs mt-2',
+                        buttonsStyling: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: '{{ route('admin.teacher_salaries.unlock') }}', // route mới
+                                type: 'POST',
+                                data: {
+                                    _token: '{{ csrf_token() }}',
+                                    month: month,
+                                    year: year
+                                },
+                                success: function (res) {
+                                    if (res.success) {
+                                        Swal.fire({
+                                            title: 'Thành công!',
+                                            text: res.message,
+                                            icon: 'success',
+                                            confirmButtonClass: 'btn btn-primary w-xs mt-2',
+                                            buttonsStyling: false
+                                        }).then(() => {
+                                             // Reload bảng lương bằng ajax
+                                                 renderSalaryTable(res.data);
+                                                 toggleSalaryButtons(false);
+
+                                                $('#unlockSalaryModal').modal('hide');
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Thất bại!',
+                                            text: res.message || 'Mở khóa thất bại',
+                                            icon: 'error',
+                                            confirmButtonClass: 'btn btn-primary w-xs mt-2',
+                                            buttonsStyling: false
+                                        });
+                                    }
+                                },
+                                error: function () {
+                                    Swal.fire({
+                                        title: 'Lỗi!',
+                                        text: 'Có lỗi xảy ra khi mở khóa bảng lương.',
+                                        icon: 'error',
+                                        confirmButtonClass: 'btn btn-primary w-xs mt-2',
+                                        buttonsStyling: false
+                                    });
+                                }
+                            });
+                        }
+                    });
+                });
+                $('#lockSalaryModal').on('show.bs.modal', function () {
+                let filterVal = $('#filterMonth').val();
+                let month, year;
+
+                if (filterVal) {
+                    let parts = filterVal.split('-');
+                    year = parts[0];
+                    month = parseInt(parts[1], 10);
+                } else {
+                    let today = new Date();
+                    month = today.getMonth() + 1;
+                    year = today.getFullYear();
+                }
+
+                // Gán vào select trong modal
+                $('#lockMonth').val(month);
+                $('#lockYear').val(year);
+            });
+                 $('#unlockSalaryModal').on('show.bs.modal', function () {
+                let filterVal = $('#filterMonth').val();
+                let month, year;
+
+                if (filterVal) {
+                    let parts = filterVal.split('-');
+                    year = parts[0];
+                    month = parseInt(parts[1], 10);
+                } else {
+                    let today = new Date();
+                    month = today.getMonth() + 1;
+                    year = today.getFullYear();
+                }
+
+                // Gán vào select trong modal
+                $('#unlockMonth').val(month);
+                $('#unlockYear').val(year);
+            });
+
+          
+
+      
+               
+
     </script>
 
 @endsection

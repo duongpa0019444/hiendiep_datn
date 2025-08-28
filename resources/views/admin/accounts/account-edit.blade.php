@@ -39,7 +39,7 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Thông tin</h4>
+                            <h4 class="card-title">Thông tin {{ $roles[request('role')] ?? request('role') }}</h4>
                         </div>
                         <form method="POST"
                             action="{{ route('admin.account.update', ['role' => request('role'), 'id' => request('id')]) }}"
@@ -68,6 +68,18 @@
                                         </div>
                                     </div>
 
+                                     @if (request('role') === 'staff')
+                                        <div class="col-lg-6">
+                                            <div class="mb-3">
+                                                <label for="" class="form-label fw-semibold">Nhiệm vụ</label>
+                                                <select name="mission" id="" class="form-select">
+                                                    <option value="">Chọn nhiệm vụ</option>
+                                                    <option value="train" {{ $info->mission === 'train' ? 'selected' : ''}}>Quản lí đào tạo</option>
+                                                    <option value="accountant" {{ $info->mission === 'accountant' ? 'selected' : ''}}>Kế toán</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    @endif
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
@@ -94,35 +106,37 @@
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="" class="form-label fw-semibold">password</label>
+                                            <label for="" class="form-label fw-semibold">Mật khẩu</label>
                                             <input type="password" name="password" class="form-control"
-                                                placeholder="Nhập password mới (nếu muốn thay đổi)">
+                                                placeholder="Nhập mật khẩu mới (nếu muốn thay đổi)">
                                         </div>
                                     </div>
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="" class="form-label fw-semibold">phone</label>
+                                            <label for="" class="form-label fw-semibold">Số điện thoại</label>
                                             <input type="tel" value="{{ $info->phone }}" name="phone"
-                                                class="form-control" placeholder="Nhập phone...">
+                                                class="form-control" placeholder="Nhập số điện thoại...">
                                         </div>
                                     </div>
                                     
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="" class="form-label fw-semibold">address</label>
+                                            <label for="" class="form-label fw-semibold">Địa chỉ</label>
                                             <input type="tel" value="{{ $info->address }}" name="address"
-                                                class="form-control" placeholder="Nhập address...">
+                                                class="form-control" placeholder="Nhập địa chỉ...">
                                         </div>
                                     </div>
 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="" class="form-label fw-semibold">birth_date</label>
+                                            <label for="" class="form-label fw-semibold">Ngày sinh</label>
                                             <input type="date" value="{{ $info->birth_date }}" name="birth_date"
-                                                class="form-control" placeholder="Nhập birth_date...">
+                                                class="form-control" placeholder="Nhập ngày sinh...">
                                         </div>
                                     </div>
+
+                                   
 
                                     <div class="col-lg-6">
                                         <label for="" class="form-label fw-semibold">Giới tính</label>

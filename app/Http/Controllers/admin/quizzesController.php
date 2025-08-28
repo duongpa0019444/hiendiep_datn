@@ -10,8 +10,10 @@ use App\Models\courses;
 use App\Models\questions;
 use App\Models\quizAttempts;
 use App\Models\quizzes;
+use App\Models\Quizzes as ModelsQuizzes;
 use App\Models\sentenceAnswers;
 use App\Models\sentenceQuestions;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -147,6 +149,13 @@ class quizzesController extends Controller
     public function delete($id)
     {
         $quiz = Quizzes::with('creator')->findOrFail($id);
+        $this->logAction(
+            'delete',
+            ModelsQuizzes::class,
+            $quiz->id,
+            Auth::user()->name . ' đã chuyển bài quiz: ' . $quiz->title . ' vào thùng rác.'
+        );
+
         $quiz->delete();
 
         // Truy vấn số câu hỏi dạng multiple + sentence
@@ -198,6 +207,13 @@ class quizzesController extends Controller
                 // Xóa bài làm của học sinh
                 DB::table('quiz_attempts')->where('quiz_id', $id)->delete();
 
+                $this->logAction(
+                    'delete',
+                    ModelsQuizzes::class,
+                    $quiz->id,
+                    Auth::user()->name . ' đã xóa vĩnh viễn bài quiz: ' . $quiz->title
+                );
+
                 // Xóa vĩnh viễn quiz
                 $quiz->forceDelete();
             });
@@ -225,6 +241,12 @@ class quizzesController extends Controller
             $quizzes->total_questions = $counts->total_questions ?? 0;
             return response()->json($quizzes);
         }
+        $this->logAction(
+            'update',
+            ModelsQuizzes::class,
+            $quizzes->id,
+            Auth::user()->name . ' đã khôi phục bài quiz: ' . $quizzes->title
+        );
         return redirect()->back()->with('success', 'Khôi phục quiz thành công!');
     }
 
@@ -300,6 +322,13 @@ class quizzesController extends Controller
             'updated_at' => now(),
         ]);
 
+        $this->logAction(
+            'create',
+            ModelsQuizzes::class,
+            $quizz->id,
+            Auth::user()->name . ' đã tạo bài quiz: ' . $quizz->title
+        );
+
         return response()->json([
             'success' => true,
             'message' => 'Thêm bài quiz thành công!',
@@ -368,6 +397,13 @@ class quizzesController extends Controller
             'updated_at' => now(),
         ]);
 
+        $this->logAction(
+            'update',
+            ModelsQuizzes::class,
+            $quiz->id,
+            Auth::user()->name . ' đã cập nhật bài quiz: ' . $quiz->title
+        );
+
         return response()->json([
             'action' => 'edit',
             'message' => 'Cập nhật bài quiz thành công!',
@@ -380,7 +416,12 @@ class quizzesController extends Controller
         $quiz = quizzes::findOrFail($id);
         $quiz->status = $status;
         $quiz->save();
-
+        $this->logAction(
+            'update',
+            ModelsQuizzes::class,
+            $quiz->id,
+            Auth::user()->name . ' đã cập nhật trạng thái bài quiz: ' . $quiz->title
+        );
         return response()->json([
             'message' => 'Lưu trạng thái ' . ($status == "published" ? 'xuất bản' : 'nháp') . ' bài quiz thành công!',
             'quiz' => $quiz,
@@ -414,7 +455,7 @@ class quizzesController extends Controller
         if ($request->ajax()) {
             return response()->json($quiz);
         }
-        if (Auth::user()->role == 'admin') {
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'staff') {
             return view('admin.quizzes.quizzes-detail', compact('quiz', 'allQuestions', 'answers'));
         } elseif (Auth::user()->role == 'teacher') {
             return view('client.quizzes.quizzes-detail', compact('quiz', 'allQuestions', 'answers'));

@@ -9,6 +9,7 @@ use App\Models\coursePayment;
 // use App\Models\coursePayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ClassController extends Controller
 {
@@ -17,13 +18,13 @@ class ClassController extends Controller
         $query = classes::select(
             'classes.id',
             'classes.name',
-            'classes.number_of_sessions as so_buoi_hoc',
+            'courses.total_sessions as so_buoi_hoc',
             'classes.status',
             'classes.created_at as start_date',
             'courses.name as course_name',
             'courses.description as course_description',
             DB::raw("(SELECT COUNT(*) FROM class_student
-            WHERE class_student.class_id = classes.id) AS so_hoc_sinh"),
+            WHERE class_student.class_id = classes.id AND class_student.deleted_at IS NULL) AS so_hoc_sinh"),
         )
             ->leftJoin('courses', 'classes.courses_id', '=', 'courses.id');
         // ->join('users', 'classes.teacher_id', '=', 'users.id')
@@ -125,7 +126,7 @@ class ClassController extends Controller
             'courses.name as course_name',
             'courses.description as course_description',
             DB::raw("(SELECT COUNT(*) FROM class_student
-            WHERE class_student.class_id = classes.id) AS so_hoc_sinh"),
+            WHERE class_student.class_id = classes.id AND class_student.deleted_at IS NULL) AS so_hoc_sinh"),
         )
             ->leftJoin('courses', 'classes.courses_id', '=', 'courses.id')
             ->where('classes.id', $id)
@@ -148,14 +149,12 @@ class ClassController extends Controller
             $request->validate([
                 'name' => 'required|string|max:255',
                 'courses_id' => 'required|exists:courses,id',
-                'number_of_sessions' => 'required|integer|min:1',
                 'status' => 'required|in:in_progress,not_started,completed',
             ]);
 
             $class = Classes::findOrFail($id);
             $class->name = $request->name;
             $class->courses_id = $request->courses_id;
-            $class->number_of_sessions = $request->number_of_sessions;
             $class->status = $request->status;
             $class->save();
 
@@ -171,6 +170,31 @@ class ClassController extends Controller
 
     public function destroy($id)
     {
+        // Kiểm tra còn học sinh chưa bị xóa mềm trong lớp hay không
+        $studentCount = DB::table('class_student')
+            ->where('class_id', $id)
+            ->whereNull('deleted_at') // chỉ check những học sinh chưa xóa mềm
+            ->count();
+
+        if ($studentCount > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể xóa lớp vì vẫn còn học sinh trong lớp.'
+            ], 400);
+        }
+
+        // Kiểm tra còn lịch học của lớp không
+    $scheduleCount = DB::table('schedules')
+        ->where('class_id', $id)
+        ->count();
+
+    if ($scheduleCount > 0) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Không thể xóa lớp vì vẫn còn lịch học.'
+        ], 400);
+    }
+
         $class = classes::findOrFail($id);
         $class->delete();
 
@@ -235,41 +259,41 @@ class ClassController extends Controller
             // dd(get_class($students), $students); // "Illuminate\Pagination\LengthAwarePaginator"
 
             // Xử lý tìm kiếm
-        if (request('search')) {
-            $search = request('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('users.name', 'like', "%{$search}%")
-                  ->orWhere('users.email', 'like', "%{$search}%");
-            });
-        }
+            if (request('search')) {
+                $search = request('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('users.name', 'like', "%{$search}%")
+                        ->orWhere('users.email', 'like', "%{$search}%");
+                });
+            }
 
-        // Xử lý sắp xếp
-        $sortBy = request('sort_by', 'created_at_desc'); // Mặc định sắp xếp theo created_at giảm dần
-        switch ($sortBy) {
-            case 'name':
-                $query->orderBy('users.name', 'asc');
-                break;
-            case 'name_desc':
-                $query->orderBy('users.name', 'desc');
-                break;
-            case 'email':
-                $query->orderBy('users.email', 'asc');
-                break;
-            case 'email_desc':
-                $query->orderBy('users.email', 'desc');
-                break;
-            case 'created_at':
-                $query->orderBy('class_student.created_at', 'asc');
-                break;
-            case 'created_at_desc':
-            default:
-                $query->orderBy('class_student.created_at', 'desc');
-                break;
-        }
+            // Xử lý sắp xếp
+            $sortBy = request('sort_by', 'created_at_desc'); // Mặc định sắp xếp theo created_at giảm dần
+            switch ($sortBy) {
+                case 'name':
+                    $query->orderBy('users.name', 'asc');
+                    break;
+                case 'name_desc':
+                    $query->orderBy('users.name', 'desc');
+                    break;
+                case 'email':
+                    $query->orderBy('users.email', 'asc');
+                    break;
+                case 'email_desc':
+                    $query->orderBy('users.email', 'desc');
+                    break;
+                case 'created_at':
+                    $query->orderBy('class_student.created_at', 'asc');
+                    break;
+                case 'created_at_desc':
+                default:
+                    $query->orderBy('class_student.created_at', 'desc');
+                    break;
+            }
 
-        // Xử lý số bản ghi mỗi trang
-        $perPage = request('per_page', 10); // Mặc định 10 bản ghi mỗi trang
-        $students = $query->paginate($perPage);
+            // Xử lý số bản ghi mỗi trang
+            $perPage = request('per_page', 10); // Mặc định 10 bản ghi mỗi trang
+            $students = $query->paginate($perPage);
 
             // Lấy danh sách học viên đã bị xóa mềm
             $trashedStudents = classStudent::onlyTrashed()
@@ -507,10 +531,17 @@ class ClassController extends Controller
             ->select('id', 'name')
             ->get();
 
+        // Lấy danh sách phòng học
+        $rooms = DB::table('class_room')
+            ->select('id', 'room_name')
+            ->get();
+
         // Lấy danh sách lịch học của lớp
         $query = DB::table('schedules')
             ->join('users', 'schedules.teacher_id', '=', 'users.id')
+            ->join('class_room', 'schedules.room', '=', 'class_room.id')
             ->where('class_id', $id);
+
         if ($request->filled('weekday')) {
             $query->where('day_of_week', $request->weekday);
         }
@@ -536,10 +567,11 @@ class ClassController extends Controller
         }
 
         $schedules = $query
-            ->orderBy('start_time', 'asc')
+            ->orderBy('date', 'desc')
             ->select(
                 'schedules.*',
-                'users.name as teacher_name'
+                'users.name as teacher_name',
+                'class_room.room_name as classroom'
             )
             ->paginate(10) // Phân trang, mỗi trang 10 bản ghi
             ->appends($request->query()); // Giữ lại các tham số filter khi chuyển trang
@@ -547,6 +579,6 @@ class ClassController extends Controller
         if ($request->ajax()) {
             return view('admin.classes.partials.schedules', compact('schedules'))->render();
         }
-        return view('admin.classes.schedules', compact('class', 'course', 'schedules', 'teachers'));
+        return view('admin.classes.schedules', compact('class', 'course', 'schedules', 'teachers', 'rooms'));
     }
 }

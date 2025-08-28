@@ -26,7 +26,8 @@
                         data-class-id="{{ $class->id }}">
                         <i class="fas fa-plus"></i> Tạo lịch
                     </a> --}}
-                    <a href="#" class="btn btn-primary mb-3 create-schedule-btn" data-class-id="{{ $class->id }}">
+                    <!-- Nút tạo lịch học -->
+                    <a href="#" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addScheduleModal">
                         <i class="fas fa-plus"></i> Tạo lịch học
                     </a>
                 </div>
@@ -95,6 +96,8 @@
                                         <th class="text-center" style="width:110px;">Giờ bắt đầu</th>
                                         <th class="text-center" style="width:110px;">Giờ kết thúc</th>
                                         <th class="text-center" style="width:160px;">Giáo viên</th>
+                                        <th class="text-center" style="width:110px;">Phòng học</th>
+                                        <th class="text-center" style="width:110px;">Trạng thái</th>
                                         <th class="text-center" style="width:110px;">Hành động</th>
                                     </tr>
                                 </thead>
@@ -104,7 +107,7 @@
                                             <td class="text-center">{{ $index + 1 }}</td>
                                             <td
                                                 class="text-center fw-bold 
-                                            {{ $schedule->day_of_week == 'Sun' ? 'text-danger' : '' }}">
+                    {{ $schedule->day_of_week == 'Sun' ? 'text-danger' : '' }}">
                                                 {{ [
                                                     'Mon' => 'Thứ 2',
                                                     'Tue' => 'Thứ 3',
@@ -120,21 +123,30 @@
                                             <td class="text-center">{{ $schedule->start_time }}</td>
                                             <td class="text-center">{{ $schedule->end_time }}</td>
                                             <td>{{ $schedule->teacher_name ?? 'N/A' }}</td>
+                                            <td class="text-center">{{ $schedule->classroom ?? '' }}</td>
                                             <td class="text-center">
-                                                <a href="#" class="btn btn-sm btn-outline-primary  btn-edit-schedule"
-                                                    data-id="{{ $schedule->id }}" title="Sửa buổi học">
-                                                    <i class="fas fa-pen"></i>
-                                                </a>
-                                                <button type="button"
-                                                    class="btn btn-sm btn-outline-danger btn-delete-schedule"
-                                                    data-id="{{ $schedule->id }}" title="Xóa buổi học">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
+                                                {{ $schedule->status == 0 ? 'Chưa điểm danh' : ($schedule->status == 1 ? 'Đã điểm danh' : 'N/A') }}
+                                            </td>
+                                            <td class="text-center">
+                                                @if ($schedule->status == 0)
+                                                    <a href="#"
+                                                        class="btn btn-sm btn-outline-primary btn-edit-schedule"
+                                                        data-id="{{ $schedule->id }}" title="Sửa buổi học">
+                                                        <i class="fas fa-pen"></i>
+                                                    </a>
+                                                    @if (auth()->user()->isAdmin())
+                                                                    <button type="button"
+                                                        class="btn btn-sm btn-outline-danger btn-delete-schedule"
+                                                        data-id="{{ $schedule->id }}" title="Xóa buổi học">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                    @endif
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">Không có lịch học nào
+                                            <td colspan="9" class="text-center text-muted py-4">Không có lịch học nào
                                             </td>
                                         </tr>
                                     @endforelse
@@ -181,7 +193,8 @@
 
 
         <!-- Modal -->
-        <div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -283,25 +296,34 @@
                         </div>
                         <div class="modal-body">
                             <input type="hidden" name="schedule_id" id="edit-schedule-id">
+                            <input type="hidden" name="weekday" id="edit-weekday">
                             <div class="mb-3">
-                                <label class="form-label">Ngày</label>
+                                <label for="edit-date" class="form-label">Ngày</label>
                                 <input type="text" class="form-control flatpickr" name="date" id="edit-date"
                                     required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Giờ bắt đầu</label>
+                                <label for="edit-start-time" class="form-label">Giờ bắt đầu</label>
                                 <input type="time" class="form-control" name="start_time" id="edit-start-time"
                                     required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Giờ kết thúc</label>
+                                <label for="edit-end-time" class="form-label">Giờ kết thúc</label>
                                 <input type="time" class="form-control" name="end_time" id="edit-end-time" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Giáo viên</label>
+                                <label for="edit-teacher-id" class="form-label">Giáo viên</label>
                                 <select class="form-select" name="teacher_id" id="edit-teacher-id" required>
                                     @foreach ($teachers as $teacher)
                                         <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-room" class="form-label">Phòng học</label>
+                                <select class="form-select" name="room" id="edit-room" required>
+                                    @foreach ($rooms as $room)
+                                        <option value="{{ $room->id }}">{{ $room->room_name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -309,6 +331,63 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                             <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal Thêm 1 lịch học -->
+        <div class="modal fade" id="addScheduleModal" tabindex="-1" aria-labelledby="addScheduleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <form id="add-schedule-form" method="POST" action="{{ route('admin.schedules.store-single') }}">
+                    @csrf
+                    <input type="hidden" name="class_id" value="{{ $class->id }}">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addScheduleModalLabel">Thêm lịch học mới</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="schedule-date" class="form-label">Ngày</label>
+                                <input type="text" class="form-control flatpickr" id="schedule-date" name="date"
+                                    placeholder="dd/mm/yyyy" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="schedule-start-time" class="form-label">Giờ bắt đầu</label>
+                                <input type="time" class="form-control" id="schedule-start-time" name="start_time"
+                                    required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="schedule-end-time" class="form-label">Giờ kết thúc</label>
+                                <input type="time" class="form-control" id="schedule-end-time" name="end_time"
+                                    required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="schedule-teacher" class="form-label">Giáo viên</label>
+                                <select class="form-select" id="schedule-teacher" name="teacher_id" required>
+                                    <option value="">-- Chọn giáo viên --</option>
+                                    @foreach ($teachers as $teacher)
+                                        <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="schedule-room" class="form-label">Phòng học</label>
+                                <select class="form-select" id="schedule-room" name="room_id" required>
+                                    <option value="">-- Chọn phòng học --</option>
+                                    @foreach ($rooms as $room)
+                                        <option value="{{ $room->id }}">{{ $room->room_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <input type="hidden" id="schedule-weekday" name="weekday">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Thêm lịch học</button>
                         </div>
                     </div>
                 </form>
@@ -912,35 +991,95 @@
                             return time.slice(0, 5);
                         };
 
-                        // Gán giá trị
+                        // Gán giá trị ban đầu
                         $('#edit-schedule-id').val(data.data.id || '');
+                        let initialWeekday = data.data.day_of_week || '';
+                        $('#edit-weekday').val(initialWeekday);
                         if ($('#edit-date').hasClass('flatpickr')) {
-                            $('#edit-date').flatpickr({
+                            let fp = $('#edit-date').flatpickr({
                                 dateFormat: 'd/m/Y',
                                 allowInput: true,
-                                locale: 'vi'
+                                locale: 'vi',
+                                onChange: function(selectedDates, dateStr, instance) {
+                                    console.log('onChange triggered with selectedDates:',
+                                        selectedDates);
+                                    if (selectedDates.length > 0) {
+                                        const date = selectedDates[0];
+                                        const weekdayMap = ['Sun', 'Mon', 'Tue', 'Wed',
+                                            'Thu', 'Fri', 'Sat'
+                                        ];
+                                        const weekday = weekdayMap[date.getDay()];
+                                        $('#edit-weekday').val(weekday);
+                                        console.log('Đã cập nhật weekday:', weekday);
+                                    } else {
+                                        $('#edit-weekday').val(
+                                        initialWeekday); // Fallback to initial value
+                                        console.log(
+                                            'No date selected, reverted to initial:',
+                                            initialWeekday);
+                                    }
+                                },
+                                onReady: function(selectedDates, dateStr, instance) {
+                                    if (selectedDates.length > 0) {
+                                        const date = selectedDates[0];
+                                        const weekdayMap = ['Sun', 'Mon', 'Tue', 'Wed',
+                                            'Thu', 'Fri', 'Sat'
+                                        ];
+                                        const weekday = weekdayMap[date.getDay()];
+                                        $('#edit-weekday').val(weekday);
+                                        console.log('onReady: Đã cập nhật weekday:',
+                                            weekday);
+                                    } else if (initialWeekday) {
+                                        $('#edit-weekday').val(initialWeekday);
+                                        console.log('onReady: Sử dụng giá trị ban đầu:',
+                                            initialWeekday);
+                                    }
+                                }
                             }).setDate(formatDate(data.data.date) || '');
+                            // Đảm bảo weekday được cập nhật ngay khi khởi tạo
+                            if (data.data.date) {
+                                const dateParts = data.data.date.split('-');
+                                const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+                                const weekdayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                                const weekday = weekdayMap[date.getDay()];
+                                $('#edit-weekday').val(weekday);
+                                console.log('Khởi tạo: Đã cập nhật weekday:', weekday);
+                            }
                         } else {
                             $('#edit-date').val(formatDate(data.data.date) || '');
+                            if (data.data.date) {
+                                const dateParts = data.data.date.split('-');
+                                const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+                                const weekdayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                                const weekday = weekdayMap[date.getDay()];
+                                $('#edit-weekday').val(weekday);
+                                console.log('Fallback: Đã cập nhật weekday:', weekday);
+                            }
                         }
                         $('#edit-start-time').val(formatTime(data.data.start_time));
                         $('#edit-end-time').val(formatTime(data.data.end_time));
                         $('#edit-teacher-id').val(data.data.teacher_id ? String(data.data.teacher_id) :
                             '');
+                        $('#edit-room').val(data.data.room ? String(data.data.room) : '');
 
-                        // Debug
+                        // Debug trước khi hiển thị modal
                         console.log('schedule-id:', $('#edit-schedule-id').val());
+                        console.log('weekday:', $('#edit-weekday').val());
                         console.log('date:', $('#edit-date').val());
                         console.log('start-time:', $('#edit-start-time').val());
                         console.log('end-time:', $('#edit-end-time').val());
                         console.log('teacher-id:', $('#edit-teacher-id').val());
+                        console.log('room:', $('#edit-room').val());
 
                         // Hiển thị modal
                         $('#editScheduleModal').modal('show');
                     }).fail(function(jqXHR, textStatus, errorThrown) {
-                        console.error('AJAX error:', textStatus, errorThrown);
+                        console.error('Lỗi AJAX:', textStatus, errorThrown);
+                        Swal.fire('Lỗi', 'Không thể tải dữ liệu lịch học, vui lòng thử lại!', 'error');
                     });
                 });
+
+                // Không cần sự kiện shown.bs.modal nữa vì weekday được set trong flatpickr
 
                 $(document).on('submit', '#edit-schedule-form', function(e) {
                     e.preventDefault();
@@ -948,13 +1087,24 @@
                     // Thu thập dữ liệu form
                     let formData = {
                         schedule_id: $('#edit-schedule-id').val(),
+                        weekday: $('#edit-weekday').val() || '', // Đảm bảo lấy giá trị từ hidden input
                         date: $('#edit-date').val(),
                         start_time: $('#edit-start-time').val(),
                         end_time: $('#edit-end-time').val(),
                         teacher_id: $('#edit-teacher-id').val(),
+                        room: $('#edit-room').val(), // Thêm trường room
                         _method: 'PUT', // Sử dụng PUT để cập nhật
                         _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
                     };
+
+                    // Debug dữ liệu trước khi gửi
+                    console.log('Dữ liệu được gửi lên:', formData);
+
+                    // Kiểm tra nếu weekday trống
+                    if (!formData.weekday) {
+                        console.warn('Weekday trống, sử dụng giá trị mặc định từ DB nếu cần');
+                        // Có thể thêm logic lấy lại từ DB nếu cần (tùy chọn)
+                    }
 
                     // Gửi AJAX
                     $.ajax({
@@ -968,7 +1118,7 @@
                             fetchSchedules(''); // Làm mới bảng lịch học nếu cần
                         },
                         error: function(xhr, status, error) {
-                            console.error('Lỗi khi cập nhật:', error);
+                            console.error('Lỗi khi cập nhật:', xhr.responseJSON);
                             let msg = 'Có lỗi xảy ra khi cập nhật lịch học.';
                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                 msg = xhr.responseJSON.message;
@@ -978,6 +1128,76 @@
                     });
                 });
 
+                // Flatpickr cho modal thêm lịch học
+                flatpickr('#schedule-date', {
+                    dateFormat: 'd/m/Y',
+                    allowInput: true,
+                    locale: 'vi',
+                    onChange: function(selectedDates, dateStr) {
+                        if (selectedDates.length > 0) {
+                            const date = selectedDates[0];
+                            // JS getDay: 0=CN, 1=T2, ..., 6=T7
+                            const weekdayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                            const weekday = weekdayMap[date.getDay()];
+                            $('#schedule-weekday').val(weekday);
+                        } else {
+                            $('#schedule-weekday').val('');
+                        }
+                    }
+                });
+
+                // Xử lý submit form thêm lịch học
+                $('#add-schedule-form').on('submit', function(e) {
+                    e.preventDefault();
+                    let form = $(this);
+                    let formData = form.serializeArray(); // Lấy dữ liệu form dưới dạng mảng
+                    let jsonData = {};
+
+                    // Chuyển mảng thành object
+                    $.each(formData, function() {
+                        jsonData[this.name] = this.value;
+                    });
+
+                    console.log('Dữ liệu gửi đi (JSON):', jsonData); // In dữ liệu JSON ra console
+
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: form.serialize(),
+                        success: function(response) {
+                            $('#addScheduleModal').modal('hide');
+                            form[0].reset();
+                            Swal.fire('Thành công', 'Lịch học đã được thêm!', 'success');
+                            // Reload bảng lịch học
+                            location.reload();
+                        },
+                        error: function(xhr) {
+                            let msg = 'Có lỗi xảy ra!';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                msg = xhr.responseJSON.message;
+                            }
+                            Swal.fire('Lỗi', msg, 'error');
+                        }
+                    });
+                });
+
+                // Flatpickr cho trường ngày trong modal sửa lịch học
+                flatpickr('#edit-date', {
+                    dateFormat: 'd/m/Y',
+                    allowInput: true,
+                    locale: 'vi',
+                    onChange: function(selectedDates, dateStr) {
+                        if (selectedDates.length > 0) {
+                            const date = selectedDates[0];
+                            const weekdayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                            const weekday = weekdayMap[date.getDay()];
+                            $('#edit-weekday').val(weekday);
+                            console.log('Đã cập nhật weekday:', weekday);
+                        } else {
+                            $('#edit-weekday').val('');
+                        }
+                    }
+                });
             });
         </script>
     @endpush

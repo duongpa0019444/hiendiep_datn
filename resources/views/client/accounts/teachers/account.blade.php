@@ -35,44 +35,70 @@
         <div class="row gx-3 gy-3 ffs-5 fs-md-6">
             <div class="col-12 col-md-4 text-center pe-4">
                 <img src="{{ asset($user->avatar) }}" class="rounded-circle img-fluid border" alt="Ảnh đại diện">
-                <div class="p-2 p-md-4 fw-semibold  ">{{ $user->name }}</div>
+                <div class="p-2 p-md-4 fw-semibold  ">{{ $user->snake_case }} - {{ $user->name }}</div>
             </div>
             <div class="col-12 col-md-8">
                 <div class="card-body">
 
                     <ul class="list-group">
+                        @php
+                            // Xử lý tên các lớp học nếu có nhiều hơn 2 lớp
+                            function limitClassNames($collection, $limit = 2)
+                            {
+                                $names =
+                                    $collection instanceof \Illuminate\Support\Collection
+                                        ? $collection
+                                        : collect($collection);
+                                $total = $names->count();
+                                $sliced = $names->take($limit);
+                                $short = $sliced->implode(', ');
+                                if ($total > $limit) {
+                                    $short .= ' ...(+' . ($total - $limit) . ' lớp nữa)';
+                                }
+                                return [
+                                    'short' => $short,
+                                    'full' => $names->implode(', '),
+                                ];
+                            }
+
+                            $all = limitClassNames($classNames);
+                            $inProgress = limitClassNames($inProgressClasses);
+                            $completed = limitClassNames($completedClasses);
+                        @endphp
+
                         <li class="list-group-item notification-item">
                             <div class="notification-content">
-
                                 <div class="d-flex justify-content-between text-muted align-items-center">
                                     <span class="d-flex align-items-center">
-                                        <i class="icofont-graduate me-2 "></i>Tất cả khóa học đã đăng ký:</span>
-                                    <span>{{ $courses }}</span>
+                                        <i class="icofont-graduate me-2 "></i>Tất cả các lớp học:
+                                    </span>
+                                    <span title="{{ $all['full'] }}">{{ $all['short'] }}</span>
                                 </div>
                             </div>
                         </li>
 
                         <li class="list-group-item notification-item">
                             <div class="notification-content">
-
                                 <div class="d-flex justify-content-between text-muted align-items-center">
                                     <span class="d-flex align-items-center">
-                                        <i class="icofont-ui-play me-2 "></i>Khóa Đang Học:</span>
-                                    <span>{{ $inProgressCourseNames }}</span>
+                                        <i class="icofont-ui-play me-2 "></i>Các lớp học đang dạy:
+                                    </span>
+                                    <span title="{{ $inProgress['full'] }}">{{ $inProgress['short'] }}</span>
                                 </div>
                             </div>
                         </li>
 
                         <li class="list-group-item notification-item">
                             <div class="notification-content">
-
                                 <div class="d-flex justify-content-between text-muted align-items-center">
                                     <span class="d-flex align-items-center">
-                                        <i class="icofont-check-alt me-2 "></i>Khóa Đã Hoàn Thành:</span>
-                                    <span>{{ $completedCourseNames }}</span>
+                                        <i class="icofont-check-alt me-2 "></i>Các lớp học đã hoàn thành:
+                                    </span>
+                                    <span title="{{ $completed['full'] }}">{{ $completed['short'] }}</span>
                                 </div>
                             </div>
                         </li>
+
 
                         <li class="list-group-item notification-item">
                             <div class="notification-content">

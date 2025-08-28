@@ -52,10 +52,12 @@
                     <a href="{{ route('admin.quizz') }}" class="btn btn-outline-secondary btn-sm me-2">
                         <iconify-icon icon="solar:arrow-left-broken" class="fs-20"></iconify-icon> Quay lại
                     </a>
-                    <a href="{{ route('admin.quizzes.update.status', ['id' => $quiz->id, 'status' => 'draft']) }}" class="btn btn-outline-primary btn-sm me-2 btn-update-status-quiz">
+                    <a href="{{ route('admin.quizzes.update.status', ['id' => $quiz->id, 'status' => 'draft']) }}"
+                        class="btn btn-outline-primary btn-sm me-2 btn-update-status-quiz">
                         <iconify-icon icon="solar:plus-circle-broken" class="fs-20"></iconify-icon> Lưu Nháp
                     </a>
-                    <a href="{{ route('admin.quizzes.update.status', ['id' => $quiz->id, 'status' => 'published']) }}" class="btn btn-success btn-sm btn-add btn-update-status-quiz">
+                    <a href="{{ route('admin.quizzes.update.status', ['id' => $quiz->id, 'status' => 'published']) }}"
+                        class="btn btn-success btn-sm btn-add btn-update-status-quiz">
                         <iconify-icon icon="solar:plus-circle-broken" class="fs-20"></iconify-icon> Xuất Bản
                     </a>
                 </div>
@@ -68,7 +70,8 @@
                     {{-- Nếu không có câu hỏi nào --}}
                     {{-- Hiển thị thông báo không có câu hỏi --}}
                     <div class="col-12">
-                        <div class="alert alert-info text-center d-flex justify-content-center align-items-center " role="alert">
+                        <div class="alert alert-info text-center d-flex justify-content-center align-items-center "
+                            role="alert">
                             <iconify-icon icon="solar:info-circle-broken" class="fs-24 me-3"></iconify-icon>
                             Hiện tại chưa có câu hỏi nào trong quiz này.
                         </div>
@@ -95,7 +98,7 @@
                                         <div class="mt-2 mt-md-0">
                                             <a href="{{ route('admin.questions.edit', ['id' => $question->id]) }}"
                                                 class="btn btn-soft-primary btn-sm me-1 btn-edit-question" title="Sửa"
-                                                data-questiontype = "{{ $question->question_type ?? ''}}">
+                                                data-questiontype = "{{ $question->question_type ?? '' }}">
                                                 <iconify-icon icon="solar:pen-2-broken" class="fs-18"></iconify-icon>
                                             </a>
                                             <form action="{{ route('admin.questions.delete', ['id' => $question->id]) }}"
@@ -483,8 +486,9 @@
 
 @push('scripts')
     <script>
+        let answerIndex = 2; // Đã có sẵn 2 đáp án A và B
+
         document.addEventListener('DOMContentLoaded', function() {
-            let answerIndex = 2; // Đã có sẵn 2 đáp án A và B
             const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
             const questionTypeSelect = document.getElementById('question_type');
@@ -616,6 +620,8 @@
 
             //Xử lý sự kiện mở modal chọn loại câu hỏi
             $(document).on('click', '.btn-open-modal', function() {
+                let answerIndex = 2; // Đã có sẵn 2 đáp án A và B
+
                 const targetModalId = $(this).data('target');
                 const currentModal = $('.modal.show');
 
@@ -638,7 +644,7 @@
                         $(this).find('input[type="hidden"]').val('0'); // Reset is_correct về 0
                         $(this).find('input.correct-answer').prop('checked', false); // Bỏ chọn đúng
                         $(this).find('input.correct-answer').attr('type',
-                        'radio'); // Reset lại type
+                            'radio'); // Reset lại type
 
                     });
                 }
@@ -660,6 +666,7 @@
                 console.log(formData);
 
                 postEdit(formData, actionUrl, method, errorContainer, formModal);
+                let answerIndex = 2; // Đã có sẵn 2 đáp án A và B
 
             });
 
@@ -677,6 +684,7 @@
                 console.log(formData);
 
                 postEdit(formData, actionUrl, method, errorContainer, formModal);
+                let answerIndex = 2; // Đã có sẵn 2 đáp án A và B
 
             });
 
@@ -695,6 +703,7 @@
                 console.log(formData);
 
                 postEdit(formData, actionUrl, method, errorContainer, formModal);
+                let answerIndex = 2; // Đã có sẵn 2 đáp án A và B
 
             });
 
@@ -827,7 +836,7 @@
                             $('#reorder-question-form').attr('action',
                                 `/admin/questions-sentence/${response.question.id}/update`);
                             $('#reorder-question-form').find('input[name="_method"]').val(
-                            'PUT');
+                                'PUT');
 
                             // Đổ dữ liệu vào form
                             $('#reorder_question_prompt').val(question.prompt || '');
@@ -896,7 +905,7 @@
                         $('#answers_mcq .answer-item').slice(2).remove(); // chỉ giữ lại 2 đáp án đầu
                         $('#answers_mcq input[type="hidden"]').val('0'); // reset is_correct về 0
                         $('#answers_mcq input.correct-answer').prop('checked',
-                        false); // bỏ chọn radio/checkbox
+                            false); // bỏ chọn radio/checkbox
                         formModal.modal('hide');
                     },
                     error: function(xhr) {
@@ -1172,7 +1181,8 @@
                         // Cập nhật trạng thái trên giao diện
                         const statusBadge = $('#quiz-status-badge');
                         statusBadge.text(response.new_status_text);
-                        statusBadge.removeClass('bg-success bg-danger').addClass(response.new_status_class);
+                        statusBadge.removeClass('bg-success bg-danger').addClass(response
+                            .new_status_class);
                     } else {
                         Swal.fire({
                             title: 'Lỗi!',

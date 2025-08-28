@@ -17,8 +17,8 @@
             <nav aria-label="breadcrumb p-0">
                 <ol class="breadcrumb py-0">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.account') }}">Quản lí người dùng</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ $roles[request('role')] ?? request('role') }}
+                    <li class="breadcrumb-item active" aria-current="page"> Quản lí
+                        {{ $roles[request('role')] ?? request('role') }}
                     </li>
                 </ol>
             </nav>
@@ -26,52 +26,118 @@
             @if (session('success'))
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
-                        const toastElement = document.createElement('div');
-                        toastElement.setAttribute('data-toast', '');
-                        toastElement.setAttribute('data-toast-text', "{{ session('success') }}");
-                        toastElement.setAttribute('data-toast-gravity', 'top');
-                        toastElement.setAttribute('data-toast-position', 'center');
-                        toastElement.setAttribute('data-toast-className', 'success');
-                        toastElement.setAttribute('data-toast-duration', '4000');
-                        document.body.appendChild(toastElement);
-
-                        // Kích hoạt toast (nếu thư viện bạn đang dùng có hàm gọi)
-                        if (typeof Toastify !== 'undefined') {
-                            Toastify({
-                                text: toastElement.getAttribute('data-toast-text'),
-                                gravity: toastElement.getAttribute('data-toast-gravity'),
-                                position: toastElement.getAttribute('data-toast-position'),
-                                className: toastElement.getAttribute('data-toast-className'),
-                                duration: parseInt(toastElement.getAttribute('data-toast-duration'))
-                            }).showToast();
-                        }
+                        Toastify({
+                            text: "{{ session('success') }}",
+                            gravity: "top",
+                            position: "center",
+                            className: "success",
+                            duration: 4000
+                        }).showToast();
                     });
                 </script>
             @endif
 
+            @if (session('error'))
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Toastify({
+                            text: "{{ session('error') }}",
+                            gravity: "top",
+                            position: "center",
+                            className: "error",
+                            duration: 4000,
+                            style: {
+                                background: "red", // 👈 đổi màu nền
+                            }
+                        }).showToast();
+                    });
+                </script>
+            @endif
+
+            <div class="d-flex justify-content-between align-items-center w-100 mb-2">
+                <h3 class="">Danh Sách {{ $roles[request('role')] ?? request('role') }}</h3>
+                <a href="{{ route('admin.account.add', ['role' => request('role')]) }}" class="btn  btn-primary">
+                    <i class="fas fa-plus me-2"></i> Thêm {{ $roles[request('role')] ?? request('role') }}
+                </a>
+            </div>
 
             <div class="row">
                 <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="card-title">Danh sách </h4>
+                    <div class="card-header ">
                         @if (request('role'))
-                            <div class="d-flex justify-content-between gap-3 align-items-center">
-                                <form method="GET" action="{{ route('admin.account.list', request('role')) }}">
-                                    <div class="position-relative">
-                                        <input type="search" name="queryAccountRole" class="form-control"
-                                            placeholder="Tìm học sinh..." autocomplete="off"
-                                            value="{{ request()->query('queryAccountRole') ?? '' }}">
-                                        <iconify-icon icon="solar:magnifer-linear" class="search-widget-icon"
-                                            style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999;"></iconify-icon>
+                            <form id="filterAccountForm" method="GET"
+                                action="{{ route('admin.account.list', request('role')) }}" class=" rounded">
+                                <div class="row d-flex  align-items-center">
+                                    {{-- Sắp xếp --}}
+                                    <div class="col-md-2">
+                                        <select class="form-select" id="sort" name="sort">
+                                            <option value="created_at_desc"
+                                                {{ request('sort') == 'created_at_desc' ? 'selected' : '' }}>Mới nhất
+                                            </option>
+                                            <option value="created_at_asc"
+                                                {{ request('sort') == 'created_at_asc' ? 'selected' : '' }}>
+                                                Cũ nhất</option>
+                                            <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>
+                                                Tên A-Z
+                                            </option>
+                                            <option value="name_desc"
+                                                {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Tên Z-A
+                                            </option>
+                                        </select>
                                     </div>
-                                </form>
+
+                                    {{-- Phân loại --}}
+                                    <div class="col-md-2">
+                                        <select name="gender" class="form-select">
+                                            <option value="">Giới tính</option>
+                                            <option value="boy" {{ request('gender') == 'boy' ? 'selected' : '' }}>Nam
+                                            </option>
+                                            <option value="girl" {{ request('gender') == 'girl' ? 'selected' : '' }}>Nữ
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    {{-- Nhiệm vụ nhân viên --}}
+                                    @if (request('role') === 'staff')
+                                        <div class="col-md-2">
+                                            <select name="mission" class="form-select">
+                                                <option value="">Nhiệm vụ</option>
+                                                <option value="train"
+                                                    {{ request('mission') == 'train' ? 'selected' : '' }}>
+                                                    Quản lí đào tạo
+                                                </option>
+                                                <option value="accountant"
+                                                    {{ request('mission') == 'accountant' ? 'selected' : '' }}>
+                                                    Kế toán
+                                                </option>
+                                            </select>
+                                        </div>
+                                    @endif
 
 
-                                <a href="{{ route('admin.account.add', ['role' => request('role')]) }}"
-                                    class="btn  btn-primary">
-                                    Thêm {{ $roles[request('role')] ?? request('role') }}
-                                </a>
-                            </div>
+                                    <div class="col-md-3">
+                                        <div class="position-relative">
+                                            <input type="search" name="queryAccountRole" class="form-control"
+                                                placeholder="Tìm {{ $roles[request('role')] ?? request('role') }}..."
+                                                autocomplete="off"
+                                                value="{{ request()->query('queryAccountRole') ?? '' }}">
+                                            <iconify-icon icon="solar:magnifer-linear" class="search-widget-icon"
+                                                style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999;"></iconify-icon>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 flex-fill">
+                                        <button type="submit" class="btn btn-success"><i class="fas fa-search me-2"></i>
+                                            Lọc</button>
+
+                                        <button id="clearFilterListAccountBtn" type="button" class="btn btn-danger"><i
+                                                class="fas fa-times me-2"></i> Xóa
+                                            Lọc</button>
+                                    </div>
+
+
+                                </div>
+                            </form>
                         @endif
 
                     </div> <!-- end card-header-->
@@ -80,54 +146,117 @@
                             <table class="table table-hover mb-0 table-centered">
                                 <thead>
                                     <tr>
-                                        <th>Ảnh đại diện</th>
-                                        <th>Tên</th>
-                                        <th>Giới tính</th>
+                                        <th>Thông tin</th>
+                                        <th>Mã {{ $roles[request('role')] ?? request('role') }}</th>
+
+                                        @if (request('role') === 'student')
+                                            <th>Khóa học đã đăng kí</th>
+                                        @elseif (request('role') === 'teacher')
+                                            <th>Lớp học được phân công</th>
+                                        @else
+                                            <th>Nhiệm vụ</th>
+                                        @endif
+
                                         <th>Ngày sinh nhật</th>
                                         <th>Email</th>
                                         <th>Số điện thoại</th>
+                                        <th>Địa chỉ</th>
                                         <th>Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse ($users as $data)
                                         <tr>
-                                            <td><img class="rounded" src="{{ asset($data->avatar) }}" width="50"
-                                                    alt="{{ $data->name }}">
+                                            <td>
+                                                <div style="display: flex; align-items: center; gap: 10px;">
+                                                    <img class="rounded"
+                                                        src="{{ $data->avatar ? asset($data->avatar) : asset('icons/user-solid.svg') }}"
+                                                        width="40" alt="{{ $data->name }}">
+                                                    <div>
+                                                        <div>{{ $data->name ?? '' }}</div>
+                                                        <div style="font-size: 0.9em; color: rgb(255, 81, 0);">
+                                                            @php
+                                                                echo match ($data->gender) {
+                                                                    'boy' => 'Nam',
+                                                                    'girl' => 'Nữ',
+                                                                    default => '',
+                                                                };
+                                                            @endphp</div>
+                                                    </div>
+                                                </div>
                                             </td>
-                                            <td>{{ $data->name }}</td>
-                                            <td>{{ $data->gender }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($data->birth_date)->format('d/m/Y') }}</td>
-                                            <td>{{ $data->email }}</td>
-                                            <td>{{ $data->phone }}</td>
+
+
+                                            <td>{{ $data->snake_case ?? '' }}</td>
+
+
+                                            @if (request('role') === 'student')
+                                                @php
+                                                    // đếm số khóa học đã đăng ký
+                                                    $count = DB::table('class_student')
+                                                        ->where('student_id', $data->id)
+                                                        ->count();
+                                                @endphp
+                                                <td>{{ $count ?? 0 }} lớp</td>
+                                            @elseif (request('role') === 'teacher')
+                                                @php
+                                                    // Lấy tất cả lớp học theo lịch học
+                                                    $allClasses = DB::table('schedules')
+                                                        ->where('teacher_id', $data->id)
+                                                        ->distinct('class_id')
+                                                        ->count('class_id');
+                                                @endphp
+                                                <td>{{ $allClasses ?? 0 }} lớp</td>
+                                            @else
+                                                @if (request('role') === 'staff')
+                                                    <td> @php
+                                                        echo match ($data->mission) {
+                                                            'train' => 'Quản lý đào tạo',
+                                                            'accountant' => 'Kế toán',
+                                                            default => 'Chưa có nhiệm vụ',
+                                                        };
+                                                    @endphp
+                                                    </td>
+                                                @else
+                                                    <td>Quản lí toàn hệ thống</td>
+                                                @endif
+                                            @endif
+
+                                            <td>
+                                                {{ $data->birth_date ? \Carbon\Carbon::parse($data->birth_date)->format('d/m/Y') : '' }}
+                                            </td>
+                                            <td>{{ $data->email ?? '' }}</td>
+                                            <td>{{ $data->phone ?? '' }}</td>
+                                            <td>{{ $data->address ?? '' }}</td>
                                             <td>
                                                 <div class="d-flex gap-2">
-
-                                                    <a href="{{ route('admin.account.detail', ['role' => request('role'), 'id' => $data->id]) }}"
-                                                        class="btn btn-soft-primary btn-sm">
-                                                        <iconify-icon   
-                                                            icon="solar:eye-broken"
-                                                            class="align-middle fs-18"></iconify-icon>
-                                                    </a>
+                                                    @if (request('role') == 'student' || request('role') == 'teacher')
+                                                        <a href="{{ route('admin.account.detail', ['role' => request('role'), 'id' => $data->id]) }}"
+                                                            class="btn btn-soft-primary btn-sm">
+                                                            <iconify-icon icon="solar:eye-broken"
+                                                                class="align-middle fs-18"></iconify-icon>
+                                                        </a>
+                                                    @endif
 
                                                     <a href="{{ route('admin.account.edit', ['role' => request('role'), 'id' => $data->id]) }}"
                                                         class="btn btn-soft-primary btn-sm"><iconify-icon
                                                             icon="solar:pen-2-broken"
                                                             class="align-middle fs-18"></iconify-icon></a>
 
-                                                    <a href="#" class="btn btn-soft-danger btn-sm"
-                                                        onclick="showDeleteConfirm({{ $data->id }}, '{{ $data->name }}', '{{ request('role') }}')">
-                                                        <iconify-icon icon="solar:trash-bin-minimalistic-2-broken"
-                                                            class="align-middle fs-18"></iconify-icon></a>
+                                                    @if (auth()->user()->isAdmin())
+                                                        <a href="#" class="btn btn-soft-danger btn-sm"
+                                                            onclick="showDeleteConfirm({{ $data->id }}, '{{ $data->name }}', '{{ request('role') }}')">
+                                                            <iconify-icon icon="solar:trash-bin-minimalistic-2-broken"
+                                                                class="align-middle fs-18"></iconify-icon></a>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
                                     @empty
-                                        <div class="col-12">
-                                            <div class="alert mt-3 alert-warning text-center" role="alert">
-                                                Không tìm thấy {{ $roles[request('role')] ?? request('role') }} nào
-                                            </div>
-                                        </div>
+                                        <tr>
+                                            <td colspan="7" class="text-center">Không tìm thấy
+                                                {{ $roles[request('role')] ?? request('role') }} nào.</td>
+                                        </tr>
                                     @endforelse
 
                                 </tbody>
@@ -163,92 +292,29 @@
     </div>
 
     <script>
-        function showDeleteConfirm(userId, userName, role) {
-            $.ajax({
-                url: `{{ route('admin.account.check', '') }}/${userId}`,
+        document.getElementById('clearFilterListAccountBtn').addEventListener('click', function() {
+            const form = document.getElementById('filterAccountForm');
 
-                method: 'GET',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                success: function(data) {
-                    let msg = `⚠️ ${role} "${userName}" đang có dữ liệu: \n\n`;
+            // Xóa tất cả input/select trong form
+            form.reset();
 
-                    if (data.classes.length)
-                        msg += `Lớp : ${data.classes.map(c => c.name).join(', ')}\n`;
-                    if (data.payments.length)
-                        msg += `Và Thanh toán: ${data.payments.length} khoản\n`;
-                    if (data.quizzes.length)
-                        msg += `Và Bài quiz: ${data.quizzes.length} lần\n`;
-                    if (data.schedules.length)
-                        msg += `Lịch dạy: ${data.schedules.length} buổi \n`;
-                    // nếu trùng 1 lớp 3 buổi thì sao
+            // Redirect về URL gốc không có query
+            window.location.href = "{{ route('admin.account.list', ['role' => request('role')]) }}";
 
-                    if (data.classes.length || data.payments.length || data.quizzes.length || data.schedules
-                        .length) {
-                        Swal.fire({
-                            title: `Bạn có chắc muốn xóa ${role}?`,
-                            text: msg,
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: 'Vâng, xóa!',
-                            cancelButtonText: 'Không, hủy',
-                            confirmButtonClass: 'btn btn-danger w-xs me-2 mt-2',
-                            cancelButtonClass: 'btn btn-secondary w-xs mt-2',
-                            buttonsStyling: false,
-                        }).then(function(result) {
-                            if (result.isConfirmed) {
-                                window.location.href = "{{ url('/admin/account/delete') }}/" + role +
-                                    "/" + userId;
+        });
 
-                            } else {
-                                Swal.fire({
-                                    title: 'Đã hủy',
-                                    text: 'Người dùng chưa bị xóa.',
-                                    icon: 'info',
-                                    confirmButtonClass: 'btn btn-primary mt-2',
-                                    buttonsStyling: false
-                                });
-                            }
-                        });
-                    } else {
-                        Swal.fire({
-                            title: `Bạn có chắc muốn xóa ${role}?`,
-                            text: `Thao tác này không thể hoàn tác.`,
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: 'Vâng, xóa!',
-                            cancelButtonText: 'Không, hủy',
-                            confirmButtonClass: 'btn btn-danger w-xs me-2 mt-2',
-                            cancelButtonClass: 'btn btn-secondary w-xs mt-2',
-                            buttonsStyling: false,
-                        }).then(function(result) {
-                            if (result.isConfirmed) {
-                                window.location.href = "{{ url('/admin/account/delete') }}/" + role +
-                                    "/" + userId;
-
-                            } else {
-                                Swal.fire({
-                                    title: 'Đã hủy',
-                                    text: 'Người dùng chưa bị xóa.',
-                                    icon: 'info',
-                                    confirmButtonClass: 'btn btn-primary mt-2',
-                                    buttonsStyling: false
-                                });
-                            }
-                        });
-                    }
-                },
-                error: function(xhr) {
-                    Swal.fire({
-                        title: 'Lỗi kết nối!',
-                        text: 'Không thể kiểm tra liên kết người dùng.',
-                        icon: 'error',
-                        confirmButtonClass: 'btn btn-danger mt-2',
-                        buttonsStyling: false
-                    });
-                    console.error(xhr.responseText);
+        function showDeleteConfirm(id, name, role) {
+            Swal.fire({
+                title: 'Xác nhận xóa',
+                text: `Bạn có chắc chắn muốn xóa người dùng "${name}" không?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/admin/account/delete/${role}/${id}`;
                 }
             });
         }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Exports\ScoresExport;
 use App\Exports\ScoresImport;
+use App\Exports\TemplateScoresExport;
 use App\Http\Controllers\Controller;
 use App\Models\classes;
 use App\Models\classStudent;
@@ -20,7 +21,7 @@ class ScoreController extends Controller
 {
     public function index()
     {
-        $data = Classes::with('course')->get();
+        $data = Classes::with('course')->paginate(12);
         return view('admin.scores.score', compact('data'));
     }
 
@@ -33,18 +34,45 @@ class ScoreController extends Controller
                     $q->where('name', 'like', "%$query%");
                 })
                 ->with('course')
-                ->get();
+                ->paginate(12);
 
             return view('admin.scores.score', compact('data', 'query'));
         }
         return redirect()->route('admin.score'); // Chuyển hướng nếu không có query
     }
 
-    public function detail($class_id, $course_id)
+    public function detail(?int $class_id, ?int $course_id)
     {
         $data = score::with(['student', 'class.course'])->where('class_id', $class_id)->paginate(9);
         // dd($data);
         return view('admin.scores.score-detail', compact('data'));
+    }
+
+    public function detailSearch(Request $request)
+    {
+        $keyword  = trim((string) $request->query('queryDetailScore'));
+        $class_id  = $request->query('class_id');
+        $course_id = $request->query('course_id');
+
+
+        $data = Score::query()
+            ->with(['student', 'class.course'])
+            ->where('class_id', $class_id)
+            ->when($keyword !== '', function ($query) use ($keyword) {
+                $query->whereHas('student', function ($q) use ($keyword) {
+                    $q->where('name', 'like', "%{$keyword}%")
+                    ->orWhere('snake_case', 'like', "%{$keyword}%");
+                });
+            })
+            ->orderByDesc('created_at')
+            ->paginate(9)
+            ->withQueryString();
+
+        return view('admin.scores.score-detail', [
+            'data' => $data,
+            'class_id' => $class_id,
+            'course_id' => $course_id
+        ]);
     }
 
     public function add($class_id)
@@ -53,9 +81,9 @@ class ScoreController extends Controller
             ->where('class_id', $class_id)
             ->get();
         // lấy thêm tên khóa học từ bảng classes
-        $class = classes::where('id',$class_id)->select('courses_id', 'name')->first();
+        $class = classes::where('id', $class_id)->select('courses_id', 'name')->first();
 
-        return view('admin.scores.score-add', compact('data','class'));
+        return view('admin.scores.score-add', compact('data', 'class'));
     }
 
     public function store($class_id, Request $request)
@@ -86,7 +114,7 @@ class ScoreController extends Controller
             ->get();
         $score = score::find($id);
 
-        $class = classes::where('id',$class_id)->select('courses_id', 'name')?->first();
+        $class = classes::where('id', $class_id)->select('courses_id', 'name')?->first();
 
 
         return view('admin.scores.score-edit', compact('data', 'score', 'class'));
@@ -134,7 +162,13 @@ class ScoreController extends Controller
 
     public function import(Request $request)
     {
-        Excel::import(new ScoresImport, $request->file('file'));
+
+        $errors = [];
+        Excel::import(new ScoresImport($errors), $request->file('file'));
+
+        if (!empty($errors)) {
+            return back()->with('error', $errors);
+        }
         return back()->with('success', 'Đã nhập điểm thành công!');
     }
 
@@ -173,6 +207,20 @@ class ScoreController extends Controller
 
     public function export($classId, $courseId)
     {
+
         return Excel::download(new ScoresExport($classId, $courseId), 'bangdiem.xlsx');
+    }
+
+    public function download(Request $request)
+    {
+        $classId  = $request->query('class_id');
+        $courseId = $request->query('course_id');
+
+        $fileName = 'score_template'
+            . ($classId ? "_class_{$classId}" : '')
+            . ($courseId ? "_course_{$courseId}" : '')
+            . '.xlsx';
+
+        return Excel::download(new TemplateScoresExport($classId, $courseId), $fileName);
     }
 }

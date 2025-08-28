@@ -4,10 +4,12 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\classes;
+use App\Models\NotificationUser;
 use App\Models\orders;
 use Illuminate\Http\Request;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class dashboardController extends Controller
@@ -276,7 +278,6 @@ class dashboardController extends Controller
         foreach ($data as $value) {
             $revenues[] = (int) $value->total_revenue;;
             $courses[] = $value->course_name;
-
         }
 
 
@@ -285,4 +286,5 @@ class dashboardController extends Controller
             'courses' => $courses
         ]);
     }
+
 }

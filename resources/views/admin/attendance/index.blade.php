@@ -188,6 +188,61 @@
         .fc-event-exam.fc-event-current {
             background-color: #c0392b !important;
         }
+
+        /* CSS cho bảng lịch học */
+        .table-row-clickable {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .table-row-clickable:hover {
+            background-color: #f8f9fa !important;
+        }
+
+        .table-row-clickable:active {
+            background-color: #e9ecef !important;
+        }
+
+        /* CSS cho modal */
+        .modal-lg {
+            max-width: 900px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        /* CSS để ẩn thời gian trong calendar */
+        .fc-event-time {
+            display: none !important;
+        }
+
+        .fc-event-title {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .attendance-icon {
+            margin-right: 4px;
+            font-size: 0.8rem;
+        }
+
+        .fc-event-main-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
     </style>
 @endpush
 
@@ -228,7 +283,7 @@
             </div>
 
             <!-- Filter Section -->
-            <div class="filter-section">
+            {{-- <div class="filter-section">
                 <div class="row">
                     <div class="col-md-3">
                         <label class="form-label">Giáo viên</label>
@@ -267,22 +322,22 @@
                         </select>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Calendar Legend -->
             <div class="calendar-legend">
                 <div class="legend-item">
                     ✅
-                    <span>Đã điểm danh</span>
+                    <span>Đã hoàn thành</span>
                 </div>
                 <div class="legend-item">
                     ❌
                     <span>Chưa điểm danh</span>
                 </div>
-                {{-- <div class="legend-item">
-                    <div class="legend-color legend-exam"></div>
-                    <span>Kiểm tra</span>
-                </div> --}}
+                <div class="legend-item">
+                    ⏳
+                    <span>Đang tiến hành</span>
+                </div>
             </div>
 
             <!-- Calendar Container -->
@@ -369,19 +424,23 @@
 
     <!-- Event Detail Modal -->
     <div class="modal fade" id="eventDetailModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="eventDetailTitle">Chi tiết sự kiện</h5>
+                    <h5 class="modal-title" id="eventDetailTitle">Lịch học trong ngày</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="eventDetailBody">
-                    <!-- Event details will be loaded here -->
+                    <!-- Class info and schedules list will be loaded here -->
+                    <div id="classInfo" class="mb-4">
+                        <!-- Class information will be loaded here -->
+                    </div>
+                    <div id="schedulesList">
+                        <!-- Schedules list will be loaded here -->
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-primary" id="attendanceBtn" style="display: none;">Điểm
-                        danh</button>
                 </div>
             </div>
         </div>
@@ -410,51 +469,82 @@
                 case 0:
                     return '❌'; // Chưa điểm danh
                 case 1:
-                    return '✅'; // Đã điểm danh đầy đủ
+                    return '✅'; // Đã hoàn thành
                 case 2:
-                    return '⏳'; // Điểm danh đang diễn ra
-                case 3:
-                    return '⚠️'; // Điểm danh không đầy đủ
+                    return '⏳'; // Đang tiến hành
                 default:
                     return '⭕'; // Không xác định
             }
         }
 
         function initializeCalendar() {
-            loadSchedules(); // Chỉ gọi hàm load dữ liệu
+            loadSchedules(); // Gọi hàm load dữ liệu
         }
 
         function loadSchedules() {
-            // Gọi API
             fetch("{{ route('admin.attendance.getSchedules') }}", {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest', // Thêm header này cho Laravel
-                        // Thêm header xác thực nếu cần, ví dụ:
-                        // 'Authorization': 'Bearer ' + yourToken
+                        'X-Requested-With': 'XMLHttpRequest',
                     }
                 })
                 .then(response => {
                     if (!response.ok) {
-                        // Nếu response lỗi, thử đọc nội dung JSON trả về
                         return response.json().then(errorData => {
                             throw new Error(
                                 `HTTP ${response.status} - ${response.statusText}: ${JSON.stringify(errorData)}`
-                            );
+                                );
                         }).catch(() => {
-                            // Nếu response không phải JSON (ví dụ lỗi 500)
                             throw new Error(`HTTP ${response.status} - ${response.statusText}`);
                         });
                     }
                     return response.json();
                 })
                 .then(schedules => {
-                    // Khởi tạo FullCalendar với dữ liệu từ API
+                    // Log dữ liệu thô từ API để debug
+                    console.log('Dữ liệu thô từ API:', schedules);
+
+                    // Chuẩn hóa và lọc dữ liệu sự kiện
+                    const processedEvents = schedules.map(event => {
+                        // Nếu API đã trả về đúng ngày (YYYY-MM-DD), không cần chỉnh lại múi giờ
+                        // Nếu event.start là '2025-04-29', giữ nguyên
+                        let isoDate = event.start;
+                        // Nếu event.start là dạng ISO có thời gian, chỉ lấy phần ngày
+                        if (typeof isoDate === 'string' && isoDate.includes('T')) {
+                            isoDate = isoDate.split('T')[0];
+                        }
+                        return {
+                            ...event,
+                            start: isoDate, // Chỉ lấy ngày
+                            allDay: true,
+                            extendedProps: {
+                                ...event.extendedProps,
+                                originalStart: event.start
+                            }
+                        };
+                    });
+
+                    // Loại bỏ các sự kiện trùng lặp dựa trên ngày và tiêu đề
+                    const uniqueEvents = [];
+                    const eventKeys = new Set();
+                    processedEvents.forEach(event => {
+                        const key = `${event.start}_${event.title}_${event.extendedProps.classId || ''}`;
+                        if (!eventKeys.has(key)) {
+                            eventKeys.add(key);
+                            uniqueEvents.push(event);
+                        }
+                    });
+
+                    // Log dữ liệu đã xử lý để debug
+                    console.log('Dữ liệu sự kiện đã xử lý:', uniqueEvents);
+
+                    // Khởi tạo FullCalendar
                     const calendarEl = document.getElementById('calendar');
                     calendar = new FullCalendar.Calendar(calendarEl, {
                         initialView: 'dayGridMonth',
                         locale: 'vi',
+                        timeZone: 'Asia/Ho_Chi_Minh',
                         headerToolbar: {
                             left: 'prev,next today',
                             center: 'title',
@@ -467,67 +557,69 @@
                             day: 'Ngày'
                         },
                         height: 'auto',
-                        events: schedules, // Dữ liệu từ API
+                        events: uniqueEvents,
                         eventClick: function(info) {
                             showEventDetail(info.event);
                         },
                         dateClick: function(info) {
                             console.log('Clicked on: ' + info.dateStr);
-                            // Có thể thêm logic tạo sự kiện mới ở đây
+                        },
+                        eventTimeFormat: {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                        },
+                        eventDisplay: 'block',
+                        eventContent: function(arg) {
+                            const icon = getAttendanceIcon(arg.event.extendedProps.status);
+                            return {
+                                html: `
+                                        <div class="fc-event-main-content">
+                                            <span class="attendance-icon">${icon}</span>
+                                            <span class="event-title">${arg.event.title}</span>
+                                        </div>
+                                    `
+                            };
                         },
                         eventDidMount: function(info) {
-                            // - phân loại event
                             const eventType = info.event.extendedProps.type;
                             if (eventType) {
                                 info.el.classList.add(`fc-event-${eventType}`);
                             }
 
-                            // - đánh dấu sự kiện hôm nay
                             const today = new Date();
-                            const eventStart = info.event.start;
-                            if (
+                            const eventStart = new Date(info.event.start);
+                            today.setHours(0, 0, 0, 0);
+                            eventStart.setHours(0, 0, 0, 0);
+
+                            if (eventStart < today) {
+                                info.el.classList.add('fc-event-past');
+                            } else if (
                                 eventStart.getFullYear() === today.getFullYear() &&
                                 eventStart.getMonth() === today.getMonth() &&
                                 eventStart.getDate() === today.getDate()
                             ) {
                                 info.el.classList.add('fc-event-current');
+                            } else {
+                                info.el.classList.add('fc-event-future');
                             }
-
-                            // Code mới - thêm icon điểm danh
-                            let icon = getAttendanceIcon(info.event.extendedProps.status);
-                            let titleEl = info.el.querySelector('.fc-event-title');
-
-                            if (titleEl) {
-                                titleEl.innerHTML = `
-                                    <span class="attendance-icon">${icon}</span>
-                                    <span class="event-title">${titleEl.textContent}</span>
-                                `;
-                            }
-                        },
-                        eventTimeFormat: {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false // Định dạng 24h
                         }
-                    }); // Render lịch
-                    console.log('Lịch học đã được tải thành công:', schedules);
+                    });
                     calendar.render();
                 })
                 .catch(error => {
                     console.error('Chi tiết lỗi:', error);
                     alert('Không thể tải lịch học. Lỗi: ' + error.message);
-
-                    // Khởi tạo calendar rỗng nếu load dữ liệu thất bại
                     initializeEmptyCalendar();
                 });
         }
 
         function initializeEmptyCalendar() {
             const calendarEl = document.getElementById('calendar');
-
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'vi',
+                timeZone: 'Asia/Ho_Chi_Minh', // Chỉ định múi giờ
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
@@ -540,12 +632,11 @@
                     day: 'Ngày'
                 },
                 height: 'auto',
-                events: [], // Không có sự kiện
+                events: [],
                 dateClick: function(info) {
                     console.log('Clicked on: ' + info.dateStr);
                 }
             });
-
             calendar.render();
         }
 
@@ -560,105 +651,117 @@
         // Hiển thị chi tiết sự kiện khi người dùng click vào sự kiện
         function showEventDetail(event) {
             const props = event.extendedProps || {};
-            const now = new Date();
-            const eventStart = new Date(event.start);
-            const eventEnd = event.end ? new Date(event.end) : new Date(event.start.getTime() + 60 * 60 *
-                1000); // Giả định 1 giờ nếu không có end
-            // Lấy ngày hiện tại (chỉ ngày, không giờ)
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            // Lấy ngày của sự kiện (chỉ ngày, không giờ)
-            const eventDate = new Date(eventStart.getFullYear(), eventStart.getMonth(), eventStart.getDate());
+            const classId = props.classId;
+            const eventDate = new Date(event.start).toISOString().split('T')[0];
 
-            // console.log('Now:', now);
-            // console.log('Event Start:', eventStart);
-            // console.log('Event End:', eventEnd);
-
-            let detailHtml = `
-                <div class="row">
-                    <div class="col-6"><strong>Thời gian:</strong></div>
-                    <div class="col-6">${event.start.toLocaleString('vi-VN')}</div>
-                </div>
-            `;
-
-            if (props.teacher) {
-                detailHtml += `
-                    <div class="row mt-2">
-                        <div class="col-6"><strong>Giáo viên:</strong></div>
-                        <div class="col-6">${props.teacher}</div>
-                    </div>
-                `;
+            if (!classId) {
+                console.error('Không tìm thấy classId');
+                return;
             }
 
-            if (props.courses) {
-                detailHtml += `
-                    <div class="row mt-2">
-                        <div class="col-6"><strong>Khóa học:</strong></div>
-                        <div class="col-6">${props.courses}</div>
-                    </div>
-                `;
-            }
-
-            if (props.class) {
-                detailHtml += `
-                    <div class="row mt-2">
-                        <div class="col-6"><strong>Lớp học:</strong></div>
-                        <div class="col-6">${props.class}</div>
-                    </div>
-                `;
-            }
-
-            // if (props.room) {
-            //     detailHtml += `
-        //         <div class="row mt-2">
-        //             <div class="col-6"><strong>Phòng học:</strong></div>
-        //             <div class="col-6">${props.room}</div>
-        //         </div>
-        //     `;
-            // }
-
-            if (props.students) {
-                detailHtml += `
-                    <div class="row mt-2">
-                        <div class="col-6"><strong>Sĩ số:</strong></div>
-                        <div class="col-6">${props.students} học sinh</div>
-                    </div>
-                `;
-            }
-
-            if (props.attended !== undefined && props.students) {
-                const attendanceRate = ((props.attended / props.students) * 100).toFixed(1);
-                detailHtml += `
-                    <div class="row mt-2">
-                        <div class="col-6"><strong>Điểm danh:</strong></div>
-                        <div class="col-6">${props.attended}/${props.students} (${attendanceRate}%)</div>
-                    </div>
-                `;
-            }
-
-            if (props.examType) {
-                detailHtml += `
-                    <div class="row mt-2">
-                        <div class="col-6"><strong>Loại kiểm tra:</strong></div>
-                        <div class="col-6">${props.examType}</div>
-                    </div>
-                `;
-            }
-
-            $('#eventDetailTitle').text(event.title);
-            $('#eventDetailBody').html(detailHtml);
-
-            // console.log(props.scheduleId || 'Ngu');
-
-            // Hiển thị nút điểm danh nếu sự kiện thuộc ngày hôm nay và nếu chưa điểm danh
-            // if (today.getTime() === eventDate.getTime() && props.students && props.students > 0 && props.status === 0) {
-                $('#attendanceBtn').show().off('click').on('click', function() {
-                    window.location.href = `/admin/attendance/schedules/${props.scheduleId || ''}`;
-                });
-            // } else {
-                // $('#attendanceBtn').hide();
-            // }
-
+            $('#eventDetailTitle').text('Đang tải...');
+            $('#classInfo').html(
+                '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Đang tải thông tin...</div>');
+            $('#schedulesList').html('');
             $('#eventDetailModal').modal('show');
+
+            fetch(`/admin/attendance/class/${classId}/detail`)
+                .then(response => response.json())
+                .then(classDetail => {
+                    $('#eventDetailTitle').text(
+                        `Lớp: ${classDetail.class_name} - ${new Date(eventDate).toLocaleDateString('vi-VN')}`);
+                    const classInfoHtml = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Thông tin lớp</h6>
+                                <p><strong>Tên lớp:</strong> ${classDetail.class_name}</p>
+                                <p><strong>Môn học:</strong> ${classDetail.course_name}</p>
+                                <p><strong>Sĩ số:</strong> ${classDetail.total_students} học sinh</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Ngày học</h6>
+                                <p><strong>Ngày:</strong> ${new Date(eventDate).toLocaleDateString('vi-VN')}</p>
+                                <p><strong>Thứ:</strong> ${new Date(eventDate).toLocaleDateString('vi-VN', { weekday: 'long' })}</p>
+                            </div>
+                        </div>
+                    `;
+                    $('#classInfo').html(classInfoHtml);
+                })
+                .catch(error => {
+                    console.error('Lỗi khi tải thông tin lớp:', error);
+                    $('#classInfo').html('<div class="alert alert-danger">Lỗi khi tải thông tin lớp</div>');
+                });
+
+            fetch(`/admin/attendance/class/${classId}/schedules?date=${eventDate}`)
+                .then(response => response.json())
+                .then(schedules => {
+                    console.log('Lịch học trong ngày:', schedules);
+                    const daySchedules = schedules.filter(schedule => schedule.date === eventDate);
+                    if (daySchedules.length === 0) {
+                        $('#schedulesList').html(
+                            '<div class="alert alert-info">Không có lịch học nào trong ngày này</div>');
+                        return;
+                    }
+
+                    let schedulesHtml = `
+                        <h6 class="text-primary mb-3">Danh sách lịch học trong ngày</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Thời gian</th>
+                                        <th>Giáo viên</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                    daySchedules.forEach(schedule => {
+                        const statusBadge = getScheduleStatusBadge(schedule.status);
+                        const isClickable = schedule.status === 0;
+                        schedulesHtml += `
+                            <tr class="${isClickable ? 'table-row-clickable' : ''}" 
+                                ${isClickable ? `onclick="goToAttendance(${schedule.id})"` : ''}>
+                                <td>${schedule.formatted_start_time} - ${schedule.formatted_end_time}</td>
+                                <td>${schedule.teacher_name}</td>
+                                <td>${statusBadge}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="goToAttendance(${schedule.id})">Điểm danh</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    schedulesHtml += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    $('#schedulesList').html(schedulesHtml);
+                })
+                .catch(error => {
+                    console.error('Lỗi khi tải danh sách lịch học:', error);
+                    $('#schedulesList').html('<div class="alert alert-danger">Lỗi khi tải danh sách lịch học</div>');
+                });
+        }
+
+        function goToAttendance(scheduleId) {
+            window.location.href = `/admin/attendance/schedules/${scheduleId}`;
+        }
+
+        function getScheduleStatusBadge(status) {
+            switch (status) {
+                case 0:
+                    return '<span class="badge bg-warning">Chưa điểm danh</span>';
+                case 1:
+                    return '<span class="badge bg-success">Đã điểm danh</span>';
+                case 2:
+                    return '<span class="badge bg-info">Đang diễn ra</span>';
+                default:
+                    return '<span class="badge bg-secondary">Không xác định</span>';
+            }
         }
 
         function filterEvents() {
@@ -667,25 +770,34 @@
             const classId = $('#classFilter').val();
             const eventType = $('#eventTypeFilter').val();
 
-            // In thực tế, bạn sẽ gửi AJAX request để lấy dữ liệu đã lọc
-            // Ở đây chỉ là demo filter
-            let filteredEvents = loadSchedules();
+            fetch("{{ route('admin.attendance.getSchedules') }}", {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                })
+                .then(response => response.json())
+                .then(schedules => {
+                    let filteredEvents = schedules;
 
-            if (teacher) {
-                filteredEvents = filteredEvents.filter(event =>
-                    event.extendedProps.teacher === getTeacherName(teacher)
-                );
-            }
+                    if (teacher) {
+                        filteredEvents = filteredEvents.filter(event => event.extendedProps.teacher === getTeacherName(
+                            teacher));
+                    }
+                    if (subject) {
+                        filteredEvents = filteredEvents.filter(event => event.extendedProps.subject === subject);
+                    }
+                    if (classId) {
+                        filteredEvents = filteredEvents.filter(event => event.extendedProps.classId === classId);
+                    }
+                    if (eventType) {
+                        filteredEvents = filteredEvents.filter(event => event.extendedProps.type === eventType);
+                    }
 
-            if (eventType) {
-                filteredEvents = filteredEvents.filter(event =>
-                    event.extendedProps.type === eventType
-                );
-            }
-
-            // Refresh calendar with filtered events
-            calendar.removeAllEvents();
-            calendar.addEventSource(filteredEvents);
+                    calendar.removeAllEvents();
+                    calendar.addEventSource(filteredEvents);
+                });
         }
 
         function getTeacherName(id) {
@@ -701,13 +813,11 @@
             const form = document.getElementById('addEventForm');
             const formData = new FormData(form);
 
-            // Validate form
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
             }
 
-            // Create new event object
             const newEvent = {
                 title: formData.get('title'),
                 start: formData.get('start_date') + 'T' + formData.get('start_time'),
@@ -717,14 +827,10 @@
                 }
             };
 
-            // Add to calendar
             calendar.addEvent(newEvent);
-
-            // Close modal and reset form
             $('#addEventModal').modal('hide');
             form.reset();
 
-            // In thực tế, bạn sẽ gửi AJAX request để lưu vào database
             Swal.fire({
                 icon: 'success',
                 title: 'Thành công!',

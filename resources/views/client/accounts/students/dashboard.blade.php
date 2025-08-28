@@ -106,7 +106,7 @@
                                         <i class="icofont-check fs-5 text-success mb-2"></i>
                                         <strong>Đã học</strong>
                                         <div class="badge bg-success text-white fw-bold mt-1 p-1 w-100" id="dahoc">
-                                            {{ $hoctaps->student_sessions_present ?? 0}} buổi</div>
+                                            {{ $hoctaps->student_sessions_present ?? 0 }} buổi</div>
                                     </div>
                                 </div>
                             </div>
@@ -126,9 +126,9 @@
                                 <div class="card text-center h-100 border-0 shadow-sm border-top border-warning">
                                     <div class="card-body p-3">
                                         <i class="icofont-clock-time fs-5 text-warning mb-2"></i>
-                                        <strong>Đến muộn</strong>
+                                        <strong>Nghỉ</strong>
                                         <div class="badge bg-warning text-dark fw-bold mt-1 p-1 w-100" id="denmuon">
-                                            {{ $hoctaps->student_sessions_late ?? 0 }} buổi</div>
+                                            {{ $hoctaps->student_sessions_absent ?? 0 }} buổi</div>
                                     </div>
                                 </div>
                             </div>
@@ -340,7 +340,7 @@
                     closeModal('qrModal');
 
                     $.ajax({
-                        url: 'course-payments/updatePayment',
+                        url: '/student/course-payments/updatePayment',
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -355,10 +355,9 @@
                     });
 
                     // Hiển thị popup demo
-                    showAlert('Thanh toán thành công!',
-                        'Cảm ơn bạn đã thanh toán. Giao dịch của bạn đã được xử lý thành công.', () => {
-                            console.log('Đã đóng popup');
-                        });
+                    showAlert('Thanh toán thành công!','Cảm ơn bạn đã thanh toán. Giao dịch của bạn đã được xử lý thành công.', () => {
+                        window.location.reload();
+                    });
 
 
 

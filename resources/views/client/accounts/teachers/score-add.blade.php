@@ -1,6 +1,15 @@
 @extends('client.accounts.information')
 
 @section('content-information')
+
+<!-- Tom Select CSS -->
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+
+<!-- Tom Select JS -->
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
+
+
     <div id="grades" class="content-section">
             <div class="row">
 
@@ -25,20 +34,21 @@
                             <div class="card-body">
                                 <div class="row">
 
-                                    <div class="col-lg-6">
+                                    <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="roles-name" class="form-label fw-semibold">Học sinh</label>
-                                            <div>
-                                                <select class="form-control" name="student_id" id="">
-                                                    <option disabled value="">Chọn học sinh</option>
-                                                    @foreach ($data as $stdClass)
-                                                        <option value="{{$stdClass->student_id}}"> {{ $stdClass->student->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
+                                            <label for="" class="form-label fw-semibold">Học sinh</label>
+                                            <select name="student_id" id="student_filter" class=" w-100"> 
+                                                <option value="">Chọn học sinh</option>
+                                                @foreach ($data as $stdClass)
+                                                    <option value="{{ $stdClass->student_id }}"
+                                                        {{ request('student_id') == $stdClass->student_id }}>
+                                                        {{ $stdClass->student->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
+                                    
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="roles-name" class="form-label fw-semibold">Loại điểm</label>
@@ -77,6 +87,23 @@
       
     </div>
 
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    new TomSelect("#student_filter", {
+        placeholder: "Chọn học sinh",
+        allowEmptyOption: true,
+        persist: false,
+        create: false,
+        maxOptions: 500,
+        closeAfterSelect: true,
+        sortField: {
+            field: "text",
+            direction: "asc"
+        }
+    });
+});
+</script>
 
 
 @endsection

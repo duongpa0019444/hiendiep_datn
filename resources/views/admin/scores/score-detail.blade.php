@@ -48,29 +48,44 @@
             @endif
 
             <div class="row">
+                <div class="d-flex justify-content-between pb-2">
+                    <h3 class="">Bảng điểm </h3>
+                    <a href="{{ route('admin.score.add', [request('class_id')]) }}" class="btn  btn-primary">
+                        <i class="fas fa-plus me-2"></i>Nhập điểm mới
+                    </a>
+                </div>
 
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="card-title">Bảng điểm </h4>
+
+                        <form method="GET" action="{{ route('admin.score.detailSearch') }}" class="app-search ms-2">
+                            <div class="position-relative">
+                                <input type="hidden" name="class_id" value="{{request('class_id')}}">
+                                <input type="hidden" name="course_id" value="{{request('course_id')}}">
+                                <input type="search" name="queryDetailScore" class="form-control"
+                                    placeholder="Tìm mã hoặc tên học sinh..." autocomplete="off"
+                                    value="{{ request()->query('queryDetailScore') ?? '' }}">
+                                <iconify-icon icon="solar:magnifer-linear" class="search-widget-icon"></iconify-icon>
+                            </div>
+                        </form>
+
                         <div class="d-flex gap-4">
+                            <a href="{{ route('admin.score.download', ['class_id' => request('class_id'), 'course_id' => request('course_id')]) }}" class="btn  btn-secondary">
+                                Tải mẫu nhập điểm
+                            </a>
                             <form action="{{ route('admin.scores.import') }}" method="POST" enctype="multipart/form-data"
                                 class="d-inline-block">
                                 @csrf
                                 <div class="d-flex align-items-center gap-2">
-                                    <input type="file" name="file" accept=".xlsx,.xls"
-                                        class="form-control form-control-sm" style="max-width: 220px;" required>
-                                    <button type="submit" class="btn btn-sm btn-warning"> Nhập điểm excel</button>
+                                    <input type="file" name="file" accept=".xlsx,.xls" class="form-control"
+                                        style="max-width: 220px;" required>
+                                    <button type="submit" class="btn  btn-warning"><i class="fas fa-plus me-2"></i> Nhập điểm excel</button>
                                 </div>
                             </form>
 
-                            <a href="{{ route('admin.score.add', [request('class_id')]) }}" class="btn btn-sm btn-primary">
-                                Nhập điểm mới
-                            </a>
-
-
-
                             <a href="{{ route('admin.scores.export', [request('class_id'), request('course_id')]) }}"
-                                class="btn btn-sm btn-success">
+                                class="btn  btn-success">
+                                <iconify-icon icon="material-symbols:download" class="fs-20"></iconify-icon>
                                 Xuất điểm Excel
                             </a>
                         </div>
@@ -81,23 +96,25 @@
                             <table class="table table-hover mb-0 table-centered">
                                 <thead>
                                     <tr>
-                                        <th>Họ Tên</th>
+                                        <th>Mã học sinh</th>
+                                        <th>Họ tên</th>
                                         <th>Lớp</th>
                                         <th>Khóa học</th>
-                                        <th>Loại Điểm</th>
+                                        <th>Loại điểm</th>
                                         <th>Điểm</th>
                                         <th>Ngày</th>
                                         <th>Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($data as $score)
+                                    @forelse ($data as $score)
                                         <tr>
                                             {{-- sử lí bảng score và thêm modol score vào --}}
-                                            <td>{{ $score->student->name ?? ''}}</td>
-                                            <td>{{ $score->class->name ?? ''}}</td>
-                                            <td>{{ $score->class->course->name ?? ''}}</td>
-                                            <td>{{ $score->score_type ?? ''}}</td> {{-- làm hàm trong model score --}}
+                                            <td>{{ $score->student->snake_case }}</td>
+                                            <td>{{ $score->student->name ?? '' }}</td>
+                                            <td>{{ $score->class->name ?? '' }}</td>
+                                            <td>{{ $score->class->course->name ?? '' }}</td>
+                                            <td>{{ $score->score_type ?? '' }}</td> {{-- làm hàm trong model score --}}
                                             <td>{{ $score->score }}</td>
                                             <td>{{ \Carbon\Carbon::parse($score->exam_date)->format('d/m/Y') }}</td>
                                             <td>
@@ -107,15 +124,19 @@
                                                         class="btn btn-soft-primary btn-sm"><iconify-icon
                                                             icon="solar:pen-2-broken"
                                                             class="align-middle fs-18"></iconify-icon></a>
-                                                    <a href="{{ route('admin.score.delete', ['id' => $score->id]) }}"
+                                                    <a href="#"
                                                         class="btn btn-soft-danger btn-sm"
-                                                        onclick="return confirm('Bạn có muốn xóa điểm của học sinh {{ $score->student->name }} ?')">
+                                                         onclick="showDeleteConfirm({{ $score->id }}, '{{ $score->student->name }}', '{{ $score->score_type }}')">
                                                         <iconify-icon icon="solar:trash-bin-minimalistic-2-broken"
                                                             class="align-middle fs-18"></iconify-icon></a>
                                                 </div>
                                             </td>
                                         </tr>
-                                    @endforeach
+                                    @empty
+                                        <tr>
+                                            <td colspan="7" class="text-center">Không có điểm nào được tìm thấy.</td>
+                                        </tr>
+                                    @endforelse
 
                                 </tbody>
                             </table>
@@ -148,5 +169,23 @@
         </footer>
 
     </div>
+
+    <script>
+      function showDeleteConfirm(id, name, score_type) {
+            Swal.fire({
+                title: 'Xác nhận xóa',
+                text: `Bạn có chắc chắn muốn xóa điểm ${score_type} của học sinh "${name}" không?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `admin/score-delete/${id}`;
+                }
+            });
+        }
+    </script>
 
 @endsection

@@ -35,11 +35,9 @@
                         <td>{{ \Carbon\Carbon::parse($score->exam_date)->format('d/m/Y') }}</td>
                     </tr>
                 @empty
-                    <div class="col-12">
-                        <div class="alert alert-warning text-center" role="alert">
-                            Không tìm thấy lớp hoặc khóa học nào.
-                        </div>
-                    </div>
+                    <tr>
+                        <td colspan="7" class="text-center">Không có điểm nào được tìm thấy.</td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>

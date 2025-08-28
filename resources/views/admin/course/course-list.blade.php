@@ -155,7 +155,7 @@
                                         <label class="form-label mb-1 d-block">Tác vụ</label>
                                         <div class="d-flex gap-1">
 
-                                            <button type="submit" class="btn btn-secondary btn-sm w-100">
+                                            <button type="submit" class="btn btn-success btn-sm w-100">
                                                 <iconify-icon icon="ic:baseline-filter-alt" class="me-1"></iconify-icon>
                                                 Lọc
                                             </button>

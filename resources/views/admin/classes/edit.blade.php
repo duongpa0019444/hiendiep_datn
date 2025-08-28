@@ -73,11 +73,6 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="number_of_sessions" class="form-label">Số buổi học</label>
-                            <input type="number" class="form-control" id="number_of_sessions" name="number_of_sessions"
-                                value="{{ old('number_of_sessions', $class->number_of_sessions) }}" required min="1">
-                        </div>
-                        <div class="mb-3">
                             <label for="status" class="form-label">Trạng thái</label>
                             <select class="form-select" id="status" name="status" required>
                                 <option value="not_started" {{ $class->status == 'not_started' ? 'selected' : '' }}>Tạm

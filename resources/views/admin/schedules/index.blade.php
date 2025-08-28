@@ -46,8 +46,9 @@
                                 <option value="">Tất cả trạng thái</option>
                                 <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>Đang
                                     hoạt động</option>
-                                <option value="not_started" {{ request('status') == 'not_started' ? 'selected' : '' }}>Tạm
-                                    dừng</option>
+                                <option value="not_started" {{ request('status') == 'not_started' ? 'selected' : '' }}>Chưa
+                                    bắt đầu
+                                </option>
                                 <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Đã hoàn
                                     thành</option>
                             </select>
@@ -129,7 +130,7 @@
                                             <th scope="col" width="80">#</th>
                                             <th scope="col">Tên lớp</th>
                                             <th scope="col">Tên khóa học</th>
-                                            <th scope="col">Số buổi học</th>
+                                            <th scope="col">Điểm danh</th>
                                             <th scope="col" width="120">Trạng thái</th>
                                             <th scope="col" width="150">Số học sinh</th>
                                             <th scope="col" width="120">Ngày tạo</th>
@@ -154,8 +155,7 @@
                                                         <div>
                                                             <h6 class="mb-0">{{ $class->course_name ?? 'N/A' }}</h6>
                                                             @if ($class->course_description)
-                                                                <small
-                                                                    class="text-muted">{{ Str::limit($class->course_description, 50) }}</small>
+                                                                <small class="text-muted">{!! Str::limit($class->course_description, 50) !!}</small>
                                                             @endif
                                                         </div>
                                                     </div>
@@ -163,9 +163,11 @@
                                                 <td>
                                                     <div class="d-flex align-items-center">
                                                         <i class="fas fa-calendar-alt text-muted me-2"></i>
-                                                        <span>{{ $class->sessions_count ?? 0 }}</span>
+                                                        <span>{{ $class->attended_sessions }}/{{ $class->scheduled_sessions }}
+                                                            buổi</span>
                                                     </div>
                                                 </td>
+
                                                 <td data-status="{{ $class->status }}">
                                                     @switch($class->status)
                                                         @case('in_progress')
@@ -173,7 +175,7 @@
                                                         @break
 
                                                         @case('not_started')
-                                                            <span class="badge bg-warning">Tạm dừng</span>
+                                                            <span class="badge bg-warning">Chưa bắt đầu</span>
                                                         @break
 
                                                         @case('completed')
@@ -222,11 +224,13 @@
                                                             class="btn btn-sm btn-outline-info btn-icon">
                                                             <i class="fas fa-calendar-alt"></i> Lịch học
                                                         </a>
-                                                        <a href="#"
-                                                            class="btn btn-sm btn-outline-primary btn-icon create-schedule-btn"
-                                                            data-class-id="{{ $class->id }}">
-                                                            <i class="fas fa-plus"></i> Tạo lịch
-                                                        </a>
+                                                        @if (($class->scheduled_sessions ?? 0) == 0)
+                                                            <a href="#"
+                                                                class="btn btn-sm btn-outline-primary btn-icon create-schedule-btn"
+                                                                data-class-id="{{ $class->id }}">
+                                                                <i class="fas fa-plus"></i> Tạo lịch
+                                                            </a>
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>
@@ -309,6 +313,13 @@
                                                 <!-- Teachers will be populated dynamically -->
                                             </select>
                                         </div>
+                                        <div class="mb-3">
+                                            <label for="room_id" class="form-label">Chọn phòng học</label>
+                                            <select name="room" id="room_id" class="form-select" required>
+                                                <option value="">-- Chọn phòng --</option>
+                                                <!-- Rooms will be populated dynamically -->
+                                            </select>
+                                        </div>
                                         <button type="button" class="btn btn-primary" id="to-step-2">Tiếp tục</button>
                                     </div>
 
@@ -317,6 +328,9 @@
                                         <h5>Bước 2: Chọn ngày bắt đầu</h5>
                                         <div class="mb-2">
                                             <strong>Giáo viên:</strong> <span id="selected-teacher-name"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>Phòng:</strong> <span id="selected-room-name"></span>
                                         </div>
                                         <div class="mb-3">
                                             <label>Chọn ngày bắt đầu:</label>
@@ -473,6 +487,15 @@
                                 // Initialize teacher name
                                 form.find('#teacher_id').trigger('change');
 
+                                // Populate rooms
+                                let roomOptions = '<option value="">-- Chọn phòng --</option>';
+                                data.rooms.forEach(function(room) {
+                                    roomOptions +=
+                                        `<option value="${room.id}">${room.name}</option>`;
+                                });
+                                form.find('#room_id').html(roomOptions);
+                                $('#room_id_step3').html(roomOptions);
+
                                 // Show modal
                                 $('#scheduleModal').modal('show');
                             },
@@ -494,6 +517,7 @@
                             return parseInt(this.value);
                         }).get();
                         let teacherId = form.find('#teacher_id').val();
+                        let room = form.find('#room_id').val();
 
                         if (weekdays.length === 0) {
                             Swal.fire('Vui lòng chọn ít nhất một thứ!');
@@ -503,6 +527,10 @@
                             Swal.fire('Vui lòng chọn giáo viên!');
                             return;
                         }
+                        if (!room) {
+                            Swal.fire('Vui lòng chọn phòng học!');
+                            return;
+                        }
 
                         form.find('#step-1').hide();
                         form.find('#step-2').show();
@@ -510,6 +538,9 @@
                         // Hiển thị tên giáo viên ở bước 2
                         let teacherName = form.find('#teacher_id option:selected').text();
                         $('#selected-teacher-name').text(teacherName);
+                        // Hiển thị tên phòng ở bước 2
+                        let roomName = form.find('#room_id option:selected').text();
+                        $('#selected-room-name').text(roomName);
 
                         // Sinh danh sách ngày hợp lệ
                         let possibleDates = [];
@@ -551,6 +582,11 @@
                         let startDate = form.find('input[name="start_date"]').val();
                         let startTime = form.find('input[name="start_time"]').val();
                         let endTime = form.find('input[name="end_time"]').val();
+                        // Đồng bộ phòng sang step 3 selector
+                        let currentRoomId = form.find('#room_id').val();
+                        if (currentRoomId) {
+                            $('#room_id_step3').val(currentRoomId);
+                        }
                         // Validate ngày và giờ
                         if (!startDate) {
                             Swal.fire('Vui lòng chọn ngày bắt đầu!');
@@ -566,20 +602,23 @@
                         }
                         // Tạo preview số buổi học
                         let html = `
-                                <table class="table table-bordered table-sm align-middle mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Buổi</th>
-                                            <th>Thứ</th>
-                                            <th>Ngày</th>
-                                            <th>Giờ bắt đầu</th>
-                                            <th>Giờ kết thúc</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                            `;
+        <table class="table table-bordered table-sm align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Buổi</th>
+                    <th>Thứ</th>
+                    <th>Ngày</th>
+                    <th>Giờ bắt đầu</th>
+                    <th>Giờ kết thúc</th>
+                    <th>Phòng học</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
                         let buoi = 1;
                         let date = new Date(startDate);
+                        let roomName = $('#room_id option[value="' + currentRoomId + '"]').text() || currentRoomId;
                         while (buoi <= totalSessions) {
                             let weekday = date.getDay();
                             if (weekdays.includes(weekday)) {
@@ -587,37 +626,39 @@
                                 let d = date.getDate().toString().padStart(2, '0') + '/' +
                                     (date.getMonth() + 1).toString().padStart(2, '0') + '/' +
                                     date.getFullYear();
-                                // Tạo div với các span
                                 html += `
-                                    <tr class="schedule-item" data-id="${buoi}">
-                                        <td class="text-primary fw-bold buoi">${buoi}</td>
-                                        <td>
-                                            <span class="thu editable" data-type="thu" style="cursor:pointer;" title="Nhấp để sửa">
-                                                ${thu} <i class="fas fa-pen text-muted ms-1" style="font-size:0.85em;"></i>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="ngay editable" data-type="ngay" style="cursor:pointer;" title="Nhấp để sửa">
-                                                ${d} <i class="fas fa-pen text-muted ms-1" style="font-size:0.85em;"></i>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="start-time editable" data-type="start" style="cursor:pointer;" title="Nhấp để sửa">
-                                                ${startTime} <i class="fas fa-pen text-muted ms-1" style="font-size:0.85em;"></i>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="end-time editable" data-type="end" style="cursor:pointer;" title="Nhấp để sửa">
-                                                ${endTime} <i class="fas fa-pen text-muted ms-1" style="font-size:0.85em;"></i>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-danger btn-remove-session" title="Xóa buổi này">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    `;
+                <tr class="schedule-item" data-id="${buoi}">
+                    <td class="text-primary fw-bold buoi">${buoi}</td>
+                    <td>
+                        <span class="thu" data-type="thu">${thu}</span>
+                    </td>
+                    <td>
+                        <span class="ngay editable" data-type="ngay" style="cursor:pointer;" title="Nhấp để sửa">
+                            ${d} <i class="fas fa-pen text-muted ms-1" style="font-size:0.85em;"></i>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="start-time editable" data-type="start" style="cursor:pointer;" title="Nhấp để sửa">
+                            ${startTime} <i class="fas fa-pen text-muted ms-1" style="font-size:0.85em;"></i>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="end-time editable" data-type="end" style="cursor:pointer;" title="Nhấp để sửa">
+                            ${endTime} <i class="fas fa-pen text-muted ms-1" style="font-size:0.85em;"></i>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="room editable" data-type="room" style="cursor:pointer;" title="Nhấp để sửa">
+                            ${roomName} <i class="fas fa-pen text-muted ms-1" style="font-size:0.85em;"></i>
+                        </span>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger btn-remove-session" title="Xóa buổi này">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
                                 buoi++;
                             }
                             date.setDate(date.getDate() + 1);
@@ -627,7 +668,6 @@
                         form.find('#step-2').hide();
                         form.find('#step-3').show();
                     });
-
                     // Quay lại bước 1
                     $('#schedule-create-form').on('click', '#back-step-1', function() {
                         let form = $('#schedule-create-form');
@@ -656,7 +696,7 @@
                     });
 
                     // Khi nhấp vào trường muốn sửa
-                    $('#preview-sessions').on('click', 'td:not(:first-child)', function() {
+                    $('#preview-sessions').on('click', 'td:not(:first-child):not(:last-child)', function() {
                         // Lấy span bên trong td
                         let $span = $(this).find('span.editable');
                         if ($span.length === 0 || $span.find('input,select').length) return;
@@ -665,19 +705,26 @@
                         let value = $span.text().trim();
                         let input;
 
-                        if (type === 'thu') {
-                            input = $('<select class="form-select form-select-sm"></select>');
-                            ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].forEach(function(thu) {
-                                input.append(
-                                    `<option value="${thu}" ${thu === value ? 'selected' : ''}>${thu}</option>`
-                                );
-                            });
-                        } else if (type === 'ngay') {
+                        if (type === 'ngay') {
                             let parts = value.split('/');
                             let dateVal = parts.length === 3 ?
                                 `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}` : '';
                             input = $(
                                 `<input type="date" class="form-control form-control-sm" value="${dateVal}">`);
+                        } else if (type === 'thu') {
+                            // Không cho phép sửa trực tiếp trường thứ
+                            return;
+                        } else if (type === 'room') {
+                            // Tạo dropdown cho phòng học
+                            input = $('<select class="form-select form-select-sm"></select>');
+                            // Lấy danh sách phòng từ #room_id
+                            let roomOptions = $('#room_id').html();
+                            input.html(roomOptions);
+                            // Tìm ID phòng dựa trên tên phòng
+                            let roomId = $('#room_id option').filter(function() {
+                                return $(this).text() === value;
+                            }).val() || '';
+                            input.val(roomId); // Đặt giá trị hiện tại là ID phòng
                         } else {
                             input = $(`<input type="time" class="form-control form-control-sm" value="${value}">`);
                         }
@@ -693,12 +740,50 @@
                                 let newValue = input.val();
                                 if (type === 'ngay' && newValue) {
                                     let d = new Date(newValue);
-                                    newValue = d.toLocaleDateString('vi-VN');
-                                }
-                                if (type === 'thu') {
-                                    newValue = input.find('option:selected').val();
-                                }
-                                if (!newValue) {
+                                    if (isNaN(d.getTime())) {
+                                        $span.html(
+                                            `${value} <i class="fas fa-pen text-muted ms-1" style="font-size:0.85em;"></i>`
+                                        );
+                                        Swal.fire('Lỗi', 'Ngày không hợp lệ!', 'error');
+                                        return;
+                                    }
+                                    // Định dạng ngày thành dd/mm/yyyy
+                                    newValue = d.toLocaleDateString('vi-VN', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric'
+                                    });
+                                    // Cập nhật trường thứ tương ứng
+                                    let weekday = d.getDay();
+                                    let thuText = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][weekday];
+                                    let $row = $span.closest('tr.schedule-item');
+                                    $row.find('.thu').text(thuText); // Cập nhật trực tiếp text của thứ
+                                } else if (type === 'room' && newValue) {
+                                    // Lấy tên phòng từ option được chọn
+                                    newValue = input.find('option:selected').text();
+                                } else if((type === 'start' || type === 'end') && newValue) {
+// Kiểm tra định dạng giờ
+                if (!/^[0-2][0-9]:[0-5][0-9]$/.test(newValue)) {
+                    $span.html(
+                        `${value} <i class="fas fa-pen text-muted ms-1" style="font-size:0.85em;"></i>`
+                    );
+                    Swal.fire('Lỗi', 'Giờ không hợp lệ!', 'error');
+                    return;
+                }
+                // Kiểm tra giờ bắt đầu và giờ kết thúc
+                let startTime = type === 'start' ? newValue : $row.find('.start-time').text().trim();
+                let endTime = type === 'end' ? newValue : $row.find('.end-time').text().trim();
+                if (startTime && endTime && startTime >= endTime) {
+                    $span.html(
+                        `${value} <i class="fas fa-pen text-muted ms-1" style="font-size:0.85em;"></i>`
+                    );
+                    Swal.fire('Lỗi', 'Giờ bắt đầu phải nhỏ hơn giờ kết thúc!', 'error');
+                    return;
+                }
+                                } else if (newValue) {
+                                    // Xử lý các trường khác (giờ)
+                                    newValue = input.val();
+                                } else {
                                     $span.html(
                                         `${value} <i class="fas fa-pen text-muted ms-1" style="font-size:0.85em;"></i>`
                                     );
@@ -757,9 +842,14 @@
                         let ngay = $(this).find('.ngay').text().trim();
                         let start_time = $(this).find('.start-time').text().trim();
                         let end_time = $(this).find('.end-time').text().trim();
+                        let roomText = $(this).find('.room').text().trim();
+                        // Lấy ID phòng từ tên phòng
+                        let roomId = $('#room_id option').filter(function() {
+                            return $(this).text() === roomText;
+                        }).val() || roomText;
 
                         // Kiểm tra dữ liệu
-                        if (!buoi || !thu || !ngay || !start_time || !end_time) {
+                        if (!buoi || !thu || !ngay || !start_time || !end_time || !roomId) {
                             Swal.fire('Lỗi', 'Dữ liệu buổi học không đầy đủ!', 'error');
                             return false;
                         }
@@ -778,7 +868,8 @@
                             thu,
                             ngay,
                             start_time,
-                            end_time
+                            end_time,
+                            room: roomId // Gửi ID phòng thay vì tên phòng
                         });
                     });
 
@@ -810,8 +901,14 @@
                         success: function(response) {
                             $('#scheduleModal').modal('hide');
                             $('#schedule-create-form')[0].reset();
-                            Swal.fire('Thành công', 'Lịch học đã được thêm thành công!', 'success');
-                            fetchClasses('');
+                            Swal.fire({
+                                title: 'Thành công',
+                                text: 'Lịch học đã được thêm thành công!',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                location.reload(); // Tải lại trang sau khi đóng thông báo
+                            });
                         },
                         error: function(xhr, status, error) {
                             let msg = `Đã xảy ra lỗi, mã lỗi: ${xhr.status}`;

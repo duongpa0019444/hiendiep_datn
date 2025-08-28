@@ -84,14 +84,14 @@
                             <i class="fas fa-check-circle me-1"></i>
                             Có mặt tất cả
                         </button>
-                        <button class="quick-action-btn btn-danger" onclick="markAllStatus('absent')">
+                        {{-- <button class="quick-action-btn btn-danger" onclick="markAllStatus('absent')">
                             <i class="fas fa-times-circle me-1"></i>
                             Vắng tất cả
                         </button>
                         <button class="quick-action-btn btn-warning" onclick="clearAll()">
                             <i class="fas fa-undo me-1"></i>
                             Xóa tất cả
-                        </button>
+                        </button> --}}
                         {{-- <button class="quick-action-btn btn-info" onclick="autoMarkPresent()">
                             <i class="fas fa-magic me-1"></i>
                             Tự động điểm danh
@@ -164,14 +164,15 @@
                                     </button>
                                 </div>
                             </div>
-          @empty
-    <div class="no-students text-center py-5">
-        <i class="fas fa-users-slash fa-3x text-muted mb-3"></i>
-        <h3 class="text-muted mb-2">Không có học sinh nào</h3>
-        <p class="text-muted mb-4">Hiện tại danh sách học sinh trống. Hãy thêm học sinh để bắt đầu điểm danh.</p>
-        {{-- <a href="#" class="btn btn-primary btn-lg" onclick="openAddStudentModal()">Thêm học sinh</a> --}}
-    </div>
-@endforelse
+                        @empty
+                            <div class="no-students text-center py-5">
+                                <i class="fas fa-users-slash fa-3x text-muted mb-3"></i>
+                                <h3 class="text-muted mb-2">Không có học sinh nào</h3>
+                                <p class="text-muted mb-4">Hiện tại danh sách học sinh trống. Hãy thêm học sinh để bắt đầu
+                                    điểm danh.</p>
+                                {{-- <a href="#" class="btn btn-primary btn-lg" onclick="openAddStudentModal()">Thêm học sinh</a> --}}
+                            </div>
+                        @endforelse
                     </div>
 
                     <!-- Modal for Note -->
@@ -613,7 +614,7 @@
                         attendance_data: attendanceData
                     });
 
-                    fetch('{{ route('attendance.save') }}', {
+                    fetch('{{ route('admin.attendance.save') }}', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -635,7 +636,14 @@
                                     icon: 'success',
                                     confirmButtonText: 'OK'
                                 }).then(() => {
-                                    showLoading(false); // Tắt loading trước
+                                    showLoading(false);
+                                    // Cập nhật trạng thái đã điểm danh trên giao diện
+                            const statusSpan = document.querySelector('.col-md-4.text-end span.text-danger, .col-md-4.text-end span.text-success');
+                            if (statusSpan) {
+                                statusSpan.textContent = '| Đã điểm danh';
+                                statusSpan.classList.remove('text-danger');
+                                statusSpan.classList.add('text-success');
+                            }
 
                                     // attendanceData = [];
                                     updateSummary();

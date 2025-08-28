@@ -97,6 +97,8 @@
                         <div class="card-body py-2 px-3">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
+
+                                    
                                     <h6 class="mb-1 fs-5">Chủ đề</h6>
                                     <p class="text-muted fw-semibold fs-5 mb-0">{{ $statistics[0]->total_topics }}</p>
                                 </div>
@@ -537,7 +539,7 @@
                         <!-- Tiêu đề + Chủ đề -->
                         <td>
                             <div class="d-flex align-items-start gap-2">
-                                <img src="${article.image ?? '/images/no-image.png'}"
+                                <img src="/${article.image ?? '/images/no-image.png'}"
                                     alt="Ảnh bài viết"
                                     class="rounded"
                                     style="width: 70px; height: 50px; object-fit: cover;">

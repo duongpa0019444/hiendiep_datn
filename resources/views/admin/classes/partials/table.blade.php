@@ -55,7 +55,7 @@
                                     @break
 
                                     @case('not_started')
-                                        <span class="badge bg-warning">Tạm dừng</span>
+                                        <span class="badge bg-warning">Chưa bắt đầu</span>
                                     @break
 
                                     @case('completed')
@@ -113,7 +113,7 @@
                                                     @csrf
                                                     @method('PATCH')
                                                     <button type="submit" class="dropdown-item text-warning">
-                                                        <i class="fas fa-pause me-2"></i>Tạm dừng
+                                                        <i class="fas fa-pause me-2"></i>Chưa bắt đầu
                                                     </button>
                                                 </form>
                                             </li>
@@ -130,10 +130,13 @@
                                             </li>
                                         @endif
                                         <li>
-                                            <button type="button" class="dropdown-item text-danger"
-                                                onclick="confirmDelete({{ $class->id }}, '{{ $class->name }}')">
-                                                <i class="fas fa-trash me-2"></i>Xóa lớp
-                                            </button>
+                                            @if (auth()->user()->isAdmin())
+                                                                    <button type="button"
+                                                                        class="dropdown-item text-danger btn-delete-class"
+                                                                        data-id="{{ $class->id }}">
+                                                                        <i class="fas fa-trash me-2"></i>Xóa lớp
+                                                                    </button>
+                                                                @endif
                                         </li>
                                     </ul>
                                 </div>
