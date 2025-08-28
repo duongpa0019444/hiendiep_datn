@@ -101,6 +101,11 @@
                             </div>
 
                         </div>
+                        <div class="card-footer border-top">
+                            <nav aria-label="Page navigation">
+                                {!! $lessions->withQueryString()->links('pagination::bootstrap-5') !!}
+                            </nav>
+                        </div>
                     </div>
                 </div>
 

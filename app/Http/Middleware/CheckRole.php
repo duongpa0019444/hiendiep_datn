@@ -69,7 +69,7 @@ class CheckRole
                     'admin.attendance.summary.update',
                     'admin.attendance.save',
 
-                    // khóa học
+                    // Lớp học
                     'admin.classes.add-student',
                     'admin.classes.detail',
                     'admin.classes.edit',
@@ -85,24 +85,40 @@ class CheckRole
                     'admin.classes.update',
 
                     // khóa học
-                    'admin.course-add',
-                    'admin.course-create',
+                    'admin.course-list',
                     'admin.course-detail',
                     'admin.course-edit',
-                    'admin.course-list',
                     'admin.course-update',
+                    'admin.course-delete',
+                    'admin.course-add',
+                    'admin.course-create',
+
 
                     // bài giảng
                     'admin.lession-add',
                     'admin.lession-create',
                     'admin.lession-edit',
                     'admin.lession-update',
+                    'admin.lession-delete',
+
+                    //Quản lý phòng học
+                    'admin.classroom.list-room',
+                    'admin.classroom.create',
+                    'admin.classroom.store',
+                    'admin.classroom.delete',
+                    'admin.classroom.detail-room',
+                    'admin.classroom.edit',
+                    'admin.classroom.update',
+
 
                     // thông báo vẫn cho xóa vì ko sửa được
                     'admin.notifications',
                     'admin.notifications.filter',
                     'admin.notifications.seed',
                     'admin.notifications.delete',
+
+
+
 
                     // câu hỏi
                     'admin.questions.delete',

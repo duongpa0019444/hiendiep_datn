@@ -71,14 +71,19 @@ class CourseController  extends Controller
         ));
     }
 
-    public function show($id)
-
+    public function show(Request $request, $id)
     {
-        $quizz = Quizzes::where('course_id', $id)->get(); // ✔ lấy theo điều kiện
-        $lessions = Lessions::where('course_id', $id)->get();
-
         $course = courses::findOrFail($id);
-        return view('admin.course.course-detail', compact('course', 'lessions', 'quizz'));
+
+        // số bản ghi mỗi trang (mặc định 10, có thể đổi qua query ?limit=20)
+        $limit = (int) $request->input('limit', 10);
+
+        $lessions = Lessions::where('course_id', $id)
+            ->orderByDesc('created_at')
+            ->paginate($limit)
+            ->withQueryString(); // giữ lại các tham số trên URL khi chuyển trang
+
+        return view('admin.course.course-detail', compact('course', 'lessions'));
     }
     public function delete($id)
     {
@@ -222,7 +227,7 @@ class CourseController  extends Controller
         $lesson->link_document = $request->input('link_document');
         $lesson->created_at = now();
         $lesson->updated_at = now();
-        
+
 
         $lesson->save();
 
