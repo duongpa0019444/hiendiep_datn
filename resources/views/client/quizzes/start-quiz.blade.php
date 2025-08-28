@@ -23,7 +23,7 @@
                 </div>
                 <div class="student-details">
                     <h6>{{ Auth::user()->name }}</h6>
-                    <small>{{ $classStudent->class_name }}</small>
+                    <small>{{ $classStudent->class_name ?? 'chưa có lớp học' }}</small>
                 </div>
             </div>
 

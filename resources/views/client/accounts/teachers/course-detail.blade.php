@@ -18,8 +18,8 @@
                             <th scope="col">#</th>
                             <th scope="col">Tên Bài Giảng</th>
                             <th scope="col">Tài Liệu Học</th>
-                            <th scope="col">Bài Tập</th>
-                            <th scope="col">Ngày Cập Nhật</th>
+                            {{-- <th scope="col">Bài Tập</th> --}}
+                            <th scope="col">Ngày Tạo</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -27,7 +27,7 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $lession->name }}</td>
-                                <td>
+                                {{-- <td>
                                     @if ($lession->link_document)
                                         <a target="_blank" rel="noopener noreferrer" href="{{ $lession->link_document }}" class="text-primary">
                                             <i class="fas fa-file-alt me-1"></i>Xem tài liệu
@@ -35,7 +35,7 @@
                                     @else
                                         <span class="text-muted">Chưa có tài liệu</span>
                                     @endif
-                                </td>
+                                </td> --}}
                                 <td>
                                     @if ($lession->quizz)
                                         <a href="{{ route('admin.quizzes.detail', ['id' => $lession->quizz->id]) }}" class="text-primary">
@@ -45,13 +45,13 @@
                                         <span class="text-muted">Chưa có bài tập</span>
                                     @endif
                                 </td>
-                                <td>{{ \Carbon\Carbon::parse($lession->updated_at)->format('d/m/Y H:i') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($lession->created_at)->format('d/m/Y H:i') }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
-            
+
             <!-- Pagination -->
             @if ($lessions->hasPages())
                 <div id="pagination-wrapper" class="flex-grow-1 mt-4">
