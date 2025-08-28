@@ -206,7 +206,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="flex-grow-1 pe-4">
-                                                    <a href="#" class="mb-1 fw-semibold fs-6">
+                                                    <a href="{{ route('admin.noti.detail', $notification->id) }}" class="mb-1 fw-semibold fs-6">
                                                         {{ $notification->notification->title }}
 
                                                     </a>

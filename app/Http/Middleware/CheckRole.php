@@ -259,10 +259,12 @@ class CheckRole
                     'admin.course_payments.trash',
                     'admin.course_payments.trash.filter',
 
+
                     // thông báo học phí
                     'admin.noti.coursepayment',
                     'admin.noti.coursepayment.filter',
                     'admin.noti.detail',
+
 
                     // thông báo vẫn cho xóa vì ko sửa được
                     'admin.notifications',

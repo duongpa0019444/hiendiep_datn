@@ -179,7 +179,7 @@
                     </div>
 
 
-                    <div>
+                    <div class="card">
                         <div class="table-responsive">
                             <table class="table align-middle mb-0 table-hover table-centered">
                                 <thead class="bg-light-subtle">

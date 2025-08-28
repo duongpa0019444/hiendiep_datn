@@ -167,7 +167,21 @@ class newsController extends Controller
             $extension = $image->getClientOriginalExtension();
             $cleanName = Str::slug($originalName);
             $imageName = time() . '_' . $cleanName . '.' . $extension;
-            $image->move(public_path('uploads/news'), $imageName);
+
+            $tmpPath = $image->getPathname();
+            $destination = public_path('uploads/news/');
+        if (!file_exists($destination)) {
+            mkdir($destination, 0777, true);
+        }
+
+        $newFileName = time() . '_' . $originalName. '.' . $extension;
+        $newPath = $destination . $newFileName;
+        //var_dump($tmpPath);
+        //die;
+            //$image->move(public_path('uploads/news'), $imageName);
+            move_uploaded_file($tmpPath, $newPath);
+
+            //$image->move(public_path('uploads/news'), $imageName);
             $news->image = 'uploads/news/' . $imageName;
         }
         $news->image_caption = $request->image_caption;
