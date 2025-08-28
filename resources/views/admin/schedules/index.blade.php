@@ -307,7 +307,7 @@
                                             </div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="teacher_id" class="form-label">Chọn giáo viên</label>
+                                            <label for="teacher_id" class="form-label" >Chọn giáo viên</label>
                                             <select name="teacher_id" id="teacher_id" class="form-select" required>
                                                 <option value="">-- Chọn giáo viên --</option>
                                                 <!-- Teachers will be populated dynamically -->

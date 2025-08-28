@@ -19,7 +19,6 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('client/images/logo-icon.png') }}">
 
