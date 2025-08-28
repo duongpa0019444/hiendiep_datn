@@ -5,6 +5,7 @@
 @section('content')
 
     <div class="page-content">
+
         <form action="{{ route('admin.lession-add', ['id' => $id]) }}" method="POST">
             @csrf
 
@@ -21,6 +22,17 @@
                         </div>
                     @endif
                     <div class="col-xl-12 col-lg-10">
+                        <nav aria-label="breadcrumb p-6">
+                            <ol class="breadcrumb py-0">
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><a
+                                        href="{{ route('admin.course-list') }}">Quản lí khóa học</a> </li>
+                                <li class="breadcrumb-item active" aria-current="page"
+                                    > <a href="{{ route('admin.course-detail', ['id' => $course->id]) }}"> Chi tiết khóa học </a> </li>
+                                <li class="breadcrumb-item">Thêm bài giảng</li>
+
+                            </ol>
+                        </nav>
                         <!-- Thêm thông tin -->
                         <div class="card">
                             <div class="card-header">
