@@ -231,11 +231,12 @@ class CourseController  extends Controller
     public function editLession($course_id, $id)
     {
         // dd($course_id, $id);
-        $course_id = $course_id;
-        $lession = Lessions::findOrFail($id);
-        // $quizz = Quizzes::where('course_id', $course_id)->get(); // hoặc Quizzes::all() nếu không cần lọc
+        // $course_id = $course_id;
+        $course = Courses::findOrFail($course_id); // thêm dòng này
 
-        return view('admin.course.lession-edit', ['id' => $id], compact('lession', 'course_id', 'id'));
+        $lession = Lessions::findOrFail($id);
+
+        return view('admin.course.lession-edit', ['id' => $id], compact('lession', 'course_id', 'id', 'course'));
     }
     public function updateLession(Request $request, $course_id, $id)
     {
