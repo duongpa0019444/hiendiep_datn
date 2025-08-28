@@ -1,3 +1,11 @@
+@php
+    $roles = [
+        'student' => 'Học sinh',
+        'teacher' => 'Giáo viên',
+        'admin' => 'Quản trị viên',
+        'staff' => 'Nhân viên',
+    ];
+@endphp
 @extends('admin.admin')
 @section('title', 'Thùng rác tài khoản')
 @section('description', '')
@@ -33,7 +41,9 @@
             <nav aria-label="breadcrumb p-0">
                 <ol class="breadcrumb py-0">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.account') }}">Quản lí người dùng</a></li>
+                    <li class="breadcrumb-item"><a
+                            href="{{ route('admin.account.list', request('role')) }}">Quản lí {{ $roles[request('role')] ?? request('role') }}</a>
+                    </li>
                     <li class="breadcrumb-item active" aria-current="page">Thùng rác tài khoản</li>
                 </ol>
             </nav>
@@ -81,6 +91,7 @@
                             <table class="table table-hover mb-0 table-centered">
                                 <thead>
                                     <tr>
+                                        <th>Mã {{ $roles[request('role')] ?? request('role') }}</th>
                                         <th>Thông tin</th>
                                         <th>Vai trò</th>
                                         <th>Ngày sinh nhật</th>
@@ -94,6 +105,7 @@
                                 <tbody>
                                     @forelse ($trash as $data)
                                         <tr>
+                                            <td>{{ $data->snake_case }}</td>
                                              <td>
                                                 <div style="display: flex; align-items: center; gap: 10px;">
                                                     <img class="rounded" src="{{ $data->avatar ? asset($data->avatar) : asset('icons/user-solid.svg') }}" width="40"
