@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\teacher_salaries;
 use App\Models\teacher_salary_rules;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -209,11 +210,20 @@ class TeacherRulesController extends Controller
             }
 
             // ✅ Insert bản ghi mới
-            DB::table('teacher_salary_rules')->insert([
+            $newSalary = DB::table('teacher_salary_rules')->insert([
                 'teacher_id' => $teacherId,
                 'pay_rate' => $newRate,
                 'effective_date' => $newEffective,
             ]);
+            // lấy tên giáo viên
+            $teacherName = DB::table('users')->where('id', $teacherId)->value('name');
+
+            $this->logAction(
+                'addNewSalaryRule',
+                teacher_salaries::class,
+                null,
+                Auth::user()->name . ' đã thêm mức lương mới cho ' . $teacherName
+            );
 
             DB::commit();
 
