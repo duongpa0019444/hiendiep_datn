@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class SchedulesController extends Controller
 {
@@ -23,11 +24,11 @@ class SchedulesController extends Controller
             'classes.created_at as start_date',
             'courses.name as course_name',
             'courses.description as course_description',
-            DB::raw("(SELECT COUNT(*) 
-              FROM schedules 
+            DB::raw("(SELECT COUNT(*)
+              FROM schedules
               WHERE schedules.class_id = classes.id) as scheduled_sessions"),
-            DB::raw("(SELECT COUNT(DISTINCT schedules.id) 
-              FROM schedules 
+            DB::raw("(SELECT COUNT(DISTINCT schedules.id)
+              FROM schedules
               JOIN attendances ON attendances.schedule_id = schedules.id
               WHERE schedules.class_id = classes.id) as attended_sessions")
         )
@@ -237,6 +238,14 @@ class SchedulesController extends Controller
 
         DB::table('schedules')->insert($sessions);
 
+        $className = DB::table('classes')->where('id', $classId)->value('name');
+        $this->logAction(
+            'create',
+            Schedule::class,
+            null, // Không ghi ID cụ thể vì tạo nhiều bản ghi
+            Auth::user()->name . ' đã tạo lịch học cho lớp: ' . $className
+        );
+
         return response()->json(['success' => true, 'message' => 'Tạo lịch học thành công!']);
     }
 
@@ -379,6 +388,15 @@ class SchedulesController extends Controller
         // Lưu vào database
         try {
             DB::table('schedules')->insert($data);
+            $scheduleId = DB::table('schedules')->insertGetId($data);
+            $className = DB::table('classes')->where('id', $classId)->value('name');
+            $this->logAction(
+                'create',
+                Schedule::class,
+                $scheduleId,
+                Auth::user()->name . ' đã tạo lịch học cho lớp: ' . $className
+            );
+
             return response()->json([
                 'success' => true,
                 'message' => 'Đã thêm lịch học thành công.'
@@ -447,7 +465,13 @@ class SchedulesController extends Controller
                 'message' => 'Không thể xóa lịch học vì đã điểm danh!'
             ], 400);
         }
-
+        $className = DB::table('classes')->where('id', $schedule->class_id)->value('name');
+        $this->logAction(
+            'delete',
+            Schedule::class,
+            $id,
+            Auth::user()->name . ' đã xóa một lịch học cho lớp: ' . $className
+        );
         DB::table('schedules')->where('id', $id)->delete();
 
         return response()->json(['success' => true, 'message' => 'Xóa lịch học thành công!']);
@@ -591,6 +615,13 @@ class SchedulesController extends Controller
         // Cập nhật vào database
         try {
             DB::table('schedules')->where('id', $id)->update($data);
+            $className = DB::table('classes')->where('id', $classId)->value('name');
+            $this->logAction(
+                'update',
+                Schedule::class,
+                $id,
+                Auth::user()->name . ' đã cập nhật lịch học cho lớp: ' . $className
+            );
             return response()->json([
                 'success' => true,
                 'message' => 'Đã cập nhật lịch học thành công.'

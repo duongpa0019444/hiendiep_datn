@@ -102,7 +102,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/thong-ke-trang-thai-lop/{year}', [ThongKeController::class, 'statusClasses'])->name('admin.thongke.statusClasses');
     Route::get('/sl-hs-theo-lop/{year}', [ThongKeController::class, 'classStudentCounts'])->name('admin.thongke.classStudentCounts');
     Route::get('/diem-tb-theo-lop/{year}', [ThongKeController::class, 'classAverageScores'])->name('admin.thongke.classAverageScores');
-    // Xuất báo cáo học sinh đk theo khóa theo tháng 
+    // Xuất báo cáo học sinh đk theo khóa theo tháng
     Route::get('/xuat-bao-cao/hoc-sinh-dang-ky/{year}', function ($year) {
         return Excel::download(new TkDaoTaoExport1($year), "bao_cao_hoc_sinh_dang_ky_$year.xlsx");
     });
@@ -330,7 +330,7 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/attendance/class/{classId}/schedules', [AttendanceController::class, 'getSchedulesByClass'])->name('admin.attendance.getSchedulesByClass');
     Route::get('/attendance/class/{classId}/detail', [AttendanceController::class, 'getClassDetail'])->name('admin.attendance.getClassDetail');
     Route::get('/attendance/schedules/{id}', [AttendanceController::class, 'attendanceClass'])->name('admin.attendance.class');
-    
+
     // Mới thêm
     Route::post('/attendance/summary', [AttendanceController::class, 'updateSummary'])->name('admin.attendance.summary.update');
     Route::post('/attendance/save', [AttendanceController::class, 'saveAttendance'])->name('admin.attendance.save');

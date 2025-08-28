@@ -4,10 +4,12 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Models\classes;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -321,6 +323,7 @@ class AttendanceController extends Controller
 
             $schedule = DB::table('schedules')->where('id', $scheduleId)->first();
             $laDiemDanhDauTien = $schedule->status == 0;
+            Log::info('Schedule data: ', (array) $schedule);
 
             // Xóa dữ liệu điểm danh cũ (nếu có) để cập nhật lại
             Attendance::where('schedule_id', $scheduleId)->delete();
@@ -350,8 +353,18 @@ class AttendanceController extends Controller
                     ->increment('number_of_sessions');
             }
 
+            $class = classes::find($classId);
+
+            $this->logAction(
+                'update',
+                Attendance::class,
+                $scheduleId,
+                Auth::user()->name . ' đã lưu điểm danh lớp: ' .$class->name
+            );
+
             // Commit transaction
             DB::commit();
+
 
             return response()->json([
                 'success' => true,
