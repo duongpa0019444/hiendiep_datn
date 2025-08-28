@@ -260,7 +260,6 @@
             $(document).on('click', '.btn-export-salary-area-chart', function(e) {
                 e.preventDefault();
 
-                let year = new Date().getFullYear();
                 console.log(year);
                 Swal.fire({
                     title: 'Đang xử lý...',
@@ -358,7 +357,6 @@
             $(document).on('click', '.btn-export-revenue-line-chart', function(e) {
                 e.preventDefault();
 
-                let year = new Date().getFullYear();
                 console.log(year);
                 Swal.fire({
                     title: 'Đang xử lý...',
@@ -495,7 +493,6 @@
             $(document).on('click', '.btn-export-tuition-stacked-chart', function(e) {
                 e.preventDefault();
 
-                let year = new Date().getFullYear();
                 console.log(year);
                 Swal.fire({
                     title: 'Đang xử lý...',
@@ -633,7 +630,6 @@
             $(document).on('click', '.btn-export-profit-chart', function(e) {
                 e.preventDefault();
 
-                let year = new Date().getFullYear();
                 console.log(year);
                 Swal.fire({
                     title: 'Đang xử lý...',

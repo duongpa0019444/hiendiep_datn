@@ -117,8 +117,12 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <a href="{{ route('admin.attendance.index') }}"><button type="button" class="btn btn-primary">Chi
-                            tiết</button></a>
+                    @if (auth()->user()->mission == 'train')
+                        <a href="{{ route('admin.attendance.index') }}"><button type="button"
+                                class="btn btn-primary">Chi
+                                tiết</button></a>
+                    @endif
+
                 </div>
             </div>
         </div>
@@ -500,6 +504,22 @@
 
 
                         <li class="menu-title mt-2">Quản lý học tập</li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.course-list') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:book-education-outline"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý khóa học </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.classroom.list-room') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:google-classroom"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý phòng học </span>
+                            </a>
+                        </li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.account') }}">
@@ -534,14 +554,7 @@
                                 <span class="nav-text"> Quản lý lớp học </span>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.classroom.list-room') }}">
-                                <span class="nav-icon">
-                                    <iconify-icon icon="mdi:google-classroom"></iconify-icon>
-                                </span>
-                                <span class="nav-text"> Quản lý phòng học </span>
-                            </a>
-                        </li>
+
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.schedules.index') }}">
@@ -552,14 +565,7 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.course-list') }}">
-                                <span class="nav-icon">
-                                    <iconify-icon icon="mdi:book-education-outline"></iconify-icon>
-                                </span>
-                                <span class="nav-text"> Quản lý khóa học </span>
-                            </a>
-                        </li>
+
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.attendance.index') }}">
@@ -567,6 +573,14 @@
                                     <iconify-icon icon="mdi:clipboard-check-outline"></iconify-icon>
                                 </span>
                                 <span class="nav-text"> Quản lý điểm danh </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.score') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:chart-bar"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý điểm số </span>
                             </a>
                         </li>
 
@@ -581,14 +595,6 @@
                         </li>
 
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.score') }}">
-                                <span class="nav-icon">
-                                    <iconify-icon icon="mdi:chart-bar"></iconify-icon>
-                                </span>
-                                <span class="nav-text"> Quản lý điểm số </span>
-                            </a>
-                        </li>
 
 
 
@@ -709,7 +715,7 @@
                             </a>
                         </li>
 
-                         <li class="nav-item">
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.thongke.taichinh') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="mdi:finance"></iconify-icon>
@@ -851,6 +857,23 @@
                         <li class="menu-title mt-2">Quản lý học tập</li>
 
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.course-list') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:book-education-outline"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý khóa học </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.classroom.list-room') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:google-classroom"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý phòng học </span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.account.list', 'student') }}">
                                 <span class="nav-icon">
                                     <iconify-icon icon="ph:student-fill" width="24"></iconify-icon>
@@ -876,14 +899,8 @@
                                 <span class="nav-text"> Quản lý lớp học </span>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.classroom.list-room') }}">
-                                <span class="nav-icon">
-                                    <iconify-icon icon="mdi:google-classroom"></iconify-icon>
-                                </span>
-                                <span class="nav-text"> Quản lý phòng học </span>
-                            </a>
-                        </li>
+
+
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.schedules.index') }}">
                                 <span class="nav-icon">
@@ -893,14 +910,7 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.course-list') }}">
-                                <span class="nav-icon">
-                                    <iconify-icon icon="mdi:book-education-outline"></iconify-icon>
-                                </span>
-                                <span class="nav-text"> Quản lý khóa học </span>
-                            </a>
-                        </li>
+
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.attendance.index') }}">
@@ -908,6 +918,14 @@
                                     <iconify-icon icon="mdi:clipboard-check-outline"></iconify-icon>
                                 </span>
                                 <span class="nav-text"> Quản lý điểm danh </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.score') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:chart-bar"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Quản lý điểm số </span>
                             </a>
                         </li>
 
@@ -922,14 +940,6 @@
                         </li>
 
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.score') }}">
-                                <span class="nav-icon">
-                                    <iconify-icon icon="mdi:chart-bar"></iconify-icon>
-                                </span>
-                                <span class="nav-text"> Quản lý điểm số </span>
-                            </a>
-                        </li>
 
                         <li class="menu-title mt-2">Truyền thông & Liên hệ</li>
 

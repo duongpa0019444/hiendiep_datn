@@ -108,8 +108,8 @@
                 </div>
                 <div class="mobile-menu-modal-main-body">
                     <!-- Mobile Menu Navigation -->
-                    <nav class="offcanvas__menu">
-                        <ul class="offcanvas__menu_ul">
+                    <nav class="offcanvas__menu mobile-menu">
+                        <ul class="offcanvas__menu_ul" id="mobileMenu">
                             <li class="offcanvas__menu_li">
                                 <a class="offcanvas__menu_item" href="{{ route('home') }}">Trang chủ</a>
 
@@ -137,7 +137,8 @@
 
 
                             <li class="offcanvas__menu_li">
-                                <a class="offcanvas__menu_item active" href="{{ route('client.about') }}">Giới thiệu</a>
+                                <a class="offcanvas__menu_item" href="{{ route('client.about') }}">Giới
+                                    thiệu</a>
 
                             </li>
 
@@ -172,7 +173,7 @@
 
                             <!-- Navigation Menu -->
                             <nav class="ed-header__navigation">
-                                <ul class="ed-header__menu">
+                                <ul class="ed-header__menu" id="desktopMenu">
                                     <li class="active">
                                         <a href="{{ route('home') }}">Trang chủ</a>
 
@@ -992,6 +993,38 @@
                     // const res = xhr.responseJSON;
                     // alert(res?.message || 'Đăng nhập thất bại');
                 }
+            });
+        });
+
+
+        function setActiveMenu(menuSelector, activePath) {
+            const menuItems = document.querySelectorAll(menuSelector + ' li a');
+            menuItems.forEach(item => {
+                if (item.getAttribute('href') === activePath) {
+                    item.parentElement.classList.add('active');
+                } else {
+                    item.parentElement.classList.remove('active');
+                }
+            });
+        }
+
+        // lấy link đã lưu
+        const activePath = localStorage.getItem('activeMenu');
+
+        // nếu có lưu thì set active cho cả desktop + mobile
+        if (activePath) {
+            setActiveMenu('#desktopMenu', activePath);
+            setActiveMenu('#mobileMenu', activePath);
+        } else {
+            // nếu chưa lưu thì mặc định active "Trang chủ"
+            document.querySelector('#desktopMenu li:first-child').classList.add('active');
+            document.querySelector('#mobileMenu li:first-child').classList.add('active');
+        }
+
+        // Bắt sự kiện click cho cả desktop + mobile
+        document.querySelectorAll('#desktopMenu li a, #mobileMenu li a').forEach(item => {
+            item.addEventListener('click', function() {
+                localStorage.setItem('activeMenu', this.getAttribute('href'));
             });
         });
     </script>
