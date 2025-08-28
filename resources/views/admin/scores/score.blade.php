@@ -16,7 +16,7 @@
                 <div class="col-lg-3">
                     <h3 class="">Danh sách các lớp </h3>
                 </div>
-                   
+
                 <div class="col-lg-3">
                     <form method="GET" action="{{ route('admin.score.search') }}"
                         class="app-search ms-2">
@@ -30,7 +30,7 @@
                 </div>
             </div>
 
-            <div class="row mt-3">                   
+            <div class="row mt-3">
                 @forelse ($data as $class)
                     <div class="col-lg-3">
                         <div class="card">
@@ -77,9 +77,9 @@
                     <div class="col-12 text-center">
                         <script>
                             document.write(new Date().getFullYear())
-                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT THANH HÓA<iconify-icon
+                        </script> &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC  THANH HÓA<iconify-icon
                             icon="iconamoon:heart-duotone" class="fs-18 align-middle text-danger"></iconify-icon> <a
-                            href="#" class="fw-bold footer-text" target="_blank">NHÓM 4</a>
+                            href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
                     </div>
                 </div>
             </div>

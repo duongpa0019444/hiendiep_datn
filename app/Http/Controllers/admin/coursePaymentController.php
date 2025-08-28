@@ -168,10 +168,28 @@ class coursePaymentController extends Controller
             $oldMethod = $payment->method;
             $oldDate   = $payment->payment_date;
 
-            $payment->payment_date = $request->payment_date;
+            // Thông tin mới
+            $newStatus = $request->status;
+            $newMethod = $request->method;
+            $newDate   = $request->payment_date;
+
+            // Gán trạng thái mới
             $payment->method = $request->method;
             $payment->status = $request->status;
             $payment->note = $request->note;
+
+            // Xử lý ngày thanh toán
+            if (empty($newDate)) {
+                if ($oldStatus === 'unpaid' && $newStatus === 'paid') {
+                    $payment->payment_date = now(); // từ chưa trả sang trả thì lấy ngày hiện tại
+                } elseif ($oldStatus === 'paid' && $newStatus === 'unpaid') {
+                    $payment->payment_date = null; // từ trả rồi sang hủy trả thì bỏ ngày
+                }
+                // nếu giữ nguyên thì không đổi
+            } else {
+                $payment->payment_date = $newDate; // user chọn ngày thì luôn lấy ngày đó
+            }
+
 
             $payment->save();
 

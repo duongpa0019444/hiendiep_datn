@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\ClassTuitionFeeExport;
+use App\Exports\LaiLoStatisticsExport;
+use App\Exports\RevenueStatisticsExport;
 use App\Http\Controllers\Controller;
 use App\Models\classes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use App\Exports\SalaryStatisticsExport;
+use Exception;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ThongKeController extends Controller
 {
@@ -369,6 +375,7 @@ class ThongKeController extends Controller
         return view('admin.thongketaichinh');
     }
 
+    //Quỹ lương giáo viên theo tháng
     public function salarystatistics($year = null)
     {
         $year = $year ?? date('Y');
@@ -423,8 +430,27 @@ class ThongKeController extends Controller
 
         return response()->json(['data' => $data]);
     }
+    public function exportSalaryStatistics($year = null)
+    {
+        try {
+            $year = $year ?? date('Y');
+            return Excel::download(new SalaryStatisticsExport($year), "bao_cao_quy_luong_$year.xlsx");
+        } catch (Exception $e) {
+            // Ghi log để debug
+            Log::error('Export Salary Error: ' . $e->getMessage());
+
+            // Trả về JSON báo lỗi (cho Ajax)
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi xuất báo cáo!',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
 
 
+
+    //Tổng daonh thu học phí theo tháng
     public function revenuestatistics($year = null)
     {
         $dataDoanhThu = DB::select("
@@ -450,8 +476,25 @@ class ThongKeController extends Controller
         }
         return response()->json(['data' => $data]);
     }
+    // Xuất báo cáo doanh thu học phí theo tháng
+    public function exportRevenueStatistics($year = null)
+    {
+        try {
+            $year = $year ?? date('Y');
+            return Excel::download(
+                new RevenueStatisticsExport($year),
+                "bao_cao_doanh_thu_$year.xlsx"
+            );
+        } catch (\Exception $e) {
+            Log::error("Lỗi xuất báo cáo doanh thu: " . $e->getMessage());
+            return response()->json([
+                'error' => 'Không thể xuất báo cáo doanh thu'
+            ], 500);
+        }
+    }
 
 
+    //Tình trạng đóng học phí theo lớp
     public function classTuitionFee($year = null)
     {
         $dataHocPhiLop = DB::table('classes as c')
@@ -474,7 +517,15 @@ class ThongKeController extends Controller
             'pagination' => $dataHocPhiLop->links('pagination::bootstrap-5')->toHtml()
         ]);
     }
+    // Xuất báo cáo Excel
+    public function exportClassTuitionFee($year = null)
+    {
+        $year = $year ?? date('Y');
+        return Excel::download(new ClassTuitionFeeExport($year), "bao_cao_hoc_phi_theo_lop_$year.xlsx");
+    }
 
+
+    //So sánh Doanh thu & Chi phí lương (Lãi/Lỗ)
     public function laiLoStatistics($year = null)
     {
         $year = $year ?? date('Y');
@@ -514,5 +565,12 @@ class ThongKeController extends Controller
 
 
         return response()->json(['data' => $dataLaiLo]);
+    }
+
+     // Xuất báo cáo Excel Lãi/Lỗ
+    public function exportLaiLoStatistics($year = null)
+    {
+        $year = $year ?? date('Y');
+        return Excel::download(new LaiLoStatisticsExport($year), "bao_cao_lai_lo_$year.xlsx");
     }
 }

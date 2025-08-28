@@ -53,11 +53,14 @@
                             </div>
                             <div class="card-body">
                                 <div class="row">
+                                    <input type="hidden" name="name" value="{{ $course->name }}">
+                                    <input type="hidden" name="price" value="{{ $course->price }}">
+                                    <input type="hidden" name="total_sessions" value="{{ $course->total_sessions }}">
                                     <!-- Tên khóa học -->
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="name" class="form-label">Tên khóa học</label>
-                                            <input type="text" name="name" id="name"
+                                            <input type="text" name="name" id="name" disabled
                                                 class="form-control"value="{{ $course->name }}">
                                         </div>
                                     </div>
@@ -75,7 +78,7 @@
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <label for="total_sessions" class="form-label">Tổng số buổi học</label>
-                                            <input type="number" name="total_sessions" id="total_sessions"
+                                            <input type="number" name="total_sessions" id="total_sessions" disabled
                                                 class="form-control" value="{{ $course->total_sessions }}">
                                         </div>
                                     </div>

@@ -49,26 +49,21 @@
                                     </div>
 
                                     <!-- Chọn Bài quizz qua các option -->
-
+{{-- 
                                     <div class="col-lg-6">
                                         <div class="mb-3">
                                             <select name="quizz_id" id="quizz_id" class="form-select">
                                                 {{-- <option value=" {{ $quizz->name }}"></option> --}}
-                                                <option value="">-- Chọn bài Quiz --</option>
+                                                {{-- <option value="">-- Chọn bài Quiz --</option>
                                                 @foreach ($quizz as $quiz)
-                                                    {{-- <option value="{{ $quiz->id }}">{{ $quiz->name }}</option> --}}
                                                     <option value="{{ $quiz->id }}">{{ $quiz->title }}</option>
                                                 @endforeach
 
                                             </select>
-                                        </div>
-
-
-
-                                
+                                        </div> --}} 
                                         <!-- Buttons -->
-
-
+                                        {{-- ngày cập nhật --}}
+                                      
 
 
                                     </div>
@@ -97,7 +92,25 @@
                                 </div>
 
                             </div>
+                        </div>
+                    </div>
+                </div>
         </form>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <script>
+                            document.write(new Date().getFullYear())
+                        </script> © DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC THANH HÓA
+                        <iconify-icon icon="iconamoon:heart-duotone" class="fs-18 align-middle text-danger"></iconify-icon>
+                        <a href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 
 @endsection

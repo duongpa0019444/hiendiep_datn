@@ -154,9 +154,9 @@
                         <script>
                             document.write(new Date().getFullYear())
                         </script>
-                        &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT THANH HÓA
-                        <iconify-icon icon="iconamoon:heart-duotone" class="text-danger"></iconify-icon>
-                        <a href="#" class="fw-bold footer-text" target="_blank">NHÓM 4</a>
+                        &copy; DỰ ÁN TỐT NGHIỆP CAO ĐẲNG FPT POLYTECHNIC  THANH HÓA
+                         <iconify-icon icon="iconamoon:heart-duotone" class="text-danger"></iconify-icon>
+                        <a href="#" class="fw-bold footer-text" target="_blank">Tiger Code</a>
                     </div>
                 </div>
             </div>

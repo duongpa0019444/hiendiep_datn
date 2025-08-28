@@ -126,7 +126,11 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/statistics/finance/hoc-phi-lop/{year}', [ThongKeController::class, 'classTuitionFee'])->name('admin.statistics.finance.hoc-phi-lop');
     Route::get('/statistics/finance/lai-lo/{year}', [ThongKeController::class, 'laiLoStatistics'])->name('admin.statistics.finance.lai-lo');
     Route::get('/thong-ke-tai-chinh', [ThongKeController::class, 'studyStatistics'])->name('admin.thongke.taichinh');
-
+    //Xuất báo cáo thống kê tài chính
+    Route::get('/statistics/finance/xuat-bao-cao/tong-quy-luong/{year}', [ThongKeController::class, 'exportSalaryStatistics'])->name('admin.statistics.finance.tong-quy-luong.xuatExcel');
+    Route::get('/statistics/finance/xuat-bao-cao/doanh-thu/{year}', [ThongKeController::class, 'exportRevenueStatistics'])->name('admin.statistics.finance.tong-doanh-thu.xuatExcel');
+    Route::get('/statistics/finance/xuat-bao-cao/hoc-phi-lop/{year}', [ThongKeController::class, 'exportClassTuitionFee'])->name('admin.statistics.finance.hoc-phi-lop.xuatExcel');
+    Route::get('/statistics/finance/xuat-bao-cao/lai-lo/{year}', [ThongKeController::class, 'exportLaiLoStatistics'])->name('admin.statistics.finance.lai-lo.xuatExcel');
 
     // Trang quản lý tài khoản
     Route::get('/account', [AccountController::class, 'account'])->name('admin.account');
