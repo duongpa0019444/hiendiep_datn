@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\classes;
 use App\Models\classStudent;
 use App\Models\coursePayment;
+use App\Models\User as ModelsUser;
+use Database\Seeders\user;
 // use App\Models\coursePayment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -23,6 +26,7 @@ class ClassController extends Controller
             'classes.created_at as start_date',
             'courses.name as course_name',
             'courses.description as course_description',
+            'classes.number_of_sessions',
             DB::raw("(SELECT COUNT(*) FROM class_student
             WHERE class_student.class_id = classes.id AND class_student.deleted_at IS NULL) AS so_hoc_sinh"),
         )
@@ -91,6 +95,21 @@ class ClassController extends Controller
         // Không cho phép đổi trạng thái nếu đã completed
         $class->save();
 
+        $this->logAction(
+            'update',
+            classes::class,
+            $class->id,
+            Auth::user()->name . ' đã đổi trạng thái lớp học ' . $class->name . ' thành: ' .
+                ($class->status == 'not_started'
+                    ? 'Chưa bắt đầu học'
+                    : ($class->status == 'in_progress'
+                        ? 'Đang học'
+                        : 'Đã hoàn thành'
+                    )
+                )
+        );
+
+
         return redirect()->back()->with('success', 'Trạng thái đã được cập nhật');
     }
 
@@ -110,6 +129,13 @@ class ClassController extends Controller
         // $class->number_of_sessions = $request->number_of_sessions;
         $class->status = $request->status;
         $class->save();
+
+        $this->logAction(
+            'create',
+            classes::class,
+            $class->id,
+            Auth::user()->name . ' đã tạo lớp học: ' . $class->name
+        );
 
         return redirect()->route('admin.classes.index')->with('success', 'Lớp học đã được tạo thành công');
     }
@@ -158,6 +184,13 @@ class ClassController extends Controller
             $class->status = $request->status;
             $class->save();
 
+            $this->logAction(
+                'update',
+                classes::class,
+                $class->id,
+                Auth::user()->name . ' đã cập nhật lớp học: ' . $class->name
+            );
+
             return redirect()->route('admin.classes.index')->with('success', 'Lớp học đã được cập nhật thành công');
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Lỗi validate sẽ được xử lý tự động, nhưng bạn có thể tùy chỉnh thông báo
@@ -184,22 +217,32 @@ class ClassController extends Controller
         }
 
         // Kiểm tra còn lịch học của lớp không
-    $scheduleCount = DB::table('schedules')
-        ->where('class_id', $id)
-        ->count();
+        $scheduleCount = DB::table('schedules')
+            ->where('class_id', $id)
+            ->count();
 
-    if ($scheduleCount > 0) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Không thể xóa lớp vì vẫn còn lịch học.'
-        ], 400);
-    }
+        if ($scheduleCount > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể xóa lớp vì vẫn còn lịch học.'
+            ], 400);
+        }
 
         $class = classes::findOrFail($id);
+
+        $this->logAction(
+            'delete',
+            classes::class,
+            $class->id,
+            Auth::user()->name . ' đã xóa lớp học: ' . $class->name
+        );
         $class->delete();
 
-        // Xóa mềm các bản ghi học phí liên quan
-        coursePayment::where('class_id', $id)->get()->each->delete();
+        // Xóa mềm các bản ghi học phí liên quan nếu như học sinh chưa thanh toán
+        CoursePayment::where('class_id', $id)
+            ->where('status', 'unpaid')
+            ->delete();
+
 
         // return redirect()->route('admin.classes.index')->with('success', 'Lớp học đã được xóa thành công');
         return response()->json([
@@ -218,16 +261,17 @@ class ClassController extends Controller
             ->where('class_id', $id)
             ->restore();
 
-
+        $this->logAction(
+            'update',
+            classes::class,
+            $class->id,
+            Auth::user()->name . ' đã khôi phục lớp học: ' . $class->name
+        );
         return redirect()->route('admin.classes.index')->with('success', 'Lớp học đã được khôi phục thành công');
     }
 
     public function forceDelete($id)
     {
-        // Xóa cứng các khoản thanh toán liên quan trước
-        coursePayment::withTrashed()
-            ->where('class_id', $id)
-            ->forceDelete();
 
         $class = classes::withTrashed()->findOrFail($id);
         $class->forceDelete();
@@ -382,11 +426,29 @@ class ClassController extends Controller
             'updated_at' => now(),
         ]);
 
+        $student = ModelsUser::find($studentId);
+
+        $this->logAction(
+            'create',
+            classes::class,
+            null, // Không có ID cụ thể vì bản ghi mới
+            Auth::user()->name . ' đã thêm học sinh ' . $student->name . ' vào lớp: ' . $classes->name
+        );
         return redirect()->back()->with('success', 'Học sinh đã được thêm vào lớp thành công.');
     }
 
     public function removeStudent($classId, $studentId)
     {
+        // Kiểm tra nếu học sinh đã thanh toán thì không cho xóa
+        $course_payment = CoursePayment::where('student_id', $studentId)
+            ->where('status', 'paid')
+            ->exists();
+
+        if ($course_payment) {
+            // Đã thanh toán → không cho xóa
+            return back()->with('error', 'Học sinh này đã thanh toán, không thể xóa!');
+        }
+
         // Xóa mềm học sinh khỏi lớp
         classStudent::where('class_id', $classId)
             ->where('student_id', $studentId)
@@ -407,6 +469,13 @@ class ClassController extends Controller
             $course_payment->delete();
         }
 
+        $student = ModelsUser::find($studentId);
+        $this->logAction(
+            'delete',
+            classes::class,
+            null, // Không có ID cụ thể vì sử dụng where
+            Auth::user()->name . ' đã xóa học sinh: ' . $student->name . ' khỏi lớp: ' . $classes->name
+        );
         return redirect()->back()->with('success', 'Học sinh đã được xóa khỏi lớp thành công.');
     }
 
@@ -420,6 +489,8 @@ class ClassController extends Controller
             ->where('class_id', $classId)
             ->where('student_id', $studentId)
             ->first();
+
+        $class = classes::find($classId);
 
         // Kiểm tra xem bản ghi có tồn tại và đã bị xóa mềm hay không
         if (!$classStudent || !$classStudent->trashed()) {
@@ -468,6 +539,14 @@ class ClassController extends Controller
 
         $course_payment->restore();
 
+        $student = ModelsUser::find($studentId);
+
+        $this->logAction(
+            'update',
+            classes::class,
+            $classStudent->id,
+            Auth::user()->name . ' đã khôi phục học sinh ' . $student->name . ' trong lớp: ' . $class->name
+        );
         return redirect()->back()->with('success', 'Đã khôi phục học viên vào lớp.');
     }
 
@@ -487,6 +566,15 @@ class ClassController extends Controller
             return redirect()->back()->with('error', 'Không tìm thấy học viên đã bị xóa.');
         }
 
+        $student = ModelsUser::find($studentId);
+        $class = classes::find($classId);
+        $this->logAction(
+            'delete',
+            classes::class,
+            null,
+            Auth::user()->name . ' đã xóa vĩnh viễn học sinh ' . $student->name . ' khỏi lớp: ' . $class->name
+        );
+
         // Xóa vĩnh viễn bản ghi
         $classStudent->forceDelete();
 
@@ -503,6 +591,7 @@ class ClassController extends Controller
         if ($course_payment) {
             $course_payment->forceDelete();
         }
+
 
         return redirect()->back()->with('success', 'Đã xóa vĩnh viễn học viên khỏi lớp.');
     }

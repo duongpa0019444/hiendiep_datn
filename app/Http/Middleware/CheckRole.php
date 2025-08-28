@@ -141,13 +141,19 @@ class CheckRole
                     'admin.scores.import',
 
                     // lịch học
-                    'admin.schedules.add-student',
-                    'admin.schedules.create',
-                    'admin.schedules.edit',
+                    // Quản lý lịch học
                     'admin.schedules.index',
+                    'admin.schedules.create',
                     'admin.schedules.store',
-                    'admin.schedules.students',
+                    'admin.schedules.store-single',
+                    'admin.schedules.edit',
                     'admin.schedules.update',
+                    'admin.schedules.destroy',
+                    'admin.schedules.restore',
+                    'admin.schedules.students',
+                    'admin.schedules.add-student',
+                    'admin.schedules.remove-student',
+                    'admin.classes.show',
 
                     // chủ đề
                     'admin.topics.create',

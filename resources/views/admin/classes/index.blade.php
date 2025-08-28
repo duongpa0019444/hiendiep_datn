@@ -171,7 +171,7 @@
                                             <th scope="col" width="80">#</th>
                                             <th scope="col">Tên lớp</th>
                                             <th scope="col">Tên khóa học</th>
-                                            <th scope="col">Số buổi học</th>
+                                            <th scope="col">Số buổi đã học</th>
                                             <th scope="col" width="120">Trạng thái</th>
                                             <th scope="col" width="150">Số học sinh</th>
                                             <th scope="col" width="120">Ngày tạo</th>
@@ -208,21 +208,21 @@
                                                 <td>
                                                     <div class="d-flex align-items-center">
                                                         <i class="fas fa-calendar-alt text-muted me-2"></i>
-                                                        <span>{{ $class->sessions_count ?? ($class->so_buoi_hoc ?? 0) }}</span>
+                                                        <span>{{ $class->number_of_sessions ?? 0 }}</span>
                                                     </div>
                                                 </td>
                                                 <td data-status="{{ $class->status }}">
                                                     @switch($class->status)
                                                         @case('in_progress')
-                                                            <span class="badge bg-success">Hoạt động</span>
+                                                            <span class="badge bg-soft-success text-success">Đang hoạt động</span>
                                                         @break
 
                                                         @case('not_started')
-                                                            <span class="badge bg-warning">Chưa bắt đầu</span>
+                                                            <span class="badge bg-soft-warning text-warning">Chưa bắt đầu</span>
                                                         @break
 
                                                         @case('completed')
-                                                            <span class="badge bg-info">Hoàn thành</span>
+                                                            <span class="badge bg-soft-info text-info">Đã hoàn thành</span>
                                                         @break
 
                                                         @default
@@ -292,7 +292,7 @@
                                                                         @method('PATCH')
                                                                         <button type="submit"
                                                                             class="dropdown-item text-success">
-                                                                            <i class="fas fa-play me-2"></i>Kích hoạt
+                                                                            <i class="fas fa-play me-2"></i> Hoạt động
                                                                         </button>
                                                                     </form>
                                                                 </li>

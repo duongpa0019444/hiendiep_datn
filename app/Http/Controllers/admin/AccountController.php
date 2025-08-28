@@ -317,7 +317,7 @@ class AccountController extends Controller
             // Lưu path vào DB
             $validated['avatar'] = 'uploads/avatar/' . $filename;
         }
-        // mã tăng tự động 01 -> 00, theo định dạng 
+        // mã tăng tự động 01 -> 00, theo định dạng
         $validated['snake_case'] = User::nextSequentialCode($request->role);
 
         // Mã hóa mật khẩu
@@ -396,7 +396,7 @@ class AccountController extends Controller
             // Lưu path vào DB
             $validated['avatar'] = 'uploads/avatar/' . $filename;
         }
-        // mã tăng tự động 01 -> 00, theo định dạng 
+        // mã tăng tự động 01 -> 00, theo định dạng
         $validated['snake_case'] = User::nextSequentialCode($role);
 
         // Mã hóa mật khẩu
@@ -509,6 +509,14 @@ class AccountController extends Controller
                 if ($classStudentCount > 0) {
                     return redirect()->route('admin.account.list', ['role' => $role])
                         ->with('error', 'Không thể xóa người dùng vì có liên kết với lớp học');
+                }
+                $quizResultCount = DB::table('quiz_attempts')
+                    ->where('user_id', $id)
+                    ->count();
+
+                if ($quizResultCount > 0) {
+                    return redirect()->route('admin.account.list', ['role' => $role])
+                        ->with('error', 'Không thể xóa người dùng vì đã có kết quả làm bài Quiz');
                 }
             } elseif ($userId->role == 'teacher') {
                 $scheduleCount = DB::table('schedules')->where('teacher_id', $id)->count();
