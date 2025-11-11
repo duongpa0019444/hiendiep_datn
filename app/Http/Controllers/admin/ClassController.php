@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\classes;
 use App\Models\classStudent;
 use App\Models\coursePayment;
-use App\Models\User as ModelsUser;
+use App\Models\user as ModelsUser;
 use Database\Seeders\user;
 // use App\Models\coursePayment;
 use Illuminate\Http\Request;

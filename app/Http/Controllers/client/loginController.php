@@ -4,7 +4,7 @@ namespace App\Http\Controllers\client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Role;
-use App\Models\User;
+use App\Models\user as User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -204,7 +204,7 @@ class loginController extends Controller
         }
 
         // Cập nhật mật khẩu
-        $user = \App\Models\User::where('email', $email)->first();
+        $user = \App\Models\user::where('email', $email)->first();
         if (!$user) {
             return back()->withErrors(['token' => 'Người dùng không tồn tại.']);
         }

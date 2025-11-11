@@ -7,7 +7,7 @@ use App\Models\ClassStudent;
 use App\Models\Classes;
 use App\Models\courses;
 use App\Models\Score;
-use App\Models\User;
+use App\Models\user as User;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Facades\Log;

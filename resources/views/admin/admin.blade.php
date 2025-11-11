@@ -205,7 +205,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="flex-grow-1 pe-4">
-                                                    <a href="{{ route('admin.noti.detail', $notification->id) }}" class="mb-1 fw-semibold fs-6">
+                                                    <a href="{{ route('admin.noti.detail', $notification->id) }}"
+                                                        class="mb-1 fw-semibold fs-6">
                                                         {{ $notification->notification->title }}
 
                                                     </a>
@@ -693,6 +694,32 @@
                                 </ul>
                             </div>
                         </li>
+
+
+
+
+
+                        <li class="menu-title mt-2">Quản lý Chatbot</li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.bot.training.index') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:robot-outline"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Huấn luyện Bot </span>
+                            </a>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.bot.suggested_questions.index') }}">
+                                <span class="nav-icon">
+                                    <iconify-icon icon="mdi:lightbulb-question-outline"></iconify-icon>
+                                </span>
+                                <span class="nav-text"> Câu hỏi gợi ý </span>
+                            </a>
+                        </li>
+
 
                         <li class="nav-item mt-3">
                             <a class="nav-link" href="{{ route('home') }}">

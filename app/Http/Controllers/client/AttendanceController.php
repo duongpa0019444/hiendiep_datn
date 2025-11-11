@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\client;
 
 use App\Http\Controllers\Controller;
-use App\Models\Attendance;
+use App\Models\attendance as Attendance;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Carbon\Carbon;

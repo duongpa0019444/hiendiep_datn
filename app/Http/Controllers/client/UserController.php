@@ -15,7 +15,7 @@ use App\Models\Quizzes;
 use App\Models\notification;
 use App\Models\Schedule;
 use App\Models\score;
-use App\Models\User as ModelsUser;
+use App\Models\user as ModelsUser;
 use Database\Seeders\user;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;

@@ -25,14 +25,14 @@
                         <td>{{ $schedule->course_name }}</td>
                         <td>{{ $schedule->class_name }}</td>
                         <td>
-                            <a href="{{ route('admin.attendance.class', ['id' => $schedule->schedule_id]) }}">
-                                <button class="btn btn-success btn-sm attendance-btn shadow-sm" 
+                            <a href="{{ route('client.attendance.class', ['id' => $schedule->schedule_id]) }}">
+                                <button class="btn btn-success btn-sm attendance-btn shadow-sm"
                                         data-schedule-id="{{ $schedule->schedule_id }}"
                                         onclick="markAttendance({{ $schedule->schedule_id }})">
                                     <i class="icofont-check-circled" style="margin-right: 0.25rem;"></i>Điểm danh
                                 </button>
                             </a>
-                            
+
                         </td>
                     </tr>
                 @endforeach

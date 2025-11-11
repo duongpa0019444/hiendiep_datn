@@ -4,7 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\classes;
-use App\Models\NotificationUser;
+use App\Models\notificationUser;
 use App\Models\orders;
 use Illuminate\Http\Request;
 use Illuminate\Http\Request as HttpRequest;

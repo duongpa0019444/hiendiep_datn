@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class user extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -47,7 +47,7 @@ class User extends Authenticatable
 
         $prefix = $prefixes[$role] ?? 'US';
  // tìm mã cuối cùng theo prefix (vd HS05) kể cả trong thùng rác
-        $latest = User::withTrashed() 
+        $latest = User::withTrashed()
             ->where('snake_case', 'like', $prefix . '%')
             ->orderBy('snake_case', 'desc')
             ->value('snake_case');

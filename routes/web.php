@@ -8,6 +8,10 @@ use App\Exports\TkDaoTaoExport5;
 use App\Http\Controllers\admin\AccountController;
 use App\Http\Controllers\admin\ActionLogController;
 use App\Http\Controllers\admin\AttendanceController;
+use App\Http\Controllers\Admin\Bot\BotDataController;
+use App\Http\Controllers\admin\Bot\BotDocumentController;
+use App\Http\Controllers\admin\Bot\SuggestedQuestionController;
+use App\Http\Controllers\admin\Bot\TrainingController;
 use App\Http\Controllers\admin\ClassController;
 use App\Http\Controllers\client\HomeController;
 use App\Http\Controllers\admin\dashboardController;
@@ -30,7 +34,7 @@ use App\Http\Controllers\client\CourseController as ClientCourseController;
 use App\Http\Controllers\client\AttendanceController as ClientAttendanceController;
 use App\Http\Controllers\client\newsController as ClientNewsController;
 use App\Http\Controllers\courseController;
-use App\Http\Controllers\Admin\ThongKeController;
+use App\Http\Controllers\admin\StatisticsController;
 use App\Http\Controllers\admin\ClassroomController;
 
 
@@ -46,7 +50,7 @@ use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\admin\StaffRulesController;
 use App\Http\Controllers\admin\StaffSalaryController;
-
+use App\Http\Controllers\ChatbotController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/course', [ClientCourseController::class, 'index'])->name('client.course');
@@ -84,6 +88,9 @@ Route::get('/news', [ClientNewsController::class, 'index'])->name('client.news')
 Route::get('/news/{id}/detail/{slug}', [ClientNewsController::class, 'newsDetail'])->name('client.news.detail');
 Route::get('/news/category/{id}/{slug}', [ClientNewsController::class, 'newsCategory'])->name('client.news.category');
 
+//Chat bot
+Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage']);
+
 
 // Route dành cho admin và nhân viên --
 Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(function () {
@@ -96,12 +103,12 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('dashboard/chart/revenue/{year}', [DashboardController::class, 'chartRevenue'])->name('admin.chartRevenue');
     Route::get('dashboard/chart/revenueCourse/{year}', [DashboardController::class, 'chartRevenueCourse'])->name('admin.revenueCourse');
     // Quản lý thống kê đào tạo
-    Route::get('/thong-ke-dao-tao', [ThongKeController::class, 'index'])->name('admin.thongke.daotao');
-    Route::get('/thong-ke-hs-dk/{year}', [ThongKeController::class, 'registerStudent'])->name('admin.thongke.hocinhdangky');
-    Route::get('/thong-ke-buoi-day/{year}', [ThongKeController::class, 'thongkebuoiday'])->name('admin.thongke.buoiday');
-    Route::get('/thong-ke-trang-thai-lop/{year}', [ThongKeController::class, 'statusClasses'])->name('admin.thongke.statusClasses');
-    Route::get('/sl-hs-theo-lop/{year}', [ThongKeController::class, 'classStudentCounts'])->name('admin.thongke.classStudentCounts');
-    Route::get('/diem-tb-theo-lop/{year}', [ThongKeController::class, 'classAverageScores'])->name('admin.thongke.classAverageScores');
+    Route::get('/thong-ke-dao-tao', [StatisticsController::class, 'index'])->name('admin.thongke.daotao');
+    Route::get('/thong-ke-hs-dk/{year}', [StatisticsController::class, 'registerStudent'])->name('admin.thongke.hocinhdangky');
+    Route::get('/thong-ke-buoi-day/{year}', [StatisticsController::class, 'thongkebuoiday'])->name('admin.thongke.buoiday');
+    Route::get('/thong-ke-trang-thai-lop/{year}', [StatisticsController::class, 'statusClasses'])->name('admin.thongke.statusClasses');
+    Route::get('/sl-hs-theo-lop/{year}', [StatisticsController::class, 'classStudentCounts'])->name('admin.thongke.classStudentCounts');
+    Route::get('/diem-tb-theo-lop/{year}', [StatisticsController::class, 'classAverageScores'])->name('admin.thongke.classAverageScores');
     // Xuất báo cáo học sinh đk theo khóa theo tháng
     Route::get('/xuat-bao-cao/hoc-sinh-dang-ky/{year}', function ($year) {
         return Excel::download(new TkDaoTaoExport1($year), "bao_cao_hoc_sinh_dang_ky_$year.xlsx");
@@ -121,16 +128,16 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     });
 
     //Thống kê tài chính
-    Route::get('/statistics/finance/tong-quy-luong/{year}', [ThongKeController::class, 'salarystatistics'])->name('admin.statistics.finance.tong-quy-luong');
-    Route::get('/statistics/finance/tong-doanh-thu/{year}', [ThongKeController::class, 'revenuestatistics'])->name('admin.statistics.finance.tong-doanh-thu');
-    Route::get('/statistics/finance/hoc-phi-lop/{year}', [ThongKeController::class, 'classTuitionFee'])->name('admin.statistics.finance.hoc-phi-lop');
-    Route::get('/statistics/finance/lai-lo/{year}', [ThongKeController::class, 'laiLoStatistics'])->name('admin.statistics.finance.lai-lo');
-    Route::get('/thong-ke-tai-chinh', [ThongKeController::class, 'studyStatistics'])->name('admin.thongke.taichinh');
+    Route::get('/statistics/finance/tong-quy-luong/{year}', [StatisticsController::class, 'salarystatistics'])->name('admin.statistics.finance.tong-quy-luong');
+    Route::get('/statistics/finance/tong-doanh-thu/{year}', [StatisticsController::class, 'revenuestatistics'])->name('admin.statistics.finance.tong-doanh-thu');
+    Route::get('/statistics/finance/hoc-phi-lop/{year}', [StatisticsController::class, 'classTuitionFee'])->name('admin.statistics.finance.hoc-phi-lop');
+    Route::get('/statistics/finance/lai-lo/{year}', [StatisticsController::class, 'laiLoStatistics'])->name('admin.statistics.finance.lai-lo');
+    Route::get('/thong-ke-tai-chinh', [StatisticsController::class, 'studyStatistics'])->name('admin.thongke.taichinh');
     //Xuất báo cáo thống kê tài chính
-    Route::get('/statistics/finance/xuat-bao-cao/tong-quy-luong/{year}', [ThongKeController::class, 'exportSalaryStatistics'])->name('admin.statistics.finance.tong-quy-luong.xuatExcel');
-    Route::get('/statistics/finance/xuat-bao-cao/doanh-thu/{year}', [ThongKeController::class, 'exportRevenueStatistics'])->name('admin.statistics.finance.tong-doanh-thu.xuatExcel');
-    Route::get('/statistics/finance/xuat-bao-cao/hoc-phi-lop/{year}', [ThongKeController::class, 'exportClassTuitionFee'])->name('admin.statistics.finance.hoc-phi-lop.xuatExcel');
-    Route::get('/statistics/finance/xuat-bao-cao/lai-lo/{year}', [ThongKeController::class, 'exportLaiLoStatistics'])->name('admin.statistics.finance.lai-lo.xuatExcel');
+    Route::get('/statistics/finance/xuat-bao-cao/tong-quy-luong/{year}', [StatisticsController::class, 'exportSalaryStatistics'])->name('admin.statistics.finance.tong-quy-luong.xuatExcel');
+    Route::get('/statistics/finance/xuat-bao-cao/doanh-thu/{year}', [StatisticsController::class, 'exportRevenueStatistics'])->name('admin.statistics.finance.tong-doanh-thu.xuatExcel');
+    Route::get('/statistics/finance/xuat-bao-cao/hoc-phi-lop/{year}', [StatisticsController::class, 'exportClassTuitionFee'])->name('admin.statistics.finance.hoc-phi-lop.xuatExcel');
+    Route::get('/statistics/finance/xuat-bao-cao/lai-lo/{year}', [StatisticsController::class, 'exportLaiLoStatistics'])->name('admin.statistics.finance.lai-lo.xuatExcel');
 
     // Trang quản lý tài khoản
     Route::get('/account', [AccountController::class, 'account'])->name('admin.account');
@@ -480,8 +487,38 @@ Route::middleware([CheckRole::class . ':admin,staff'])->prefix('admin')->group(f
     Route::get('/actions/log', [ActionLogController::class, 'index'])->name('admin.actions.log');
     Route::get('/actions/log/filter', [ActionLogController::class, 'filter'])->name('admin.actions.log.filter');
     Route::post('/actions/log/delete', [ActionLogController::class, 'delete'])->name('admin.actions.log.delete');
-    Route::post('/actions/log/delete/{id}', [ActionLogController::class, 'delete'])->name('admin.actions.log.delete');
+    Route::delete('/actions/log/delete/{id}', [ActionLogController::class, 'delete'])->name('admin.actions.log.delete');
     Route::get('/actions/log/view/{id}', [ActionLogController::class, 'viewLog'])->name('admin.actions.log.view');
+
+
+
+
+
+
+    // Quản lý huấn luyện Bot
+    Route::prefix('bot/training')->group(function () {
+        Route::get('/', [TrainingController::class, 'index'])->name('admin.bot.training.index');   // danh sách sets + Q&A
+        Route::post('/store-set', [TrainingController::class, 'storeSet'])->name('admin.bot.training.storeSet'); // thêm tập huấn luyện
+        Route::put('/update-set/{id}', [TrainingController::class, 'updateSet'])->name('admin.bot.training.updateSet'); // sửa tập huấn luyện
+        Route::delete('/delete-set/{id}', [TrainingController::class, 'deleteSet'])->name('admin.bot.training.deleteSet'); // xóa tập
+
+        Route::get('/detail/{id}', [TrainingController::class, 'detail'])->name('admin.bot.training.detail');   // danh sách sets + Q&A
+
+
+        Route::post('/store-data/{setId}', [TrainingController::class, 'storeData'])->name('admin.bot.training.storeData'); // thêm Q&A
+        Route::put('/update-data/{id}', [TrainingController::class, 'updateData'])->name('admin.bot.training.updateData'); // sửa Q&A
+        Route::delete('/delete-data/{id}', [TrainingController::class, 'destroyData'])->name('admin.bot.training.destroyData'); // xóa Q&A
+
+        Route::get('/filter', [TrainingController::class, 'filter'])->name('admin.bot.training.filter');   // danh sách sets + Q&A
+        Route::get('/detail/{id}/filter', [BotDataController::class, 'filter'])->name('admin.bot.training.detail.filter');   // danh sách sets + Q&A
+        Route::get('/document/detail/{id}/filter', [BotDocumentController::class, 'filter'])->name('admin.bot.training.detail.document.filter');   // danh sách sets + Q&A
+
+        Route::post('/upload-document', [BotDocumentController::class, 'store'])->name('admin.bot.training.storeDocument');
+    });
+
+
+    // Quản lý câu hỏi gợi ý
+    Route::resource('bot/suggested-questions', SuggestedQuestionController::class)->names('admin.bot.suggested_questions');
 });
 
 

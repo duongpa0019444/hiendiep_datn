@@ -20,12 +20,12 @@ class Classroom extends Model
 
     public function schedules()
     {
-        return $this->hasMany(Schedule::class, 'room');
+        return $this->hasMany(schedule::class, 'room');
     }
 
     // Quan hệ gián tiếp tới classes qua schedules
     public function classes()
     {
-        return $this->hasManyThrough(classes::class, Schedule::class, 'room', 'id', 'id', 'class_id');
+        return $this->hasManyThrough(classes::class, schedule::class, 'room', 'id', 'id', 'class_id');
     }
 }

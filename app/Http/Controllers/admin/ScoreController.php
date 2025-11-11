@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\classes;
 use App\Models\classStudent;
 use App\Models\score;
-use App\Models\User;
+use App\Models\user as User;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;

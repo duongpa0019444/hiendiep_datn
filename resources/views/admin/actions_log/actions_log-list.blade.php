@@ -32,7 +32,7 @@
                                     <hr class="my-2 text-muted">
 
                                     {{-- Học tập --}}
-                                    <a class="nav-link py-1" data-model-type="App\Models\User" href="#">
+                                    <a class="nav-link py-1" data-model-type="App\Models\user as User" href="#">
                                         <span class="d-flex align-items-center">
                                             <i class="fas fa-users fs-16 me-2 align-middle"></i> Người dùng
                                         </span>

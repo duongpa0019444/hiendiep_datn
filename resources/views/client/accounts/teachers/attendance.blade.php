@@ -108,7 +108,7 @@
                                 data-name="{{ strtolower($student->name) }}"
                                 data-gender="{{ strtolower($student->gender == 'female' ? 'nữ' : 'nam') }}">
                                 <div class="student-avatar">
-                                    <img src="{{ $student->avatar ? asset('storage/' . $student->avatar) : asset('images/default-avatar.png') }}"
+                                    <img src="{{ $student->avatar ? asset('storage/' . $student->avatar) : asset('icons/user-solid.svg') }}"
                                         alt="{{ $student->name }}" class="img-fluid rounded-circle">
                                     @php
                                         $status = $attendance[$student->id]['status'] ?? 'undone';
@@ -269,7 +269,7 @@
                     keyboard: false
                 });
             }
-            
+
             // Đồng bộ giao diện với attendanceData
             attendanceData.forEach(item => {
                 updateStudentStatus(item.student_id, item.status);

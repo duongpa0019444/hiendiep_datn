@@ -14,7 +14,7 @@ use App\Models\Quizzes as ModelsQuizzes;
 use App\Models\sentenceAnswers;
 use App\Models\sentenceQuestions;
 use App\Models\studentAnswers;
-use App\Models\User;
+use App\Models\user as User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

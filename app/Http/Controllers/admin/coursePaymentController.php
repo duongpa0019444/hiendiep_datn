@@ -15,7 +15,7 @@ use App\Exports\CoursePaymentsExport;
 use App\Models\notification;
 use App\Models\notificationCoursePayments;
 use App\Models\NotificationUser;
-use App\Models\User;
+use App\Models\user as User;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 

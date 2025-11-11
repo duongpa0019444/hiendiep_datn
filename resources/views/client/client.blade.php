@@ -906,7 +906,7 @@
         </div>
     </div>
 
-
+    @include('client.chatbot')
     {{-- Thông báo --}}
     <!-- Popup container -->
     <div id="customAlert" class="custom-alert-backdrop" role="alert" aria-modal="true" aria-hidden="true">
@@ -966,6 +966,9 @@
 
     <!-- Main JS -->
     <script src="{{ asset('client/plugins/js/active.js') }}"></script>
+
+    {{-- Chatbot --}}
+    <script src="{{ asset('client/plugins/js/chatbot.js') }}"></script>
 
     @stack('script')
     <script>

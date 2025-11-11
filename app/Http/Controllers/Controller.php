@@ -2,28 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\answers;
-use App\Models\Attendance;
-use App\Models\classes;
-use App\Models\classStudent;
-use App\Models\contact;
-use App\Models\coursePayment;
-use App\Models\courses;
-use App\Models\lessons;
-use App\Models\news;
-use App\Models\notification;
-use App\Models\notificationCoursePayments;
-use App\Models\NotificationUser;
-use App\Models\questions;
-use App\Models\quizAttempts;
-use App\Models\Quizzes;
-use App\Models\Schedule;
-use App\Models\score;
-use App\Models\sentenceAnswers;
-use App\Models\teacher_salaries;
-use App\Models\teacher_salary_rules;
-use App\Models\topics;
-use Database\Seeders\user;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
@@ -84,7 +62,7 @@ abstract class Controller
         // App\Models\teacher_salaries
         // App\Models\teacher_salary_rules
         // App\Models\topics
-        // App\Models\user
+        // App\Models\user as User
 
     }
 }

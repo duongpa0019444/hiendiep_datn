@@ -15,7 +15,7 @@ use Exception;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
-class ThongKeController extends Controller
+class StatisticsController extends Controller
 {
     public function index()
     {

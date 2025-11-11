@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\User as ModelsUser;
+use App\Models\user as ModelsUser;
 use Illuminate\Database\Eloquent\Model;
 
 class notificationCoursePayments extends Model

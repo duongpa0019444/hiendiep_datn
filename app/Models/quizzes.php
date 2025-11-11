@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\classes;
 use App\Models\courses;
-use App\Models\User;
+use App\Models\user as User;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Quizzes extends Model

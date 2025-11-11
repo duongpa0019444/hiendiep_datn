@@ -12,7 +12,7 @@ use App\Models\Quizzes;
 use App\Models\sentenceAnswers;
 use App\Models\sentenceQuestions;
 use App\Models\studentAnswers;
-use App\Models\User;
+use App\Models\user as User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;

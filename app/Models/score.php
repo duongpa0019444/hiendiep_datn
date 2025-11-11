@@ -20,7 +20,7 @@ class score extends Model
     // Quan hệ với lớp học (courses)
     public function student()
     {
-        return $this->belongsTo(User::class, 'student_id', 'id');
+        return $this->belongsTo(user::class, 'student_id', 'id');
     }
 
 

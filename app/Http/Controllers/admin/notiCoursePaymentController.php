@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\NotificationUser;
+use App\Models\notificationUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,7 +13,7 @@ class notiCoursePaymentController extends Controller
     public function index(Request $request)
     {
         $id = Auth::user()->id;
-        $notifications = NotificationUser::with('notification')
+        $notifications = notificationUser::with('notification')
             ->where('user_id', $id)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -44,7 +44,7 @@ class notiCoursePaymentController extends Controller
 
     private function getFilteredNotifications(Request $request)
     {
-        $query = NotificationUser::query()
+        $query = notificationUser::query()
             ->with(['notification', 'user'])
             ->orderByDesc('created_at');
 
@@ -73,7 +73,7 @@ class notiCoursePaymentController extends Controller
     public function updateNotiSeen($id)
     {
         // Lấy thông báo cho user hiện tại
-        $notificationUser = NotificationUser::find($id);
+        $notificationUser = notificationUser::find($id);
 
         if (!$notificationUser) {
             return response()->json([
@@ -89,7 +89,7 @@ class notiCoursePaymentController extends Controller
 
         $notificationUser->status = 'seen';
         $notificationUser->save();
-        $notificationUserItem = NotificationUser::with('notification')->find($id);
+        $notificationUserItem = notificationUser::with('notification')->find($id);
 
         return response()->json([
             'notificationUser' => $notificationUserItem,
@@ -99,7 +99,7 @@ class notiCoursePaymentController extends Controller
 
     public function detail($id)
     {
-        $notificationUser = NotificationUser::with([
+        $notificationUser = notificationUser::with([
             'notification.coursePayment.user',
             'notification.coursePayment.course',
         ])->findOrFail($id);
@@ -122,9 +122,9 @@ class notiCoursePaymentController extends Controller
     public function updateSeenMultiple(Request $request)
     {
         $ids = $request->input('ids', []);
-        $updated = NotificationUser::whereIn('id', $ids)->where('user_id', Auth::user()->id)->update(['status' => 'seen']);
+        $updated = notificationUser::whereIn('id', $ids)->where('user_id', Auth::user()->id)->update(['status' => 'seen']);
         if ($updated) {
-            $notifications = NotificationUser::with('notification')->whereIn('id', $ids)->get();
+            $notifications = notificationUser::with('notification')->whereIn('id', $ids)->get();
             return response()->json(['success' => true, 'notifications' => $notifications]);
         }
         return response()->json(['success' => false, 'error' => 'Không thể cập nhật trạng thái!']);
@@ -133,7 +133,7 @@ class notiCoursePaymentController extends Controller
     public function deleteMultiple(Request $request)
     {
         $ids = $request->input('ids', []);
-        $deleted = NotificationUser::whereIn('id', $ids)->where('user_id', Auth::user()->id)->delete();
+        $deleted = notificationUser::whereIn('id', $ids)->where('user_id', Auth::user()->id)->delete();
         if ($deleted) {
             return response()->json(['success' => true]);
         }
